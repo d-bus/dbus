@@ -458,6 +458,8 @@ in_data = \
 	data/valid-config-files/multi-user.conf.in \
 	data/valid-config-files/pending-fd-timeout.conf.in \
 	data/valid-config-files/systemd-activation.conf.in \
+	data/valid-config-files/tmp-session.conf.in \
+	data/valid-config-files-system/tmp-session-like-system.conf.in \
 	data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoExec.service.in \
 	data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoService.service.in \
 	data/invalid-service-files-system/org.freedesktop.DBus.TestSuiteNoUser.service.in \
@@ -476,7 +478,6 @@ in_data = \
 EXTRA_DIST += $(in_data)
 
 static_data = \
-	name-test/tmp-session-like-system.conf \
 	data/auth/anonymous-client-successful.auth-script \
 	data/auth/anonymous-server-successful.auth-script \
 	data/auth/cancel.auth-script \
@@ -579,6 +580,8 @@ uninstalled-config-local:
 	for F in $(in_data); do \
 		$(MKDIR_P) "$${F%/*}"; \
 		sed \
+			-e 's,[@]DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL[@],$(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL),' \
+			-e 's,[@]DBUS_SESSION_BUS_LISTEN_ADDRESS[@],$(DBUS_SESSION_BUS_LISTEN_ADDRESS),' \
 			-e 's,[@]DBUS_TEST_DATA[@],@abs_builddir@/data,' \
 			-e 's,[@]DBUS_TEST_EXEC[@],@abs_builddir@,' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \
@@ -594,6 +597,8 @@ if DBUS_ENABLE_INSTALLED_TESTS
 	for F in $(in_data); do \
 		$(MKDIR_P) "installable/$${F%/*}"; \
 		sed \
+			-e 's,[@]DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL[@],$(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL),' \
+			-e 's,[@]DBUS_SESSION_BUS_LISTEN_ADDRESS[@],$(DBUS_SESSION_BUS_LISTEN_ADDRESS),' \
 			-e 's,[@]DBUS_TEST_DATA[@],$(testexecdir)/data,' \
 			-e 's,[@]DBUS_TEST_EXEC[@],$(testexecdir),' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \

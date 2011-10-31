@@ -7,8 +7,8 @@ MODE=$1
 DBUS_TEST_NAME_RUN_TEST_SCRIPT=1
 export DBUS_TEST_NAME_RUN_TEST_SCRIPT
 
-SOURCE_CONFIG_FILE=$DBUS_TOP_SRCDIR/test/name-test/tmp-session-like-system.conf
-export SOURCE_CONFIG_FILE
+DBUS_TEST_CONFIG_FILE=$DBUS_TOP_BUILDDIR/test/data/valid-config-files-system/tmp-session-like-system.conf
+export DBUS_TEST_CONFIG_FILE
 # Rerun ourselves with tmp session bus if we're not already
 if test -z "$DBUS_TEST_NAME_IN_SYS_RUN_TEST"; then
   DBUS_TEST_NAME_IN_SYS_RUN_TEST=1

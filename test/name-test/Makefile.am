@@ -19,7 +19,7 @@ SH_LOG_DRIVER = $(LOG_DRIVER)
 
 LOG_COMPILER = \
 	@abs_top_builddir@/tools/dbus-run-session$(EXEEXT) \
-	--config-file=@abs_builddir@/uninstalled-session.conf \
+        --config-file=@abs_top_builddir@/test/data/valid-config-files/tmp-session.conf \
 	--dbus-daemon=@abs_top_builddir@/bus/dbus-daemon$(EXEEXT) \
 	-- \
 	$(NULL)
@@ -45,15 +45,6 @@ AM_TESTS_ENVIRONMENT = \
         unset DBUS_SESSION_BUS_ADDRESS; \
         unset DBUS_SESSION_BUS_PID; \
         $(NULL)
-
-uninstalled-session.conf: $(top_builddir)/bus/session.conf Makefile
-	$(SED) -e 's|<standard_session_servicedirs.*$$|<servicedir>@abs_top_builddir@/test/data/valid-service-files</servicedir>|g' \
-		-e 's|<include.*$$||g' \
-		< $< > $@
-
-check_DATA = \
-	uninstalled-session.conf \
-	$(NULL)
 
 TESTS += \
 	run-test.sh \
