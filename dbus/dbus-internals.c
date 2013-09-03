@@ -184,7 +184,14 @@
  */
 const char *_dbus_no_memory_message = "Not enough memory";
 
+/* Not necessarily thread-safe, but if writes don't propagate between
+ * threads, the worst that will happen is that we duplicate work in more than
+ * one thread. */
 static dbus_bool_t warn_initted = FALSE;
+
+/* Not necessarily thread-safe, but if writes don't propagate between
+ * threads, the worst that will happen is that warnings get their default
+ * fatal/non-fatal nature. */
 static dbus_bool_t fatal_warnings = FALSE;
 static dbus_bool_t fatal_warnings_on_check_failed = TRUE;
 

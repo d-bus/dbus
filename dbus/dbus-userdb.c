@@ -222,6 +222,7 @@ _dbus_user_database_lookup (DBusUserDatabase *db,
     }
 }
 
+/* Protected by _DBUS_LOCK_system_users */
 static dbus_bool_t database_locked = FALSE;
 static DBusUserDatabase *system_db = NULL;
 static DBusString process_username;

@@ -103,6 +103,10 @@ typedef MIB_TCPROW_OWNER_PID _MIB_TCPROW_EX;
 typedef MIB_TCPTABLE_OWNER_PID MIB_TCPTABLE_EX;
 typedef PMIB_TCPTABLE_OWNER_PID PMIB_TCPTABLE_EX;
 typedef DWORD (WINAPI *ProcAllocateAndGetTcpExtTableFromStack)(PMIB_TCPTABLE_EX*,BOOL,HANDLE,DWORD,DWORD);
+
+/* Not protected by a lock, but if we miss a write, all that
+ * happens is that the lazy initialization will happen in two threads
+ * concurrently - it results in the same value either way so that's OK */
 static ProcAllocateAndGetTcpExtTableFromStack lpfnAllocateAndGetTcpExTableFromStack = NULL;
 
 /**
