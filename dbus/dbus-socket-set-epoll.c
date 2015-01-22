@@ -144,6 +144,7 @@ socket_set_epoll_add (DBusSocketSet  *set,
   struct epoll_event event;
   int err;
 
+  _DBUS_ZERO (event);
   event.data.fd = fd;
 
   if (enabled)
@@ -196,6 +197,7 @@ socket_set_epoll_enable (DBusSocketSet  *set,
   struct epoll_event event;
   int err;
 
+  _DBUS_ZERO (event);
   event.data.fd = fd;
   event.events = watch_flags_to_epoll_events (flags);
 
@@ -251,6 +253,7 @@ socket_set_epoll_disable (DBusSocketSet  *set,
    * work on 2.6.32). Compile this file with -DTEST_BEHAVIOUR_OF_EPOLLET for
    * test code.
    */
+  _DBUS_ZERO (event);
   event.data.fd = fd;
   event.events = EPOLLET;
 
@@ -270,7 +273,8 @@ socket_set_epoll_remove (DBusSocketSet  *set,
   int err;
   /* Kernels < 2.6.9 require a non-NULL struct pointer, even though its
    * contents are ignored */
-  struct epoll_event dummy = { 0 };
+  struct epoll_event dummy;
+  _DBUS_ZERO (dummy);
 
   if (epoll_ctl (self->epfd, EPOLL_CTL_DEL, fd, &dummy) == 0)
     return;
@@ -345,6 +349,8 @@ main (void)
   int epfd = epoll_create1 (EPOLL_CLOEXEC);
   int fd = 0; /* stdin */
   int ret;
+
+  _DBUS_ZERO (input);
 
   input.events = EPOLLHUP | EPOLLET;
   ret = epoll_ctl (epfd, EPOLL_CTL_ADD, fd, &input);
