@@ -543,8 +543,10 @@ build_env_string (char** envp)
   return compose_string (envp, '\0');
 }
 
-static HANDLE
-spawn_program (char* name, char** argv, char** envp)
+HANDLE
+_dbus_spawn_program (const char *name,
+                     char      **argv,
+                     char      **envp)
 {
   PROCESS_INFORMATION pi = { NULL, 0, 0, 0 };
   STARTUPINFOA si;
@@ -566,6 +568,15 @@ spawn_program (char* name, char** argv, char** envp)
 
   memset (&si, 0, sizeof (si));
   si.cb = sizeof (si);
+
+#ifdef DBUS_ENABLE_VERBOSE_MODE
+  {
+    char *s = compose_string (envp, ';');
+    _dbus_verbose ("spawning '%s'' with args: '%s' env: '%s'\n", name, arg_string, s);
+    free (s);
+  }
+#endif
+
 #ifdef DBUS_WINCE
   result = CreateProcessA (name, arg_string, NULL, NULL, FALSE, 0,
 #else
@@ -595,7 +606,7 @@ babysitter (void *parameter)
   _dbus_verbose ("babysitter: spawning %s\n", sitter->log_name);
 
   PING();
-  handle = spawn_program (sitter->log_name, sitter->argv, sitter->envp);
+  handle = _dbus_spawn_program (sitter->log_name, sitter->argv, sitter->envp);
 
   PING();
   if (handle != INVALID_HANDLE_VALUE)

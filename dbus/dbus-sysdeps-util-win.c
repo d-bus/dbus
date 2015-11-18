@@ -1674,3 +1674,16 @@ void
 _dbus_daemon_report_stopping (void)
 {
 }
+
+void
+_dbus_win_stderr_win_error (const char    *app,
+                            const char    *message,
+                            unsigned long  code)
+{
+  DBusError error;
+
+  dbus_error_init (&error);
+  _dbus_win_set_error_from_win_error (&error, code);
+  fprintf (stderr, "%s: %s: %s\n", app, message, error.message);
+  dbus_error_free (&error);
+}

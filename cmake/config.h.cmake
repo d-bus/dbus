@@ -242,6 +242,7 @@
 
 #cmakedefine DBUS_USER "@DBUS_USER@"
 #cmakedefine DBUS_TEST_USER "@DBUS_TEST_USER@"
+#cmakedefine DBUS_TEST_EXEC "@DBUS_TEST_EXEC@"
 
 // system type defines
 #if defined(_WIN32) || defined(_WIN64) || defined (_WIN32_WCE)

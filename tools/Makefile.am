@@ -16,6 +16,7 @@ AM_LDFLAGS = @R_DYNAMIC_LDFLAG@
 bin_PROGRAMS = \
 	dbus-launch \
 	dbus-monitor \
+	dbus-run-session \
 	dbus-send \
 	dbus-test-tool \
 	dbus-update-activation-environment \
@@ -24,7 +25,6 @@ bin_PROGRAMS = \
 if DBUS_UNIX
 bin_PROGRAMS += \
 	dbus-cleanup-sockets \
-	dbus-run-session \
 	dbus-uuidgen \
 	$(NULL)
 endif
@@ -57,6 +57,8 @@ dbus_launch_SOURCES=				\
 	tool-common.c \
 	tool-common.h \
 	$(NULL)
+endif
+
 dbus_launch_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	$(NULL)
@@ -69,9 +71,8 @@ dbus_run_session_SOURCES =			\
 	dbus-run-session.c
 
 dbus_run_session_LDADD = \
-	$(top_builddir)/dbus/libdbus-1.la \
+	$(top_builddir)/dbus/libdbus-internal.la \
 	$(NULL)
-endif
 
 dbus_cleanup_sockets_SOURCES=			\
 	dbus-cleanup-sockets.c

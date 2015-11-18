@@ -46,7 +46,9 @@ const char* _dbus_win_error_from_last_error (void);
 dbus_bool_t _dbus_win_startup_winsock (void);
 void _dbus_win_warn_win_error  (const char *message,
                                 unsigned long code);
-                                
+void _dbus_win_stderr_win_error (const char *app,
+                                 const char *message,
+                                  unsigned long code);
 DBUS_PRIVATE_EXPORT
 char * _dbus_win_error_string (int error_number);
 DBUS_PRIVATE_EXPORT
@@ -90,6 +92,9 @@ void        _dbus_threads_windows_ensure_ctor_linked (void);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_getsid(char **sid, dbus_pid_t process_id);
+
+HANDLE      _dbus_spawn_program (const char *name, char **argv, char **envp);
+
 #endif
 
 /** @} end of sysdeps-win.h */
