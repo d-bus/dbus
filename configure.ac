@@ -1011,8 +1011,8 @@ if test x$enable_selinux = xno ; then
     have_selinux=no;
 else
     # See if we have SELinux library
-    AC_CHECK_LIB(selinux, is_selinux_enabled,
-                 have_selinux=yes, have_selinux=no)
+    PKG_CHECK_MODULES([SELINUX], [libselinux >= 2.0.86],
+                 [have_selinux=yes], [have_selinux=no])
 
     # see if we have the SELinux header with the new D-Bus stuff in it
     if test x$have_selinux = xyes ; then
@@ -1046,7 +1046,7 @@ if test x$have_selinux = xyes ; then
     AC_CHECK_FUNC(pthread_create,,[AC_CHECK_LIB(pthread,pthread_create,
                                                 [SELINUX_THREAD_LIBS="-lpthread"])])
 
-    SELINUX_LIBS="-lselinux $SELINUX_THREAD_LIBS"
+    SELINUX_LIBS="$SELINUX_LIBS $SELINUX_THREAD_LIBS"
     AC_DEFINE(HAVE_SELINUX,1,[SELinux support])
 else
     SELINUX_LIBS=

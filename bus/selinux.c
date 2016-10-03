@@ -389,37 +389,6 @@ bus_selinux_full_init (void)
 }
 
 /**
- * Decrement SID reference count.
- * 
- * @param sid the SID to decrement
- */
-void
-bus_selinux_id_unref (BusSELinuxID *sid)
-{
-#ifdef HAVE_SELINUX
-  if (!selinux_enabled)
-    return;
-
-  _dbus_assert (sid != NULL);
-  
-  sidput (SELINUX_SID_FROM_BUS (sid));
-#endif /* HAVE_SELINUX */
-}
-
-void
-bus_selinux_id_ref (BusSELinuxID *sid)
-{
-#ifdef HAVE_SELINUX
-  if (!selinux_enabled)
-    return;
-
-  _dbus_assert (sid != NULL);
-  
-  sidget (SELINUX_SID_FROM_BUS (sid));
-#endif /* HAVE_SELINUX */
-}
-
-/**
  * Determine if the SELinux security policy allows the given sender
  * security context to go to the given recipient security context.
  * This function determines if the requested permissions are to be
@@ -789,21 +758,6 @@ bus_selinux_init_connection_id (DBusConnection *connection,
 #endif /* HAVE_SELINUX */
 }
 
-
-/**
- * Function for freeing hash table data.  These SIDs
- * should no longer be referenced.
- */
-static void
-bus_selinux_id_table_free_value (BusSELinuxID *sid)
-{
-#ifdef HAVE_SELINUX
-  /* NULL sometimes due to how DBusHashTable works */
-  if (sid)
-    bus_selinux_id_unref (sid);
-#endif /* HAVE_SELINUX */
-}
-
 /**
  * Creates a new table mapping service names to security ID.
  * A security ID is a "compiled" security context, a security
@@ -815,8 +769,7 @@ DBusHashTable*
 bus_selinux_id_table_new (void)
 {
   return _dbus_hash_table_new (DBUS_HASH_STRING,
-                               (DBusFreeFunction) dbus_free,
-                               (DBusFreeFunction) bus_selinux_id_table_free_value);
+                               (DBusFreeFunction) dbus_free, NULL);
 }
 
 /** 
@@ -878,9 +831,6 @@ bus_selinux_id_table_insert (DBusHashTable *service_table,
   retval = TRUE;
   
  out:
-  if (sid != SECSID_WILD)
-    sidput (sid);
-
   if (key)
     dbus_free (key);
 
@@ -1015,7 +965,6 @@ bus_selinux_shutdown (void)
 
   if (bus_sid != SECSID_WILD)
     {
-      sidput (bus_sid);
       bus_sid = SECSID_WILD;
 
       bus_avc_print_stats ();

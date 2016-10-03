@@ -33,6 +33,11 @@ Fixes:
 
 • Fix some integration test issues (fd.o #100686, Simon McVittie)
 
+Dependencies:
+
+• SELinux support requires at least libselinux 2.0.86 as explicit refcounting
+  for SID (sidput/sidget) has been removed from the code.
+
 D-Bus 1.11.12 (2017-04-07)
 ==
 

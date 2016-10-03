@@ -441,9 +441,6 @@ free_connection_data (void *data)
   if (d->policy)
     bus_client_policy_unref (d->policy);
 
-  if (d->selinux_id)
-    bus_selinux_id_unref (d->selinux_id);
-
   if (d->apparmor_confinement)
     bus_apparmor_confinement_unref (d->apparmor_confinement);
   
@@ -869,8 +866,6 @@ bus_connections_setup_connection (BusConnections *connections,
  out:
   if (!retval)
     {
-      if (d->selinux_id)
-        bus_selinux_id_unref (d->selinux_id);
       d->selinux_id = NULL;
 
       if (d->apparmor_confinement)
