@@ -419,7 +419,7 @@ bus_selinux_check (BusSELinuxID        *sender_sid,
   if (avc_has_perm (SELINUX_SID_FROM_BUS (sender_sid),
                     override_sid ?
                     SELINUX_SID_FROM_BUS (override_sid) :
-                    SELINUX_SID_FROM_BUS (bus_sid), 
+                    bus_sid,
                     target_class, requested, &aeref, auxdata) < 0)
     {
     switch (errno)
