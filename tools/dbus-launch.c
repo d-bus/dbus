@@ -709,6 +709,8 @@ babysit (int   exit_with_session,
 	       strerror (errno));
       exit (1);
       break;
+    default:
+      _dbus_assert_not_reached ("Invalid read result");
     }
 
   verbose ("Got PID %ld from daemon\n",
@@ -1328,6 +1330,8 @@ main (int argc, char **argv)
                    strerror (errno));
           exit (1);
           break;
+        default:
+          _dbus_assert_not_reached ("Invalid read result");
         }
         
       close (bus_address_to_launcher_pipe[READ_END]);
@@ -1347,6 +1351,8 @@ main (int argc, char **argv)
 		   strerror (errno));
 	  exit (1);
 	  break;
+	default:
+	  _dbus_assert_not_reached ("Invalid read result");
 	}
 
       end = NULL;

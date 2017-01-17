@@ -21,7 +21,7 @@
 
 #include <config.h>
 
-#include "dbus/dbus-internals.h"        /* just for the macros */
+#include "dbus/dbus-internals.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -238,6 +238,10 @@ binary_filter_func (DBusConnection *connection,
                 exit (1);
               }
           }
+        break;
+
+      case BINARY_MODE_NOT:
+        _dbus_assert_not_reached ("wrong filter function");
         break;
 
       case BINARY_MODE_RAW:
@@ -474,8 +478,10 @@ main (int argc, char *argv[])
             case DBUS_BUS_SESSION:
               where = "session bus";
               break;
+            case DBUS_BUS_STARTER:
             default:
-              where = "";
+              /* We don't set type to anything else */
+              _dbus_assert_not_reached ("impossible bus type");
             }
         }
       fprintf (stderr, "Failed to open connection to %s: %s\n",

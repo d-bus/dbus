@@ -693,7 +693,9 @@ get_next_expected_result (DBusString *results,
           i = 0;
           while (i < _dbus_string_get_length (result))
             {
-              switch (_dbus_string_get_byte (result, i))
+              unsigned char c = _dbus_string_get_byte (result, i);
+
+              switch (c)
                 {
                 case 'A':
                   _dbus_string_set_byte (result, i, 'a');
@@ -718,6 +720,9 @@ get_next_expected_result (DBusString *results,
                   _dbus_string_delete (result, i, 1);
                   --i; /* to offset ++i below */
                   break;
+                default:
+                  if ((c < '0' || c > '9') && (c < 'a' || c > 'f'))
+                    _dbus_assert_not_reached ("invalid SHA-1 test script");
                 }
 
               ++i;

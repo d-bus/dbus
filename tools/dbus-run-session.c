@@ -37,6 +37,7 @@
 #include <signal.h>
 
 #include "dbus/dbus.h"
+#include "dbus/dbus-internals.h"
 
 #define MAX_ADDR_LEN 512
 #define PIPE_READ_END  0
@@ -386,6 +387,9 @@ main (int argc, char **argv)
                me, strerror (errno));
       return 127;
       break;
+
+    default:
+      _dbus_assert_not_reached ("invalid read result");
     }
 
   close (bus_address_pipe[PIPE_READ_END]);

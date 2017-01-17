@@ -328,6 +328,7 @@ handle_sockets (SocketEntry **entries,
           break;
 
         case SOCKET_UNLINKED:
+        default:
           fprintf (stderr, "Bad status from open_socket(), should not happen\n");
           exit (1);
           break;

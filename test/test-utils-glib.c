@@ -151,6 +151,8 @@ spawn_dbus_daemon (const gchar *binary,
 
             break;
 
+          case TEST_USER_ME:
+            /* cannot get here, fall through */
           default:
             g_assert_not_reached ();
         }
@@ -409,10 +411,15 @@ test_connect_to_bus_as_user (TestMainContext *ctx,
       case TEST_USER_ME:
         return test_connect_to_bus (ctx, address);
 
-      default:
+      case TEST_USER_ROOT:
+      case TEST_USER_MESSAGEBUS:
+      case TEST_USER_OTHER:
         g_test_skip ("setresuid() not available, or unsure about "
             "credentials-passing semantics on this platform");
         return NULL;
+
+      default:
+        g_return_val_if_reached (NULL);
     }
 
 #endif

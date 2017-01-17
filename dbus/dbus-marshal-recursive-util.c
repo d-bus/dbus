@@ -2390,6 +2390,9 @@ string_from_seed (char *buf,
    */
   switch (seed % 3)
     {
+    default:
+      /* don't alter it */
+      break;
     case 1:
       len += 2;
       break;
