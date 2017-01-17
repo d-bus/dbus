@@ -3720,6 +3720,7 @@ _dbus_logv (DBusSystemLogSeverity  severity,
      case DBUS_SYSTEM_LOG_WARNING: s = "warning"; break;
      case DBUS_SYSTEM_LOG_SECURITY: s = "security"; break;
      case DBUS_SYSTEM_LOG_FATAL: s = "fatal"; break;
+     default: _dbus_assert_not_reached ("invalid log severity");
    }
 
   if (log_flags & DBUS_LOG_FLAGS_SYSTEM_LOG)

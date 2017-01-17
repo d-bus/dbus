@@ -4628,7 +4628,7 @@ _dbus_logv (DBusSystemLogSeverity  severity,
             flags = LOG_DAEMON|LOG_CRIT;
             break;
           default:
-            return;
+            _dbus_assert_not_reached ("invalid log severity");
         }
 
       DBUS_VA_COPY (tmp, args);
