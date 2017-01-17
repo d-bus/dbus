@@ -2165,6 +2165,7 @@ bus_config_parser_end_element (BusConfigParser   *parser,
   switch (e->type)
     {
     case ELEMENT_NONE:
+    default:
       _dbus_assert_not_reached ("element in stack has no type");
       break;
 
@@ -2506,6 +2507,7 @@ bus_config_parser_content (BusConfigParser   *parser,
   switch (top_element_type (parser))
     {
     case ELEMENT_NONE:
+    default:
       _dbus_assert_not_reached ("element at top of stack has no type");
       return FALSE;
 
