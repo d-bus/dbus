@@ -410,6 +410,9 @@ _dbus_transport_open (DBusAddressEntry *entry,
           _DBUS_ASSERT_ERROR_IS_SET (&tmp_error);
           goto out;
           break;
+        default:
+          _dbus_assert_not_reached ("invalid transport open result");
+          break;
         }
     }
 
