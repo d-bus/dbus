@@ -128,6 +128,11 @@ signal_handler (int sig)
           }
       }
       break;
+
+    default:
+      /* can't happen unless this signal handler gets used for a wrong
+       * signal, but keep -Wswitch-default happy */
+      break;
     }
 }
 #endif /* DBUS_UNIX */
