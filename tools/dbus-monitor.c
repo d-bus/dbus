@@ -555,6 +555,8 @@ main (int argc, char *argv[])
     {
       case BINARY_MODE_NOT:
       case BINARY_MODE_RAW:
+      default:
+        /* no special header needed */
         break;
 
       case BINARY_MODE_PCAP:
