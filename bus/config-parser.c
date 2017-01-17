@@ -1741,6 +1741,7 @@ append_rule_from_element (BusConfigParser   *parser,
       switch (pe->d.policy.type)
         {
         case POLICY_IGNORED:
+        default:
           /* drop the rule on the floor */
           break;
           
