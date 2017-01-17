@@ -2717,9 +2717,9 @@ HANDLE _dbus_global_lock (const char *mutexname)
        case WAIT_FAILED:
        case WAIT_TIMEOUT:
                return 0;
+       default:
+               return mutex;
      }
-
-   return mutex;
 }
 
 static
