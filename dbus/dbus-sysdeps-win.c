@@ -3554,12 +3554,15 @@ _dbus_strerror (int error_number)
 
     case WSASYSCALLFAILURE:
       return "System call failure";
-    }
-  msg = strerror (error_number);
-  if (msg == NULL)
-    msg = "unknown";
 
-  return msg;
+    default:
+      msg = strerror (error_number);
+
+      if (msg == NULL)
+        msg = "unknown";
+
+      return msg;
+    }
 #endif //DBUS_WINCE
 }
 
