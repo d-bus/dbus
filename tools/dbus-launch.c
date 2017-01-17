@@ -459,19 +459,12 @@ print_variables (const char *bus_address, pid_t bus_pid, long bus_wid,
     }
 }
 
-static int got_sighup = FALSE;
+static int got_fatal_signal = 0;
 
 static void
 signal_handler (int sig)
 {
-  switch (sig)
-    {
-    case SIGHUP:
-    case SIGINT:
-    case SIGTERM:
-      got_sighup = TRUE;
-      break;
-    }
+  got_fatal_signal = sig;
 }
 
 static void kill_bus_when_session_ends (void) _DBUS_GNUC_NORETURN;
@@ -487,7 +480,7 @@ kill_bus_when_session_ends (void)
   sigset_t empty_mask;
   
   /* install SIGHUP handler */
-  got_sighup = FALSE;
+  got_fatal_signal = 0;
   sigemptyset (&empty_mask);
   act.sa_handler = signal_handler;
   act.sa_mask    = empty_mask;
@@ -564,9 +557,10 @@ kill_bus_when_session_ends (void)
       select (MAX (tty_fd, x_fd) + 1,
               &read_set, NULL, &err_set, NULL);
 
-      if (got_sighup)
+      if (got_fatal_signal)
         {
-          verbose ("Got SIGHUP, exiting\n");
+          verbose ("Got fatal signal %d, killing dbus-daemon\n",
+                   got_fatal_signal);
           kill_bus_and_exit (0);
         }
       
