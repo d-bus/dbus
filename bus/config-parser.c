@@ -3268,8 +3268,29 @@ elements_equal (const Element *a,
 	return FALSE;
       break;
 
+    case ELEMENT_NONE:
+    case ELEMENT_BUSCONFIG:
+    case ELEMENT_USER:
+    case ELEMENT_LISTEN:
+    case ELEMENT_AUTH:
+    case ELEMENT_ALLOW:
+    case ELEMENT_DENY:
+    case ELEMENT_FORK:
+    case ELEMENT_PIDFILE:
+    case ELEMENT_SERVICEDIR:
+    case ELEMENT_SERVICEHELPER:
+    case ELEMENT_INCLUDEDIR:
+    case ELEMENT_CONFIGTYPE:
+    case ELEMENT_SELINUX:
+    case ELEMENT_ASSOCIATE:
+    case ELEMENT_STANDARD_SESSION_SERVICEDIRS:
+    case ELEMENT_STANDARD_SYSTEM_SERVICEDIRS:
+    case ELEMENT_KEEP_UMASK:
+    case ELEMENT_SYSLOG:
+    case ELEMENT_ALLOW_ANONYMOUS:
+    case ELEMENT_APPARMOR:
     default:
-      /* do nothing */
+      /* do nothing: nothing in the Element struct for these types */
       break;
     }
 
