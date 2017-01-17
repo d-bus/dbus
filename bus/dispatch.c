@@ -2875,6 +2875,7 @@ check_existent_service_no_auto_start (BusContext     *context,
       switch (message_kind)
         {
         case GOT_SOMETHING_ELSE:
+        default:
           _dbus_warn ("Unexpected message after ActivateService "
                       "(should be an error or a service announcement");
           goto out;
@@ -3550,6 +3551,7 @@ check_existent_service_auto_start (BusContext     *context,
 
         case GOT_ERROR:
         case GOT_SOMETHING_ELSE:
+        default:
           _dbus_warn ("Unexpected message after auto activation");
           goto out;
         }
@@ -4243,6 +4245,7 @@ check_shell_service_success_auto_start (BusContext     *context,
 
         case GOT_ERROR:
         case GOT_SOMETHING_ELSE:
+        default:
           _dbus_warn ("Unexpected message after auto activation");
           goto out;
         }
@@ -4671,6 +4674,7 @@ check_list_services (BusContext     *context,
 	case GOT_SOMETHING_ELSE:
 	case GOT_ERROR:
 	case GOT_SERVICE_DELETED:
+	default:
 	  _dbus_warn ("Unexpected message after ActivateService "
 		      "(should be an error or a service announcement)");
 	  goto out;
