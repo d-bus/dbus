@@ -69,6 +69,8 @@ bus_policy_rule_new (BusPolicyRuleType type,
       break;
     case BUS_POLICY_RULE_OWN:
       break;
+    default:
+      _dbus_assert_not_reached ("invalid rule");
     }
   
   return rule;
@@ -116,6 +118,8 @@ bus_policy_rule_unref (BusPolicyRule *rule)
           break;
         case BUS_POLICY_RULE_GROUP:
           break;
+        default:
+          _dbus_assert_not_reached ("invalid rule");
         }
       
       dbus_free (rule);
@@ -261,6 +265,9 @@ add_list_to_client (DBusList        **list,
           if (!bus_client_policy_append_rule (client, rule))
             return FALSE;
           break;
+
+        default:
+          _dbus_assert_not_reached ("invalid rule");
         }
     }
   
@@ -830,8 +837,11 @@ bus_client_policy_optimize (BusClientPolicy *policy)
           remove_preceding =
             rule->d.own.service_name == NULL;
           break;
+
+        /* The other rule types don't appear in this list */
         case BUS_POLICY_RULE_USER:
         case BUS_POLICY_RULE_GROUP:
+        default:
           _dbus_assert_not_reached ("invalid rule");
           break;
         }
