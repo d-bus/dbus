@@ -897,8 +897,8 @@ start_busconfig_child (BusConfigParser   *parser,
     }
   else if (element_type == ELEMENT_STANDARD_SESSION_SERVICEDIRS)
     {
-      DBusList *dirs;
-      dirs = NULL;
+      DBusError local_error = DBUS_ERROR_INIT;
+      DBusList *dirs = NULL;
 
       if (!check_no_attributes (parser, "standard_session_servicedirs", attribute_names, attribute_values, error))
         return FALSE;
@@ -908,6 +908,29 @@ start_busconfig_child (BusConfigParser   *parser,
           BUS_SET_OOM (error);
           return FALSE;
         }
+
+      if (_dbus_set_up_transient_session_servicedirs (&dirs, &local_error))
+        {
+          if (!service_dirs_absorb_string_list (&parser->service_dirs, &dirs,
+                BUS_SERVICE_DIR_FLAGS_NO_WATCH |
+                BUS_SERVICE_DIR_FLAGS_STRICT_NAMING))
+            {
+              BUS_SET_OOM (error);
+              _dbus_list_foreach (&dirs, (DBusForeachFunction) dbus_free,
+                  NULL);
+              _dbus_list_clear (&dirs);
+              return FALSE;
+            }
+        }
+      else
+        {
+          /* Failing to set these up isn't fatal */
+          _dbus_warn ("Unable to set up transient service directory: %s",
+                      local_error.message);
+          dbus_error_free (&local_error);
+        }
+
+      _dbus_assert (dirs == NULL);
 
       if (!_dbus_get_standard_session_servicedirs (&dirs))
         {
@@ -927,6 +950,8 @@ start_busconfig_child (BusConfigParser   *parser,
           _dbus_list_clear (&dirs);
           return FALSE;
         }
+
+      _dbus_assert (dirs == NULL);
 
       return TRUE;
     }
@@ -3566,6 +3591,7 @@ static const char *test_session_service_dir_matches[] =
          NULL, /* install root-based */
          NULL, /* CommonProgramFiles-based */
 #else
+         NULL, /* XDG_RUNTIME_DIR-based */
          NULL, /* XDG_DATA_HOME-based */
          NULL, /* XDG_DATA_DIRS-based */
          NULL, /* XDG_DATA_DIRS-based */
@@ -3586,6 +3612,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   DBusString full_path;
   DBusString progs;
   DBusString install_root_based;
+  DBusString runtime_dir_based;
   DBusString data_home_based;
   DBusString data_dirs_based;
   DBusString data_dirs_based2;
@@ -3596,6 +3623,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
 #else
   const char *dbus_test_builddir;
   const char *xdg_data_home;
+  const char *xdg_runtime_dir;
 #endif
 
   /* On each platform we don't actually use all of these, but it's easier to
@@ -3604,6 +3632,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   if (!_dbus_string_init (&full_path) ||
       !_dbus_string_init (&progs) ||
       !_dbus_string_init (&install_root_based) ||
+      !_dbus_string_init (&runtime_dir_based) ||
       !_dbus_string_init (&data_home_based) ||
       !_dbus_string_init (&data_dirs_based) ||
       !_dbus_string_init (&data_dirs_based2))
@@ -3649,8 +3678,10 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
 #else
   dbus_test_builddir = _dbus_getenv ("DBUS_TEST_BUILDDIR");
   xdg_data_home = _dbus_getenv ("XDG_DATA_HOME");
+  xdg_runtime_dir = _dbus_getenv ("XDG_RUNTIME_DIR");
 
-  if (dbus_test_builddir == NULL || xdg_data_home == NULL)
+  if (dbus_test_builddir == NULL || xdg_data_home == NULL ||
+      xdg_runtime_dir == NULL)
     {
       printf ("Not testing default session service directories because a "
               "build-time testing environment variable is not set: "
@@ -3663,8 +3694,15 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
       !_dbus_string_append (&data_dirs_based, "/XDG_DATA_DIRS/dbus-1/services") ||
       !_dbus_string_append (&data_dirs_based2, dbus_test_builddir) ||
       !_dbus_string_append (&data_dirs_based2, "/XDG_DATA_DIRS2/dbus-1/services") ||
+      !_dbus_string_append (&runtime_dir_based, xdg_runtime_dir) ||
       !_dbus_string_append (&data_home_based, xdg_data_home) ||
       !_dbus_string_append (&data_home_based, "/dbus-1/services"))
+    _dbus_assert_not_reached ("out of memory");
+
+  if (!_dbus_ensure_directory (&runtime_dir_based, NULL))
+    _dbus_assert_not_reached ("Unable to create fake XDG_RUNTIME_DIR");
+
+  if (!_dbus_string_append (&runtime_dir_based, "/dbus-1/services"))
     _dbus_assert_not_reached ("out of memory");
 
   /* Sanity check: the Makefile sets this up. We assume that if this is
@@ -3672,11 +3710,16 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   if (!_dbus_string_starts_with_c_str (&data_home_based, dbus_test_builddir))
     _dbus_assert_not_reached ("$XDG_DATA_HOME should start with $DBUS_TEST_BUILDDIR");
 
+  if (!_dbus_string_starts_with_c_str (&runtime_dir_based, dbus_test_builddir))
+    _dbus_assert_not_reached ("$XDG_RUNTIME_DIR should start with $DBUS_TEST_BUILDDIR");
+
   test_session_service_dir_matches[0] = _dbus_string_get_const_data (
-      &data_home_based);
+      &runtime_dir_based);
   test_session_service_dir_matches[1] = _dbus_string_get_const_data (
-      &data_dirs_based);
+      &data_home_based);
   test_session_service_dir_matches[2] = _dbus_string_get_const_data (
+      &data_dirs_based);
+  test_session_service_dir_matches[3] = _dbus_string_get_const_data (
       &data_dirs_based2);
 #endif
 
@@ -3692,6 +3735,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
        link = _dbus_list_get_next_link (dirs, link), i++)
     {
       BusConfigServiceDir *dir = link->data;
+      BusServiceDirFlags expected = BUS_SERVICE_DIR_FLAGS_NONE;
 
       printf ("    test service dir: '%s'\n", dir->path);
       printf ("    current standard service dir: '%s'\n", test_session_service_dir_matches[i]);
@@ -3708,10 +3752,18 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
           goto out;
         }
 
-      if (dir->flags != BUS_SERVICE_DIR_FLAGS_NONE)
+#ifndef DBUS_WIN
+      /* On Unix we expect the first directory in the search path to be
+       * in the XDG_RUNTIME_DIR, and we expect it to have special flags */
+      if (i == 0)
+        expected = (BUS_SERVICE_DIR_FLAGS_NO_WATCH |
+                    BUS_SERVICE_DIR_FLAGS_STRICT_NAMING);
+#endif
+
+      if (dir->flags != expected)
         {
           printf ("'%s' directory has flags 0x%x, should be 0x%x\n",
-                  dir->path, dir->flags, BUS_SERVICE_DIR_FLAGS_NONE);
+                  dir->path, dir->flags, expected);
           goto out;
         }
     }
@@ -3726,7 +3778,17 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   if (!bus_config_parser_get_watched_dirs (parser, &watched_dirs))
     _dbus_assert_not_reached ("out of memory");
 
-  for (link = _dbus_list_get_first_link (&watched_dirs), i = 0;
+#ifdef DBUS_WIN
+  /* We expect all directories to be watched (not that it matters on Windows,
+   * because we don't know how) */
+  i = 0;
+#else
+  /* We expect all directories except the first to be watched, because
+   * the first one is transient */
+  i = 1;
+#endif
+
+  for (link = _dbus_list_get_first_link (&watched_dirs);
        link != NULL;
        link = _dbus_list_get_next_link (&watched_dirs, link), i++)
     {
@@ -3767,6 +3829,7 @@ out:
   _dbus_string_free (&full_path);
   _dbus_string_free (&install_root_based);
   _dbus_string_free (&progs);
+  _dbus_string_free (&runtime_dir_based);
   _dbus_string_free (&data_home_based);
   _dbus_string_free (&data_dirs_based);
   _dbus_string_free (&data_dirs_based2);

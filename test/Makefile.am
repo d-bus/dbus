@@ -513,7 +513,7 @@ EXTRA_DIST += $(static_data)
 ## copy tests to builddir so that generated tests and static tests
 ## are all in one place.
 all-local: copy-config-local uninstalled-config-local
-	@:
+	$(AM_V_at)$(MKDIR_P) -m700 XDG_RUNTIME_DIR
 
 copy-config-local:
 	$(AM_V_at)$(MKDIR_P) data/valid-config-files/session.d
