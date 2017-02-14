@@ -546,3 +546,27 @@ test_rmdir_must_exist (const gchar *path)
                g_strerror (saved_errno));
     }
 }
+
+/*
+ * Delete empty directory @path, with a retry loop if the system call is
+ * interrupted by an async signal. If @path does not exist, ignore.
+ */
+void
+test_rmdir_if_exists (const gchar *path)
+{
+  while (g_remove (path) != 0)
+    {
+      int saved_errno = errno;
+
+      if (saved_errno == ENOENT)
+        return;
+
+#ifdef G_OS_UNIX
+      if (saved_errno == EINTR)
+        continue;
+#endif
+
+      g_error ("Unable to remove directory \"%s\": %s", path,
+               g_strerror (saved_errno));
+    }
+}
