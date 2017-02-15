@@ -2789,6 +2789,46 @@ bus_config_parser_steal_service_context_table (BusConfigParser *parser)
   return table;
 }
 
+/*
+ * Return a list of the directories that should be watched with inotify,
+ * as strings. The list might be empty and is in arbitrary order.
+ *
+ * The list must be empty on entry. On success, the links are owned by the
+ * caller and must be freed, but the data in each link remains owned by
+ * the BusConfigParser and must not be freed: in GObject-Introspection
+ * notation, it is (transfer container).
+ */
+dbus_bool_t
+bus_config_parser_get_watched_dirs (BusConfigParser *parser,
+                                    DBusList **watched_dirs)
+{
+  DBusList *link;
+
+  _dbus_assert (*watched_dirs == NULL);
+
+  for (link = _dbus_list_get_first_link (&parser->conf_dirs);
+       link != NULL;
+       link = _dbus_list_get_next_link (&parser->conf_dirs, link))
+    {
+      if (!_dbus_list_append (watched_dirs, link->data))
+        goto oom;
+    }
+
+  for (link = _dbus_list_get_first_link (&parser->service_dirs);
+       link != NULL;
+       link = _dbus_list_get_next_link (&parser->service_dirs, link))
+    {
+      if (!_dbus_list_append (watched_dirs, link->data))
+        goto oom;
+    }
+
+  return TRUE;
+
+oom:
+  _dbus_list_clear (watched_dirs);
+  return FALSE;
+}
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 #include <stdio.h>
 
@@ -3399,6 +3439,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   BusConfigParser *parser = NULL;
   DBusError error = DBUS_ERROR_INIT;
   DBusList **dirs;
+  DBusList *watched_dirs = NULL;
   DBusList *link;
   DBusString tmp;
   DBusString full_path;
@@ -3534,12 +3575,47 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
       goto out;
     }
 
+  if (!bus_config_parser_get_watched_dirs (parser, &watched_dirs))
+    _dbus_assert_not_reached ("out of memory");
+
+  for (link = _dbus_list_get_first_link (&watched_dirs), i = 0;
+       link != NULL;
+       link = _dbus_list_get_next_link (&watched_dirs, link), i++)
+    {
+      printf ("    watched service dir: '%s'\n", (const char *) link->data);
+      printf ("    current standard service dir: '%s'\n",
+              test_session_service_dir_matches[i]);
+
+      if (test_session_service_dir_matches[i] == NULL)
+        {
+          printf ("more directories parsed than in match set\n");
+          goto out;
+        }
+
+      if (strcmp (test_session_service_dir_matches[i],
+                  (const char *) link->data) != 0)
+        {
+          printf ("'%s' directory does not match '%s' in the match set\n",
+                  (const char *) link->data,
+                  test_session_service_dir_matches[i]);
+          goto out;
+        }
+    }
+
+  if (test_session_service_dir_matches[i] != NULL)
+    {
+      printf ("extra data %s in the match set was not matched\n",
+              test_session_service_dir_matches[i]);
+      goto out;
+    }
+
   ret = TRUE;
 
 out:
   if (parser != NULL)
     bus_config_parser_unref (parser);
 
+  _dbus_list_clear (&watched_dirs);
   _dbus_string_free (&full_path);
   _dbus_string_free (&install_root_based);
   _dbus_string_free (&progs);

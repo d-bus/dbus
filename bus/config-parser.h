@@ -73,6 +73,8 @@ DBusList**  bus_config_parser_get_conf_dirs    (BusConfigParser *parser);
 BusPolicy*  bus_config_parser_steal_policy     (BusConfigParser *parser);
 void        bus_config_parser_get_limits       (BusConfigParser *parser,
                                                 BusLimits       *limits);
+dbus_bool_t bus_config_parser_get_watched_dirs (BusConfigParser  *parser,
+                                                DBusList        **watched_dirs);
 
 DBusHashTable* bus_config_parser_steal_service_context_table (BusConfigParser *parser);
 
