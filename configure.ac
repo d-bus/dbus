@@ -1530,6 +1530,9 @@ AS_AC_EXPAND(EXPANDED_LIBDIR, "$libdir")
 AS_AC_EXPAND(EXPANDED_LIBEXECDIR, "$libexecdir")
 AS_AC_EXPAND(EXPANDED_DATADIR, "$datadir")
 
+# For the moment we don't support relocation when building with Autotools
+AC_SUBST([pkgconfig_prefix], ['${original_prefix}'])
+
 #### Check our operating system
 operating_system=unknown
 if test -f /etc/redhat-release || test -f $EXPANDED_SYSCONFDIR/redhat-release ; then

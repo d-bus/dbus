@@ -1,4 +1,5 @@
-prefix=@prefix@
+original_prefix=@prefix@
+prefix=@pkgconfig_prefix@
 exec_prefix=@exec_prefix@
 bindir=@bindir@
 libdir=@libdir@

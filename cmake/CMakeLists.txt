@@ -84,6 +84,19 @@ set(SYSCONFDIR_FROM_PKGDATADIR ${CMAKE_INSTALL_FULL_SYSCONFDIR})
 set(DATADIR_FROM_PKGSYSCONFDIR ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 
+option (DBUS_RELOCATABLE "Attempt to make metadata relocatable" ON)
+
+# For simplicity, we're not relocatable if CMAKE_INSTALL_LIBDIR
+# is something more complicated (e.g. Debian multiarch);
+# we don't want to have to compute how many ../ to add
+if(CMAKE_INSTALL_LIBDIR STREQUAL "lib" OR CMAKE_INSTALL_LIBDIR STREQUAL "lib64")
+    # We know we can use ../ to get to the prefix. Do nothing.
+elseif(DBUS_RELOCATABLE)
+    # Sorry, it's too hard to make this particular build relocatable
+    message("Unusual CMAKE_INSTALL_LIBDIR: the generated package will not be relocatable.")
+    set(DBUS_RELOCATABLE OFF)
+endif()
+
 # used in the C code
 set(DBUS_LIBEXECDIR          ${CMAKE_INSTALL_FULL_LIBEXECDIR})
 set(DBUS_DATADIR             ${CMAKE_INSTALL_FULL_DATADIR})
@@ -638,13 +651,20 @@ if(UNIX)
         foreach(LIB ${CMAKE_C_IMPLICIT_LINK_LIBRARIES} ${PLATFORM_LIBS})
             set(LIBDBUS_LIBS "${LIBDBUS_LIBS} -l${LIB}")
         endforeach()
-        set(bindir ${EXPANDED_BINDIR})
-        set(libdir ${EXPANDED_LIBDIR})
-        set(includedir ${EXPANDED_INCLUDEDIR})
-        set(sysconfdir ${EXPANDED_SYSCONFDIR})
-        set(datadir ${EXPANDED_DATADIR})
-        set(datarootdir ${EXPANDED_DATADIR})
-        set(dbus_daemondir ${DBUS_DAEMONDIR})
+        set(original_prefix "${CMAKE_INSTALL_PREFIX}")
+        if(DBUS_RELOCATABLE)
+            set(pkgconfig_prefix "\${pcfiledir}/../../")
+        else()
+            set(pkgconfig_prefix "\${original_prefix}")
+        endif()
+        set(exec_prefix "\${prefix}")
+        set(bindir "\${prefix}/${CMAKE_INSTALL_BINDIR}")
+        set(libdir "\${prefix}/${CMAKE_INSTALL_LIBDIR}")
+        set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+        set(sysconfdir "\${prefix}/${CMAKE_INSTALL_SYSCONFDIR}")
+        set(datadir "\${prefix}/${CMAKE_INSTALL_DATADIR}")
+        set(datarootdir "\${prefix}/${CMAKE_INSTALL_DATADIR}")
+        set(dbus_daemondir "\${prefix}/${CMAKE_INSTALL_BINDIR}")
         configure_file(../dbus-1.pc.in ${CMAKE_BINARY_DIR}/dbus-1.pc @ONLY)
         install(FILES ${CMAKE_BINARY_DIR}/dbus-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     endif()
