@@ -1353,6 +1353,8 @@ TP_COMPILER_WARNINGS([WARNING_CFLAGS],
    sign-compare \
    pointer-sign \
    type-limits \
+   misleading-indentation \
+   unused-const-variable \
   ])
 
 if test "x$GCC" = "xyes"; then
