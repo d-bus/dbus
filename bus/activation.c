@@ -53,7 +53,7 @@ struct BusActivation
                               * i.e. number of pending activation requests, not pending
                               * activations per se
                               */
-  DBusHashTable *directories;
+  DBusList *directories;
   DBusHashTable *environment;
 };
 
@@ -814,16 +814,9 @@ bus_activation_reload (BusActivation     *activation,
       goto failed;
     }
 
-  if (activation->directories != NULL)
-    _dbus_hash_table_unref (activation->directories);
-  activation->directories = _dbus_hash_table_new (DBUS_HASH_STRING, NULL,
-                                                  (DBusFreeFunction)bus_service_directory_unref);
-
-  if (activation->directories == NULL)
-    {
-      BUS_SET_OOM (error);
-      goto failed;
-    }
+  _dbus_list_foreach (&activation->directories,
+                      (DBusForeachFunction) bus_service_directory_unref, NULL);
+  _dbus_list_clear (&activation->directories);
 
   link = _dbus_list_get_first_link (directories);
   while (link != NULL)
@@ -858,7 +851,7 @@ bus_activation_reload (BusActivation     *activation,
           goto failed;
         }
 
-      if (!_dbus_hash_table_insert_string (activation->directories, s_dir->dir_c, s_dir))
+      if (!_dbus_list_append (&activation->directories, s_dir))
         {
           bus_service_directory_unref (s_dir);
           BUS_SET_OOM (error);
@@ -965,8 +958,11 @@ bus_activation_unref (BusActivation *activation)
     _dbus_hash_table_unref (activation->entries);
   if (activation->pending_activations)
     _dbus_hash_table_unref (activation->pending_activations);
-  if (activation->directories)
-    _dbus_hash_table_unref (activation->directories);
+
+  _dbus_list_foreach (&activation->directories,
+                      (DBusForeachFunction) bus_service_directory_unref, NULL);
+  _dbus_list_clear (&activation->directories);
+
   if (activation->environment)
     _dbus_hash_table_unref (activation->environment);
 
@@ -1537,15 +1533,14 @@ add_cancel_pending_to_transaction (BusTransaction       *transaction,
 static dbus_bool_t
 update_service_cache (BusActivation *activation, DBusError *error)
 {
-  DBusHashIter iter;
+  DBusList *iter;
 
-  _dbus_hash_iter_init (activation->directories, &iter);
-  while (_dbus_hash_iter_next (&iter))
+  for (iter = _dbus_list_get_first_link (&activation->directories);
+       iter != NULL;
+       iter = _dbus_list_get_next_link (&activation->directories, iter))
     {
       DBusError tmp_error;
-      BusServiceDirectory *s_dir;
-
-      s_dir = _dbus_hash_iter_get_value (&iter);
+      BusServiceDirectory *s_dir = iter->data;
 
       dbus_error_init (&tmp_error);
       if (!update_directory (activation, s_dir, &tmp_error))
