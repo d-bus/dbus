@@ -238,11 +238,15 @@ installcheck_environment = \
 	export DBUS_TEST_DATADIR=$(DESTDIR)$(datadir); \
 	${NULL}
 
+# Tests in bus/config-parser.c rely on these specific values for XDG_* and
+# DBUS_TEST_BUILDDIR.
 AM_TESTS_ENVIRONMENT = \
 	export XDG_DATA_HOME=@abs_top_builddir@/test/XDG_DATA_HOME; \
-	export XDG_DATA_DIRS=@abs_top_builddir@/test/XDG_DATA_DIRS; \
+	export XDG_DATA_DIRS=@abs_top_builddir@/test/XDG_DATA_DIRS:@abs_top_builddir@/test/XDG_DATA_DIRS2; \
 	export XDG_RUNTIME_DIR=@abs_top_builddir@/test/XDG_RUNTIME_DIR; \
 	export DBUS_FATAL_WARNINGS=1; \
+	export DBUS_TEST_BUILDDIR=@abs_builddir@; \
+	export DBUS_TEST_SRCDIR=@abs_srcdir@; \
 	export DBUS_TEST_DAEMON=@abs_top_builddir@/bus/dbus-daemon$(EXEEXT); \
 	export DBUS_TEST_DBUS_LAUNCH=@abs_top_builddir@/tools/dbus-launch$(EXEEXT); \
 	export DBUS_TEST_DBUS_MONITOR=@abs_top_builddir@/tools/dbus-monitor$(EXEEXT); \

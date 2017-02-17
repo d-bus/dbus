@@ -3380,16 +3380,15 @@ process_test_equiv_subdir (const DBusString *test_base_dir,
 
 static const char *test_session_service_dir_matches[] = 
         {
-#ifdef DBUS_UNIX
-         "/testhome/foo/.testlocal/testshare/dbus-1/services",
-         "/testusr/testlocal/testshare/dbus-1/services",
-         "/testusr/testshare/dbus-1/services",
-         DBUS_DATADIR"/dbus-1/services",
-#endif
 /* will be filled in test_default_session_servicedirs() */
 #ifdef DBUS_WIN
-         NULL,
-         NULL,
+         NULL, /* install root-based */
+         NULL, /* CommonProgramFiles-based */
+#else
+         NULL, /* XDG_DATA_HOME-based */
+         NULL, /* XDG_DATA_DIRS-based */
+         NULL, /* XDG_DATA_DIRS-based */
+         DBUS_DATADIR "/dbus-1/services",
 #endif
          NULL
         };
@@ -3401,16 +3400,26 @@ test_default_session_servicedirs (void)
   DBusList *link;
   DBusString progs;
   DBusString install_root_based;
+  DBusString data_home_based;
+  DBusString data_dirs_based;
+  DBusString data_dirs_based2;
   int i;
   dbus_bool_t ret = FALSE;
 #ifdef DBUS_WIN
   const char *common_progs;
+#else
+  const char *dbus_test_builddir;
+  const char *xdg_data_home;
 #endif
 
-  /* On Unix we don't actually use these, but it's easier to handle the
-   * deallocation if we always allocate them, whether needed or not */
+  /* On each platform we don't actually use all of these, but it's easier to
+   * handle the deallocation if we always allocate them, whether needed or
+   * not */
   if (!_dbus_string_init (&progs) ||
-      !_dbus_string_init (&install_root_based))
+      !_dbus_string_init (&install_root_based) ||
+      !_dbus_string_init (&data_home_based) ||
+      !_dbus_string_init (&data_dirs_based) ||
+      !_dbus_string_init (&data_dirs_based2))
     _dbus_assert_not_reached ("OOM allocating strings");
 
 #ifdef DBUS_WIN
@@ -3436,18 +3445,42 @@ test_default_session_servicedirs (void)
 
       test_session_service_dir_matches[1] = _dbus_string_get_const_data(&progs);
     }
+#else
+  dbus_test_builddir = _dbus_getenv ("DBUS_TEST_BUILDDIR");
+  xdg_data_home = _dbus_getenv ("XDG_DATA_HOME");
+
+  if (dbus_test_builddir == NULL || xdg_data_home == NULL)
+    {
+      printf ("Not testing default session service directories because a "
+              "build-time testing environment variable is not set: "
+              "see AM_TESTS_ENVIRONMENT in tests/Makefile.am\n");
+      ret = TRUE;
+      goto out;
+    }
+
+  if (!_dbus_string_append (&data_dirs_based, dbus_test_builddir) ||
+      !_dbus_string_append (&data_dirs_based, "/XDG_DATA_DIRS/dbus-1/services") ||
+      !_dbus_string_append (&data_dirs_based2, dbus_test_builddir) ||
+      !_dbus_string_append (&data_dirs_based2, "/XDG_DATA_DIRS2/dbus-1/services") ||
+      !_dbus_string_append (&data_home_based, xdg_data_home) ||
+      !_dbus_string_append (&data_home_based, "/dbus-1/services"))
+    _dbus_assert_not_reached ("out of memory");
+
+  /* Sanity check: the Makefile sets this up. We assume that if this is
+   * right, the XDG_DATA_DIRS will be too. */
+  if (!_dbus_string_starts_with_c_str (&data_home_based, dbus_test_builddir))
+    _dbus_assert_not_reached ("$XDG_DATA_HOME should start with $DBUS_TEST_BUILDDIR");
+
+  test_session_service_dir_matches[0] = _dbus_string_get_const_data (
+      &data_home_based);
+  test_session_service_dir_matches[1] = _dbus_string_get_const_data (
+      &data_dirs_based);
+  test_session_service_dir_matches[2] = _dbus_string_get_const_data (
+      &data_dirs_based2);
 #endif
+
   dirs = NULL;
 
-  printf ("Testing retrieving the default session service directories\n");
-
-#ifdef DBUS_UNIX
-  if (!dbus_setenv ("XDG_DATA_HOME", "/testhome/foo/.testlocal/testshare"))
-    _dbus_assert_not_reached ("couldn't setenv XDG_DATA_HOME");
-
-  if (!dbus_setenv ("XDG_DATA_DIRS", ":/testusr/testlocal/testshare: :/testusr/testshare:"))
-    _dbus_assert_not_reached ("couldn't setenv XDG_DATA_DIRS");
-#endif
   if (!_dbus_get_standard_session_servicedirs (&dirs))
     _dbus_assert_not_reached ("couldn't get stardard dirs");
 
@@ -3494,6 +3527,9 @@ test_default_session_servicedirs (void)
 out:
   _dbus_string_free (&install_root_based);
   _dbus_string_free (&progs);
+  _dbus_string_free (&data_home_based);
+  _dbus_string_free (&data_dirs_based);
+  _dbus_string_free (&data_dirs_based2);
   return ret;
 }
 
