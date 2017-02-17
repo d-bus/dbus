@@ -467,15 +467,22 @@ which mechanisms are listed is not meaningful.</para>
 
 </itemizedlist>
 
-<para>Adds a directory to scan for .service files. Directories are
-scanned starting with the first to appear in the config file
-(the first .service file found that provides a particular
-service will be used).</para>
+<para>
+  Adds a directory to search for .service files, which tell the
+  dbus-daemon how to start a program to provide a particular well-known
+  bus name. See the D-Bus Specification for more details about the
+  contents of .service files.
+</para>
 
-
-<para>Service files tell the bus how to automatically start a program.
-They are primarily used with the per-user-session bus,
-not the systemwide bus.</para>
+<para>
+  If a particular service is found in more than one &lt;servicedir&gt;,
+  the first directory listed in the configuration file takes precedence.
+  If two service files providing the same well-known bus name are found
+  in the same directory, it is arbitrary which one will be chosen
+  (this can only happen if at least one of the service files does not
+  have the recommended name, which is its well-known bus name followed
+  by ".service").
+</para>
 
 <itemizedlist remap='TP'>
 
@@ -484,16 +491,127 @@ not the systemwide bus.</para>
 
 </itemizedlist>
 
-<para>&lt;standard_session_servicedirs/&gt; is equivalent to specifying a series
-of &lt;servicedir/&gt; elements for each of the data directories in the "XDG
-Base Directory Specification" with the subdirectory "dbus-1/services",
-so for example "/usr/share/dbus-1/services" would be among the
-directories searched.</para>
+<para>
+  &lt;standard_session_servicedirs/&gt; requests a standard set of
+  session service directories. Its effect is similar to specifying a series
+  of &lt;servicedir/&gt; elements for each of the data directories,
+  in the order given here.
+  It is not exactly equivalent, because there is currently no way
+  to disable directory monitoring or enforce strict service file naming
+  for a &lt;servicedir/&gt;.
+</para>
 
+<para>
+  As with &lt;servicedir/&gt; elements, if a particular service is found
+  in more than one service directory, the first directory takes precedence.
+  If two service files providing the same well-known bus name are found
+  in the same directory, it is arbitrary which one will be chosen
+  (this can only happen if at least one of the service files does not
+  have the recommended name, which is its well-known bus name followed
+  by ".service").
+</para>
+
+<para>
+  On Unix, the standard session service directories are:
+  <itemizedlist>
+    <listitem>
+      <para>
+        <emphasis>$XDG_RUNTIME_DIR</emphasis>/dbus-1/services,
+        if XDG_RUNTIME_DIR is set (see the XDG Base Directory
+        Specification for details of XDG_RUNTIME_DIR):
+        this location is suitable for transient services created at runtime
+        by systemd generators (see
+        <citerefentry>
+          <refentrytitle>systemd.generator</refentrytitle>
+          <manvolnum>7</manvolnum>
+        </citerefentry>),
+        session managers or other session infrastructure.
+        It is an extension provided by the reference implementation
+        of dbus-daemon, and is not standardized in the D-Bus Specification.
+      </para>
+      <para>
+        Unlike the other standard session service directories, this directory
+        enforces strict naming for the service files: the filename must be
+        exactly the well-known bus name of the service, followed by
+        ".service".
+      </para>
+      <para>
+        Also unlike the other standard session service directories, this
+        directory is never monitored with
+        <citerefentry>
+          <refentrytitle>inotify</refentrytitle>
+          <manvolnum>7</manvolnum>
+        </citerefentry>
+        or similar APIs. Programs that create service files in this directory
+        while a dbus-daemon is running are expected to call the dbus-daemon's
+        ReloadConfig() method after they have made changes.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis>$XDG_DATA_HOME</emphasis>/dbus-1/services,
+        where XDG_DATA_HOME defaults to ~/.local/share
+        (see the XDG Base Directory Specification): this location is
+        specified by the D-Bus Specification, and is suitable for per-user,
+        locally-installed software.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis>directory</emphasis>/dbus-1/services for each
+        directory in XDG_DATA_DIRS, where XDG_DATA_DIRS defaults to
+        /usr/local/share:/usr/share
+        (see the XDG Base Directory Specification): these locations are
+        specified by the D-Bus Specification. The defaults are suitable
+        for software installed locally by a system administrator
+        (/usr/local/share) or for software installed from operating system
+        packages (/usr/share). Per-user or system-wide configuration that
+        sets the XDG_DATA_DIRS environment variable can extend this search
+        path to cover installations in other locations, for example
+        ~/.local/share/flatpak/exports/share/ and
+        /var/lib/flatpak/exports/share/ when
+        <citerefentry>
+          <refentrytitle>flatpak</refentrytitle>
+          <manvolnum>1</manvolnum>
+        </citerefentry>
+        is used.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis>${datadir}</emphasis>/dbus-1/services
+        for the <emphasis>${datadir}</emphasis> that was specified when
+        dbus was compiled, typically /usr/share: this location is an
+        extension provided by the reference dbus-daemon implementation,
+        and is suitable for software stacks installed alongside dbus-daemon.
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
 
 <para>The "XDG Base Directory Specification" can be found at
 <ulink url='http://freedesktop.org/wiki/Standards/basedir-spec'>http://freedesktop.org/wiki/Standards/basedir-spec</ulink> if it hasn't moved,
 otherwise try your favorite search engine.</para>
+
+<para>
+  On Windows, the standard session service directories are:
+  <itemizedlist>
+    <listitem>
+      <para>
+        <emphasis>%CommonProgramFiles%</emphasis>/dbus-1/services
+        if %CommonProgramFiles% is set: this location is suitable for
+        system-wide installed software packages
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        A share/dbus-1/services directory found in the same
+        directory hierarchy (prefix) as the dbus-daemon: this location
+        is suitable for software stacks installed alongside dbus-daemon
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
 
 
 <para>The &lt;standard_session_servicedirs/&gt; option is only relevant to the
@@ -509,9 +627,53 @@ configuration file would probably be nonsense.</para>
 </itemizedlist>
 
 <para>&lt;standard_system_servicedirs/&gt; specifies the standard system-wide
-activation directories that should be searched for service files.
-This option defaults to @EXPANDED_DATADIR@/dbus-1/system-services.</para>
+  activation directories that should be searched for service files.
+  As with session services, the first directory listed has highest
+  precedence.</para>
 
+<para>
+  On Unix, the standard session service directories are:
+  <itemizedlist>
+    <listitem>
+      <para>
+        /usr/local/share/dbus-1/system-services: this location is
+        specified by the D-Bus Specification, and is suitable for
+        software installed locally by the system administrator
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        /usr/share/dbus-1/system-services: this location is
+        specified by the D-Bus Specification, and is suitable for
+        software installed by operating system packages
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        <emphasis>${datadir}</emphasis>/dbus-1/system-services
+        for the <emphasis>${datadir}</emphasis> that was specified when
+        dbus was compiled, typically /usr/share: this location is an
+        extension provided by the reference dbus-daemon implementation,
+        and is suitable for software stacks installed alongside dbus-daemon
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+        /lib/dbus-1/system-services: this location is
+        specified by the D-Bus Specification, and was intended for
+        software installed by operating system packages and used during
+        early boot (but it should be considered deprecated, because
+        the reference dbus-daemon is not designed to be available during
+        early boot)
+      </para>
+    </listitem>
+  </itemizedlist>
+</para>
+
+<para>
+  On Windows, there is no standard system bus, so there are no standard
+  system bus directories either.
+</para>
 
 <para>The &lt;standard_system_servicedirs/&gt; option is only relevant to the
 per-system bus daemon defined in
