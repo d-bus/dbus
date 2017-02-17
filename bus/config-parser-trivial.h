@@ -59,7 +59,7 @@ dbus_bool_t      bus_config_parser_finished      (BusConfigParser   *parser,
 /* Functions for extracting the parse results */
 const char* bus_config_parser_get_user         (BusConfigParser *parser);
 const char* bus_config_parser_get_type         (BusConfigParser *parser);
-DBusList**  bus_config_parser_get_service_dirs (BusConfigParser *parser);
+DBusList**  bus_config_parser_get_service_paths (BusConfigParser *parser);
 
 /* Loader functions (backended off one of the XML parsers).  Returns a
  * finished ConfigParser.

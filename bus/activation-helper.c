@@ -80,7 +80,7 @@ desktop_file_for_name (BusConfigParser *parser,
       goto out;
     }
 
-  service_dirs = bus_config_parser_get_service_dirs (parser);
+  service_dirs = bus_config_parser_get_service_paths (parser);
   for (link = _dbus_list_get_first_link (service_dirs);
        link != NULL;
        link = _dbus_list_get_next_link (service_dirs, link))

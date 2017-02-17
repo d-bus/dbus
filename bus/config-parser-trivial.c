@@ -367,8 +367,11 @@ bus_config_parser_get_type (BusConfigParser *parser)
   return _dbus_string_get_const_data (&parser->bus_type);
 }
 
+/*
+ * @returns A list of strings, owned by the BusConfigParser
+ */
 DBusList**
-bus_config_parser_get_service_dirs (BusConfigParser *parser)
+bus_config_parser_get_service_paths (BusConfigParser *parser)
 {
   return &parser->service_dirs;
 }
@@ -441,7 +444,7 @@ check_return_values (const DBusString *full_path)
   printf ("    <type>system</type> OKAY!\n");
 
   /* check dirs return value is okay */
-  dirs = bus_config_parser_get_service_dirs (parser);
+  dirs = bus_config_parser_get_service_paths (parser);
   if (dirs == NULL)
     {
       _dbus_warn ("Service dirs are NULL!");
