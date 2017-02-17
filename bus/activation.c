@@ -26,6 +26,7 @@
 #include <config.h>
 #include "activation.h"
 #include "activation-exit-codes.h"
+#include "config-parser.h"
 #include "desktop-file.h"
 #include "dispatch.h"
 #include "services.h"
@@ -821,9 +822,12 @@ bus_activation_reload (BusActivation     *activation,
   link = _dbus_list_get_first_link (directories);
   while (link != NULL)
     {
+      BusConfigServiceDir *config = link->data;
       BusServiceDirectory *s_dir;
 
-      dir = _dbus_strdup ((const char *) link->data);
+      _dbus_assert (config->path != NULL);
+
+      dir = _dbus_strdup (config->path);
       if (!dir)
         {
           BUS_SET_OOM (error);
@@ -2519,6 +2523,7 @@ static dbus_bool_t
 do_service_reload_test (DBusString *dir, dbus_bool_t oom_test)
 {
   BusActivation *activation;
+  BusConfigServiceDir config;
   DBusString     address;
   DBusList      *directories;
   CheckData      d;
@@ -2526,7 +2531,9 @@ do_service_reload_test (DBusString *dir, dbus_bool_t oom_test)
   directories = NULL;
   _dbus_string_init_const (&address, "");
 
-  if (!_dbus_list_append (&directories, _dbus_string_get_data (dir)))
+  config.path = _dbus_string_get_data (dir);
+
+  if (!_dbus_list_append (&directories, &config))
     return FALSE;
 
   activation = bus_activation_new (NULL, &address, &directories, NULL);

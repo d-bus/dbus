@@ -100,7 +100,7 @@ struct BusConfigParser
 
   DBusList *mechanisms; /**< Auth mechanisms */
 
-  DBusList *service_dirs; /**< Directories to look for session services in */
+  DBusList *service_dirs; /**< BusConfigServiceDirs to look for session services in */
 
   DBusList *conf_dirs;   /**< Directories to look for policy configuration in */
 
@@ -232,7 +232,33 @@ merge_service_context_hash (DBusHashTable *dest,
   return FALSE;
 }
 
-static dbus_bool_t
+/*
+ * Create a new BusConfigServiceDir. Takes ownership of path if #TRUE is returned.
+ *
+ * @returns #FALSE on OOM
+ */
+static BusConfigServiceDir *
+bus_config_service_dir_new_take (char *path,
+    BusServiceDirFlags flags)
+{
+  BusConfigServiceDir *self = dbus_new0 (BusConfigServiceDir, 1);
+
+  if (self == NULL)
+    return NULL;
+
+  self->path = path; /* take ownership */
+  self->flags = flags;
+  return self;
+}
+
+static void
+bus_config_service_dir_free (BusConfigServiceDir *self)
+{
+  dbus_free (self->path);
+  dbus_free (self);
+}
+
+static BusConfigServiceDir *
 service_dirs_find_dir (DBusList **service_dirs,
                        const char *dir)
 {
@@ -242,29 +268,79 @@ service_dirs_find_dir (DBusList **service_dirs,
 
   for (link = *service_dirs; link; link = _dbus_list_get_next_link(service_dirs, link))
     {
-      const char *link_dir;
-      
-      link_dir = (const char *)link->data;
-      if (strcmp (dir, link_dir) == 0)
-        return TRUE;
+      BusConfigServiceDir *link_dir = link->data;
+
+      if (strcmp (dir, link_dir->path) == 0)
+        return link_dir;
     }
 
-  return FALSE;
+  return NULL;
 }
 
-static void 
+static void
 service_dirs_append_link_unique_or_free (DBusList **service_dirs,
                                          DBusList *dir_link)
 {
-  if (!service_dirs_find_dir (service_dirs, dir_link->data))
+  BusConfigServiceDir *dir = dir_link->data;
+  BusConfigServiceDir *already = service_dirs_find_dir (service_dirs,
+                                                        dir->path);
+
+  if (already == NULL)
     {
       _dbus_list_append_link (service_dirs, dir_link);
     }
   else
     {
-      dbus_free (dir_link->data);
+      /* BusServiceDirFlags are chosen such that the compatible thing to do
+       * is to "and" the flags. For example, if a directory is explicitly
+       * added as a <servicedir> (which is watched with inotify) and is also
+       * the transient service directory (which should not be watched),
+       * the compatible thing to do is to watch it. */
+      already->flags &= dir->flags;
+      bus_config_service_dir_free (dir_link->data);
       _dbus_list_free_link (dir_link);
     }
+}
+
+/*
+ * Consume links from dirs (a list of paths), converting them into links in
+ * service_dirs (a list of unique BusServiceDir).
+ *
+ * On success, return TRUE. dirs will be empty, and every original entry in
+ * dirs will have a corresponding service_dirs entry.
+ *
+ * On OOM, return FALSE. Each original entry of dirs has either been
+ * appended to service_dirs or left in dirs.
+ */
+static dbus_bool_t
+service_dirs_absorb_string_list (DBusList           **service_dirs,
+                                 DBusList           **dirs,
+                                 BusServiceDirFlags   flags)
+{
+  DBusList *link;
+
+  _dbus_assert (service_dirs != NULL);
+  _dbus_assert (dirs != NULL);
+
+  while ((link = _dbus_list_pop_first_link (dirs)))
+    {
+      char *path = link->data;
+      BusConfigServiceDir *dir = bus_config_service_dir_new_take (path, flags);
+
+      if (dir == NULL)
+        {
+          /* OOM - roll back (this does not need to allocate memory) */
+          _dbus_list_prepend_link (service_dirs, link);
+          return FALSE;
+        }
+
+      /* Ownership of path has been taken by dir */
+      link->data = dir;
+      service_dirs_append_link_unique_or_free (service_dirs, link);
+    }
+
+  _dbus_assert (*dirs == NULL);
+  return TRUE;
 }
 
 static dbus_bool_t
@@ -504,7 +580,7 @@ bus_config_parser_unref (BusConfigParser *parser)
       _dbus_list_clear (&parser->listen_on);
 
       _dbus_list_foreach (&parser->service_dirs,
-                          (DBusForeachFunction) dbus_free,
+                          (DBusForeachFunction) bus_config_service_dir_free,
                           NULL);
 
       _dbus_list_clear (&parser->service_dirs);
@@ -821,7 +897,6 @@ start_busconfig_child (BusConfigParser   *parser,
     }
   else if (element_type == ELEMENT_STANDARD_SESSION_SERVICEDIRS)
     {
-      DBusList *link;
       DBusList *dirs;
       dirs = NULL;
 
@@ -840,14 +915,23 @@ start_busconfig_child (BusConfigParser   *parser,
           return FALSE;
         }
 
-      while ((link = _dbus_list_pop_first_link (&dirs)))
-        service_dirs_append_link_unique_or_free (&parser->service_dirs, link);
+      /* We have traditionally watched the standard session service
+       * directories with inotify, and allowed service files whose names do not
+       * match the bus name */
+      if (!service_dirs_absorb_string_list (&parser->service_dirs, &dirs,
+                                            BUS_SERVICE_DIR_FLAGS_NONE))
+        {
+          BUS_SET_OOM (error);
+          _dbus_list_foreach (&dirs, (DBusForeachFunction) dbus_free,
+              NULL);
+          _dbus_list_clear (&dirs);
+          return FALSE;
+        }
 
       return TRUE;
     }
   else if (element_type == ELEMENT_STANDARD_SYSTEM_SERVICEDIRS)
     {
-      DBusList *link;
       DBusList *dirs;
       dirs = NULL;
 
@@ -866,8 +950,19 @@ start_busconfig_child (BusConfigParser   *parser,
           return FALSE;
         }
 
-      while ((link = _dbus_list_pop_first_link (&dirs)))
-        service_dirs_append_link_unique_or_free (&parser->service_dirs, link);
+      /* We have traditionally watched the standard system service
+       * directories with inotify, and allowed service files whose names do not
+       * match the bus name (the servicehelper won't successfully activate
+       * them, but we do still parse them) */
+      if (!service_dirs_absorb_string_list (&parser->service_dirs, &dirs,
+                                            BUS_SERVICE_DIR_FLAGS_NONE))
+        {
+          BUS_SET_OOM (error);
+          _dbus_list_foreach (&dirs, (DBusForeachFunction) dbus_free,
+              NULL);
+          _dbus_list_clear (&dirs);
+          return FALSE;
+        }
 
       return TRUE;
     }
@@ -2589,6 +2684,7 @@ bus_config_parser_content (BusConfigParser   *parser,
     case ELEMENT_SERVICEDIR:
       {
         char *s;
+        BusConfigServiceDir *dir;
         DBusString full_path;
         DBusList *link;
 
@@ -2609,12 +2705,24 @@ bus_config_parser_content (BusConfigParser   *parser,
             goto nomem;
           }
 
-        link = _dbus_list_alloc_link (s);
+        /* <servicedir/> has traditionally implied that we watch the
+         * directory with inotify, and allow service files whose names do not
+         * match the bus name */
+        dir = bus_config_service_dir_new_take (s, BUS_SERVICE_DIR_FLAGS_NONE);
+
+        if (dir == NULL)
+          {
+            _dbus_string_free (&full_path);
+            dbus_free (s);
+            goto nomem;
+          }
+
+        link = _dbus_list_alloc_link (dir);
 
         if (link == NULL)
           {
             _dbus_string_free (&full_path);
-            dbus_free (s);
+            bus_config_service_dir_free (dir);
             goto nomem;
           }
 
@@ -2818,7 +2926,12 @@ bus_config_parser_get_watched_dirs (BusConfigParser *parser,
        link != NULL;
        link = _dbus_list_get_next_link (&parser->service_dirs, link))
     {
-      if (!_dbus_list_append (watched_dirs, link->data))
+      BusConfigServiceDir *dir = link->data;
+
+      if (dir->flags & BUS_SERVICE_DIR_FLAGS_NO_WATCH)
+        continue;
+
+      if (!_dbus_list_append (watched_dirs, dir->path))
         goto oom;
     }
 
@@ -3179,6 +3292,34 @@ lists_of_c_strings_equal (DBusList *a,
 }
 
 static dbus_bool_t
+lists_of_service_dirs_equal (DBusList *a,
+                             DBusList *b)
+{
+  DBusList *ia;
+  DBusList *ib;
+
+  ia = a;
+  ib = b;
+
+  while (ia != NULL && ib != NULL)
+    {
+      BusConfigServiceDir *da = ia->data;
+      BusConfigServiceDir *db = ib->data;
+
+      if (strcmp (da->path, db->path))
+        return FALSE;
+
+      if (da->flags != db->flags)
+        return FALSE;
+
+      ia = _dbus_list_get_next_link (&a, ia);
+      ib = _dbus_list_get_next_link (&b, ib);
+    }
+
+  return ia == NULL && ib == NULL;
+}
+
+static dbus_bool_t
 limits_equal (const BusLimits *a,
 	      const BusLimits *b)
 {
@@ -3221,7 +3362,7 @@ config_parsers_equal (const BusConfigParser *a,
   if (!lists_of_c_strings_equal (a->mechanisms, b->mechanisms))
     return FALSE;
 
-  if (!lists_of_c_strings_equal (a->service_dirs, b->service_dirs))
+  if (!lists_of_service_dirs_equal (a->service_dirs, b->service_dirs))
     return FALSE;
   
   /* FIXME: compare policy */
@@ -3550,7 +3691,9 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
        link != NULL;
        link = _dbus_list_get_next_link (dirs, link), i++)
     {
-      printf ("    test service dir: '%s'\n", (char *)link->data);
+      BusConfigServiceDir *dir = link->data;
+
+      printf ("    test service dir: '%s'\n", dir->path);
       printf ("    current standard service dir: '%s'\n", test_session_service_dir_matches[i]);
       if (test_session_service_dir_matches[i] == NULL)
         {
@@ -3558,12 +3701,17 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
           goto out;
         }
  
-      if (strcmp (test_session_service_dir_matches[i], 
-                  (char *)link->data) != 0)
+      if (strcmp (test_session_service_dir_matches[i], dir->path) != 0)
         {
           printf ("'%s' directory does not match '%s' in the match set\n",
-                  (char *)link->data,
-                  test_session_service_dir_matches[i]);
+                  dir->path, test_session_service_dir_matches[i]);
+          goto out;
+        }
+
+      if (dir->flags != BUS_SERVICE_DIR_FLAGS_NONE)
+        {
+          printf ("'%s' directory has flags 0x%x, should be 0x%x\n",
+                  dir->path, dir->flags, BUS_SERVICE_DIR_FLAGS_NONE);
           goto out;
         }
     }

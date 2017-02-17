@@ -86,4 +86,22 @@ BusConfigParser* bus_config_load (const DBusString      *file,
                                   const BusConfigParser *parent,
                                   DBusError             *error);
 
+/*
+ * These are chosen such that if we configure a directory twice with different
+ * flags, we have to do an "and" operation on the flags - the compatible
+ * thing to do is to have no flags.
+ */
+typedef enum
+{
+  BUS_SERVICE_DIR_FLAGS_NO_WATCH = (1 << 0),
+  /* Keep this one at the end to reduce diffs when adding new entries */
+  BUS_SERVICE_DIR_FLAGS_NONE = 0
+} BusServiceDirFlags;
+
+typedef struct
+{
+  BusServiceDirFlags flags;
+  char *path;
+} BusConfigServiceDir;
+
 #endif /* BUS_CONFIG_PARSER_H */
