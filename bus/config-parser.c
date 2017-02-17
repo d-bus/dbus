@@ -3533,45 +3533,9 @@ test_default_system_servicedirs (void)
 {
   DBusList *dirs;
   DBusList *link;
-  DBusString progs;
   int i;
 
-  /* On Unix we don't actually use this variable, but it's easier to handle the
-   * deallocation if we always allocate it, whether needed or not */
-  if (!_dbus_string_init (&progs))
-    _dbus_assert_not_reached ("OOM allocating progs");
-
   dirs = NULL;
-
-  printf ("Testing retrieving the default system service directories\n");
-  if (!_dbus_get_standard_system_servicedirs (&dirs))
-    _dbus_assert_not_reached ("couldn't get stardard dirs");
-
-  /* make sure our defaults end with share/dbus-1/system-service */
-  while ((link = _dbus_list_pop_first_link (&dirs)))
-    {
-      DBusString path;
-      
-      printf ("    default service dir: %s\n", (char *)link->data);
-      _dbus_string_init_const (&path, (char *)link->data);
-      if (!_dbus_string_ends_with_c_str (&path, "dbus-1/system-services"))
-        {
-          printf ("error with default system service directories\n");
-	      dbus_free (link->data);
-    	  _dbus_list_free_link (link);
-          _dbus_string_free (&progs);
-          return FALSE;
-        }
- 
-      dbus_free (link->data);
-      _dbus_list_free_link (link);
-    }
-
-  if (!dbus_setenv ("XDG_DATA_HOME", "/testhome/foo/.testlocal/testshare"))
-    _dbus_assert_not_reached ("couldn't setenv XDG_DATA_HOME");
-
-  if (!dbus_setenv ("XDG_DATA_DIRS", ":/testusr/testlocal/testshare: :/testusr/testshare:"))
-    _dbus_assert_not_reached ("couldn't setenv XDG_DATA_DIRS");
 
   if (!_dbus_get_standard_system_servicedirs (&dirs))
     _dbus_assert_not_reached ("couldn't get stardard dirs");
@@ -3586,7 +3550,6 @@ test_default_system_servicedirs (void)
           printf ("more directories parsed than in match set\n");
           dbus_free (link->data);
           _dbus_list_free_link (link);
-          _dbus_string_free (&progs);
           return FALSE;
         }
  
@@ -3598,7 +3561,6 @@ test_default_system_servicedirs (void)
                   test_system_service_dir_matches[i]);
           dbus_free (link->data);
           _dbus_list_free_link (link);
-          _dbus_string_free (&progs);
           return FALSE;
         }
 
@@ -3613,11 +3575,9 @@ test_default_system_servicedirs (void)
       printf ("extra data %s in the match set was not matched\n",
               test_system_service_dir_matches[i]);
 
-      _dbus_string_free (&progs);
       return FALSE;
     }
     
-  _dbus_string_free (&progs);
   return TRUE;
 }
 #endif
