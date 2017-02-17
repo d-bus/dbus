@@ -3440,27 +3440,6 @@ test_default_session_servicedirs (void)
   dirs = NULL;
 
   printf ("Testing retrieving the default session service directories\n");
-  if (!_dbus_get_standard_session_servicedirs (&dirs))
-    _dbus_assert_not_reached ("couldn't get stardard dirs");
-
-  /* make sure our defaults end with share/dbus-1/service */
-  while ((link = _dbus_list_pop_first_link (&dirs)))
-    {
-      DBusString path;
-      
-      printf ("    default service dir: %s\n", (char *)link->data);
-      _dbus_string_init_const (&path, (char *)link->data);
-      if (!_dbus_string_ends_with_c_str (&path, "dbus-1/services"))
-        {
-          printf ("error with default session service directories\n");
-	      dbus_free (link->data);
-    	  _dbus_list_free_link (link);
-          goto out;
-        }
- 
-      dbus_free (link->data);
-      _dbus_list_free_link (link);
-    }
 
 #ifdef DBUS_UNIX
   if (!dbus_setenv ("XDG_DATA_HOME", "/testhome/foo/.testlocal/testshare"))
