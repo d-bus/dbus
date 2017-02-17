@@ -2307,9 +2307,9 @@ bus_activation_entry_get_assumed_apparmor_label (BusActivationEntry *entry)
 
 #include <stdio.h>
 
-#define SERVICE_NAME_1 "MyService1"
-#define SERVICE_NAME_2 "MyService2"
-#define SERVICE_NAME_3 "MyService3"
+#define SERVICE_NAME_1 "com.example.MyService1"
+#define SERVICE_NAME_2 "org.example.MyService2"
+#define SERVICE_NAME_3 "net.example.MyService3"
 
 #define SERVICE_FILE_1 "service-1.service"
 #define SERVICE_FILE_2 "service-2.service"
