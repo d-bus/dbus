@@ -3394,10 +3394,14 @@ static const char *test_session_service_dir_matches[] =
         };
 
 static dbus_bool_t
-test_default_session_servicedirs (void)
+test_default_session_servicedirs (const DBusString *test_base_dir)
 {
-  DBusList *dirs;
+  BusConfigParser *parser = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  DBusList **dirs;
   DBusList *link;
+  DBusString tmp;
+  DBusString full_path;
   DBusString progs;
   DBusString install_root_based;
   DBusString data_home_based;
@@ -3415,12 +3419,27 @@ test_default_session_servicedirs (void)
   /* On each platform we don't actually use all of these, but it's easier to
    * handle the deallocation if we always allocate them, whether needed or
    * not */
-  if (!_dbus_string_init (&progs) ||
+  if (!_dbus_string_init (&full_path) ||
+      !_dbus_string_init (&progs) ||
       !_dbus_string_init (&install_root_based) ||
       !_dbus_string_init (&data_home_based) ||
       !_dbus_string_init (&data_dirs_based) ||
       !_dbus_string_init (&data_dirs_based2))
     _dbus_assert_not_reached ("OOM allocating strings");
+
+  if (!_dbus_string_copy (test_base_dir, 0,
+                          &full_path, 0))
+    _dbus_assert_not_reached ("couldn't copy test_base_dir to full_path");
+
+  _dbus_string_init_const (&tmp, "valid-config-files");
+
+  if (!_dbus_concat_dir_and_file (&full_path, &tmp))
+    _dbus_assert_not_reached ("couldn't allocate full path");
+
+  _dbus_string_init_const (&tmp, "standard-session-dirs.conf");
+
+  if (!_dbus_concat_dir_and_file (&full_path, &tmp))
+    _dbus_assert_not_reached ("couldn't allocate full path");
 
 #ifdef DBUS_WIN
   if (!_dbus_string_append (&install_root_based, DBUS_DATADIR) ||
@@ -3479,22 +3498,22 @@ test_default_session_servicedirs (void)
       &data_dirs_based2);
 #endif
 
-  dirs = NULL;
+  parser = bus_config_load (&full_path, TRUE, NULL, &error);
 
-  if (!_dbus_get_standard_session_servicedirs (&dirs))
-    _dbus_assert_not_reached ("couldn't get stardard dirs");
+  if (parser == NULL)
+    _dbus_assert_not_reached (error.message);
 
-  /* make sure we read and parse the env variable correctly */
-  i = 0;
-  while ((link = _dbus_list_pop_first_link (&dirs)))
+  dirs = bus_config_parser_get_service_dirs (parser);
+
+  for (link = _dbus_list_get_first_link (dirs), i = 0;
+       link != NULL;
+       link = _dbus_list_get_next_link (dirs, link), i++)
     {
       printf ("    test service dir: '%s'\n", (char *)link->data);
       printf ("    current standard service dir: '%s'\n", test_session_service_dir_matches[i]);
       if (test_session_service_dir_matches[i] == NULL)
         {
           printf ("more directories parsed than in match set\n");
-          dbus_free (link->data);
-          _dbus_list_free_link (link);
           goto out;
         }
  
@@ -3504,15 +3523,8 @@ test_default_session_servicedirs (void)
           printf ("'%s' directory does not match '%s' in the match set\n",
                   (char *)link->data,
                   test_session_service_dir_matches[i]);
-          dbus_free (link->data);
-          _dbus_list_free_link (link);
           goto out;
         }
-
-      ++i;
-
-      dbus_free (link->data);
-      _dbus_list_free_link (link);
     }
   
   if (test_session_service_dir_matches[i] != NULL)
@@ -3525,6 +3537,10 @@ test_default_session_servicedirs (void)
   ret = TRUE;
 
 out:
+  if (parser != NULL)
+    bus_config_parser_unref (parser);
+
+  _dbus_string_free (&full_path);
   _dbus_string_free (&install_root_based);
   _dbus_string_free (&progs);
   _dbus_string_free (&data_home_based);
@@ -3607,7 +3623,7 @@ bus_config_parser_test (const DBusString *test_data_dir)
       return TRUE;
     }
 
-  if (!test_default_session_servicedirs())
+  if (!test_default_session_servicedirs (test_data_dir))
     return FALSE;
 
 #ifdef DBUS_WIN

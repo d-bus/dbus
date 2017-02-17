@@ -489,6 +489,7 @@ static_data = \
 	data/valid-config-files/entities.conf \
 	data/valid-config-files/listen-unix-runtime.conf \
 	data/valid-config-files/many-rules.conf \
+	data/valid-config-files/standard-session-dirs.conf \
 	data/valid-config-files-system/system.d/test.conf \
 	data/valid-messages/array-of-array-of-uint32.message \
 	data/valid-messages/dict-simple.message \
