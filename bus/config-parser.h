@@ -94,6 +94,7 @@ BusConfigParser* bus_config_load (const DBusString      *file,
 typedef enum
 {
   BUS_SERVICE_DIR_FLAGS_NO_WATCH = (1 << 0),
+  BUS_SERVICE_DIR_FLAGS_STRICT_NAMING = (1 << 1),
   /* Keep this one at the end to reduce diffs when adding new entries */
   BUS_SERVICE_DIR_FLAGS_NONE = 0
 } BusServiceDirFlags;

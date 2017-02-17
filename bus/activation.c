@@ -62,6 +62,7 @@ typedef struct
 {
   int refcount;
   char *dir_c;
+  BusServiceDirFlags flags;
   DBusHashTable *entries;
 } BusServiceDirectory;
 
@@ -401,8 +402,69 @@ update_desktop_file_entry (BusActivation       *activation,
 
   if (entry == NULL) /* New file */
     {
+      DBusString expected_name;
+
+      if (!_dbus_string_init (&expected_name))
+        {
+          BUS_SET_OOM (error);
+          goto out;
+        }
+
+      if (!_dbus_string_append (&expected_name, name) ||
+          !_dbus_string_append (&expected_name, ".service"))
+        {
+          _dbus_string_free (&expected_name);
+          BUS_SET_OOM (error);
+          goto out;
+        }
+
+      if (_dbus_string_equal (&expected_name, filename))
+        {
+          _dbus_verbose ("Name of \"%s\" is as expected\n",
+                         _dbus_string_get_const_data (&file_path));
+        }
+      else if (s_dir->flags & BUS_SERVICE_DIR_FLAGS_STRICT_NAMING)
+        {
+          bus_context_log_and_set_error (activation->context,
+                                         DBUS_SYSTEM_LOG_WARNING, error,
+                                         DBUS_ERROR_FAILED,
+                                         "Service file \"%s\" should have "
+                                         "been named \"%s\": not loading it",
+                                         _dbus_string_get_const_data (&file_path),
+                                         _dbus_string_get_const_data (&expected_name));
+          _dbus_string_free (&expected_name);
+          goto out;
+        }
+      else if (bus_context_get_servicehelper (activation->context) != NULL)
+        {
+          bus_context_log (activation->context, DBUS_SYSTEM_LOG_WARNING,
+                           "Service file \"%s\" should have been named \"%s\""
+                           "and will not work with system bus activation",
+                           _dbus_string_get_const_data (&file_path),
+                           _dbus_string_get_const_data (&expected_name));
+          /* We don't actually error out here, because *technically* it could
+           * still work on systemd systems, where we tell systemd to start the
+           * SystemdService instead of launching dbus-daemon-launch-helper
+           * ourselves. But maybe we should:
+           * https://bugs.freedesktop.org/show_bug.cgi?id=99874 */
+        }
+      else
+        {
+          /* We could maybe log mismatched names for session services in
+           * a user-visible way too, but not until
+           * https://lintian.debian.org/tags/dbus-session-service-wrong-name.html
+           * is a bit shorter.
+           * https://bugs.freedesktop.org/show_bug.cgi?id=99873 */
+          _dbus_verbose ("Name of \"%s\" should canonically be \"%s\"\n",
+                         _dbus_string_get_const_data (&file_path),
+                         _dbus_string_get_const_data (&expected_name));
+        }
+
+      _dbus_string_free (&expected_name);
+
       /* FIXME we need a better-defined algorithm for which service file to
        * pick than "whichever one is first in the directory listing"
+       * See also https://bugs.freedesktop.org/show_bug.cgi?id=99874
        */
       if (_dbus_hash_table_lookup_string (activation->entries, name))
         {
@@ -844,6 +906,7 @@ bus_activation_reload (BusActivation     *activation,
 
       s_dir->refcount = 1;
       s_dir->dir_c = dir;
+      s_dir->flags = config->flags;
 
       s_dir->entries = _dbus_hash_table_new (DBUS_HASH_STRING, NULL,
                                              (DBusFreeFunction)bus_activation_entry_unref);
@@ -2520,10 +2583,13 @@ do_test (const char *description, dbus_bool_t oom_test, CheckData *data)
 }
 
 static dbus_bool_t
-do_service_reload_test (DBusString *dir, dbus_bool_t oom_test)
+do_service_reload_test (const DBusString *test_data_dir,
+                        DBusString       *dir,
+                        dbus_bool_t       oom_test)
 {
   BusActivation *activation;
   BusConfigServiceDir config;
+  BusContext    *context;
   DBusString     address;
   DBusList      *directories;
   CheckData      d;
@@ -2532,11 +2598,17 @@ do_service_reload_test (DBusString *dir, dbus_bool_t oom_test)
   _dbus_string_init_const (&address, "");
 
   config.path = _dbus_string_get_data (dir);
+  config.flags = BUS_SERVICE_DIR_FLAGS_NONE;
 
   if (!_dbus_list_append (&directories, &config))
     return FALSE;
 
-  activation = bus_activation_new (NULL, &address, &directories, NULL);
+  context = bus_context_new_test (test_data_dir,
+                                  "valid-config-files/debug-allow-all.conf");
+  if (context == NULL)
+    return FALSE;
+
+  activation = bus_activation_new (context, &address, &directories, NULL);
   if (!activation)
     return FALSE;
 
@@ -2597,6 +2669,7 @@ do_service_reload_test (DBusString *dir, dbus_bool_t oom_test)
 
   bus_activation_unref (activation);
   _dbus_list_clear (&directories);
+  bus_context_unref (context);
 
   return TRUE;
 }
@@ -2627,7 +2700,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
   if (!init_service_reload_test (&directory))
     _dbus_assert_not_reached ("could not initiate service reload test");
 
-  if (!do_service_reload_test (&directory, FALSE))
+  if (!do_service_reload_test (test_data_dir, &directory, FALSE))
     {
       /* Do nothing? */
     }
@@ -2639,7 +2712,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
   if (!init_service_reload_test (&directory))
     _dbus_assert_not_reached ("could not initiate service reload test");
 
-  if (!do_service_reload_test (&directory, TRUE))
+  if (!do_service_reload_test (test_data_dir, &directory, TRUE))
     {
       /* Do nothing? */
     }
