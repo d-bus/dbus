@@ -407,8 +407,12 @@ teardown (Fixture *f,
       f->eavesdropper = NULL;
     }
 
-  test_kill_pid (f->daemon_pid);
-  g_spawn_close_pid (f->daemon_pid);
+  if (f->daemon_pid != 0)
+    {
+      test_kill_pid (f->daemon_pid);
+      g_spawn_close_pid (f->daemon_pid);
+      f->daemon_pid = 0;
+    }
 
   test_main_context_unref (f->ctx);
 }
