@@ -135,9 +135,9 @@ EXTRA_DIST += dbus-test-runner
 testexecdir = $(libexecdir)/installed-tests/dbus
 testmetadir = $(datadir)/installed-tests/dbus
 
-dist_testexec_SCRIPTS =
-testexec_PROGRAMS =
-testmeta_DATA =
+nobase_dist_testexec_SCRIPTS =
+nobase_testexec_PROGRAMS =
+nobase_testmeta_DATA =
 
 installable_helpers = \
 	$(NULL)
@@ -191,6 +191,7 @@ dist_installable_test_scripts += \
 
 # Only runnable when installed, not from the source tree
 dist_installed_test_scripts += \
+	integration/transient-services.sh \
 	test-apparmor-activation.sh \
 	$(NULL)
 
@@ -361,14 +362,14 @@ TESTS += $(installable_tests)
 installcheck_tests += $(installable_tests)
 
 if DBUS_ENABLE_INSTALLED_TESTS
-  testexec_PROGRAMS += $(installable_helpers)
-  testexec_PROGRAMS += $(installable_manual_tests)
-  testexec_PROGRAMS += $(installable_tests)
-  dist_testexec_SCRIPTS += $(dist_installed_test_scripts)
-  dist_testexec_SCRIPTS += $(dist_installable_test_scripts)
+  nobase_testexec_PROGRAMS += $(installable_helpers)
+  nobase_testexec_PROGRAMS += $(installable_manual_tests)
+  nobase_testexec_PROGRAMS += $(installable_tests)
+  nobase_dist_testexec_SCRIPTS += $(dist_installed_test_scripts)
+  nobase_dist_testexec_SCRIPTS += $(dist_installable_test_scripts)
 
-  testmeta_DATA += $(installable_test_meta)
-  testmeta_DATA += $(installable_test_meta_with_config)
+  nobase_testmeta_DATA += $(installable_test_meta)
+  nobase_testmeta_DATA += $(installable_test_meta_with_config)
 else !DBUS_ENABLE_INSTALLED_TESTS
   noinst_PROGRAMS += $(installable_tests) $(installable_manual_tests)
 endif !DBUS_ENABLE_INSTALLED_TESTS
@@ -610,6 +611,7 @@ data/valid-config-files-system/system.conf: $(top_builddir)/bus/system.conf
 	$(AM_V_GEN)cp $< $@
 
 $(installable_test_meta): %.test: %$(EXEEXT) Makefile
+	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN) ( \
 		echo '[Test]'; \
 		echo 'Type=session'; \
@@ -618,6 +620,7 @@ $(installable_test_meta): %.test: %$(EXEEXT) Makefile
 	) > $@.tmp && mv $@.tmp $@
 
 $(installable_test_meta_with_config): %_with_config.test: %$(EXEEXT) Makefile
+	$(AM_V_at)$(MKDIR_P) $(dir $@)
 	$(AM_V_GEN) ( \
 		echo '[Test]'; \
 		echo 'Type=session'; \
