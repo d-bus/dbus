@@ -826,6 +826,8 @@ however there are some steps which you can take when designing an API to ease
 security policy implementation.
 
 D-Bus security policies are written as XML files in
+$file($var($$(datadir$)/dbus-1/system.d)),
+$file($var($$(datadir$)/dbus-1/session.d)),
 $file($var($$(sysconfdir$)/dbus-1/system.d)) and
 $file($var($$(sysconfdir$)/dbus-1/session.d)) and use an allow/deny model, where
 each message (method call, signal emission, etc.) can be allowed or denied
@@ -836,7 +838,10 @@ $code(send_destination) or $code(receive_sender) attribute set.
 When designing an API, bear in mind the need to write and install such a
 security policy, and consider splitting up methods or providing more restricted
 versions which accept constrained parameters, so that they can be exposed with
-less restrictive security policies if needed by less trusted clients.
+less restrictive security policies if needed by less trusted clients. Since
+dbus-daemon 1.10, security policies should be installed to
+$file($var($$(datadir$))) rather than $(file($var($$(sysconfdir$))); the latter
+is intended for system administators.
 
 Secondly, the default D-Bus security policy for the system bus is restrictive
 enough to allow sensitive data, such as passwords, to be safely sent over the

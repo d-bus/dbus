@@ -46,7 +46,8 @@ Exec=/usr/sbin/dbus-test-server.py
 User=ftp
 
 This gives the user to switch to, and also the path of the executable.
-The service name must match that specified in the /etc/dbus-1/system.d conf file.
+The service name must match that specified in the /etc/dbus-1/system.d or
+/usr/share/dbus-1/system.d conf file.
 
 Precautions taken:
 
