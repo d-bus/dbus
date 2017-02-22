@@ -17,6 +17,8 @@ Fixes:
 • When tests are skipped, don't try to kill nonexistent process 0
   (fd.o #99825, Simon McVittie)
 
+• Avoid valgrind false positives (fd.o #88808, Philip Withnall)
+
 D-Bus 1.11.10 (2017-02-16)
 ==
 
