@@ -182,6 +182,13 @@ _dbus_check_fdleaks_enter (void)
           if (fd == dirfd (d))
             continue;
 
+          if (fd >= FD_SETSIZE)
+            {
+              _dbus_verbose ("FD %d unexpectedly large; cannot track whether "
+                             "it is leaked\n", fd);
+              continue;
+            }
+
           FD_SET (fd, &fds->set);
         }
 
@@ -226,6 +233,13 @@ _dbus_check_fdleaks_leave (DBusInitialFDs *fds)
 
           if (fd == dirfd (d))
             continue;
+
+          if (fd >= FD_SETSIZE)
+            {
+              _dbus_verbose ("FD %d unexpectedly large; cannot track whether "
+                             "it is leaked\n", fd);
+              continue;
+            }
 
           if (FD_ISSET (fd, &fds->set))
             continue;
