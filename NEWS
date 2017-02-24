@@ -9,6 +9,25 @@ Enhancements:
   or similar, and the service files must be named exactly
   ${bus_name}.service. (fd.o #99825, Simon McVittie)
 
+• dbus can be configured with --enable-relocation when building with
+  Autotools, or with -DDBUS_RELOCATABLE=ON when building with cmake,
+  to make the pkg-config metadata relocatable. This is useful for
+  non-standard prefixes, and in particular for Windows installations.
+  However, it is not recommended for system-wide installations into
+  /usr, because it interferes with pkg-config's ability to filter out
+  compiler default linker directories.
+
+  With Autotools, the default is --enable-relocation when building
+  for Windows or --disable-relocation otherwise. With CMake, the default
+  is -DDBUS_RELOCATABLE=ON.
+
+  (fd.o #99721; Ralf Habacker, Simon McVittie)
+
+• Users of CMake ≥ 2.6 can now link to libdbus without providing their
+  own FindDBus.cmake macros, whether dbus was compiled with Autotools
+  or with CMake. See the end of README.cmake for more information.
+  (fd.o #99721; Ralf Habacker, Simon McVittie)
+
 Fixes:
 
 • Always read service file directories in the intended order
@@ -18,6 +37,9 @@ Fixes:
   (fd.o #99825, Simon McVittie)
 
 • Avoid valgrind false positives (fd.o #88808, Philip Withnall)
+
+• Clarify the roles of /etc/dbus-1/s*.d and /usr/share/dbus-1/s*.d
+  in documentation (fd.o #99901, Philip Withnall)
 
 D-Bus 1.11.10 (2017-02-16)
 ==
