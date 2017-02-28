@@ -742,6 +742,9 @@ test_deny_receive (Fixture *f,
   DBusMessage *m;
   const Config *config = context;
 
+  g_assert (config != NULL);
+  g_assert (config->bus_name != NULL);
+
   if (f->address == NULL)
     return;
 
@@ -852,6 +855,9 @@ test_transient_services (Fixture *f,
   DBusMessage *reply = NULL;
   DBusPendingCall *pc;
 
+  g_assert (config != NULL);
+  g_assert (config->bus_name != NULL);
+
   if (f->address == NULL)
     return;
 
@@ -863,7 +869,7 @@ test_transient_services (Fixture *f,
   f->systemd_name = dbus_bus_get_unique_name (f->systemd);
   take_well_known_name (f, f->systemd, "org.freedesktop.systemd1");
 
-  if (config == NULL || (config->flags & FLAG_EARLY_TRANSIENT_SERVICE) == 0)
+  if ((config->flags & FLAG_EARLY_TRANSIENT_SERVICE) == 0)
     {
       /* Try to activate a service that isn't there. */
       m = dbus_message_new_method_call (config->bus_name,
