@@ -880,7 +880,7 @@ test_transient_services (Fixture *f,
       /* It fails. */
 
       if (dbus_pending_call_get_completed (pc))
-        test_pending_call_store_reply (pc, &reply);
+        test_pending_call_store_reply (pc, &m);
       else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
             &m, NULL))
         g_error ("OOM");
