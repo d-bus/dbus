@@ -1530,9 +1530,6 @@ AS_AC_EXPAND(EXPANDED_LIBDIR, "$libdir")
 AS_AC_EXPAND(EXPANDED_LIBEXECDIR, "$libexecdir")
 AS_AC_EXPAND(EXPANDED_DATADIR, "$datadir")
 
-# For the moment we don't support relocation when building with Autotools
-AC_SUBST([pkgconfig_prefix], ['${original_prefix}'])
-
 #### Check our operating system
 operating_system=unknown
 if test -f /etc/redhat-release || test -f $EXPANDED_SYSCONFDIR/redhat-release ; then
@@ -1693,6 +1690,45 @@ AC_DEFINE_UNQUOTED(DBUS_BINDIR,"$DBUS_BINDIR", [Directory for installing the bin
 DBUS_LIBEXECDIR="$EXPANDED_LIBEXECDIR"
 AC_SUBST(DBUS_LIBEXECDIR)
 AC_DEFINE_UNQUOTED(DBUS_LIBEXECDIR,"$DBUS_LIBEXECDIR", [Directory for installing the libexec binaries])
+
+AC_ARG_ENABLE([relocation],
+  [AS_HELP_STRING([--enable-relocation[=yes/no/auto]],
+    [Make pkg-config metadata relocatable [default=auto]])],
+  [], [enable_relocation=auto])
+
+can_relocate=yes
+
+AS_CASE(["${exec_prefix}"],
+  ['NONE'|'${prefix}'],
+    [:],
+  [*],
+    [can_relocate=no])
+
+AS_CASE(["${libdir}"],
+  ['${prefix}/lib'|'${prefix}/lib64'|'${exec_prefix}/lib'|'${exec_prefix}/lib64'],
+    [:],
+  [*],
+    [can_relocate=no])
+
+# If the user said --enable-relocation but we can't do it, error out
+AS_IF([test "x$can_relocate" = xno && test "x$enable_relocation" = xyes],
+  [AC_MSG_ERROR([Relocatable pkg-config metadata requires --exec-prefix='\${prefix}' and the default libdir])])
+
+# By default, on Windows we are relocatable if possible
+AS_IF([test "x$enable_relocation" = xauto && test "x$dbus_win" = xyes],
+  [enable_relocation="$can_relocate"])
+
+# By default, on non-Windows we are not relocatable because it can interfere
+# with pkg-config's ability to filter out system include directories,
+# resulting in linking an outdated system-wide library in preference to a
+# newer version installed elsewhere
+AS_IF([test "x$enable_relocation" = xauto],
+  [enable_relocation="no"])
+
+
+AS_IF([test "x$enable_relocation" = xyes],
+  [AC_SUBST([pkgconfig_prefix], ['${pcfiledir}/../../'])],
+  [AC_SUBST([pkgconfig_prefix], ['${original_prefix}'])])
 
 #### Directory to source sysconfdir configuration from
 
