@@ -3,8 +3,14 @@ SUBDIRS=dbus bus tools test doc
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = dbus-1.pc
 
+cmakeconfigdir = $(libdir)/cmake/DBus1
+cmakeconfig_DATA = cmake/DBus1Config.cmake       \
+                   cmake/DBus1ConfigVersion.cmake
+
 DISTCLEANFILES = 		\
-	dbus-1.pc
+	${pkgconfig_DATA}       \
+	${cmakeconfig_DATA}     \
+	$(NULL)
 
 EXTRA_DIST =			\
 	autogen.sh		\

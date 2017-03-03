@@ -104,7 +104,7 @@ set(DBUS_DATADIR             ${CMAKE_INSTALL_FULL_DATADIR})
 #enable building of shared library
 SET(BUILD_SHARED_LIBS ON)
 
-set(INSTALL_TARGETS_DEFAULT_ARGS  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(INSTALL_TARGETS_DEFAULT_ARGS EXPORT DBus1Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if (CYGWIN)
    set (WIN32)
@@ -522,6 +522,26 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbus-env.bat.cmake ${CMAKE_BINARY_DIR
 endif()
 
 add_definitions(-DHAVE_CONFIG_H=1)
+
+#
+# create cmake find_package related files
+#
+set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/DBus1)
+if(WIN32)
+   configure_file(DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+else()
+   configure_file(DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+endif()
+configure_file(DBus1ConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake" @ONLY)
+install(FILES
+    "${CMAKE_BINARY_DIR}/DBus1Config.cmake"
+    "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake"
+    DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev
+)
+
+if(WIN32)
+    install(EXPORT DBus1Targets DESTINATION "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+endif()
 
 ########### subdirs ###############
 
