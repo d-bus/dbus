@@ -38,6 +38,9 @@ Fixes:
 
 • Avoid valgrind false positives (fd.o #88808, Philip Withnall)
 
+• Fix some typos in test code
+  (fd.o #99999, Coverity #141876, #141877; Philip Withnall)
+
 • Clarify the roles of /etc/dbus-1/s*.d and /usr/share/dbus-1/s*.d
   in documentation (fd.o #99901, Philip Withnall)
 
