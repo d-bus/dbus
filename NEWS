@@ -1,7 +1,11 @@
 D-Bus 1.10.18 (UNRELEASED)
 ==
 
-...
+Fixes:
+
+• Re-order dbus-daemon startup so that on SELinux systems, the thread
+  that reads AVC notifications retains the ability to write to the
+  audit log (fd.o #92832, Laurent Bigonville)
 
 D-Bus 1.10.16 (2017-02-16)
 ==
