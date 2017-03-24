@@ -1364,14 +1364,6 @@ AS_IF([test "x$enable_ansi" = "xyes"],[
     AC_DEFINE([_BSD_SOURCE],[1],[Define to enable BSD features])
   ])
 
-dnl TODO: The compiler flags below disable warnings that the
-dnl       compiler emits while building dbus. Fix the source
-dnl       code and remove these flags.
-DISABLE_WARNINGS="$DISABLE_WARNINGS
-                  -Wno-switch-default
-                  -Wno-switch-enum
-                  "
-
 dnl We are only calling this for its side-effect of setting up
 dnl --enable-compile-warnings; the WARN_CFLAGS, etc. are ignored,
 dnl to work around https://github.com/peti/autoconf-archive/pull/96
