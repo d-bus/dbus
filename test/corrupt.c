@@ -271,7 +271,6 @@ test_byte_order (Fixture *f,
   int fd;
   char *blob;
   const gchar *arg = not_a_dbus_message;
-  const gchar * const *args = &arg;
   int blob_len;
   DBusMessage *message;
   dbus_bool_t mem;
@@ -283,7 +282,7 @@ test_byte_order (Fixture *f,
   /* Append 0xFF bytes, so that the length of the body when byte-swapped
    * is 0xFF000000, which is invalid */
   mem = dbus_message_append_args (message,
-      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &args, 0xFF,
+      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &arg, 0xFF,
       DBUS_TYPE_INVALID);
   g_assert (mem);
   mem = dbus_message_marshal (message, &blob, &blob_len);
