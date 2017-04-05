@@ -99,14 +99,16 @@ test_connect (Fixture *f,
     gconstpointer addr G_GNUC_UNUSED)
 {
   dbus_bool_t have_mem;
+  char *address = NULL;
 
   g_assert (f->server_conn == NULL);
 
-  f->client_conn = dbus_connection_open_private (
-      dbus_server_get_address (f->server), &f->e);
+  address = dbus_server_get_address (f->server);
+  f->client_conn = dbus_connection_open_private (address, &f->e);
   assert_no_error (&f->e);
   g_assert (f->client_conn != NULL);
   test_connection_setup (f->ctx, f->client_conn);
+  dbus_free (address);
 
   while (f->server_conn == NULL)
     {
@@ -352,6 +354,7 @@ teardown (Fixture *f,
 {
   if (f->client_conn != NULL)
     {
+      test_connection_shutdown (f->ctx, f->client_conn);
       dbus_connection_close (f->client_conn);
       dbus_connection_unref (f->client_conn);
       f->client_conn = NULL;
@@ -359,6 +362,7 @@ teardown (Fixture *f,
 
   if (f->server_conn != NULL)
     {
+      test_connection_shutdown (f->ctx, f->server_conn);
       dbus_connection_close (f->server_conn);
       dbus_connection_unref (f->server_conn);
       f->server_conn = NULL;
