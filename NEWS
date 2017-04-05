@@ -38,6 +38,9 @@ Fixes:
 
 • Avoid valgrind false positives (fd.o #88808, Philip Withnall)
 
+• Fix a harmless read overflow and some memory leaks in a unit test
+  (fd.o #100568, Philip Withnall)
+
 • Fix some typos in test code
   (fd.o #99999, Coverity #141876, #141877; Philip Withnall)
 

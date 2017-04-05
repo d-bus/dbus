@@ -99,14 +99,16 @@ test_connect (Fixture *f,
     gconstpointer addr G_GNUC_UNUSED)
 {
   dbus_bool_t have_mem;
+  char *address = NULL;
 
   g_assert (f->server_conn == NULL);
 
-  f->client_conn = dbus_connection_open_private (
-      dbus_server_get_address (f->server), &f->e);
+  address = dbus_server_get_address (f->server);
+  f->client_conn = dbus_connection_open_private (address, &f->e);
   assert_no_error (&f->e);
   g_assert (f->client_conn != NULL);
   test_connection_setup (f->ctx, f->client_conn);
+  dbus_free (address);
 
   while (f->server_conn == NULL)
     {
@@ -271,7 +273,6 @@ test_byte_order (Fixture *f,
   int fd;
   char *blob;
   const gchar *arg = not_a_dbus_message;
-  const gchar * const *args = &arg;
   int blob_len;
   DBusMessage *message;
   dbus_bool_t mem;
@@ -283,7 +284,7 @@ test_byte_order (Fixture *f,
   /* Append 0xFF bytes, so that the length of the body when byte-swapped
    * is 0xFF000000, which is invalid */
   mem = dbus_message_append_args (message,
-      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &args, 0xFF,
+      DBUS_TYPE_ARRAY, DBUS_TYPE_BYTE, &arg, 0xFF,
       DBUS_TYPE_INVALID);
   g_assert (mem);
   mem = dbus_message_marshal (message, &blob, &blob_len);
@@ -353,6 +354,7 @@ teardown (Fixture *f,
 {
   if (f->client_conn != NULL)
     {
+      test_connection_shutdown (f->ctx, f->client_conn);
       dbus_connection_close (f->client_conn);
       dbus_connection_unref (f->client_conn);
       f->client_conn = NULL;
@@ -360,6 +362,7 @@ teardown (Fixture *f,
 
   if (f->server_conn != NULL)
     {
+      test_connection_shutdown (f->ctx, f->server_conn);
       dbus_connection_close (f->server_conn);
       dbus_connection_unref (f->server_conn);
       f->server_conn = NULL;
