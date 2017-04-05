@@ -1,11 +1,16 @@
-D-Bus 1.10.18 (UNRELEASED)
+D-Bus 1.10.18 (2017-04-05)
 ==
+
+The “can't handle a self-referential paradox” release.
 
 Fixes:
 
 • Re-order dbus-daemon startup so that on SELinux systems, the thread
   that reads AVC notifications retains the ability to write to the
   audit log (fd.o #92832, Debian #857660; Laurent Bigonville)
+
+• Fix a harmless read overflow and some memory leaks in a unit test
+  (fd.o #100568, Philip Withnall)
 
 D-Bus 1.10.16 (2017-02-16)
 ==
