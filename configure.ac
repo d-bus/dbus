@@ -933,17 +933,7 @@ fi
 # unix:path=/foo or unix:abstract=/foo
 AC_SUBST(DBUS_PATH_OR_ABSTRACT)
 
-#### Sort out XML library
-
-AC_CHECK_LIB(expat, XML_ParserCreate_MM,
-             [ AC_CHECK_HEADERS(expat.h, [],
-                                [AC_MSG_ERROR([Could not find expat.h, check config.log for failed attempts])]) ],
-             [ AC_MSG_ERROR([Explicitly requested expat but expat not found]) ])
-
-XML_LIBS=-lexpat
-XML_CFLAGS=
-AC_SUBST([XML_CFLAGS])
-AC_SUBST([XML_LIBS])
+PKG_CHECK_MODULES([EXPAT], [expat])
 
 # Thread lib detection
 AC_ARG_VAR([THREAD_LIBS])

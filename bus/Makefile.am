@@ -6,7 +6,7 @@ systemdsysusersdir = $(prefix)/lib/sysusers.d
 
 DBUS_BUS_LIBS = \
 	$(CODE_COVERAGE_LDFLAGS) \
-	$(XML_LIBS) \
+	$(EXPAT_LIBS) \
 	$(SELINUX_LIBS) \
 	$(APPARMOR_LIBS) \
 	$(THREAD_LIBS) \
@@ -16,7 +16,7 @@ DBUS_BUS_LIBS = \
 
 DBUS_LAUNCHER_LIBS = \
 	$(CODE_COVERAGE_LDFLAGS) \
-	$(XML_LIBS) \
+	$(EXPAT_LIBS) \
 	$(THREAD_LIBS) \
 	$(NETWORK_libs) \
 	$(NULL)
@@ -25,7 +25,7 @@ AM_CPPFLAGS = \
 	$(CODE_COVERAGE_CPPFLAGS) \
 	-I$(top_srcdir) \
 	$(DBUS_STATIC_BUILD_CPPFLAGS) \
-	$(XML_CFLAGS) \
+	$(EXPAT_CFLAGS) \
 	$(APPARMOR_CFLAGS) \
 	-DDBUS_SYSTEM_CONFIG_FILE=\""$(dbusdatadir)/system.conf"\" \
 	-DDBUS_COMPILATION \
