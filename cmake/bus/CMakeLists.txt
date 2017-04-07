@@ -26,7 +26,6 @@ FOREACH(FILE ${FILES})
 	configure_file(${FILE} ${TARGET} )
 ENDFOREACH(FILE)
 
-SET (XML_SOURCES ${BUS_DIR}/config-loader-expat.c)
 
 if (DBUS_BUS_ENABLE_INOTIFY)
     set (DIR_WATCH_SOURCE ${BUS_DIR}/dir-watch-inotify.c)
@@ -45,6 +44,7 @@ set (BUS_SOURCES
 	${BUS_DIR}/audit.h
 	${BUS_DIR}/bus.c					
 	${BUS_DIR}/bus.h					
+	${BUS_DIR}/config-loader-expat.c
 	${BUS_DIR}/config-parser.c				
 	${BUS_DIR}/config-parser.h
 	${BUS_DIR}/config-parser-common.c
@@ -73,7 +73,6 @@ set (BUS_SOURCES
 	${BUS_DIR}/test.h					
 	${BUS_DIR}/utils.c					
 	${BUS_DIR}/utils.h					
-	${XML_SOURCES}
 	${DIR_WATCH_SOURCE}
 )
 if(DBUS_ENABLE_STATS)
@@ -86,11 +85,11 @@ endif(DBUS_ENABLE_STATS)
 include_directories(
 	${CMAKE_BINARY_DIR}
 	${CMAKE_SOURCE_DIR}/..
-	${XML_INCLUDE_DIR}
+	${EXPAT_INCLUDE_DIR}
 )
 
 add_executable(dbus-daemon ${BUS_SOURCES} ${BUS_DIR}/main.c)
-target_link_libraries(dbus-daemon ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY})
+target_link_libraries(dbus-daemon ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 set_target_properties(dbus-daemon PROPERTIES OUTPUT_NAME ${DBUS_DAEMON_NAME})
 set_target_properties(dbus-daemon PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
@@ -117,12 +116,13 @@ if (DBUS_SERVICE)
 	)
 
 	add_executable(dbus-service ${dbus_service_SOURCES} )
-	target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY})
+	target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 	set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 	install(TARGETS dbus-service ${INSTALL_TARGETS_DEFAULT_ARGS})
 endif (DBUS_SERVICE)
 
-set(LAUNCH_HELPER_SOURCES ${XML_SOURCES}
+set(LAUNCH_HELPER_SOURCES
+    ${BUS_DIR}/config-loader-expat.c
     ${BUS_DIR}/config-parser-common.c
     ${BUS_DIR}/config-parser-trivial.c
     ${BUS_DIR}/desktop-file.c
@@ -132,29 +132,29 @@ set(LAUNCH_HELPER_SOURCES ${XML_SOURCES}
 
 if(NOT WIN32)
 	add_executable(dbus-daemon-launch-helper ${LAUNCH_HELPER_SOURCES} ${BUS_DIR}/activation-helper-bin.c )
-	target_link_libraries(dbus-daemon-launch-helper ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY} )
+	target_link_libraries(dbus-daemon-launch-helper ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES} )
 endif(NOT WIN32)
 
 if (DBUS_ENABLE_EMBEDDED_TESTS)
 	set(SOURCES ${BUS_SOURCES} ${BUS_DIR}/test-main.c)
-	add_test_executable(test-bus "${SOURCES}"  ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY})
+	add_test_executable(test-bus "${SOURCES}"  ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 	set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 	if (NOT WIN32)
 		set(test_bus_system_SOURCES
-			${XML_SOURCES}
+			${BUS_DIR}/config-loader-expat.c
 			${BUS_DIR}/config-parser-common.c
 			${BUS_DIR}/config-parser-trivial.c
 			${BUS_DIR}/utils.c
 			${BUS_DIR}/test-system.c
 		)
-		add_test_executable(test-bus-system "${test_bus_system_SOURCES}" ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY} ${DBUS_BUS_LIBS})
+		add_test_executable(test-bus-system "${test_bus_system_SOURCES}" ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES} ${DBUS_BUS_LIBS})
 
 		add_executable(dbus-daemon-launch-helper-test ${LAUNCH_HELPER_SOURCES}     ${BUS_DIR}/activation-helper-bin.c)
 		set_target_properties(dbus-daemon-launch-helper-test PROPERTIES COMPILE_FLAGS "-DACTIVATION_LAUNCHER_TEST")
-		target_link_libraries(dbus-daemon-launch-helper-test ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY} )
+		target_link_libraries(dbus-daemon-launch-helper-test ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES} )
 
 		set (SOURCES ${LAUNCH_HELPER_SOURCES} ${BUS_DIR}/test-launch-helper.c)
-		add_test_executable(test-bus-launch-helper "${SOURCES}"  ${DBUS_INTERNAL_LIBRARIES} ${XML_LIBRARY})
+		add_test_executable(test-bus-launch-helper "${SOURCES}"  ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 		set_target_properties(test-bus-launch-helper PROPERTIES COMPILE_FLAGS "-DACTIVATION_LAUNCHER_TEST -DACTIVATION_LAUNCHER_DO_OOM")
 		install_targets(/lib dbus-daemon-launch-helper)
 	endif()

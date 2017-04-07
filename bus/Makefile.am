@@ -69,8 +69,6 @@ agentdir=$(LAUNCHD_AGENT_DIR)
 agent_DATA=org.freedesktop.dbus-session.plist
 endif
 
-XML_SOURCES=config-loader-expat.c
-
 if DBUS_BUS_ENABLE_KQUEUE
 DIR_WATCH_SOURCE=dir-watch-kqueue.c
 else
@@ -91,6 +89,7 @@ BUS_SOURCES=					\
 	audit.h					\
 	bus.c					\
 	bus.h					\
+	config-loader-expat.c			\
 	config-parser.c				\
 	config-parser.h				\
 	config-parser-common.c			\
@@ -121,7 +120,7 @@ BUS_SOURCES=					\
 	test.h					\
 	utils.c					\
 	utils.h					\
-	$(XML_SOURCES)
+	$(NULL)
 
 dbus_daemon_SOURCES=				\
 	$(BUS_SOURCES)				\
@@ -134,7 +133,7 @@ dbus_daemon_LDADD=					\
 	$(DBUS_BUS_LIBS)
 
 LAUNCH_HELPER_SOURCES=				\
-	$(XML_SOURCES)				\
+	config-loader-expat.c			\
 	config-parser-common.c			\
 	config-parser-common.h			\
 	config-parser-trivial.c			\
@@ -217,7 +216,7 @@ endif DBUS_UNIX
 endif DBUS_ENABLE_EMBEDDED_TESTS
 
 test_bus_system_SOURCES=			\
-	$(XML_SOURCES)				\
+	config-loader-expat.c			\
 	config-parser-common.c			\
 	config-parser-common.h			\
 	config-parser-trivial.c			\

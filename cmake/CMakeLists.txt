@@ -363,10 +363,6 @@ if(NOT EXPAT_FOUND)
     message(FATAL_ERROR "expat not found!")
 endif(NOT EXPAT_FOUND)
 
-SET(XML_LIB "Expat")
-SET(XML_LIBRARY     ${EXPAT_LIBRARIES})
-SET(XML_INCLUDE_DIR ${EXPAT_INCLUDE_DIR})
-
 # all missing or hardcoded for now
 
 # 'hidden' ones
