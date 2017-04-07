@@ -50,6 +50,9 @@ Fixes:
 • Fix most of the compiler warnings related to -Wswitch
   (fd.o #98191; Thomas Zimmermann, Simon McVittie)
 
+• Fix writing off the end of a fd_set when testing with valgrind
+  (fd.o #99839, Philip Withnall)
+
 D-Bus 1.11.10 (2017-02-16)
 ==
 
