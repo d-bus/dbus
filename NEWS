@@ -47,7 +47,7 @@ Fixes:
 • Clarify the roles of /etc/dbus-1/s*.d and /usr/share/dbus-1/s*.d
   in documentation (fd.o #99901, Philip Withnall)
 
-• Fix most of the compiler warnings related to -Wswitch
+• Fix and enable compiler warnings related to -Wswitch
   (fd.o #98191; Thomas Zimmermann, Simon McVittie)
 
 • Fix writing off the end of a fd_set when testing with valgrind
