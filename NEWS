@@ -1,7 +1,20 @@
 D-Bus 1.11.14 (UNRELEASED)
 ==
 
-...
+Build-time configuration changes:
+
+• We now use pkg-config to find libexpat in Autotools builds. This requires
+  Expat 2.1.0 (March 2012) or later. In particular, this should remove the
+  need to configure with LDFLAGS=-L/usr/local/lib on OpenBSD, which can
+  itself cause compilation failures.
+
+  As with all pkg-config-based configure checks, you can use
+  PKG_CONFIG_PATH=/whatever/lib/pkgconfig to find expat.pc in a
+  non-standard prefix, or EXPAT_CFLAGS="-I/whatever/include" and
+  EXPAT_LIBS="-L/whatever/lib -lexpat" to avoid needing a .pc file
+  at all.
+
+  (fd.o #69801, Simon McVittie)
 
 D-Bus 1.11.12 (2017-04-07)
 ==
