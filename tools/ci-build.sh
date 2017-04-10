@@ -187,8 +187,6 @@ case "$ci_buildsys" in
                 set _ "$@"
                 set "$@" --build="$(build-aux/config.guess)"
                 set "$@" --host=i686-w64-mingw32
-                set "$@" LDFLAGS=-L"${mingw}/lib"
-                set "$@" CPPFLAGS=-I"${mingw}/include"
                 set "$@" CFLAGS=-static-libgcc
                 set "$@" CXXFLAGS=-static-libgcc
                 # don't run tests yet, Wine needs Xvfb and
