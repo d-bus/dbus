@@ -123,7 +123,7 @@ dbus-send --session --dest="org.freedesktop.systemd1" \
 if [ -d "$XDG_RUNTIME_DIR/systemd" ] && ! [ -e "$workdir/no-systemd" ]; then
 
     # systemd is Linux-specific, so we can assume GNU mkdir.
-    mkdir -p -m700 "$XDG_RUNTIME_DIR/systemd/transient"
+    mkdir -p -m700 "$XDG_RUNTIME_DIR/systemd/user"
     cd "$XDG_RUNTIME_DIR/systemd/user"
 
     sed -e 's/^ *//' > "dbus-com.example.DBusTests.Systemd.$unique.tmp" <<EOF
