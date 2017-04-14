@@ -31,6 +31,7 @@
 
   # We aren't really confining this process seriously; allow most things.
   /** mrix,
+  /tmp/dbus-daemon-test.*/{,**} w,
   @{sys}/kernel/security/apparmor/** w,
   dbus (send, receive, bind),
   network,
