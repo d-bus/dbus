@@ -198,7 +198,7 @@ test_xdg_runtime_dir () {
     export XDG_RUNTIME_DIR="$workdir"
     fake_uuid="ffffffffffffffffffffffffffffffff"
 
-    if echo "$workdir" | grep '[^0-9A-Za-z_-/.]'; then
+    if echo "$workdir" | grep '[^-0-9A-Za-z_/.]'; then
         test_num=$(($test_num + 1))
         echo "ok ${test_num} # SKIP - $workdir would need escaping"
         return

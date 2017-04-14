@@ -3097,7 +3097,7 @@
         <listitem>
           <para>
             The set of optionally-escaped bytes is:
-            <literal>[0-9A-Za-z_-/.\]</literal>. To escape, each
+            <literal>[-0-9A-Za-z_/.\]</literal>. To escape, each
             <emphasis>byte</emphasis> (note, not character) which is not in the
             set of optionally-escaped bytes must be replaced with an ASCII
             percent (<literal>%</literal>) and the value of the byte in hex.
