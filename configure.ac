@@ -1742,8 +1742,6 @@ DBUS_TEST_DATA="$DBUS_PWD/test/data"
 AC_SUBST([DBUS_TEST_DATA])
 AC_SUBST([DBUS_TEST_EXEC])
 
-AC_DEFINE_UNQUOTED([DBUS_TEST_EXEC], ["$DBUS_TEST_EXEC"],
-                   [Full path to the daemon in the builddir])
 AC_DEFINE_UNQUOTED([DBUS_EXEEXT], ["$EXEEXT"],
                    [Extension for executables, typically empty or .exe])
 

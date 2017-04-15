@@ -38,7 +38,7 @@ get_test_exec (const char *exe,
   dbus_test_exec = _dbus_getenv ("DBUS_TEST_EXEC");
 
   if (dbus_test_exec == NULL)
-    dbus_test_exec = DBUS_TEST_EXEC;
+    return NULL;
 
   if (!_dbus_string_init (scratch_space))
     return NULL;
@@ -111,7 +111,7 @@ check_spawn_segfault (void *data)
 
   if (argv[0] == NULL)
     {
-      /* OOM was simulated, never mind */
+      /* OOM was simulated or DBUS_TEST_EXEC was unset; either is OK */
       return TRUE;
     }
 
@@ -166,7 +166,7 @@ check_spawn_exit (void *data)
 
   if (argv[0] == NULL)
     {
-      /* OOM was simulated, never mind */
+      /* OOM was simulated or DBUS_TEST_EXEC was unset; either is OK */
       return TRUE;
     }
 
@@ -217,7 +217,7 @@ check_spawn_and_kill (void *data)
 
   if (argv[0] == NULL)
     {
-      /* OOM was simulated, never mind */
+      /* OOM was simulated or DBUS_TEST_EXEC was unset; either is OK */
       return TRUE;
     }
 

@@ -31,7 +31,6 @@
 #define TEST_LISTEN       "@TEST_LISTEN@"
 
 // test binaries
-#define DBUS_TEST_EXEC "@DBUS_TEST_EXEC@"
 #define DBUS_EXEEXT "@EXEEXT@"
 
 /* Some dbus features */
