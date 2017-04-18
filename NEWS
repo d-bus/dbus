@@ -16,6 +16,22 @@ Build-time configuration changes:
 
   (fd.o #69801, Simon McVittie)
 
+Enhancements:
+
+• D-Bus Specification version 0.31
+  · Don't require implementation-specific search paths to be lowest
+    priority
+  · Correct regex syntax for optionally-escaped bytes in addresses so it
+    includes hyphen-minus, forward slash and underscore as intended
+  (fd.o #99825, #100686; Simon McVittie)
+
+Fixes:
+
+• Don't put timestamps in the Doxygen-generated documentation, for
+  reproducible builds (fd.o #100692, Simon McVittie)
+
+• Fix some integration test issues (fd.o #100686, Simon McVittie)
+
 D-Bus 1.11.12 (2017-04-07)
 ==
 
