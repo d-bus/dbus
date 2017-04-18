@@ -27,8 +27,9 @@ Enhancements:
 
 Fixes:
 
-• Don't put timestamps in the Doxygen-generated documentation, for
-  reproducible builds (fd.o #100692, Simon McVittie)
+• Don't put timestamps in the Doxygen-generated documentation,
+  or hard-code the build directory into builds with embedded tests,
+  for reproducible builds (fd.o #100692, Simon McVittie)
 
 • Fix some integration test issues (fd.o #100686, Simon McVittie)
 
