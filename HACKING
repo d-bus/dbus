@@ -68,15 +68,15 @@ Development
 ===
 
 D-Bus uses Git as its version control system. The main repository is
-hosted at git.freedesktop.org/dbus/dbus. To clone D-Bus, execute the
-following command:
+hosted on freedesktop.org. To clone D-Bus, execute one of the
+following commands:
 
-    git clone git://git.freedesktop.org/dbus/dbus
-OR
-    git clone git.freedesktop.org:dbus/dbus
+    git clone https://anongit.freedesktop.org/git/dbus/dbus.git
+    git clone git://anongit.freedesktop.org/dbus/dbus
+    git clone ssh://git.freedesktop.org/git/dbus/dbus
 
-The latter form is the one that allows pushing, but it also requires
-an SSH account on the server. The former form allows anonymous
+The last form is the one that allows pushing, but it also requires
+an SSH account on the server. The other forms allow anonymous
 checkouts.
 
 D-Bus development happens in two branches in parallel: the current
