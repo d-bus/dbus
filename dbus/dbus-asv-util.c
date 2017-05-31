@@ -80,7 +80,7 @@ _dbus_asv_new_method_return (DBusMessage      *message,
  * @param var_iter will be initialized to append (i.e. write) to the variant
  * @returns #TRUE on success, or #FALSE if not enough memory
  */
-static dbus_bool_t
+dbus_bool_t
 _dbus_asv_open_entry (DBusMessageIter *arr_iter,
                       DBusMessageIter *entry_iter,
                       const char      *key,
@@ -118,7 +118,7 @@ _dbus_asv_open_entry (DBusMessageIter *arr_iter,
  * @param var_iter the iterator appending to the variant, will be closed
  * @returns #TRUE on success, or #FALSE if not enough memory
  */
-static dbus_bool_t
+dbus_bool_t
 _dbus_asv_close_entry (DBusMessageIter *arr_iter,
                        DBusMessageIter *entry_iter,
                        DBusMessageIter *var_iter)
@@ -162,7 +162,7 @@ _dbus_asv_close (DBusMessageIter *iter,
  * @param arr_iter the iterator appending to the array, will be closed
  * @returns #TRUE on success, or #FALSE if not enough memory
  */
-static void
+void
 _dbus_asv_abandon_entry (DBusMessageIter *arr_iter,
                          DBusMessageIter *entry_iter,
                          DBusMessageIter *var_iter)

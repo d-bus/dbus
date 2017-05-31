@@ -46,5 +46,16 @@ dbus_bool_t  _dbus_asv_add_byte_array    (DBusMessageIter *arr_iter,
                                           const char      *key,
                                           const void      *value,
                                           int              n_elements);
+dbus_bool_t  _dbus_asv_open_entry        (DBusMessageIter *arr_iter,
+                                          DBusMessageIter *entry_iter,
+                                          const char      *key,
+                                          const char      *type,
+                                          DBusMessageIter *var_iter);
+dbus_bool_t  _dbus_asv_close_entry       (DBusMessageIter *arr_iter,
+                                          DBusMessageIter *entry_iter,
+                                          DBusMessageIter *var_iter);
+void         _dbus_asv_abandon_entry     (DBusMessageIter *arr_iter,
+                                          DBusMessageIter *entry_iter,
+                                          DBusMessageIter *var_iter);
 
 #endif
