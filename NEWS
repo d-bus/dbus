@@ -1,6 +1,11 @@
 D-Bus 1.11.14 (UNRELEASED)
 ==
 
+Dependencies:
+
+• SELinux support requires at least libselinux 2.0.86 as explicit
+  refcounting for SID (sidput/sidget) has been removed from the code.
+
 Build-time configuration changes:
 
 • We now use pkg-config to find libexpat in Autotools builds. This requires
@@ -16,6 +21,8 @@ Build-time configuration changes:
 
   (fd.o #69801, Simon McVittie)
 
+• Similarly, we now use pkg-config to find libselinux.
+
 Enhancements:
 
 • D-Bus Specification version 0.31
@@ -25,6 +32,9 @@ Enhancements:
     includes hyphen-minus, forward slash and underscore as intended
   (fd.o #99825, #100686; Simon McVittie)
 
+• Avoid deprecated API calls when using SELinux
+  (fd.o #100912, Laurent Bigonville)
+
 Fixes:
 
 • Don't put timestamps in the Doxygen-generated documentation,
@@ -32,11 +42,6 @@ Fixes:
   for reproducible builds (fd.o #100692, Simon McVittie)
 
 • Fix some integration test issues (fd.o #100686, Simon McVittie)
-
-Dependencies:
-
-• SELinux support requires at least libselinux 2.0.86 as explicit refcounting
-  for SID (sidput/sidget) has been removed from the code.
 
 D-Bus 1.11.12 (2017-04-07)
 ==
