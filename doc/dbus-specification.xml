@@ -5218,7 +5218,25 @@
       <title>Message Bus Messages</title>
       <para>
         The special message bus name <literal>org.freedesktop.DBus</literal>
-        responds to a number of additional messages.
+        responds to a number of additional messages at the object path
+        <literal>/org/freedesktop/DBus</literal>.
+        That object path is also used when emitting the
+        <xref linkend='bus-messages-name-owner-changed'/> signal.
+      </para>
+
+      <para>
+        For historical reasons, some of the methods in the
+        <literal>org.freedesktop.DBus</literal> interface are available
+        on multiple object paths. Message bus implementations should
+        accept method calls that were added before specification version
+        0.26 on any object path. Message bus implementations should
+        not accept newer method calls on unexpected object paths,
+        and as a security hardening measure, older method calls
+        that are security-sensitive may be rejected with the error
+        <literal>org.freedesktop.DBus.Error.AccessDenied</literal> when
+        called on an unexpected object path. Client software should send
+        all method calls to <literal>/org/freedesktop/DBus</literal>
+        instead of relying on this.
       </para>
 
       <sect3 id="bus-messages-hello">
