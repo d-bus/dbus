@@ -5647,7 +5647,7 @@
           List the connections currently queued for a bus name (see
           <xref linkend="term-queued-owner"/>).
         </para>
-       </sect3>
+      </sect3>
 
       <sect3 id="bus-messages-list-names">
         <title><literal>org.freedesktop.DBus.ListNames</literal></title>
