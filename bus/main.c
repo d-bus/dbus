@@ -189,7 +189,7 @@ introspect (void)
   if (!_dbus_string_init (&xml))
     goto oom;
 
-  if (!bus_driver_generate_introspect_string (&xml))
+  if (!bus_driver_generate_introspect_string (&xml, TRUE))
     {
       _dbus_string_free (&xml);
       goto oom;

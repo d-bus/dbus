@@ -642,7 +642,7 @@ test_invalid (Fixture *f,
 
   g_assert_cmpint (dbus_message_get_type (m), ==, DBUS_MESSAGE_TYPE_ERROR);
   g_assert_cmpstr (dbus_message_get_error_name (m), ==,
-      DBUS_ERROR_ACCESS_DENIED);
+      DBUS_ERROR_UNKNOWN_INTERFACE);
 
   /* Try to become a monitor but specify a bad match rule -
    * also not allowed */

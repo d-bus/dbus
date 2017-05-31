@@ -2200,9 +2200,6 @@ bus_driver_handle_become_monitor (DBusConnection *connection,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-  if (!bus_driver_check_message_is_for_us (message, error))
-    goto out;
-
   context = bus_transaction_get_context (transaction);
   bustype = context ? bus_context_get_type (context) : NULL;
   if (!bus_apparmor_allows_eavesdropping (connection, bustype, error))
@@ -2418,10 +2415,23 @@ static const MessageHandler stats_message_handlers[] = {
 };
 #endif
 
+typedef enum
+{
+  /* Various older interfaces were available at every object path. We have to
+   * preserve that behaviour for backwards compatibility, but we can at least
+   * stop doing that for newly added interfaces:
+   * <https://bugs.freedesktop.org/show_bug.cgi?id=101256>
+   * Introspectable is also useful at all object paths. */
+  INTERFACE_FLAG_ANY_PATH = (1 << 0),
+
+  INTERFACE_FLAG_NONE = 0
+} InterfaceFlags;
+
 typedef struct {
   const char *name;
   const MessageHandler *message_handlers;
   const char *extra_introspection;
+  InterfaceFlags flags;
 } InterfaceHandler;
 
 /* These should ideally be sorted by frequency of use, although it
@@ -2438,14 +2448,19 @@ static InterfaceHandler interface_handlers[] = {
     "    </signal>\n"
     "    <signal name=\"NameAcquired\">\n"
     "      <arg type=\"s\"/>\n"
-    "    </signal>\n" },
-  { DBUS_INTERFACE_INTROSPECTABLE, introspectable_message_handlers, NULL },
-  { DBUS_INTERFACE_MONITORING, monitoring_message_handlers, NULL },
+    "    </signal>\n",
+    INTERFACE_FLAG_ANY_PATH },
+  { DBUS_INTERFACE_INTROSPECTABLE, introspectable_message_handlers, NULL,
+    INTERFACE_FLAG_ANY_PATH },
+  { DBUS_INTERFACE_MONITORING, monitoring_message_handlers, NULL,
+    INTERFACE_FLAG_NONE },
 #ifdef DBUS_ENABLE_VERBOSE_MODE
-  { DBUS_INTERFACE_VERBOSE, verbose_message_handlers, NULL },
+  { DBUS_INTERFACE_VERBOSE, verbose_message_handlers, NULL,
+    INTERFACE_FLAG_NONE },
 #endif
 #ifdef DBUS_ENABLE_STATS
-  { BUS_INTERFACE_STATS, stats_message_handlers, NULL },
+  { BUS_INTERFACE_STATS, stats_message_handlers, NULL,
+    INTERFACE_FLAG_NONE },
 #endif
   { NULL, NULL, NULL }
 };
@@ -2486,7 +2501,8 @@ write_args_for_direction (DBusString *xml,
 }
 
 dbus_bool_t
-bus_driver_generate_introspect_string (DBusString *xml)
+bus_driver_generate_introspect_string (DBusString *xml,
+                                       dbus_bool_t is_canonical_path)
 {
   const InterfaceHandler *ih;
   const MessageHandler *mh;
@@ -2498,6 +2514,9 @@ bus_driver_generate_introspect_string (DBusString *xml)
 
   for (ih = interface_handlers; ih->name != NULL; ih++)
     {
+      if (!(is_canonical_path || (ih->flags & INTERFACE_FLAG_ANY_PATH)))
+        continue;
+
       if (!_dbus_string_append_printf (xml, "  <interface name=\"%s\">\n",
                                        ih->name))
         return FALSE;
@@ -2541,6 +2560,7 @@ bus_driver_handle_introspect (DBusConnection *connection,
   DBusString xml;
   DBusMessage *reply;
   const char *v_STRING;
+  dbus_bool_t is_canonical_path;
 
   _dbus_verbose ("Introspect() on bus driver\n");
 
@@ -2561,7 +2581,9 @@ bus_driver_handle_introspect (DBusConnection *connection,
       return FALSE;
     }
 
-  if (!bus_driver_generate_introspect_string (&xml))
+  is_canonical_path = dbus_message_has_path (message, DBUS_PATH_DBUS);
+
+  if (!bus_driver_generate_introspect_string (&xml, is_canonical_path))
     goto oom;
 
   v_STRING = _dbus_string_get_const_data (&xml);
@@ -2636,6 +2658,7 @@ bus_driver_handle_message (DBusConnection *connection,
   const InterfaceHandler *ih;
   const MessageHandler *mh;
   dbus_bool_t found_interface = FALSE;
+  dbus_bool_t is_canonical_path;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
@@ -2701,8 +2724,13 @@ bus_driver_handle_message (DBusConnection *connection,
   _dbus_assert (dbus_message_get_sender (message) != NULL ||
                 strcmp (name, "Hello") == 0);
 
+  is_canonical_path = dbus_message_has_path (message, DBUS_PATH_DBUS);
+
   for (ih = interface_handlers; ih->name != NULL; ih++)
     {
+      if (!(is_canonical_path || (ih->flags & INTERFACE_FLAG_ANY_PATH)))
+        continue;
+
       if (interface != NULL && strcmp (interface, ih->name) != 0)
         continue;
 
