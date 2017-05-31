@@ -30,7 +30,8 @@ Enhancements:
     priority
   · Correct regex syntax for optionally-escaped bytes in addresses so it
     includes hyphen-minus, forward slash and underscore as intended
-  (fd.o #99825, #100686; Simon McVittie)
+  · Describe all message bus methods in the same section
+  (fd.o #99825, #100686, #100795; Simon McVittie, Tom Gundersen)
 
 • Avoid deprecated API calls when using SELinux
   (fd.o #100912, Laurent Bigonville)
