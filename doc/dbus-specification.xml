@@ -5644,9 +5644,7 @@
           </informaltable>
         </para>
         <para>
-          This method call should be sent to
-          <literal>org.freedesktop.DBus</literal> and lists the connections
-          currently queued for a bus name (see
+          List the connections currently queued for a bus name (see
           <xref linkend="term-queued-owner"/>).
         </para>
        </sect3>
