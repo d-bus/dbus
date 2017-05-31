@@ -5316,14 +5316,12 @@
           </informaltable>
         </para>
         <para>
-          This method call should be sent to
-          <literal>org.freedesktop.DBus</literal> and asks the message bus to
-          assign the given name to the method caller. Each name maintains a
-          queue of possible owners, where the head of the queue is the primary
-          or current owner of the name. Each potential owner in the queue
-          maintains the DBUS_NAME_FLAG_ALLOW_REPLACEMENT and
-          DBUS_NAME_FLAG_DO_NOT_QUEUE settings from its latest RequestName
-          call.  When RequestName is invoked the following occurs:
+          Ask the message bus to assign the given name to the method caller. Each
+          name maintains a queue of possible owners, where the head of the queue is
+          the primary or current owner of the name. Each potential owner in the
+          queue maintains the DBUS_NAME_FLAG_ALLOW_REPLACEMENT and
+          DBUS_NAME_FLAG_DO_NOT_QUEUE settings from its latest RequestName call.
+          When RequestName is invoked the following occurs:
           <itemizedlist>
             <listitem>
               <para>
