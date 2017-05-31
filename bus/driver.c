@@ -1090,9 +1090,6 @@ bus_driver_handle_update_activation_environment (DBusConnection *connection,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-  if (!bus_driver_check_message_is_for_us (message, error))
-    return FALSE;
-
 #ifdef DBUS_UNIX
     {
       /* UpdateActivationEnvironment is basically a recipe for privilege
@@ -2292,6 +2289,17 @@ out:
   return ret;
 }
 
+typedef enum
+{
+  /* Various older methods were available at every object path. We have to
+   * preserve that behaviour for backwards compatibility, but we can at least
+   * stop doing that for newly added methods.
+   * <https://bugs.freedesktop.org/show_bug.cgi?id=101256> */
+  METHOD_FLAG_ANY_PATH = (1 << 0),
+
+  METHOD_FLAG_NONE = 0
+} MethodFlags;
+
 typedef struct
 {
   const char *name;
@@ -2301,6 +2309,7 @@ typedef struct
                            BusTransaction *transaction,
                            DBusMessage    *message,
                            DBusError      *error);
+  MethodFlags flags;
 } MessageHandler;
 
 /* For speed it might be useful to sort this in order of
@@ -2311,77 +2320,96 @@ static const MessageHandler dbus_message_handlers[] = {
   { "Hello",
     "",
     DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_hello },
+    bus_driver_handle_hello,
+    METHOD_FLAG_ANY_PATH },
   { "RequestName",
     DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_UINT32_AS_STRING,
     DBUS_TYPE_UINT32_AS_STRING,
-    bus_driver_handle_acquire_service },
+    bus_driver_handle_acquire_service,
+    METHOD_FLAG_ANY_PATH },
   { "ReleaseName",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_UINT32_AS_STRING,
-    bus_driver_handle_release_service },
+    bus_driver_handle_release_service,
+    METHOD_FLAG_ANY_PATH },
   { "StartServiceByName",
     DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_UINT32_AS_STRING,
     DBUS_TYPE_UINT32_AS_STRING,
-    bus_driver_handle_activate_service },
+    bus_driver_handle_activate_service,
+    METHOD_FLAG_ANY_PATH },
   { "UpdateActivationEnvironment",
     DBUS_TYPE_ARRAY_AS_STRING DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_STRING_AS_STRING DBUS_DICT_ENTRY_END_CHAR_AS_STRING,
     "",
-    bus_driver_handle_update_activation_environment },
+    bus_driver_handle_update_activation_environment,
+    METHOD_FLAG_NONE },
   { "NameHasOwner",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_BOOLEAN_AS_STRING,
-    bus_driver_handle_service_exists },
+    bus_driver_handle_service_exists,
+    METHOD_FLAG_ANY_PATH },
   { "ListNames",
     "",
     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_list_services },
+    bus_driver_handle_list_services,
+    METHOD_FLAG_ANY_PATH },
   { "ListActivatableNames",
     "",
     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_list_activatable_services },
+    bus_driver_handle_list_activatable_services,
+    METHOD_FLAG_ANY_PATH },
   { "AddMatch",
     DBUS_TYPE_STRING_AS_STRING,
     "",
-    bus_driver_handle_add_match },
+    bus_driver_handle_add_match,
+    METHOD_FLAG_ANY_PATH },
   { "RemoveMatch",
     DBUS_TYPE_STRING_AS_STRING,
     "",
-    bus_driver_handle_remove_match },
+    bus_driver_handle_remove_match,
+    METHOD_FLAG_ANY_PATH },
   { "GetNameOwner",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_get_service_owner },
+    bus_driver_handle_get_service_owner,
+    METHOD_FLAG_ANY_PATH },
   { "ListQueuedOwners",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_list_queued_owners },
+    bus_driver_handle_list_queued_owners,
+    METHOD_FLAG_ANY_PATH },
   { "GetConnectionUnixUser",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_UINT32_AS_STRING,
-    bus_driver_handle_get_connection_unix_user },
+    bus_driver_handle_get_connection_unix_user,
+    METHOD_FLAG_ANY_PATH },
   { "GetConnectionUnixProcessID",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_UINT32_AS_STRING,
-    bus_driver_handle_get_connection_unix_process_id },
+    bus_driver_handle_get_connection_unix_process_id,
+    METHOD_FLAG_ANY_PATH },
   { "GetAdtAuditSessionData",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING,
-    bus_driver_handle_get_adt_audit_session_data },
+    bus_driver_handle_get_adt_audit_session_data,
+    METHOD_FLAG_ANY_PATH },
   { "GetConnectionSELinuxSecurityContext",
     DBUS_TYPE_STRING_AS_STRING,
     DBUS_TYPE_ARRAY_AS_STRING DBUS_TYPE_BYTE_AS_STRING,
-    bus_driver_handle_get_connection_selinux_security_context },
+    bus_driver_handle_get_connection_selinux_security_context,
+    METHOD_FLAG_ANY_PATH },
   { "ReloadConfig",
     "",
     "",
-    bus_driver_handle_reload_config },
+    bus_driver_handle_reload_config,
+    METHOD_FLAG_ANY_PATH },
   { "GetId",
     "",
     DBUS_TYPE_STRING_AS_STRING,
-    bus_driver_handle_get_id },
+    bus_driver_handle_get_id,
+    METHOD_FLAG_ANY_PATH },
   { "GetConnectionCredentials", "s", "a{sv}",
-    bus_driver_handle_get_connection_credentials },
+    bus_driver_handle_get_connection_credentials,
+    METHOD_FLAG_ANY_PATH },
   { NULL, NULL, NULL, NULL }
 };
 
@@ -2389,28 +2417,35 @@ static dbus_bool_t bus_driver_handle_introspect (DBusConnection *,
     BusTransaction *, DBusMessage *, DBusError *);
 
 static const MessageHandler introspectable_message_handlers[] = {
-  { "Introspect", "", DBUS_TYPE_STRING_AS_STRING, bus_driver_handle_introspect },
+  { "Introspect", "", DBUS_TYPE_STRING_AS_STRING, bus_driver_handle_introspect,
+    METHOD_FLAG_ANY_PATH },
   { NULL, NULL, NULL, NULL }
 };
 
 static const MessageHandler monitoring_message_handlers[] = {
-  { "BecomeMonitor", "asu", "", bus_driver_handle_become_monitor },
+  { "BecomeMonitor", "asu", "", bus_driver_handle_become_monitor,
+    METHOD_FLAG_NONE },
   { NULL, NULL, NULL, NULL }
 };
 
 #ifdef DBUS_ENABLE_VERBOSE_MODE
 static const MessageHandler verbose_message_handlers[] = {
-  { "EnableVerbose", "", "", bus_driver_handle_enable_verbose},
-  { "DisableVerbose", "", "", bus_driver_handle_disable_verbose},
+  { "EnableVerbose", "", "", bus_driver_handle_enable_verbose,
+    METHOD_FLAG_NONE },
+  { "DisableVerbose", "", "", bus_driver_handle_disable_verbose,
+    METHOD_FLAG_NONE },
   { NULL, NULL, NULL, NULL }
 };
 #endif
 
 #ifdef DBUS_ENABLE_STATS
 static const MessageHandler stats_message_handlers[] = {
-  { "GetStats", "", "a{sv}", bus_stats_handle_get_stats },
-  { "GetConnectionStats", "s", "a{sv}", bus_stats_handle_get_connection_stats },
-  { "GetAllMatchRules", "", "a{sas}", bus_stats_handle_get_all_match_rules },
+  { "GetStats", "", "a{sv}", bus_stats_handle_get_stats,
+    METHOD_FLAG_NONE },
+  { "GetConnectionStats", "s", "a{sv}", bus_stats_handle_get_connection_stats,
+    METHOD_FLAG_NONE },
+  { "GetAllMatchRules", "", "a{sas}", bus_stats_handle_get_all_match_rules,
+    METHOD_FLAG_NONE },
   { NULL, NULL, NULL, NULL }
 };
 #endif
@@ -2616,38 +2651,6 @@ bus_driver_handle_introspect (DBusConnection *connection,
   return FALSE;
 }
 
-/*
- * Set @error and return FALSE if the message is not directed to the
- * dbus-daemon by its canonical object path. This is hardening against
- * system services with poorly-written security policy files, which
- * might allow sending dangerously broad equivalence classes of messages
- * such as "anything with this assumed-to-be-safe object path".
- *
- * dbus-daemon is unusual in that it normally ignores the object path
- * of incoming messages; we need to keep that behaviour for the "read"
- * read-only method calls like GetConnectionUnixUser for backwards
- * compatibility, but it seems safer to be more restrictive for things
- * intended to be root-only or privileged-developers-only.
- *
- * It is possible that there are other system services with the same
- * quirk as dbus-daemon.
- */
-dbus_bool_t
-bus_driver_check_message_is_for_us (DBusMessage *message,
-                                    DBusError   *error)
-{
-  if (!dbus_message_has_path (message, DBUS_PATH_DBUS))
-    {
-      dbus_set_error (error, DBUS_ERROR_ACCESS_DENIED,
-          "Method '%s' is only available at the canonical object path '%s'",
-          dbus_message_get_member (message), DBUS_PATH_DBUS);
-
-      return FALSE;
-    }
-
-  return TRUE;
-}
-
 dbus_bool_t
 bus_driver_handle_message (DBusConnection *connection,
                            BusTransaction *transaction,
@@ -2742,6 +2745,16 @@ bus_driver_handle_message (DBusConnection *connection,
             continue;
 
           _dbus_verbose ("Found driver handler for %s\n", name);
+
+          if (!(is_canonical_path || (mh->flags & METHOD_FLAG_ANY_PATH)))
+            {
+              _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+              dbus_set_error (error, DBUS_ERROR_ACCESS_DENIED,
+                  "Method '%s' is only available at the canonical object path '%s'",
+                  dbus_message_get_member (message), DBUS_PATH_DBUS);
+              _DBUS_ASSERT_ERROR_IS_SET (error);
+              return FALSE;
+            }
 
           if (!dbus_message_has_signature (message, mh->in_args))
             {
