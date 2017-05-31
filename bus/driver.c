@@ -2289,6 +2289,26 @@ out:
   return ret;
 }
 
+static dbus_bool_t bus_driver_handle_get (DBusConnection *connection,
+                                          BusTransaction *transaction,
+                                          DBusMessage *message,
+                                          DBusError *error);
+
+static dbus_bool_t bus_driver_handle_get_all (DBusConnection *connection,
+                                              BusTransaction *transaction,
+                                              DBusMessage *message,
+                                              DBusError *error);
+
+static dbus_bool_t bus_driver_handle_set (DBusConnection *connection,
+                                          BusTransaction *transaction,
+                                          DBusMessage *message,
+                                          DBusError *error);
+
+static dbus_bool_t features_getter (BusContext      *context,
+                                    DBusMessageIter *variant_iter);
+static dbus_bool_t interfaces_getter (BusContext      *context,
+                                      DBusMessageIter *variant_iter);
+
 typedef enum
 {
   /* Various older methods were available at every object path. We have to
@@ -2311,6 +2331,14 @@ typedef struct
                            DBusError      *error);
   MethodFlags flags;
 } MessageHandler;
+
+typedef struct
+{
+  const char *name;
+  const char *type;
+  dbus_bool_t (* getter) (BusContext      *context,
+                          DBusMessageIter *variant_iter);
+} PropertyHandler;
 
 /* For speed it might be useful to sort this in order of
  * frequency of use (but doesn't matter with only a few items
@@ -2413,8 +2441,21 @@ static const MessageHandler dbus_message_handlers[] = {
   { NULL, NULL, NULL, NULL }
 };
 
+static const PropertyHandler dbus_property_handlers[] = {
+  { "Features", "as", features_getter },
+  { "Interfaces", "as", interfaces_getter },
+  { NULL, NULL, NULL }
+};
+
 static dbus_bool_t bus_driver_handle_introspect (DBusConnection *,
     BusTransaction *, DBusMessage *, DBusError *);
+
+static const MessageHandler properties_message_handlers[] = {
+  { "Get", "ss", "v", bus_driver_handle_get, METHOD_FLAG_NONE },
+  { "GetAll", "s", "a{sv}", bus_driver_handle_get_all, METHOD_FLAG_NONE },
+  { "Set", "ssv", "", bus_driver_handle_set, METHOD_FLAG_NONE },
+  { NULL, NULL, NULL, NULL }
+};
 
 static const MessageHandler introspectable_message_handlers[] = {
   { "Introspect", "", DBUS_TYPE_STRING_AS_STRING, bus_driver_handle_introspect,
@@ -2459,6 +2500,10 @@ typedef enum
    * Introspectable is also useful at all object paths. */
   INTERFACE_FLAG_ANY_PATH = (1 << 0),
 
+  /* Set this flag for interfaces that should not show up in the
+   * Interfaces property. */
+  INTERFACE_FLAG_UNINTERESTING = (1 << 1),
+
   INTERFACE_FLAG_NONE = 0
 } InterfaceFlags;
 
@@ -2467,6 +2512,7 @@ typedef struct {
   const MessageHandler *message_handlers;
   const char *extra_introspection;
   InterfaceFlags flags;
+  const PropertyHandler *property_handlers;
 } InterfaceHandler;
 
 /* These should ideally be sorted by frequency of use, although it
@@ -2484,9 +2530,26 @@ static InterfaceHandler interface_handlers[] = {
     "    <signal name=\"NameAcquired\">\n"
     "      <arg type=\"s\"/>\n"
     "    </signal>\n",
-    INTERFACE_FLAG_ANY_PATH },
+    /* Not in the Interfaces property because if you can get the properties
+     * of the o.fd.DBus interface, then you certainly have the o.fd.DBus
+     * interface, so there is little point in listing it explicitly.
+     * Partially available at all paths for backwards compatibility. */
+    INTERFACE_FLAG_ANY_PATH | INTERFACE_FLAG_UNINTERESTING,
+    dbus_property_handlers },
+  { DBUS_INTERFACE_PROPERTIES, properties_message_handlers,
+    "    <signal name=\"PropertiesChanged\">\n"
+    "      <arg type=\"s\" name=\"interface_name\"/>\n"
+    "      <arg type=\"a{sv}\" name=\"changed_properties\"/>\n"
+    "      <arg type=\"as\" name=\"invalidated_properties\"/>\n"
+    "    </signal>\n",
+    /* Not in the Interfaces property because if you can get the properties
+     * of the o.fd.DBus interface, then you certainly have Properties. */
+    INTERFACE_FLAG_UNINTERESTING },
   { DBUS_INTERFACE_INTROSPECTABLE, introspectable_message_handlers, NULL,
-    INTERFACE_FLAG_ANY_PATH },
+    /* Not in the Interfaces property because introspection isn't really a
+     * feature in the same way as e.g. Monitoring.
+     * Available at all paths so tools like d-feet can start from "/". */
+    INTERFACE_FLAG_ANY_PATH | INTERFACE_FLAG_UNINTERESTING },
   { DBUS_INTERFACE_MONITORING, monitoring_message_handlers, NULL,
     INTERFACE_FLAG_NONE },
 #ifdef DBUS_ENABLE_VERBOSE_MODE
@@ -2542,6 +2605,7 @@ bus_driver_generate_introspect_string (DBusString *xml,
 {
   const InterfaceHandler *ih;
   const MessageHandler *mh;
+  const PropertyHandler *ph;
 
   if (!_dbus_string_append (xml, DBUS_INTROSPECT_1_0_XML_DOCTYPE_DECL_NODE))
     return FALSE;
@@ -2570,6 +2634,20 @@ bus_driver_generate_introspect_string (DBusString *xml,
             return FALSE;
 
           if (!_dbus_string_append (xml, "    </method>\n"))
+            return FALSE;
+        }
+
+      for (ph = ih->property_handlers; ph != NULL && ph->name != NULL; ph++)
+        {
+          /* We only have constant properties so far, so hard-code that bit */
+          if (!_dbus_string_append_printf (xml,
+                                           "    <property name=\"%s\" type=\"%s\" access=\"read\">\n",
+                                           ph->name, ph->type))
+            return FALSE;
+
+          if (!_dbus_string_append (xml,
+                                    "      <annotation name=\"org.freedesktop.DBus.Property.EmitsChangedSignal\" value=\"const\"/>\n"
+                                    "    </property>\n"))
             return FALSE;
         }
 
@@ -2825,4 +2903,299 @@ bus_driver_remove_connection (DBusConnection *connection)
   /* FIXME 1.0 Does nothing for now, should unregister the connection
    * with the bus driver.
    */
+}
+
+static dbus_bool_t
+features_getter (BusContext      *context,
+                 DBusMessageIter *variant_iter)
+{
+  DBusMessageIter arr_iter;
+
+  if (!dbus_message_iter_open_container (variant_iter, DBUS_TYPE_ARRAY,
+                                         DBUS_TYPE_STRING_AS_STRING,
+                                         &arr_iter))
+    return FALSE;
+
+  if (bus_apparmor_enabled ())
+    {
+      const char *s = "AppArmor";
+
+      if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
+        goto abandon;
+    }
+
+  if (bus_selinux_enabled ())
+    {
+      const char *s = "SELinux";
+
+      if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
+        goto abandon;
+    }
+
+  if (bus_context_get_systemd_activation (context))
+    {
+      const char *s = "SystemdActivation";
+
+      if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
+        goto abandon;
+    }
+
+  return dbus_message_iter_close_container (variant_iter, &arr_iter);
+
+abandon:
+  dbus_message_iter_abandon_container (variant_iter, &arr_iter);
+  return FALSE;
+}
+
+static dbus_bool_t
+interfaces_getter (BusContext      *context,
+                   DBusMessageIter *variant_iter)
+{
+  DBusMessageIter arr_iter;
+  const InterfaceHandler *ih;
+
+  if (!dbus_message_iter_open_container (variant_iter, DBUS_TYPE_ARRAY,
+                                         DBUS_TYPE_STRING_AS_STRING,
+                                         &arr_iter))
+    return FALSE;
+
+  for (ih = interface_handlers; ih->name != NULL; ih++)
+    {
+      if (ih->flags & INTERFACE_FLAG_UNINTERESTING)
+        continue;
+
+      if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING,
+                                           &ih->name))
+        goto abandon;
+    }
+
+  return dbus_message_iter_close_container (variant_iter, &arr_iter);
+
+abandon:
+  dbus_message_iter_abandon_container (variant_iter, &arr_iter);
+  return FALSE;
+}
+
+static const InterfaceHandler *
+bus_driver_find_interface (const char  *name,
+                           dbus_bool_t  canonical_path,
+                           DBusError   *error)
+{
+  const InterfaceHandler *ih;
+
+  for (ih = interface_handlers; ih->name != NULL; ih++)
+    {
+      if (!(canonical_path || (ih->flags & INTERFACE_FLAG_ANY_PATH)))
+        continue;
+
+      if (strcmp (name, ih->name) == 0)
+        return ih;
+    }
+
+  dbus_set_error (error, DBUS_ERROR_UNKNOWN_INTERFACE,
+                  "Interface \"%s\" not found", name);
+  return NULL;
+}
+
+static const PropertyHandler *
+interface_handler_find_property (const InterfaceHandler *ih,
+                                 const char             *name,
+                                 DBusError              *error)
+{
+  const PropertyHandler *ph;
+
+  for (ph = ih->property_handlers; ph != NULL && ph->name != NULL; ph++)
+    {
+      if (strcmp (name, ph->name) == 0)
+        return ph;
+    }
+
+  dbus_set_error (error, DBUS_ERROR_UNKNOWN_PROPERTY,
+                  "Property \"%s.%s\" not found", ih->name, name);
+  return NULL;
+}
+
+static dbus_bool_t
+bus_driver_handle_get (DBusConnection *connection,
+                       BusTransaction *transaction,
+                       DBusMessage    *message,
+                       DBusError      *error)
+{
+  const InterfaceHandler *ih;
+  const PropertyHandler *handler;
+  const char *iface;
+  const char *prop;
+  BusContext *context;
+  DBusMessage *reply = NULL;
+  DBusMessageIter iter;
+  DBusMessageIter var_iter;
+
+  /* The message signature has already been checked for us,
+   * so this should always succeed. */
+  if (!dbus_message_get_args (message, error,
+                              DBUS_TYPE_STRING, &iface,
+                              DBUS_TYPE_STRING, &prop,
+                              DBUS_TYPE_INVALID))
+    return FALSE;
+
+  /* We only implement Properties on /org/freedesktop/DBus so far. */
+  ih = bus_driver_find_interface (iface, TRUE, error);
+
+  if (ih == NULL)
+    return FALSE;
+
+  handler = interface_handler_find_property (ih, prop, error);
+
+  if (handler == NULL)
+    return FALSE;
+
+  context = bus_transaction_get_context (transaction);
+
+  reply = dbus_message_new_method_return (message);
+
+  if (reply == NULL)
+    goto oom;
+
+  dbus_message_iter_init_append (reply, &iter);
+
+  if (!dbus_message_iter_open_container (&iter, DBUS_TYPE_VARIANT,
+                                         handler->type, &var_iter))
+    goto oom;
+
+  if (!handler->getter (context, &var_iter))
+    {
+      dbus_message_iter_abandon_container (&iter, &var_iter);
+      goto oom;
+    }
+
+  if (!dbus_message_iter_close_container (&iter, &var_iter))
+    goto oom;
+
+  if (!bus_transaction_send_from_driver (transaction, connection, reply))
+    goto oom;
+
+  dbus_message_unref (reply);
+  return TRUE;
+
+oom:
+  if (reply != NULL)
+    dbus_message_unref (reply);
+
+  BUS_SET_OOM (error);
+  return FALSE;
+}
+
+static dbus_bool_t
+bus_driver_handle_get_all (DBusConnection *connection,
+                           BusTransaction *transaction,
+                           DBusMessage    *message,
+                           DBusError      *error)
+{
+  const InterfaceHandler *ih;
+  const char *iface;
+  const PropertyHandler *ph;
+  DBusMessageIter reply_iter;
+  DBusMessageIter array_iter;
+  BusContext *context;
+  DBusMessage *reply = NULL;
+
+  /* The message signature has already been checked for us,
+   * so this should always succeed. */
+  if (!dbus_message_get_args (message, error,
+                              DBUS_TYPE_STRING, &iface,
+                              DBUS_TYPE_INVALID))
+    return FALSE;
+
+  /* We only implement Properties on /org/freedesktop/DBus so far. */
+  ih = bus_driver_find_interface (iface, TRUE, error);
+
+  if (ih == NULL)
+    return FALSE;
+
+  context = bus_transaction_get_context (transaction);
+
+  reply = _dbus_asv_new_method_return (message, &reply_iter, &array_iter);
+
+  if (reply == NULL)
+    goto oom;
+
+  for (ph = ih->property_handlers; ph != NULL && ph->name != NULL; ph++)
+    {
+      DBusMessageIter entry_iter;
+      DBusMessageIter var_iter;
+
+      if (!_dbus_asv_open_entry (&array_iter, &entry_iter, ph->name,
+                                 ph->type, &var_iter))
+        goto oom_abandon_message;
+
+      if (!ph->getter (context, &var_iter))
+        {
+          _dbus_asv_abandon_entry (&array_iter, &entry_iter, &var_iter);
+          goto oom_abandon_message;
+        }
+
+      if (!_dbus_asv_close_entry (&array_iter, &entry_iter, &var_iter))
+        goto oom_abandon_message;
+    }
+
+  if (!_dbus_asv_close (&reply_iter, &array_iter))
+    goto oom;
+
+  if (!bus_transaction_send_from_driver (transaction, connection, reply))
+    goto oom;
+
+  dbus_message_unref (reply);
+  return TRUE;
+
+oom_abandon_message:
+  _dbus_asv_abandon (&reply_iter, &array_iter);
+  /* fall through */
+oom:
+  if (reply != NULL)
+    dbus_message_unref (reply);
+
+  BUS_SET_OOM (error);
+  return FALSE;
+}
+
+static dbus_bool_t
+bus_driver_handle_set (DBusConnection *connection,
+                       BusTransaction *transaction,
+                       DBusMessage    *message,
+                       DBusError      *error)
+{
+  const InterfaceHandler *ih;
+  const char *iface;
+  const char *prop;
+  const PropertyHandler *handler;
+  DBusMessageIter iter;
+
+  /* We already checked this in bus_driver_handle_message() */
+  _dbus_assert (dbus_message_has_signature (message, "ssv"));
+
+  if (!dbus_message_iter_init (message, &iter))
+    _dbus_assert_not_reached ("Message type was already checked to be 'ssv'");
+
+  dbus_message_iter_get_basic (&iter, &iface);
+
+  if (!dbus_message_iter_next (&iter))
+    _dbus_assert_not_reached ("Message type was already checked to be 'ssv'");
+
+  dbus_message_iter_get_basic (&iter, &prop);
+
+  /* We only implement Properties on /org/freedesktop/DBus so far. */
+  ih = bus_driver_find_interface (iface, TRUE, error);
+
+  if (ih == NULL)
+    return FALSE;
+
+  handler = interface_handler_find_property (ih, prop, error);
+
+  if (handler == NULL)
+    return FALSE;
+
+  /* We don't implement any properties that can be set yet. */
+  dbus_set_error (error, DBUS_ERROR_PROPERTY_READ_ONLY,
+                  "Property '%s.%s' cannot be set", iface, prop);
+  return FALSE;
 }
