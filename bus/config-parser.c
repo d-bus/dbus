@@ -1285,28 +1285,42 @@ append_rule_from_element (BusConfigParser   *parser,
                           DBusError         *error)
 {
   const char *log;
+
+  /* Group: send_ attributes */
   const char *send_interface;
   const char *send_member;
   const char *send_error;
   const char *send_destination;
   const char *send_path;
   const char *send_type;
+  const char *send_requested_reply;
+  /* TRUE if any send_ attribute is present */
+  dbus_bool_t any_send_attribute;
+
+  /* Group: receive_ attributes */
   const char *receive_interface;
   const char *receive_member;
   const char *receive_error;
   const char *receive_sender;
   const char *receive_path;
   const char *receive_type;
-  const char *eavesdrop;
-  const char *send_requested_reply;
   const char *receive_requested_reply;
+  /* TRUE if any receive_ attribute is present */
+  dbus_bool_t any_receive_attribute;
+
+  /* Group: message-matching modifiers that can go on send_ or receive_ */
+  const char *eavesdrop;
+  /* TRUE if any message-matching modifier is present */
+  dbus_bool_t any_message_attribute;
+
+  /* Non-message-related attributes */
   const char *own;
   const char *own_prefix;
   const char *user;
   const char *group;
 
   BusPolicyRule *rule;
-  
+
   if (!locate_attributes (parser, element_name,
                           attribute_names,
                           attribute_values,
@@ -1334,11 +1348,32 @@ append_rule_from_element (BusConfigParser   *parser,
                           NULL))
     return FALSE;
 
-  if (!(send_interface || send_member || send_error || send_destination ||
-        send_type || send_path ||
-        receive_interface || receive_member || receive_error || receive_sender ||
-        receive_type || receive_path || eavesdrop ||
-        send_requested_reply || receive_requested_reply ||
+  any_send_attribute = (send_destination != NULL ||
+                        send_path != NULL ||
+                        send_type != NULL ||
+                        send_interface != NULL ||
+                        send_member != NULL ||
+                        send_error != NULL ||
+                        send_requested_reply != NULL);
+  any_receive_attribute = (receive_sender != NULL ||
+                           receive_path != NULL ||
+                           receive_type != NULL ||
+                           receive_interface != NULL ||
+                           receive_member != NULL ||
+                           receive_error != NULL ||
+                           receive_requested_reply != NULL ||
+                           /* <allow eavesdrop="true"/> means the same as
+                            * <allow receive_sender="*" eavesdrop="true"/>,
+                            * but <allow send_anything="anything"/> can also
+                            * take the eavesdrop attribute and still counts
+                            * as a send rule. */
+                           (!any_send_attribute && eavesdrop != NULL));
+  any_message_attribute = (any_send_attribute ||
+                           any_receive_attribute ||
+                           eavesdrop != NULL);
+
+  if (!(any_send_attribute ||
+        any_receive_attribute ||
         own || own_prefix || user || group))
     {
       dbus_set_error (error, DBUS_ERROR_FAILED,
@@ -1364,113 +1399,56 @@ append_rule_from_element (BusConfigParser   *parser,
    *     interface + member
    *     error
    * 
-   *   base send_ can combine with send_destination, send_path, send_type, send_requested_reply
+   *   base send_ can combine with send_destination, send_path, send_type, send_requested_reply, eavesdrop
    *   base receive_ with receive_sender, receive_path, receive_type, receive_requested_reply, eavesdrop
    *
    *   user, group, own, own_prefix must occur alone
-   *
-   * Pretty sure the below stuff is broken, FIXME think about it more.
    */
 
-  if ((send_interface && (send_error ||
-                          receive_interface ||
-                          receive_member ||
-                          receive_error ||
-                          receive_sender ||
-                          receive_requested_reply ||
-                          own || own_prefix ||
-                          user ||
-                          group)) ||
-
-      (send_member && (send_error ||
-                       receive_interface ||
-                       receive_member ||
-                       receive_error ||
-                       receive_sender ||
-                       receive_requested_reply ||
-                       own || own_prefix ||
-                       user ||
-                       group)) ||
-
-      (send_error && (receive_interface ||
-                      receive_member ||
-                      receive_error ||
-                      receive_sender ||
-                      receive_requested_reply ||
-                      own || own_prefix ||
-                      user ||
-                      group)) ||
-
-      (send_destination && (receive_interface ||
-                            receive_member ||
-                            receive_error ||
-                            receive_sender ||
-                            receive_requested_reply ||
-                            own || own_prefix ||
-                            user ||
-                            group)) ||
-
-      (send_type && (receive_interface ||
-                     receive_member ||
-                     receive_error ||
-                     receive_sender ||
-                     receive_requested_reply ||
-                     own || own_prefix ||
-                     user ||
-                     group)) ||
-
-      (send_path && (receive_interface ||
-                     receive_member ||
-                     receive_error ||
-                     receive_sender ||
-                     receive_requested_reply ||
-                     own || own_prefix ||
-                     user ||
-                     group)) ||
-
-      (send_requested_reply && (receive_interface ||
-                                receive_member ||
-                                receive_error ||
-                                receive_sender ||
-                                receive_requested_reply ||
-                                own || own_prefix ||
-                                user ||
-                                group)) ||
-
-      (receive_interface && (receive_error ||
-                             own || own_prefix ||
-                             user ||
-                             group)) ||
-
-      (receive_member && (receive_error ||
-                          own || own_prefix ||
-                          user ||
-                          group)) ||
-
-      (receive_error && (own || own_prefix ||
-                         user ||
-                         group)) ||
-
-      (eavesdrop && (own || own_prefix ||
-                     user ||
-                     group)) ||
-
-      (receive_requested_reply && (own || own_prefix ||
-                                   user ||
-                                   group)) ||
-
-      (own && (own_prefix || user || group)) ||
-
-      (own_prefix && (own || user || group)) ||
-
-      (user && group))
+  if (any_message_attribute +
+      ((own != NULL) +
+       (own_prefix != NULL) +
+       (user != NULL) +
+       (group != NULL)) > 1)
     {
       dbus_set_error (error, DBUS_ERROR_FAILED,
-                      "Invalid combination of attributes on element <%s>",
+                      "Invalid combination of attributes on element <%s>: "
+                      "own, own_prefix, user, group and the message-related "
+                      "attributes cannot be combined",
                       element_name);
       return FALSE;
     }
-  
+
+  if (any_send_attribute && any_receive_attribute)
+    {
+      dbus_set_error (error, DBUS_ERROR_FAILED,
+                      "Invalid combination of attributes on element <%s>: "
+                      "send and receive attributes cannot be combined",
+                      element_name);
+      return FALSE;
+    }
+
+  if ((send_member != NULL || send_interface != NULL) && send_error != NULL)
+    {
+      dbus_set_error (error, DBUS_ERROR_FAILED,
+                      "Invalid combination of attributes on element <%s>: "
+                      "send_error cannot be combined with send_member or "
+                      "send_interface",
+                      element_name);
+      return FALSE;
+    }
+
+  if ((receive_member != NULL || receive_interface != NULL) &&
+      receive_error != NULL)
+    {
+      dbus_set_error (error, DBUS_ERROR_FAILED,
+                      "Invalid combination of attributes on element <%s>: "
+                      "receive_error cannot be combined with receive_member "
+                      "or receive_interface",
+                      element_name);
+      return FALSE;
+    }
+
   rule = NULL;
 
   /* In BusPolicyRule, NULL represents wildcard.
@@ -1478,8 +1456,7 @@ append_rule_from_element (BusConfigParser   *parser,
    */
 #define IS_WILDCARD(str) ((str) && ((str)[0]) == '*' && ((str)[1]) == '\0')
 
-  if (send_interface || send_member || send_error || send_destination ||
-      send_path || send_type || send_requested_reply)
+  if (any_send_attribute)
     {
       int message_type;
       
@@ -1559,8 +1536,7 @@ append_rule_from_element (BusConfigParser   *parser,
       if (send_destination && rule->d.send.destination == NULL)
         goto nomem;
     }
-  else if (receive_interface || receive_member || receive_error || receive_sender ||
-           receive_path || receive_type || eavesdrop || receive_requested_reply)
+  else if (any_receive_attribute)
     {
       int message_type;
       
