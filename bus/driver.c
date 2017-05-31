@@ -2537,7 +2537,8 @@ write_args_for_direction (DBusString *xml,
 
 dbus_bool_t
 bus_driver_generate_introspect_string (DBusString *xml,
-                                       dbus_bool_t is_canonical_path)
+                                       dbus_bool_t is_canonical_path,
+                                       DBusMessage *message)
 {
   const InterfaceHandler *ih;
   const MessageHandler *mh;
@@ -2580,6 +2581,28 @@ bus_driver_generate_introspect_string (DBusString *xml,
         return FALSE;
     }
 
+  if (message != NULL)
+    {
+      /* Make the bus driver object path discoverable */
+      if (dbus_message_has_path (message, "/"))
+        {
+          if (!_dbus_string_append (xml,
+                "  <node name=\"org/freedesktop/DBus\"/>\n"))
+            return FALSE;
+        }
+      else if (dbus_message_has_path (message, "/org"))
+        {
+          if (!_dbus_string_append (xml,
+                "  <node name=\"freedesktop/DBus\"/>\n"))
+            return FALSE;
+        }
+      else if (dbus_message_has_path (message, "/org/freedesktop"))
+        {
+          if (!_dbus_string_append (xml, "  <node name=\"DBus\"/>\n"))
+            return FALSE;
+        }
+    }
+
   if (!_dbus_string_append (xml, "</node>\n"))
     return FALSE;
 
@@ -2618,7 +2641,7 @@ bus_driver_handle_introspect (DBusConnection *connection,
 
   is_canonical_path = dbus_message_has_path (message, DBUS_PATH_DBUS);
 
-  if (!bus_driver_generate_introspect_string (&xml, is_canonical_path))
+  if (!bus_driver_generate_introspect_string (&xml, is_canonical_path, message))
     goto oom;
 
   v_STRING = _dbus_string_get_const_data (&xml);
