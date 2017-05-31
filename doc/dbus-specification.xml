@@ -5549,15 +5549,13 @@
           </informaltable>
         </para>
         <para>
-          This method call should be sent to
-          <literal>org.freedesktop.DBus</literal> and asks the message bus to
-          release the method caller's claim to the given name. If the caller is
-          the primary owner, a new primary owner will be selected from the
-          queue if any other owners are waiting. If the caller is waiting in
-          the queue for the name, the caller will removed from the queue and
-          will not be made an owner of the name if it later becomes available.
-          If there are no other owners in the queue for the name, it will be
-          removed from the bus entirely.
+          Ask the message bus to release the method caller's claim to the given
+          name. If the caller is the primary owner, a new primary owner will be
+          selected from the queue if any other owners are waiting. If the
+          caller is waiting in the queue for the name, the caller will removed
+          from the queue and will not be made an owner of the name if it later
+          becomes available. If there are no other owners in the queue for the
+          name, it will be removed from the bus entirely.
 
           The return code can be one of the following values:
 
