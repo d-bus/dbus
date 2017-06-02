@@ -5239,6 +5239,14 @@
         instead of relying on this.
       </para>
 
+      <para>
+        In addition to the method calls listed below, the message bus
+        should implement the standard Introspectable, Properties and Peer
+        interfaces (see <xref linkend="standard-interfaces"/>).
+        Support for the Properties and Peer interfaces was added in version
+        1.11.x of the reference implementation of the message bus.
+      </para>
+
       <sect3 id="bus-messages-hello">
         <title><literal>org.freedesktop.DBus.Hello</literal></title>
         <para>
