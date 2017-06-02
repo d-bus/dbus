@@ -409,6 +409,7 @@ dbus_bool_t _dbus_write_uuid_file (const DBusString *filename,
                                    const DBusGUID   *uuid,
                                    DBusError        *error);
 
+DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_get_local_machine_uuid_encoded (DBusString *uuid_str,
                                                   DBusError  *error);
 

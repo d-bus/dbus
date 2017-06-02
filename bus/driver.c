@@ -2289,6 +2289,72 @@ out:
   return ret;
 }
 
+static dbus_bool_t
+bus_driver_handle_get_machine_id (DBusConnection *connection,
+                                  BusTransaction *transaction,
+                                  DBusMessage *message,
+                                  DBusError *error)
+{
+  DBusMessage *reply = NULL;
+  DBusString uuid;
+  const char *str;
+
+  _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+
+  if (!_dbus_string_init (&uuid))
+    {
+      BUS_SET_OOM (error);
+      return FALSE;
+    }
+
+  if (!_dbus_get_local_machine_uuid_encoded (&uuid, error))
+    goto fail;
+
+  reply = dbus_message_new_method_return (message);
+
+  if (reply == NULL)
+    goto oom;
+
+  str = _dbus_string_get_const_data (&uuid);
+
+  if (!dbus_message_append_args (reply,
+                                 DBUS_TYPE_STRING, &str,
+                                 DBUS_TYPE_INVALID))
+    goto oom;
+
+  _dbus_assert (dbus_message_has_signature (reply, "s"));
+
+  if (!bus_transaction_send_from_driver (transaction, connection, reply))
+    goto oom;
+
+  _dbus_string_free (&uuid);
+  dbus_message_unref (reply);
+  return TRUE;
+
+oom:
+  _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+
+  BUS_SET_OOM (error);
+
+fail:
+  _DBUS_ASSERT_ERROR_IS_SET (error);
+
+  if (reply != NULL)
+    dbus_message_unref (reply);
+
+  _dbus_string_free (&uuid);
+  return FALSE;
+}
+
+static dbus_bool_t
+bus_driver_handle_ping (DBusConnection *connection,
+                        BusTransaction *transaction,
+                        DBusMessage *message,
+                        DBusError *error)
+{
+  return send_ack_reply (connection, transaction, message, error);
+}
+
 static dbus_bool_t bus_driver_handle_get (DBusConnection *connection,
                                           BusTransaction *transaction,
                                           DBusMessage *message,
@@ -2314,6 +2380,7 @@ typedef enum
   /* Various older methods were available at every object path. We have to
    * preserve that behaviour for backwards compatibility, but we can at least
    * stop doing that for newly added methods.
+   * The special Peer interface should also work at any object path.
    * <https://bugs.freedesktop.org/show_bug.cgi?id=101256> */
   METHOD_FLAG_ANY_PATH = (1 << 0),
 
@@ -2491,13 +2558,20 @@ static const MessageHandler stats_message_handlers[] = {
 };
 #endif
 
+static const MessageHandler peer_message_handlers[] = {
+  { "GetMachineId", "", "s", bus_driver_handle_get_machine_id,
+    METHOD_FLAG_ANY_PATH },
+  { "Ping", "", "", bus_driver_handle_ping, METHOD_FLAG_ANY_PATH },
+  { NULL, NULL, NULL, NULL }
+};
+
 typedef enum
 {
   /* Various older interfaces were available at every object path. We have to
    * preserve that behaviour for backwards compatibility, but we can at least
    * stop doing that for newly added interfaces:
    * <https://bugs.freedesktop.org/show_bug.cgi?id=101256>
-   * Introspectable is also useful at all object paths. */
+   * Introspectable and Peer are also useful at all object paths. */
   INTERFACE_FLAG_ANY_PATH = (1 << 0),
 
   /* Set this flag for interfaces that should not show up in the
@@ -2560,6 +2634,11 @@ static InterfaceHandler interface_handlers[] = {
   { BUS_INTERFACE_STATS, stats_message_handlers, NULL,
     INTERFACE_FLAG_NONE },
 #endif
+  { DBUS_INTERFACE_PEER, peer_message_handlers, NULL,
+    /* Not in the Interfaces property because it's a pseudo-interface
+     * on all object paths of all connections, rather than a feature of the
+     * bus driver object. */
+    INTERFACE_FLAG_ANY_PATH | INTERFACE_FLAG_UNINTERESTING },
   { NULL, NULL, NULL }
 };
 
