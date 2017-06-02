@@ -215,6 +215,8 @@ case "$ci_buildsys" in
 
         if [ "$ci_sudo" = yes ] && [ "$ci_test" = yes ]; then
             sudo ${make} install
+            sudo env LD_LIBRARY_PATH=/usr/local/lib \
+                /usr/local/bin/dbus-uuidgen --ensure
             LD_LIBRARY_PATH=/usr/local/lib ${make} installcheck || \
                 maybe_fail_tests
             cat test/test-suite.log || :

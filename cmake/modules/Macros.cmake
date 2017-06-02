@@ -65,6 +65,7 @@ macro(add_test_executable _target _source)
     list(APPEND _env "DBUS_TEST_DBUS_LAUNCH=${PREFIX}${CMAKE_BINARY_DIR}/bin/dbus-launch${EXEEXT}")
     list(APPEND _env "DBUS_TEST_EXEC=${PREFIX}${DBUS_TEST_EXEC}")
     list(APPEND _env "DBUS_TEST_HOMEDIR=${PREFIX}${CMAKE_BINARY_DIR}/dbus")
+    list(APPEND _env "DBUS_TEST_UNINSTALLED=1")
     set_tests_properties(${_target} PROPERTIES ENVIRONMENT "${_env}")
 endmacro(add_test_executable)
 

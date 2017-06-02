@@ -36,6 +36,8 @@
 #include <glib/gstdio.h>
 #include <gio/gio.h>
 
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-string.h"
 #include "test-utils-glib.h"
 
 #include <string.h>
@@ -1049,6 +1051,123 @@ test_pending_fd_timeout (Fixture *f,
 #endif
 
 static void
+test_peer_get_machine_id (Fixture *f,
+                          gconstpointer context)
+{
+  DBusString what_i_think;
+  const char *what_daemon_thinks;
+  DBusMessage *m = NULL;
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  DBusGUID uuid;
+
+  if (f->skip)
+    return;
+
+  /* Unlike dbus_get_local_machine_id(), this does not consider it to be
+   * a fatal error if dbus is not correctly installed, which is
+   * useful during build-time tests on a system where dbus might not be
+   * installed at all. */
+  if (!_dbus_read_local_machine_uuid (&uuid, FALSE, &error))
+    {
+      if (g_getenv ("DBUS_TEST_UNINSTALLED") != NULL)
+        {
+          /* When running unit tests during make check or make installcheck,
+           * tolerate this */
+          g_test_skip ("Machine UUID not available");
+          return;
+        }
+      else
+        {
+          /* When running integration tests, don't tolerate it */
+          g_error ("dbus not installed correctly: machine UUID not available");
+        }
+    }
+
+  if (!_dbus_string_init (&what_i_think) ||
+      !_dbus_uuid_encode (&uuid, &what_i_think))
+    g_error ("OOM");
+
+  /* Check that the dbus-daemon agrees with us. */
+  m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+                                    DBUS_PATH_DBUS,
+                                    DBUS_INTERFACE_PEER,
+                                    "GetMachineId");
+
+  if (m == NULL ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_message_get_args (m, &error,
+        DBUS_TYPE_STRING, &what_daemon_thinks,
+        DBUS_TYPE_INVALID))
+    g_error ("%s: %s", error.name, error.message);
+
+  g_assert_cmpstr (_dbus_string_get_const_data (&what_i_think), ==,
+                   what_daemon_thinks);
+  g_assert_nonnull (what_daemon_thinks);
+  g_assert_cmpuint (strlen (what_daemon_thinks), ==, 32);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+  _dbus_string_free (&what_i_think);
+}
+
+static void
+test_peer_ping (Fixture *f,
+                gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PEER, "Ping");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+
+  if (f->skip)
+    return;
+
+  m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PEER, "Ping");
+
+  if (m == NULL ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_message_get_args (m, &error, DBUS_TYPE_INVALID))
+    g_error ("%s: %s", error.name, error.message);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
 teardown (Fixture *f,
     gconstpointer context G_GNUC_UNUSED)
 {
@@ -1197,6 +1316,9 @@ main (int argc,
   g_test_add ("/limits/max-names-per-connection", Fixture,
       &max_names_per_connection_config,
       setup, test_max_names_per_connection, teardown);
+  g_test_add ("/peer/ping", Fixture, NULL, setup, test_peer_ping, teardown);
+  g_test_add ("/peer/get-machine-id", Fixture, NULL,
+      setup, test_peer_get_machine_id, teardown);
 
 #if defined(DBUS_UNIX) && defined(HAVE_UNIX_FD_PASSING) && defined(HAVE_GIO_UNIX)
   g_test_add ("/limits/pending-fd-timeout", Fixture,

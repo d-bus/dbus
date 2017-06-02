@@ -238,6 +238,7 @@ installcheck_environment = \
 	export DBUS_TEST_EXEC=@abs_top_builddir@/test; \
 	export DBUS_TEST_HOMEDIR=@abs_top_builddir@/dbus; \
 	export DBUS_TEST_DATADIR=$(DESTDIR)$(datadir); \
+	export DBUS_TEST_UNINSTALLED=1; \
 	${NULL}
 
 # Tests in bus/config-parser.c rely on these specific values for XDG_* and
@@ -256,6 +257,7 @@ AM_TESTS_ENVIRONMENT = \
 	export DBUS_TEST_DATA=@abs_top_builddir@/test/data; \
 	export DBUS_TEST_EXEC=@abs_top_builddir@/test; \
 	export DBUS_TEST_HOMEDIR=@abs_top_builddir@/dbus; \
+	export DBUS_TEST_UNINSTALLED=1; \
 	$(NULL)
 
 manual_authz_SOURCES = manual-authz.c

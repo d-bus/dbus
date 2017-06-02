@@ -623,6 +623,7 @@ dbus_bool_t _dbus_lookup_session_address (dbus_bool_t *supported,
  */
 typedef union DBusGUID DBusGUID;
 
+DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_read_local_machine_uuid   (DBusGUID         *machine_id,
                                              dbus_bool_t       create_if_not_found,
                                              DBusError        *error);
