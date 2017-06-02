@@ -6661,6 +6661,122 @@
 
     </sect2>
 
+    <sect2 id="message-bus-properties">
+      <title>Message Bus Properties</title>
+      <para>
+        The special message bus name <literal>org.freedesktop.DBus</literal>
+        exports several properties (see
+        <xref linkend="standard-interfaces-properties"/>) on the object path
+        <literal>/org/freedesktop/DBus</literal>.
+      </para>
+
+      <sect3 id="message-bus-properties-features">
+        <title><literal>org.freedesktop.DBus.Features</literal></title>
+        <para>
+          As a property:
+          <programlisting>
+            Read-only constant ARRAY of STRING Features
+          </programlisting>
+          This property lists abstract “features” provided by the message
+          bus, and can be used by clients to detect the capabilities
+          of the message bus with which they are communicating.
+          This property was added in version 1.11.x of the reference
+          implementation of the message bus.
+        </para>
+
+        <para>
+          Items in the returned array not containing “.” are defined
+          by this specification. Bus daemon implementors wishing to advertise
+          features not mentioned in this document should either contribute
+          patches to this specification, or use keys containing “.” and
+          starting with their own reversed domain name, for example
+          <literal>com.example.MyBus.SubliminalMessages</literal>.
+        </para>
+
+        <para>
+          The features currently defined in this specification are as follows:
+          <variablelist>
+
+            <varlistentry>
+              <term><literal>AppArmor</literal></term>
+              <listitem>
+                <para>
+                  This message bus filters messages via the
+                  <ulink url="http://wiki.apparmor.net/">AppArmor</ulink>
+                  security framework. This feature should only be
+                  advertised if AppArmor mediation is enabled and
+                  active at runtime; merely compiling in support
+                  for AppArmor should not result in this feature being
+                  advertised on message bus instances where it is disabled by
+                  message bus or operating system configuration.
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term><literal>SELinux</literal></term>
+              <listitem>
+                <para>
+                  This message bus filters messages via the
+                  <ulink url="https://selinuxproject.org/">SELinux</ulink>
+                  security framework. Similar to <literal>apparmor</literal>,
+                  this feature should only be advertised if SELinux mediation
+                  is enabled and active at runtime (if SELinux is placed in
+                  permissive mode, that is still considered to be active).
+                </para>
+              </listitem>
+            </varlistentry>
+
+            <varlistentry>
+              <term><literal>SystemdActivation</literal></term>
+              <listitem>
+                <para>
+                  When asked to activate a service that has the
+                  <literal>SystemdService</literal> field in its
+                  <filename>.service</filename> file, this message bus will
+                  carry out systemd activation (for details see
+                  <xref linkend="message-bus-starting-services-systemd"/>).
+                </para>
+              </listitem>
+            </varlistentry>
+
+          </variablelist>
+        </para>
+      </sect3>
+
+      <sect3 id="message-bus-properties-interfaces">
+        <title><literal>org.freedesktop.DBus.Interfaces</literal></title>
+        <para>
+          As a property:
+          <programlisting>
+            Read-only constant ARRAY of STRING Interfaces
+          </programlisting>
+          This property lists interfaces provided by the
+          <literal>/org/freedesktop/DBus</literal> object,
+          and can be used by clients to detect the capabilities
+          of the message bus with which they are communicating.
+          Unlike the standard Introspectable interface, querying this
+          property does not require parsing XML.
+          This property was added in version 1.11.x of the reference
+          implementation of the message bus.
+        </para>
+
+        <para>
+          The standard <literal>org.freedesktop.DBus</literal> and
+          <literal>org.freedesktop.DBus.Properties</literal> interfaces
+          are not included in the value of this property, because their
+          presence can be inferred from the fact that a method call on
+          <literal>org.freedesktop.DBus.Properties</literal> asking for
+          properties of <literal>org.freedesktop.DBus</literal> was
+          successful. The standard <literal>org.freedesktop.DBus.Peer</literal>
+          and <literal>org.freedesktop.DBus.Introspectable</literal>
+          interfaces are not included in the value of this property either,
+          because they do not indicate features of the message bus
+          implementation.
+        </para>
+      </sect3>
+    </sect2>
+
   </sect1>
 <!--
   <appendix id="implementation-notes">
