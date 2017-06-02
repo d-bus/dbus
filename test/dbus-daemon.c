@@ -36,6 +36,7 @@
 #include <glib/gstdio.h>
 #include <gio/gio.h>
 
+#include "bus/stats.h"
 #include "dbus/dbus-internals.h"
 #include "dbus/dbus-string.h"
 #include "test-utils-glib.h"
@@ -1168,6 +1169,742 @@ test_peer_ping (Fixture *f,
 }
 
 static void
+test_get_invalid_path (Fixture *f,
+                       gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      "/", DBUS_INTERFACE_PROPERTIES, "Get");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *property = "Interfaces";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  /* That object path does not have that interface */
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_get_invalid_iface (Fixture *f,
+                        gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Get");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = "com.example.Nope";
+  const char *property = "Whatever";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_get_invalid (Fixture *f,
+                  gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Get");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *property = "Whatever";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_PROPERTY);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_get_all_invalid_iface (Fixture *f,
+                            gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "GetAll");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = "com.example.Nope";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_get_all_invalid_path (Fixture *f,
+                           gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      "/", DBUS_INTERFACE_PROPERTIES, "GetAll");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  /* That object path does not have that interface */
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_set_invalid_iface (Fixture *f,
+                        gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Set");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = "com.example.Nope";
+  const char *property = "Whatever";
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  dbus_bool_t b = FALSE;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID))
+    g_error ("OOM");
+
+  dbus_message_iter_init_append (m, &args_iter);
+
+  if (!dbus_message_iter_open_container (&args_iter,
+        DBUS_TYPE_VARIANT, "b", &var_iter) ||
+      !dbus_message_iter_append_basic (&var_iter, DBUS_TYPE_BOOLEAN, &b) ||
+      !dbus_message_iter_close_container (&args_iter, &var_iter) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_set_invalid_path (Fixture *f,
+                       gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      "/", DBUS_INTERFACE_PROPERTIES, "Set");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *property = "Interfaces";
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  dbus_bool_t b = FALSE;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID))
+    g_error ("OOM");
+
+  dbus_message_iter_init_append (m, &args_iter);
+
+  if (!dbus_message_iter_open_container (&args_iter,
+        DBUS_TYPE_VARIANT, "b", &var_iter) ||
+      !dbus_message_iter_append_basic (&var_iter, DBUS_TYPE_BOOLEAN, &b) ||
+      !dbus_message_iter_close_container (&args_iter, &var_iter) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_set_invalid (Fixture *f,
+                  gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Set");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *property = "Whatever";
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  dbus_bool_t b = FALSE;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID))
+    g_error ("OOM");
+
+  dbus_message_iter_init_append (m, &args_iter);
+
+  if (!dbus_message_iter_open_container (&args_iter,
+        DBUS_TYPE_VARIANT, "b", &var_iter) ||
+      !dbus_message_iter_append_basic (&var_iter, DBUS_TYPE_BOOLEAN, &b) ||
+      !dbus_message_iter_close_container (&args_iter, &var_iter) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_PROPERTY);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_set (Fixture *f,
+          gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Set");
+  DBusPendingCall *pc = NULL;
+  DBusError error = DBUS_ERROR_INIT;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *property = "Features";
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  dbus_bool_t b = FALSE;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &property,
+        DBUS_TYPE_INVALID))
+    g_error ("OOM");
+
+  dbus_message_iter_init_append (m, &args_iter);
+
+  if (!dbus_message_iter_open_container (&args_iter,
+        DBUS_TYPE_VARIANT, "b", &var_iter) ||
+      !dbus_message_iter_append_basic (&var_iter, DBUS_TYPE_BOOLEAN, &b) ||
+      !dbus_message_iter_close_container (&args_iter, &var_iter) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_set_error_from_message (&error, m))
+    g_error ("Unexpected success");
+
+  g_assert_cmpstr (error.name, ==, DBUS_ERROR_PROPERTY_READ_ONLY);
+  dbus_error_free (&error);
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+check_features (DBusMessageIter *var_iter)
+{
+  DBusMessageIter arr_iter;
+  gboolean have_systemd_activation = FALSE;
+
+  g_assert_cmpint (dbus_message_iter_get_arg_type (var_iter), ==,
+      DBUS_TYPE_ARRAY);
+  g_assert_cmpint (dbus_message_iter_get_element_type (var_iter), ==,
+      DBUS_TYPE_STRING);
+  dbus_message_iter_recurse (var_iter, &arr_iter);
+
+  while (dbus_message_iter_get_arg_type (&arr_iter) != DBUS_TYPE_INVALID)
+    {
+      const char *feature;
+
+      g_assert_cmpint (dbus_message_iter_get_arg_type (&arr_iter), ==,
+          DBUS_TYPE_STRING);
+      dbus_message_iter_get_basic (&arr_iter, &feature);
+
+      g_test_message ("Feature: %s", feature);
+
+      if (g_strcmp0 (feature, "SystemdActivation") == 0)
+        have_systemd_activation = TRUE;
+
+      dbus_message_iter_next (&arr_iter);
+    }
+
+  /* We pass --systemd-activation to the daemon for this unit test on Unix
+   * (it can only work in practice on Linux, but there's nothing
+   * inherently Linux-specific about the protocol). */
+#ifdef DBUS_UNIX
+  g_assert_true (have_systemd_activation);
+#else
+  g_assert_false (have_systemd_activation);
+#endif
+}
+
+static void
+test_features (Fixture *f,
+               gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Get");
+  DBusPendingCall *pc = NULL;
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *features = "Features";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &features,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_message_iter_init (m, &args_iter))
+    g_error ("Reply has no arguments");
+
+  g_assert_cmpint (dbus_message_iter_get_arg_type (&args_iter), ==,
+      DBUS_TYPE_VARIANT);
+
+  dbus_message_iter_recurse (&args_iter, &var_iter);
+  check_features (&var_iter);
+
+  if (dbus_message_iter_next (&args_iter))
+    g_error ("Reply has too many arguments");
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+check_interfaces (DBusMessageIter *var_iter)
+{
+  DBusMessageIter arr_iter;
+  gboolean have_monitoring = FALSE;
+  gboolean have_stats = FALSE;
+  gboolean have_verbose = FALSE;
+
+  g_assert_cmpint (dbus_message_iter_get_arg_type (var_iter), ==,
+      DBUS_TYPE_ARRAY);
+  g_assert_cmpint (dbus_message_iter_get_element_type (var_iter), ==,
+      DBUS_TYPE_STRING);
+  dbus_message_iter_recurse (var_iter, &arr_iter);
+
+  while (dbus_message_iter_get_arg_type (&arr_iter) != DBUS_TYPE_INVALID)
+    {
+      const char *iface;
+
+      g_assert_cmpint (dbus_message_iter_get_arg_type (&arr_iter), ==,
+          DBUS_TYPE_STRING);
+      dbus_message_iter_get_basic (&arr_iter, &iface);
+      g_test_message ("Interface: %s", iface);
+
+      g_assert_cmpstr (iface, !=, DBUS_INTERFACE_DBUS);
+      g_assert_cmpstr (iface, !=, DBUS_INTERFACE_PROPERTIES);
+      g_assert_cmpstr (iface, !=, DBUS_INTERFACE_INTROSPECTABLE);
+      g_assert_cmpstr (iface, !=, DBUS_INTERFACE_PEER);
+
+      if (g_strcmp0 (iface, DBUS_INTERFACE_MONITORING) == 0)
+        have_monitoring = TRUE;
+      else if (g_strcmp0 (iface, BUS_INTERFACE_STATS) == 0)
+        have_stats = TRUE;
+      else if (g_strcmp0 (iface, DBUS_INTERFACE_VERBOSE) == 0)
+        have_verbose = TRUE;
+
+      dbus_message_iter_next (&arr_iter);
+    }
+
+  g_assert_true (have_monitoring);
+
+#ifdef DBUS_ENABLE_STATS
+  g_assert_true (have_stats);
+#else
+  g_assert_false (have_stats);
+#endif
+
+#ifdef DBUS_ENABLE_VERBOSE_MODE
+  g_assert_true (have_verbose);
+#else
+  g_assert_false (have_verbose);
+#endif
+}
+
+static void
+test_interfaces (Fixture *f,
+                 gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "Get");
+  DBusPendingCall *pc = NULL;
+  DBusMessageIter args_iter;
+  DBusMessageIter var_iter;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  const char *ifaces = "Interfaces";
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_STRING, &ifaces,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  if (!dbus_message_iter_init (m, &args_iter))
+    g_error ("Reply has no arguments");
+
+  if (dbus_message_iter_get_arg_type (&args_iter) != DBUS_TYPE_VARIANT)
+    g_error ("Reply does not have a variant argument");
+
+  dbus_message_iter_recurse (&args_iter, &var_iter);
+  check_interfaces (&var_iter);
+
+  if (dbus_message_iter_next (&args_iter))
+    g_error ("Reply has too many arguments");
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
+test_get_all (Fixture *f,
+              gconstpointer context)
+{
+  DBusMessage *m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+      DBUS_PATH_DBUS, DBUS_INTERFACE_PROPERTIES, "GetAll");
+  DBusPendingCall *pc = NULL;
+  DBusMessageIter args_iter;
+  DBusMessageIter arr_iter;
+  DBusMessageIter pair_iter;
+  DBusMessageIter var_iter;
+  const char *iface = DBUS_INTERFACE_DBUS;
+  gboolean have_features = FALSE;
+  gboolean have_interfaces = FALSE;
+
+  if (f->skip)
+    return;
+
+  if (m == NULL ||
+      !dbus_message_append_args (m,
+        DBUS_TYPE_STRING, &iface,
+        DBUS_TYPE_INVALID) ||
+      !dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                        DBUS_TIMEOUT_USE_DEFAULT) ||
+      pc == NULL)
+    g_error ("OOM");
+
+  dbus_message_unref (m);
+  m = NULL;
+
+  if (dbus_pending_call_get_completed (pc))
+    test_pending_call_store_reply (pc, &m);
+  else if (!dbus_pending_call_set_notify (pc, test_pending_call_store_reply,
+                                          &m, NULL))
+    g_error ("OOM");
+
+  while (m == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  dbus_message_iter_init (m, &args_iter);
+  g_assert_cmpuint (dbus_message_iter_get_arg_type (&args_iter), ==,
+      DBUS_TYPE_ARRAY);
+  g_assert_cmpuint (dbus_message_iter_get_element_type (&args_iter), ==,
+      DBUS_TYPE_DICT_ENTRY);
+  dbus_message_iter_recurse (&args_iter, &arr_iter);
+
+  while (dbus_message_iter_get_arg_type (&arr_iter) != DBUS_TYPE_INVALID)
+    {
+      const char *name;
+
+      dbus_message_iter_recurse (&arr_iter, &pair_iter);
+      g_assert_cmpuint (dbus_message_iter_get_arg_type (&pair_iter), ==,
+          DBUS_TYPE_STRING);
+      dbus_message_iter_get_basic (&pair_iter, &name);
+      dbus_message_iter_next (&pair_iter);
+      g_assert_cmpuint (dbus_message_iter_get_arg_type (&pair_iter), ==,
+          DBUS_TYPE_VARIANT);
+      dbus_message_iter_recurse (&pair_iter, &var_iter);
+
+      if (g_strcmp0 (name, "Features") == 0)
+        {
+          check_features (&var_iter);
+          have_features = TRUE;
+        }
+      else if (g_strcmp0 (name, "Interfaces") == 0)
+        {
+          check_interfaces (&var_iter);
+          have_interfaces = TRUE;
+        }
+
+      dbus_message_iter_next (&arr_iter);
+    }
+
+  g_assert_true (have_features);
+  g_assert_true (have_interfaces);
+
+  if (dbus_message_iter_next (&args_iter))
+    g_error ("Reply has too many arguments");
+
+  dbus_message_unref (m);
+  dbus_pending_call_unref (pc);
+}
+
+static void
 teardown (Fixture *f,
     gconstpointer context G_GNUC_UNUSED)
 {
@@ -1319,6 +2056,30 @@ main (int argc,
   g_test_add ("/peer/ping", Fixture, NULL, setup, test_peer_ping, teardown);
   g_test_add ("/peer/get-machine-id", Fixture, NULL,
       setup, test_peer_get_machine_id, teardown);
+  g_test_add ("/properties/get-invalid-iface", Fixture, NULL,
+      setup, test_get_invalid_iface, teardown);
+  g_test_add ("/properties/get-invalid-path", Fixture, NULL,
+      setup, test_get_invalid_path, teardown);
+  g_test_add ("/properties/get-invalid", Fixture, NULL,
+      setup, test_get_invalid, teardown);
+  g_test_add ("/properties/get-all-invalid-iface", Fixture, NULL, setup,
+      test_get_all_invalid_iface, teardown);
+  g_test_add ("/properties/get-all-invalid-path", Fixture, NULL, setup,
+      test_get_all_invalid_path, teardown);
+  g_test_add ("/properties/set-invalid-iface", Fixture, NULL,
+      setup, test_set_invalid_iface, teardown);
+  g_test_add ("/properties/set-invalid-path", Fixture, NULL,
+      setup, test_set_invalid_path, teardown);
+  g_test_add ("/properties/set-invalid", Fixture, NULL,
+      setup, test_set_invalid, teardown);
+  g_test_add ("/properties/set", Fixture, NULL,
+      setup, test_set, teardown);
+  g_test_add ("/properties/features", Fixture, NULL,
+      setup, test_features, teardown);
+  g_test_add ("/properties/interfaces", Fixture, NULL, setup,
+      test_interfaces, teardown);
+  g_test_add ("/properties/get-all", Fixture, NULL, setup,
+      test_get_all, teardown);
 
 #if defined(DBUS_UNIX) && defined(HAVE_UNIX_FD_PASSING) && defined(HAVE_GIO_UNIX)
   g_test_add ("/limits/pending-fd-timeout", Fixture,
