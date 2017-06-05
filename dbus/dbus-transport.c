@@ -254,13 +254,16 @@ check_address (const char *address, DBusError *error)
   int len, i;
 
   _dbus_assert (address != NULL);
+  _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
   if (!dbus_parse_address (address, &entries, &len, error))
     return NULL;              /* not a valid address */
 
   for (i = 0; i < len; i++)
     {
+      dbus_error_free (error);
       transport = _dbus_transport_open (entries[i], error);
+
       if (transport != NULL)
         break;
     }
