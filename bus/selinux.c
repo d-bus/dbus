@@ -272,6 +272,19 @@ bus_selinux_enabled (void)
 #endif /* HAVE_SELINUX */
 }
 
+BusSELinuxID*
+bus_selinux_get_self (void)
+{
+#ifdef HAVE_SELINUX
+  if(bus_selinux_enabled ())
+    return BUS_SID_FROM_SELINUX (bus_sid);
+  else
+    return NULL;
+#else
+  return NULL;
+#endif /* HAVE_SELINUX */
+}
+
 /**
  * Do early initialization; determine whether SELinux is enabled.
  */

@@ -1854,8 +1854,9 @@ bus_driver_handle_get_connection_selinux_security_context (DBusConnection *conne
   if (reply == NULL)
     goto oom;
 
-  /* FIXME: Obtain the SELinux security context for the bus daemon itself */
-  if (found == BUS_DRIVER_FOUND_PEER)
+  if (found == BUS_DRIVER_FOUND_SELF)
+    context = bus_selinux_get_self ();
+  else if (found == BUS_DRIVER_FOUND_PEER)
     context = bus_connection_get_selinux_id (conn);
   else
     context = NULL;

@@ -33,6 +33,8 @@ void        bus_selinux_shutdown (void);
 
 dbus_bool_t bus_selinux_enabled  (void);
 
+BusSELinuxID *bus_selinux_get_self (void);
+
 DBusHashTable* bus_selinux_id_table_new    (void);
 BusSELinuxID*  bus_selinux_id_table_lookup (DBusHashTable    *service_table,
                                             const DBusString *service_name);
