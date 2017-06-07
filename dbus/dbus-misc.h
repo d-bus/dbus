@@ -48,6 +48,9 @@ DBUS_EXPORT
 dbus_bool_t dbus_setenv                (const char *variable,
                                         const char *value);
 
+DBUS_EXPORT
+char *dbus_try_get_local_machine_id (DBusError *error);
+
 /** @} */
 
 DBUS_END_DECLS

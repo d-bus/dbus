@@ -37,8 +37,6 @@
 #include <gio/gio.h>
 
 #include "bus/stats.h"
-#include "dbus/dbus-internals.h"
-#include "dbus/dbus-string.h"
 #include "test-utils-glib.h"
 
 #include <string.h>
@@ -1055,21 +1053,18 @@ static void
 test_peer_get_machine_id (Fixture *f,
                           gconstpointer context)
 {
-  DBusString what_i_think;
+  char *what_i_think;
   const char *what_daemon_thinks;
   DBusMessage *m = NULL;
   DBusPendingCall *pc = NULL;
   DBusError error = DBUS_ERROR_INIT;
-  DBusGUID uuid;
 
   if (f->skip)
     return;
 
-  /* Unlike dbus_get_local_machine_id(), this does not consider it to be
-   * a fatal error if dbus is not correctly installed, which is
-   * useful during build-time tests on a system where dbus might not be
-   * installed at all. */
-  if (!_dbus_read_local_machine_uuid (&uuid, FALSE, &error))
+  what_i_think = dbus_try_get_local_machine_id (&error);
+
+  if (what_i_think == NULL)
     {
       if (g_getenv ("DBUS_TEST_UNINSTALLED") != NULL)
         {
@@ -1081,13 +1076,9 @@ test_peer_get_machine_id (Fixture *f,
       else
         {
           /* When running integration tests, don't tolerate it */
-          g_error ("dbus not installed correctly: machine UUID not available");
+          g_error ("%s", error.message);
         }
     }
-
-  if (!_dbus_string_init (&what_i_think) ||
-      !_dbus_uuid_encode (&uuid, &what_i_think))
-    g_error ("OOM");
 
   /* Check that the dbus-daemon agrees with us. */
   m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
@@ -1118,14 +1109,13 @@ test_peer_get_machine_id (Fixture *f,
         DBUS_TYPE_INVALID))
     g_error ("%s: %s", error.name, error.message);
 
-  g_assert_cmpstr (_dbus_string_get_const_data (&what_i_think), ==,
-                   what_daemon_thinks);
+  g_assert_cmpstr (what_i_think, ==, what_daemon_thinks);
   g_assert_nonnull (what_daemon_thinks);
   g_assert_cmpuint (strlen (what_daemon_thinks), ==, 32);
 
   dbus_message_unref (m);
   dbus_pending_call_unref (pc);
-  _dbus_string_free (&what_i_think);
+  dbus_free (what_i_think);
 }
 
 static void
