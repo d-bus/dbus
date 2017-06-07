@@ -37,9 +37,6 @@ dbus_bool_t dbus_internal_do_not_use_get_uuid    (const char *filename,
                                                   char      **uuid_p,
                                                   dbus_bool_t create_if_not_found,
                                                   DBusError  *error);
-dbus_bool_t dbus_internal_do_not_use_ensure_uuid (const char *filename,
-                                                  char      **uuid_p,
-                                                  DBusError  *error);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_create_uuid                    (char      **uuid_p,
                                                   DBusError  *error);
