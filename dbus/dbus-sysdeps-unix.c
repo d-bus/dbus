@@ -3922,10 +3922,13 @@ _dbus_read_local_machine_uuid (DBusGUID   *machine_id,
 
   if (b)
     {
-      /* try to copy it to the DBUS_MACHINE_UUID_FILE, but do not
-       * complain if that isn't possible for whatever reason */
-      _dbus_string_init_const (&filename, DBUS_MACHINE_UUID_FILE);
-      _dbus_write_uuid_file (&filename, machine_id, NULL);
+      if (create_if_not_found)
+        {
+          /* try to copy it to the DBUS_MACHINE_UUID_FILE, but do not
+           * complain if that isn't possible for whatever reason */
+          _dbus_string_init_const (&filename, DBUS_MACHINE_UUID_FILE);
+          _dbus_write_uuid_file (&filename, machine_id, NULL);
+        }
 
       return TRUE;
     }
