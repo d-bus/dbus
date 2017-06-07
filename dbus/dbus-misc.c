@@ -67,11 +67,17 @@
  * The UUID is not a UUID in the sense of RFC4122; the details
  * are explained in the D-Bus specification.
  *
- * @returns a 32-byte-long hex-encoded UUID string, or #NULL if insufficient memory
+ * This function returns #NULL if there was not enough memory to read
+ * the UUID, or if the UUID could not be read because the D-Bus
+ * library was installed incorrectly. In the latter case, a warning
+ * is logged.
+ *
+ * @returns a 32-byte-long hex-encoded UUID string, or #NULL on failure
  */
 char*
 dbus_get_local_machine_id (void)
 {
+  DBusError error = DBUS_ERROR_INIT;
   DBusString uuid;
   char *s;
 
@@ -82,10 +88,20 @@ dbus_get_local_machine_id (void)
 
   /* The documentation says dbus_get_local_machine_id() only fails on OOM;
    * this can actually also fail if the D-Bus installation is faulty
-   * (no UUID) *and* reading a new random UUID fails, but we have no way
-   * to report that */
-  if (!_dbus_get_local_machine_uuid_encoded (&uuid, NULL) ||
-      !_dbus_string_steal_data (&uuid, &s))
+   * (no UUID), but we have no good way to report that. Historically,
+   * _dbus_get_local_machine_uuid_encoded was responsible for issuing the
+   * warning; now we do that here. */
+  if (!_dbus_get_local_machine_uuid_encoded (&uuid, &error))
+    {
+      if (!dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))
+        _dbus_warn_check_failed ("%s", error.message);
+
+      _dbus_string_free (&uuid);
+      dbus_error_free (&error);
+      return NULL;
+    }
+
+  if (!_dbus_string_steal_data (&uuid, &s))
     {
       _dbus_string_free (&uuid);
       return NULL;

@@ -908,25 +908,8 @@ _dbus_get_local_machine_uuid_encoded (DBusString *uuid_str,
 
   if (machine_uuid_initialized_generation != _dbus_current_generation)
     {
-      DBusError local_error = DBUS_ERROR_INIT;
-
-      if (!_dbus_read_local_machine_uuid (&machine_uuid, FALSE,
-                                          &local_error))
-        {          
-#ifndef DBUS_ENABLE_EMBEDDED_TESTS
-          /* For the test suite, we may not be installed so just continue silently
-           * here. But in a production build, we want to be nice and loud about
-           * this.
-           */
-          _dbus_warn_check_failed ("D-Bus library appears to be incorrectly set up; failed to read machine uuid: %s\n"
-                                   "See the manual page for dbus-uuidgen to correct this issue.\n",
-                                   local_error.message);
-#endif
-          
-          dbus_error_free (&local_error);
-          
-          ok = _dbus_generate_uuid (&machine_uuid, error);
-        }
+      if (!_dbus_read_local_machine_uuid (&machine_uuid, FALSE, error))
+        ok = FALSE;
     }
 
   if (ok)
