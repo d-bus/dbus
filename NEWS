@@ -23,6 +23,21 @@ Build-time configuration changes:
 
 • Similarly, we now use pkg-config to find libselinux.
 
+Behaviour changes:
+
+• Previously, /etc/machine-id could be copied to /var/lib/dbus/machine-id
+  as a side-effect of a sufficiently privileged process merely reading the
+  machine ID. It is no longer copied as a side-effect of reading.
+  Running dbus-uuidgen --ensure, which should be done after installing dbus,
+  continues to copy /etc/machine-id to /var/lib/dbus/machine-id if the
+  former exists and the latter does not.
+  (fd.o #101257, Simon McVittie)
+
+• The undocumented Verbose interface, and the GetAllMatchRules method on
+  the undocumented Stats interface, must now be used via the object path
+  /org/freedesktop/DBus. Previously, they existed on all object paths.
+  (fd.o #101257, Simon McVittie)
+
 Enhancements:
 
 • D-Bus Specification version 0.31
@@ -32,7 +47,16 @@ Enhancements:
     includes hyphen-minus, forward slash and underscore as intended
   · Describe all message bus methods in the same section
   · Clarify the correct object path for method calls to the message bus
-  (fd.o #99825, #100686, #100795, #101256; Simon McVittie, Tom Gundersen)
+    (/org/freedesktop/DBus, DBUS_PATH_DBUS in the reference implementation)
+  · Document that the message bus implements Introspectable, Peer and
+    Properties
+  · Add new Features and Interfaces properties for message bus
+    feature-discovery
+  (fd.o #99825, #100686, #100795, #101256, #101257;
+  Simon McVittie, Tom Gundersen)
+
+• Implement the Properties and Peer interfaces in dbus-daemon
+  (fd.o #101257, Simon McVittie)
 
 • Avoid deprecated API calls when using SELinux
   (fd.o #100912, Laurent Bigonville)
@@ -44,6 +68,12 @@ Fixes:
   for reproducible builds (fd.o #100692, Simon McVittie)
 
 • Fix some integration test issues (fd.o #100686, Simon McVittie)
+
+• Fix memory leaks in the tests (fd.o #101257, Simon McVittie)
+
+• If we somehow get an autolaunch address with multiple semicolon-separated
+  components, and they don't work, don't invalidly "pile up" errors
+  (fd.o #101257, Simon McVittie)
 
 D-Bus 1.11.12 (2017-04-07)
 ==
