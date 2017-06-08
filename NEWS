@@ -58,6 +58,12 @@ Enhancements:
 • Implement the Properties and Peer interfaces in dbus-daemon
   (fd.o #101257, Simon McVittie)
 
+• New function dbus_try_get_local_machine_id() is like
+  dbus_get_local_machine_id(), but returning a DBusError. Other code
+  that needs the machine ID will now report a recoverable error (instead
+  of logging to stderr and aborting) if dbus has not been installed
+  correctly. (fd.o #13194, Simon McVittie)
+
 • Avoid deprecated API calls when using SELinux
   (fd.o #100912, Laurent Bigonville)
 
