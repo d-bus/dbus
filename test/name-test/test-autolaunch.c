@@ -25,7 +25,7 @@ main (int argc, char *argv[])
   if (!_dbus_read_local_machine_uuid (&uuid, FALSE, &error))
     {
       /* We can't expect autolaunching to work in this situation */
-      fprintf (stderr, "%s\n", error.message);
+      fprintf (stderr, "*** %s\n", error.message);
       dbus_error_free (&error);
       return 0;
     }
