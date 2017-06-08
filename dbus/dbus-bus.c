@@ -933,7 +933,7 @@ dbus_bus_get_unix_user (DBusConnection *connection,
  * probably the bus ID is not useful; instead, use the machine ID
  * since it's accessible without necessarily connecting to the bus and
  * may be persistent beyond a single bus instance (across reboots for
- * example). See dbus_get_local_machine_id().
+ * example). See dbus_try_get_local_machine_id().
  *
  * In addition to an ID for each bus and an ID for each machine, there is
  * an ID for each address that the bus is listening on; that can

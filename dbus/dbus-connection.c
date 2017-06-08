@@ -3057,7 +3057,7 @@ dbus_connection_get_is_anonymous (DBusConnection *connection)
  * dbus_bus_get_id() instead (which is just a convenience wrapper
  * around the org.freedesktop.DBus.GetId method invoked on the bus).
  *
- * You can also get a machine ID; see dbus_get_local_machine_id() to
+ * You can also get a machine ID; see dbus_try_get_local_machine_id() to
  * get the machine you are on.  There isn't a convenience wrapper, but
  * you can invoke org.freedesktop.DBus.Peer.GetMachineId on any peer
  * to get the machine ID on the other end.
