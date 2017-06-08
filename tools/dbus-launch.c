@@ -117,12 +117,12 @@ save_machine_uuid (const char *uuid_arg)
 /* Read the machine uuid from file if needed. Returns TRUE if machine_uuid is
  * set after this function */
 static int
-read_machine_uuid_if_needed (void)
+read_machine_uuid_if_needed (DBusError *error)
 {
   if (machine_uuid != NULL)
     return TRUE;
 
-  machine_uuid = dbus_get_local_machine_id ();
+  machine_uuid = dbus_try_get_local_machine_id (error);
 
   if (machine_uuid == NULL)
     return FALSE;
@@ -841,6 +841,7 @@ main (int argc, char **argv)
   dbus_bool_t user_bus_supported = FALSE;
   DBusString user_bus;
   const char *error_str;
+  DBusError error = DBUS_ERROR_INIT;
 
   exit_with_session = FALSE;
   config_file = NULL;
@@ -1013,7 +1014,6 @@ main (int argc, char **argv)
       char *address;
       pid_t pid;
       long wid;
-      DBusError error = DBUS_ERROR_INIT;
       
       if (get_machine_uuid () == NULL)
         {
@@ -1087,9 +1087,10 @@ main (int argc, char **argv)
       fprintf (stderr, "Session lifetime based on X11 requested, but X11 support not compiled in.\n");
       exit (1);
 #else /* DBUS_BUILD_X11 */
-      if (!read_machine_uuid_if_needed())
+      if (!read_machine_uuid_if_needed (&error))
         {
-          fprintf (stderr, "Session lifetime based on X11 requested, but machine UUID unavailable.\n");
+          fprintf (stderr, "Session lifetime based on X11 requested, but machine UUID unavailable: %s.\n", error.message);
+          dbus_error_free (&error);
           exit (1);
         }
 
@@ -1101,9 +1102,15 @@ main (int argc, char **argv)
 #endif /* DBUS_BUILD_X11 */
     }
 #ifdef DBUS_BUILD_X11
-  else if (read_machine_uuid_if_needed())
+  else if (read_machine_uuid_if_needed (&error))
     {
       x11_init();
+    }
+  else
+    {
+      /* Survive this misconfiguration, but complain about it. */
+      fprintf (stderr, "%s\n", error.message);
+      dbus_error_free (&error);
     }
 #endif /* DBUS_BUILD_X11 */
 
