@@ -28,6 +28,7 @@ export DBUS_DEBUG_OUTPUT=1
 echo "# dbus-daemon binary: ${DBUS_TEST_DAEMON:=dbus-daemon}"
 echo "# dbus-launch binary: ${DBUS_TEST_DBUS_LAUNCH:=dbus-launch}"
 echo "# dbus-send binary: ${DBUS_TEST_DBUS_SEND:=dbus-send}"
+echo "# dbus-uuidgen binary: ${DBUS_TEST_DBUS_UUIDGEN:=dbus-uuidgen}"
 
 if test -n "$DBUS_TEST_DATA"; then
     echo "# test data: $DBUS_TEST_DATA"
@@ -39,6 +40,16 @@ else
     echo "# using standard session bus configuration"
     # add a harmless command-line argument
     config="--sh-syntax"
+fi
+
+if ! "${DBUS_TEST_DBUS_UUIDGEN}" --get >/dev/null; then
+    if test -n "$DBUS_TEST_UNINSTALLED"; then
+        echo "1..0 # SKIP - Unable to test dbus-launch without a machine ID"
+        exit 0
+    else
+        echo "Bail out! dbus not correctly installed: no machine ID"
+        exit 1
+    fi
 fi
 
 echo "1..1"

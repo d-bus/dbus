@@ -8,6 +8,7 @@
 #endif
 
 #include <dbus/dbus.h>
+#include "dbus/dbus-internals.h"
 #include "dbus/dbus-sysdeps.h"
 
 int
@@ -15,10 +16,19 @@ main (int argc, char *argv[])
 {
   DBusConnection *conn = NULL;
   DBusError error;
+  DBusGUID uuid;
 
   dbus_setenv ("DBUS_SESSION_BUS_ADDRESS", NULL);
 
   dbus_error_init (&error);
+
+  if (!_dbus_read_local_machine_uuid (&uuid, FALSE, &error))
+    {
+      /* We can't expect autolaunching to work in this situation */
+      fprintf (stderr, "%s\n", error.message);
+      dbus_error_free (&error);
+      return 0;
+    }
 
   conn = dbus_bus_get (DBUS_BUS_SESSION, &error);
 

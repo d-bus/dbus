@@ -3330,9 +3330,20 @@ static dbus_bool_t
 check_existent_get_machine_id (BusContext     *context,
                                DBusConnection *connection)
 {
+  DBusError error = DBUS_ERROR_INIT;
   DBusMessage *message;
   dbus_uint32_t serial;
+  DBusGUID uuid;
   const char *machine_id;
+
+  if (!_dbus_read_local_machine_uuid (&uuid, FALSE, &error))
+    {
+      /* Unable to test further: either we ran out of memory, or neither
+       * dbus nor systemd was ever correctly installed on this machine */
+      _dbus_verbose ("Machine UUID not available: %s", error.message);
+      dbus_error_free (&error);
+      return TRUE;
+    }
 
   message = dbus_message_new_method_call (EXISTENT_SERVICE_NAME,
                                           "/org/freedesktop/TestSuite",
