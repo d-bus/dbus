@@ -65,6 +65,9 @@ Enhancements:
   of logging to stderr and aborting) if dbus has not been installed
   correctly. (fd.o #13194, Simon McVittie)
 
+• Implement GetConnectionSELinuxSecurityContext("org.freedesktop.DBus")
+  (fd.o #101315, Laurent Bigonville)
+
 • Avoid deprecated API calls when using SELinux
   (fd.o #100912, Laurent Bigonville)
 
