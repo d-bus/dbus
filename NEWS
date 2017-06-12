@@ -5,6 +5,7 @@ Dependencies:
 
 • SELinux support requires at least libselinux 2.0.86 as explicit
   refcounting for SID (sidput/sidget) has been removed from the code.
+• Full test coverage now requires GLib 2.40.
 
 Build-time configuration changes:
 
@@ -66,6 +67,10 @@ Enhancements:
 
 • Avoid deprecated API calls when using SELinux
   (fd.o #100912, Laurent Bigonville)
+
+• Switch a test from the deprecated g_test_trap_fork() to
+  g_test_trap_subprocess(), for Windows support and better robustness
+  on Unix (fd.o #101362, Simon McVittie)
 
 Fixes:
 
