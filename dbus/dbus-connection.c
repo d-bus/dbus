@@ -2476,6 +2476,8 @@ _dbus_connection_block_pending_call (DBusPendingCall *pending)
 
       /* on OOM error_msg is set to NULL */
       complete_pending_call_and_unlock (connection, pending, error_msg);
+      if (error_msg != NULL)
+        dbus_message_unref (error_msg);
       dbus_pending_call_unref (pending);
       return;
     }

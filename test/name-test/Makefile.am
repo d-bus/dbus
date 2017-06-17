@@ -59,6 +59,7 @@ TESTS += \
 	test-ids \
 	test-pending-call-dispatch \
 	test-pending-call-timeout \
+	test-pending-call-disconnected \
 	test-privserver-client \
 	test-shutdown \
 	test-threads-init \
@@ -72,10 +73,11 @@ if DBUS_ENABLE_EMBEDDED_TESTS
 
 ## we use noinst_PROGRAMS not check_PROGRAMS for TESTS so that we
 ## build even when not doing "make check"
-noinst_PROGRAMS=test-pending-call-dispatch test-pending-call-timeout test-threads-init test-ids test-shutdown test-privserver test-privserver-client test-autolaunch
+noinst_PROGRAMS=test-pending-call-dispatch test-pending-call-timeout test-pending-call-disconnected test-threads-init test-ids test-shutdown test-privserver test-privserver-client test-autolaunch
 
 test_pending_call_dispatch_LDADD=$(top_builddir)/dbus/libdbus-1.la
 test_pending_call_timeout_LDADD=$(top_builddir)/dbus/libdbus-1.la
+test_pending_call_disconnected_LDADD=$(top_builddir)/dbus/libdbus-1.la
 test_threads_init_LDADD=$(top_builddir)/dbus/libdbus-1.la
 test_ids_LDADD=$(top_builddir)/dbus/libdbus-1.la
 
