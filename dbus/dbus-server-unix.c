@@ -64,18 +64,19 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
   if (strcmp (method, "unix") == 0)
     {
       const char *path = dbus_address_entry_get_value (entry, "path");
+      const char *dir = dbus_address_entry_get_value (entry, "dir");
       const char *tmpdir = dbus_address_entry_get_value (entry, "tmpdir");
       const char *abstract = dbus_address_entry_get_value (entry, "abstract");
       const char *runtime = dbus_address_entry_get_value (entry, "runtime");
       int mutually_exclusive_modes = 0;
 
       mutually_exclusive_modes = (path != NULL) + (tmpdir != NULL) +
-        (abstract != NULL) + (runtime != NULL);
+        (abstract != NULL) + (runtime != NULL) + (dir != NULL);
 
       if (mutually_exclusive_modes < 1)
         {
           _dbus_set_bad_address(error, "unix",
-                                "path or tmpdir or abstract or runtime",
+                                "path or tmpdir or abstract or runtime or dir",
                                 NULL);
           return DBUS_SERVER_LISTEN_BAD_ADDRESS;
         }
@@ -83,7 +84,7 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
       if (mutually_exclusive_modes > 1)
         {
           _dbus_set_bad_address(error, NULL, NULL,
-                                "cannot specify two of \"path\", \"tmpdir\", \"abstract\" and \"runtime\" at the same time");
+                                "cannot specify two of \"path\", \"tmpdir\", \"abstract\", \"runtime\" and \"dir\" at the same time");
           return DBUS_SERVER_LISTEN_BAD_ADDRESS;
         }
 
@@ -134,10 +135,23 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
 
           _dbus_string_free (&full_path);
         }
-      else if (tmpdir != NULL)
+      else if (tmpdir != NULL || dir != NULL)
         {
           DBusString full_path;
           DBusString filename;
+          dbus_bool_t use_abstract = FALSE;
+
+          if (tmpdir != NULL)
+            {
+              dir = tmpdir;
+
+#ifdef HAVE_ABSTRACT_SOCKETS
+              /* Use abstract sockets for tmpdir if supported, so that it
+               * never needs to be cleaned up. Use dir instead if you want a
+               * path-based socket. */
+              use_abstract = TRUE;
+#endif
+            }
 
           if (!_dbus_string_init (&full_path))
             {
@@ -167,7 +181,7 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
               return DBUS_SERVER_LISTEN_DID_NOT_CONNECT;
             }
 
-          if (!_dbus_string_append (&full_path, tmpdir) ||
+          if (!_dbus_string_append (&full_path, dir) ||
               !_dbus_concat_dir_and_file (&full_path, &filename))
             {
               _dbus_string_free (&full_path);
@@ -176,15 +190,9 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
               return DBUS_SERVER_LISTEN_DID_NOT_CONNECT;
             }
 
-          /* Always use abstract namespace if possible with tmpdir */
-
           *server_p =
             _dbus_server_new_for_domain_socket (_dbus_string_get_const_data (&full_path),
-#ifdef HAVE_ABSTRACT_SOCKETS
-                                                TRUE,
-#else
-                                                FALSE,
-#endif
+                                                use_abstract,
                                                 error);
 
           _dbus_string_free (&full_path);

@@ -3223,7 +3223,8 @@
       <para>
         Unix addresses that specify <literal>path</literal> or
         <literal>abstract</literal> are both listenable and connectable.
-        Unix addresses that specify <literal>tmpdir</literal> are only
+        Unix addresses that specify <literal>tmpdir</literal>
+        or <literal>dir</literal> are only
         listenable: the corresponding connectable address will specify
         either <literal>path</literal> or <literal>abstract</literal>.
         Similarly, Unix addresses that specify <literal>runtime</literal>
@@ -3249,17 +3250,42 @@
            <row>
             <entry>path</entry>
             <entry>(path)</entry>
-            <entry>path of the unix domain socket. If set, the "tmpdir" and "abstract" key must not be set.</entry>
+            <entry>
+              Path of the unix domain socket.
+            </entry>
+          </row>
+          <row>
+            <entry>dir</entry>
+            <entry>(path)</entry>
+            <entry>
+              Directory in which a socket file with a random file name
+              starting with 'dbus-' will be created by the server. This key
+              can only be used in server addresses, not in client addresses;
+              the resulting client address will have the "path" key instead.
+              be set.
+            </entry>
           </row>
           <row>
             <entry>tmpdir</entry>
             <entry>(path)</entry>
-            <entry>temporary directory in which a socket file with a random file name starting with 'dbus-' will be created by the server. This key can only be used in server addresses, not in client addresses. If set, the "path" and "abstract" key must not be set.</entry>
+            <entry>
+              The same as "dir", except that on platforms with
+              abstract sockets, the server may attempt to create an
+              abstract socket whose name starts with this directory instead
+              of a path-based socket. This key can only be used in server
+              addresses, not in client addresses; the resulting client address
+              will have the "abstract" or "path" key instead.
+            </entry>
           </row>
           <row>
             <entry>abstract</entry>
             <entry>(string)</entry>
-            <entry>unique string (path) in the abstract namespace. If set, the "path" or "tmpdir" key must not be set. This key is only supported on platforms with "abstract Unix sockets", of which Linux is the only known example.</entry>
+            <entry>
+              Unique string in the abstract namespace, often syntactically
+              resembling a path but unconnected to the filesystem namespace.
+              This key is only supported on platforms with abstract Unix
+              sockets, of which Linux is the only known example.
+            </entry>
           </row>
           <row>
             <entry>runtime</entry>
@@ -3271,8 +3297,8 @@
        </informaltable>
        <para>
          Exactly one of the keys <literal>path</literal>,
-         <literal>abstract</literal>, <literal>runtime</literal> or
-         <literal>tmpdir</literal> must be provided.
+         <literal>abstract</literal>, <literal>runtime</literal>,
+         <literal>dir</literal> or <literal>tmpdir</literal> must be provided.
        </para>
       </sect3>
     </sect2>
