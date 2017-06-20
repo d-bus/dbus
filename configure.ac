@@ -1486,6 +1486,11 @@ AM_CONDITIONAL(DBUS_CAN_UPLOAD_DOCS,
     [test x$enable_doxygen_docs = xyes && test x$enable_xml_docs = xyes &&
      test x$enable_ducktype_docs = xyes])
 
+# Autoconf 2.70 will support this, and many distros patch this option in,
+# but Autoconf 2.70 hasn't actually been released yet.
+AS_IF([test -z "${runstatedir}"], [runstatedir='${localstatedir}/run'])
+AC_SUBST([runstatedir])
+
 #### Have to go $localstatedir->$prefix/var->/usr/local/var
 
 #### find the actual value for $prefix that we'll end up with
@@ -1498,6 +1503,7 @@ AS_AC_EXPAND(EXPANDED_BINDIR, "$bindir")
 AS_AC_EXPAND(EXPANDED_LIBDIR, "$libdir")
 AS_AC_EXPAND(EXPANDED_LIBEXECDIR, "$libexecdir")
 AS_AC_EXPAND(EXPANDED_DATADIR, "$datadir")
+AS_AC_EXPAND(EXPANDED_RUNSTATEDIR, "$runstatedir")
 
 #### Check our operating system
 operating_system=unknown
@@ -1556,6 +1562,9 @@ AC_SUBST([systemduserunitdir], [$with_systemduserunitdir])
 if ! test -z "$with_system_socket"; then
    DBUS_SYSTEM_SOCKET=$with_system_socket
 else
+   # We don't use runstatedir for this (yet?), because /var/run has been the
+   # interoperable system bus socket for 10+ years.
+   # See https://bugs.freedesktop.org/show_bug.cgi?id=101628
    DBUS_SYSTEM_SOCKET=${EXPANDED_LOCALSTATEDIR}/run/dbus/system_bus_socket
 fi
 
@@ -1581,9 +1590,9 @@ AC_DEFINE_UNQUOTED(DBUS_SYSTEM_BUS_DEFAULT_ADDRESS, "$DBUS_SYSTEM_BUS_DEFAULT_AD
 if ! test -z "$with_system_pid_file"; then
    DBUS_SYSTEM_PID_FILE=$with_system_pid_file
 elif test x$with_init_scripts = xredhat ; then
-   DBUS_SYSTEM_PID_FILE=${EXPANDED_LOCALSTATEDIR}/run/messagebus.pid
+   DBUS_SYSTEM_PID_FILE="${EXPANDED_RUNSTATEDIR}/messagebus.pid"
 else
-   DBUS_SYSTEM_PID_FILE=${EXPANDED_LOCALSTATEDIR}/run/dbus/pid
+   DBUS_SYSTEM_PID_FILE="${EXPANDED_RUNSTATEDIR}/dbus/pid"
 fi
 
 AC_SUBST(DBUS_SYSTEM_PID_FILE)
@@ -1592,6 +1601,8 @@ AC_SUBST(DBUS_SYSTEM_PID_FILE)
 if ! test -z "$with_console_auth_dir"; then
    DBUS_CONSOLE_AUTH_DIR=$with_console_auth_dir
 else
+   # We don't use runstatedir for this, because /var/run is the
+   # path that was traditionally used by pam_console and pam_foreground.
    DBUS_CONSOLE_AUTH_DIR=/var/run/console/
 fi
 
@@ -1919,6 +1930,7 @@ echo "
         bindir:                   ${EXPANDED_BINDIR}
         sysconfdir:               ${EXPANDED_SYSCONFDIR}
         localstatedir:            ${EXPANDED_LOCALSTATEDIR}
+        runstatedir:              ${EXPANDED_RUNSTATEDIR}
 	datadir:                  ${EXPANDED_DATADIR}
 	source code location:	  ${srcdir}
 	compiler:		  ${CC}

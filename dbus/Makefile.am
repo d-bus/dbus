@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 	-DDBUS_MACHINE_UUID_FILE=\""$(localstatedir)/lib/dbus/machine-id"\" \
 	-DDBUS_SYSTEM_CONFIG_FILE=\""$(dbusdatadir)/system.conf"\" \
 	-DDBUS_SESSION_CONFIG_FILE=\""$(dbusdatadir)/session.conf"\" \
+	-DDBUS_RUNSTATEDIR=\""$(runstatedir)"\" \
 	$(NULL)
 
 AM_CFLAGS = \

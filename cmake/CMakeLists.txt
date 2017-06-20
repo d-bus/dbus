@@ -70,6 +70,7 @@ set(DBUS_MACHINE_UUID_FILE   ${CMAKE_INSTALL_FULL_LOCALSTATEDIR}/lib/dbus/machin
 set(DBUS_BINDIR              ${CMAKE_INSTALL_FULL_BINDIR})
 set(DBUS_DAEMONDIR           ${CMAKE_INSTALL_FULL_BINDIR})
 set(DBUS_LOCALSTATEDIR       ${CMAKE_INSTALL_FULL_LOCALSTATEDIR})
+set(DBUS_RUNSTATEDIR         ${CMAKE_INSTALL_FULL_LOCALSTATEDIR}/run)
 
 # On Windows this is relative to where we put the bus setup, in
 # ${datadir}/dbus-1. For simplicity, we only do this if
@@ -432,7 +433,7 @@ if(UNIX)
 endif()
 
  # Not used on Windows, where there is no system bus
-set (DBUS_SYSTEM_PID_FILE ${DBUS_LOCALSTATEDIR}/run/dbus/pid)
+set (DBUS_SYSTEM_PID_FILE ${DBUS_RUNSTATEDIR}/dbus/pid)
 
 if (WIN32)
 	set (DBUS_CONSOLE_AUTH_DIR "")
@@ -448,7 +449,7 @@ endif (WIN32)
 # and also to connect to. If this ever changes, it'll need to be split into
 # two variables, one for the listening address and one for the connecting
 # address.
-set (DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "unix:path=${DBUS_LOCALSTATEDIR}/run/dbus/system_bus_socket" CACHE STRING "system bus default address")
+set (DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "unix:path=${DBUS_RUNSTATEDIR}/dbus/system_bus_socket" CACHE STRING "system bus default address")
 
 if (WIN32)
   set (DBUS_SESSION_BUS_LISTEN_ADDRESS "autolaunch:" CACHE STRING "session bus default listening address")
