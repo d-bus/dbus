@@ -1883,6 +1883,7 @@ bus/dbus.socket
 bus/systemd-user/dbus.service
 bus/systemd-user/dbus.socket
 bus/sysusers.d/dbus.conf
+bus/tmpfiles.d/dbus.conf
 Makefile
 dbus/Makefile
 bus/Makefile

@@ -2,6 +2,7 @@ dbusdatadir=$(datadir)/dbus-1
 legacydbusdatadir=$(sysconfdir)/dbus-1
 dbus_daemon_execdir = $(DBUS_DAEMONDIR)
 # Always lib, even if ${libdir} is lib64 or lib/x86_64-linux-gnu
+systemdtmpfilesdir = $(prefix)/lib/tmpfiles.d
 systemdsysusersdir = $(prefix)/lib/sysusers.d
 
 DBUS_BUS_LIBS = \
@@ -317,7 +318,8 @@ SCRIPT_IN_FILES += \
 	dbus.socket.in \
 	systemd-user/dbus.service.in \
 	systemd-user/dbus.socket.in \
-	sysusers.d/dbus.conf.in
+	sysusers.d/dbus.conf.in \
+	tmpfiles.d/dbus.conf.in \
 	$(NULL)
 
 systemdsystemunit_DATA = \
@@ -326,6 +328,10 @@ systemdsystemunit_DATA = \
 
 nodist_systemdsysusers_DATA = \
 	sysusers.d/dbus.conf
+
+nodist_systemdtmpfiles_DATA = \
+	tmpfiles.d/dbus.conf \
+	$(NULL)
 endif
 
 if DBUS_ENABLE_USER_SESSION

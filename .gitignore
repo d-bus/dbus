@@ -37,6 +37,7 @@ config.h.in
 *.gcda
 *.gcno
 tags
+/bus/tmpfiles.d/dbus.conf
 /dbus-1.*/
 /dbus-1.*.tar.*
 /lcov.html/
