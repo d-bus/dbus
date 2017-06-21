@@ -62,5 +62,9 @@ BusDriverFound bus_driver_get_conn_helper (DBusConnection  *connection,
                                            const char     **name_p,
                                            DBusConnection **peer_conn_p,
                                            DBusError       *error);
+dbus_bool_t bus_driver_send_ack_reply     (DBusConnection  *connection,
+                                           BusTransaction  *transaction,
+                                           DBusMessage     *message,
+                                           DBusError       *error);
 
 #endif /* BUS_DRIVER_H */

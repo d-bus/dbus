@@ -966,11 +966,11 @@ bus_driver_handle_activate_service (DBusConnection *connection,
   return retval;
 }
 
-static dbus_bool_t
-send_ack_reply (DBusConnection *connection,
-                BusTransaction *transaction,
-                DBusMessage    *message,
-                DBusError      *error)
+dbus_bool_t
+bus_driver_send_ack_reply (DBusConnection *connection,
+                           BusTransaction *transaction,
+                           DBusMessage    *message,
+                           DBusError      *error)
 {
   DBusMessage *reply;
 
@@ -1266,8 +1266,7 @@ bus_driver_handle_update_activation_environment (DBusConnection *connection,
         }
     }
 
-  if (!send_ack_reply (connection, transaction,
-                       message, error))
+  if (!bus_driver_send_ack_reply (connection, transaction, message, error))
     goto out;
 
   retval = TRUE;
@@ -1354,8 +1353,7 @@ bus_driver_handle_add_match (DBusConnection *connection,
       goto failed;
     }
 
-  if (!send_ack_reply (connection, transaction,
-                       message, error))
+  if (!bus_driver_send_ack_reply (connection, transaction, message, error))
     {
       bus_matchmaker_remove_rule (matchmaker, rule);
       goto failed;
@@ -1405,8 +1403,7 @@ bus_driver_handle_remove_match (DBusConnection *connection,
   /* Send the ack before we remove the rule, since the ack is undone
    * on transaction cancel, but rule removal isn't.
    */
-  if (!send_ack_reply (connection, transaction,
-                       message, error))
+  if (!bus_driver_send_ack_reply (connection, transaction, message, error))
     goto failed;
 
   matchmaker = bus_connection_get_matchmaker (connection);
@@ -2249,7 +2246,7 @@ bus_driver_handle_become_monitor (DBusConnection *connection,
   /* Send the ack before we remove the rule, since the ack is undone
    * on transaction cancel, but becoming a monitor isn't.
    */
-  if (!send_ack_reply (connection, transaction, message, error))
+  if (!bus_driver_send_ack_reply (connection, transaction, message, error))
     goto out;
 
   if (!bus_connection_be_monitor (connection, transaction, &rules, error))
@@ -2337,7 +2334,7 @@ bus_driver_handle_ping (DBusConnection *connection,
                         DBusMessage *message,
                         DBusError *error)
 {
-  return send_ack_reply (connection, transaction, message, error);
+  return bus_driver_send_ack_reply (connection, transaction, message, error);
 }
 
 static dbus_bool_t bus_driver_handle_get (DBusConnection *connection,
