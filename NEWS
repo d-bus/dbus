@@ -1,7 +1,21 @@
 D-Bus 1.10.20 (UNRELEASED)
 ==
 
-...
+Fixes:
+
+• Fix a reference leak when blocking on a pending call on a connection
+  that has been disconnected (fd.o #101481, Shin-ichi MORITA)
+
+• Don't put timestamps in the Doxygen-generated documentation, for
+  closer-to-reproducible builds (fd.o #100692, Simon McVittie)
+
+• Avoid an assertion failure when connecting to a semicolon-separated
+  series of addresses, one of which fails (fd.o #101257, Simon McVittie)
+
+Documentation:
+
+• Update git URIs in HACKING document to sync up with cgit.freedesktop.org
+  (fd.o #100715, Simon McVittie)
 
 D-Bus 1.10.18 (2017-04-05)
 ==
