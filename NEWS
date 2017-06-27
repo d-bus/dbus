@@ -77,6 +77,9 @@ Enhancements:
 
 Fixes:
 
+• Fix a reference leak when blocking on a pending call on a connection
+  that has been disconnected (fd.o #101481, Shin-ichi MORITA)
+
 • Don't put timestamps in the Doxygen-generated documentation,
   or hard-code the build directory into builds with embedded tests,
   for reproducible builds (fd.o #100692, Simon McVittie)
@@ -88,6 +91,11 @@ Fixes:
 • If we somehow get an autolaunch address with multiple semicolon-separated
   components, and they don't work, don't invalidly "pile up" errors
   (fd.o #101257, Simon McVittie)
+
+Documentation:
+
+• Update git URIs in HACKING document to sync up with cgit.freedesktop.org
+  (fd.o #100715, Simon McVittie)
 
 D-Bus 1.11.12 (2017-04-07)
 ==
