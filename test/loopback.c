@@ -158,13 +158,86 @@ setup_no_runtime (Fixture *f,
 
 static void
 test_connect (Fixture *f,
-    gconstpointer addr G_GNUC_UNUSED)
+    gconstpointer addr)
 {
+  const char *listening_address = addr;
   char *address;
+  DBusAddressEntry **entries;
+  int n_entries;
+  dbus_bool_t ok;
+
   g_assert (f->server_conn == NULL);
 
   address = dbus_server_get_address (f->server);
   g_test_message ("listening at %s", address);
+
+  ok = dbus_parse_address (address, &entries, &n_entries, &f->e);
+  assert_no_error (&f->e);
+  g_assert_true (ok);
+  g_assert_cmpint (n_entries, ==, 1);
+
+  g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "guid"), !=,
+                   NULL);
+
+  if (g_strcmp0 (listening_address, "tcp:host=127.0.0.1") == 0)
+    {
+      g_assert_cmpstr (dbus_address_entry_get_method (entries[0]), ==, "tcp");
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "host"), ==,
+                       "127.0.0.1");
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "port"), !=,
+                       NULL);
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "noncefile"),
+                       ==, NULL);
+    }
+  else if (g_strcmp0 (listening_address, "nonce-tcp:host=127.0.0.1") == 0)
+    {
+      g_assert_cmpstr (dbus_address_entry_get_method (entries[0]), ==,
+                       "nonce-tcp");
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "host"), ==,
+                       "127.0.0.1");
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "port"), !=,
+                       NULL);
+      g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "noncefile"),
+                       !=, NULL);
+    }
+#ifdef DBUS_UNIX
+  else if (g_strcmp0 (listening_address, "unix:tmpdir=/tmp") == 0)
+    {
+      g_assert_cmpstr (dbus_address_entry_get_method (entries[0]), ==, "unix");
+
+      if (dbus_address_entry_get_value (entries[0], "abstract") != NULL)
+        {
+          const char *abstract = dbus_address_entry_get_value (entries[0],
+                                                               "abstract");
+
+          g_assert_true (g_str_has_prefix (abstract, "/tmp/dbus-"));
+          g_assert_cmpstr (dbus_address_entry_get_value (entries[0], "path"),
+                                                         ==, NULL);
+        }
+      else
+        {
+          const char *path = dbus_address_entry_get_value (entries[0],
+                                                           "path");
+
+          g_assert_nonnull (path);
+          g_assert_true (g_str_has_prefix (path, "/tmp/dbus-"));
+        }
+    }
+  else if (g_strcmp0 (listening_address,
+                      "unix:runtime=yes;unix:tmpdir=/tmp") == 0)
+    {
+      g_assert_cmpstr (dbus_address_entry_get_method (entries[0]), ==, "unix");
+      /* No particular statement about the path here: for that see
+       * setup_runtime() and setup_no_runtime() */
+    }
+#endif
+  else
+    {
+      g_assert_not_reached ();
+    }
+
+  dbus_address_entries_free (entries);
+
   f->client_conn = dbus_connection_open_private (address, &f->e);
   assert_no_error (&f->e);
   g_assert (f->client_conn != NULL);
