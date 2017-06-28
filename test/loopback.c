@@ -223,6 +223,15 @@ test_connect (Fixture *f,
           g_assert_true (g_str_has_prefix (path, "/tmp/dbus-"));
         }
     }
+  else if (g_strcmp0 (listening_address, "unix:dir=/tmp") == 0)
+    {
+      const char *path = dbus_address_entry_get_value (entries[0],
+                                                       "path");
+
+      g_assert_cmpstr (dbus_address_entry_get_method (entries[0]), ==, "unix");
+      g_assert_nonnull (path);
+      g_assert_true (g_str_has_prefix (path, "/tmp/dbus-"));
+    }
   else if (g_strcmp0 (listening_address,
                       "unix:runtime=yes;unix:tmpdir=/tmp") == 0)
     {
@@ -441,9 +450,13 @@ main (int argc,
       test_message, teardown);
 
 #ifdef DBUS_UNIX
-  g_test_add ("/connect/unix", Fixture, "unix:tmpdir=/tmp", setup,
+  g_test_add ("/connect/unix/tmpdir", Fixture, "unix:tmpdir=/tmp", setup,
       test_connect, teardown);
-  g_test_add ("/message/unix", Fixture, "unix:tmpdir=/tmp", setup,
+  g_test_add ("/message/unix/tmpdir", Fixture, "unix:tmpdir=/tmp", setup,
+      test_message, teardown);
+  g_test_add ("/connect/unix/dir", Fixture, "unix:dir=/tmp", setup,
+      test_connect, teardown);
+  g_test_add ("/message/unix/dir", Fixture, "unix:dir=/tmp", setup,
       test_message, teardown);
 
   g_test_add ("/connect/unix/runtime", Fixture,
