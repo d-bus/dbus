@@ -3,9 +3,9 @@ D-Bus 1.11.14 (UNRELEASED)
 
 Dependencies:
 
-• SELinux support requires at least libselinux 2.0.86 as explicit
-  refcounting for SID (sidput/sidget) has been removed from the code.
-• Full test coverage now requires GLib 2.40.
+• Expat >= 2.1.0 is always required
+• libselinux >= 2.0.86 is required if SELinux support is enabled
+• GLib >= 2.40 is required if full test coverage is enabled
 
 Build-time configuration changes:
 
@@ -22,7 +22,9 @@ Build-time configuration changes:
 
   (fd.o #69801, Simon McVittie)
 
-• Similarly, we now use pkg-config to find libselinux.
+• Similarly, we now use pkg-config to find libselinux. Version 2.0.86
+  is required due to the removal of explicit refcounting for SIDs.
+  (fd.o #100912, Laurent Bigonville)
 
 Behaviour changes:
 
@@ -62,8 +64,9 @@ Enhancements:
 • New function dbus_try_get_local_machine_id() is like
   dbus_get_local_machine_id(), but returning a DBusError. Other code
   that needs the machine ID will now report a recoverable error (instead
-  of logging to stderr and aborting) if dbus has not been installed
-  correctly. (fd.o #13194, Simon McVittie)
+  of logging to stderr and aborting) if no machine ID is available.
+  Generating a machine ID is still considered to be a required part of
+  installing dbus correctly. (fd.o #13194, Simon McVittie)
 
 • Implement GetConnectionSELinuxSecurityContext("org.freedesktop.DBus")
   (fd.o #101315, Laurent Bigonville)
