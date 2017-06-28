@@ -78,6 +78,13 @@ Enhancements:
   g_test_trap_subprocess(), for Windows support and better robustness
   on Unix (fd.o #101362, Simon McVittie)
 
+• On systemd systems, if ${localstatedir}/dbus/machine-id doesn't exist,
+  instruct systemd-tmpfiles to make it a symbolic link to /etc/machine-id.
+  This prevents the two files from going out of sync on stateless or live
+  images without needing to run dbus-uuidgen, and supports older D-Bus
+  implementations that do not necessarily read /etc/machine-id themselves.
+  (fd.o #101570, Simon McVittie)
+
 Fixes:
 
 • Fix a reference leak when blocking on a pending call on a connection
