@@ -160,10 +160,12 @@ static void
 test_connect (Fixture *f,
     gconstpointer addr G_GNUC_UNUSED)
 {
+  char *address;
   g_assert (f->server_conn == NULL);
 
-  f->client_conn = dbus_connection_open_private (
-      dbus_server_get_address (f->server), &f->e);
+  address = dbus_server_get_address (f->server);
+  g_test_message ("listening at %s", address);
+  f->client_conn = dbus_connection_open_private (address, &f->e);
   assert_no_error (&f->e);
   g_assert (f->client_conn != NULL);
   test_connection_setup (f->ctx, f->client_conn);
@@ -173,6 +175,8 @@ test_connect (Fixture *f,
       test_progress ('.');
       test_main_context_iterate (f->ctx, TRUE);
     }
+
+  dbus_free (address);
 }
 
 static void
@@ -180,7 +184,7 @@ test_bad_guid (Fixture *f,
     gconstpointer addr G_GNUC_UNUSED)
 {
   DBusMessage *incoming;
-  gchar *address = g_strdup (dbus_server_get_address (f->server));
+  char *address = dbus_server_get_address (f->server);
   gchar *guid;
 
   g_test_bug ("39720");
@@ -232,7 +236,7 @@ test_bad_guid (Fixture *f,
 
   dbus_message_unref (incoming);
 
-  g_free (address);
+  dbus_free (address);
 }
 
 static void
