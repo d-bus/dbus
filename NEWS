@@ -64,6 +64,9 @@ Enhancements:
     feature-discovery
   · Add unix:dir=..., which resembles unix:tmpdir=... but never uses
     abstract sockets
+  · Don't require eavesdrop='true' to be accepted from connections not
+    sufficiently privileged to use it successfully
+  · Formally deprecate eavesdropping in favour of BecomeMonitor
   (fd.o #99825, #100686, #100795, #101256, #101257, #101567;
   Simon McVittie, Tom Gundersen)
 
