@@ -41,6 +41,13 @@ Behaviour changes:
   /org/freedesktop/DBus. Previously, they existed on all object paths.
   (fd.o #101257, Simon McVittie)
 
+• AddMatch() with a match rule containing eavesdrop='true' will now fail
+  unless called by either the same user as the dbus-daemon, or Unix uid 0
+  (root), matching the restrictions applied to the newer BecomeMonitor()
+  method. On the session bus this has no practical effect. On the system
+  bus this will prevent certain configurations that already did not
+  work well in practice. (fd.o #101567, Simon McVittie)
+
 Enhancements:
 
 • D-Bus Specification version 0.31
