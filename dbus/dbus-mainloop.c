@@ -629,9 +629,6 @@ _dbus_loop_iterate (DBusLoop     *loop,
 #endif
               
               _dbus_assert (timeout >= 0);
-                  
-              if (timeout == 0)
-                break; /* it's not going to get shorter... */
             }
 #if MAINLOOP_SPEW
           else
