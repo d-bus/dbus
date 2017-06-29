@@ -4361,6 +4361,14 @@
         </para>
 
         <para>
+          Eavesdropping interacts poorly with buses with non-trivial
+          access control restrictions, and is deprecated. The
+          <literal>BecomeMonitor</literal> method (see
+          <xref linkend="bus-messages-become-monitor"/>) provides
+          a preferable way to monitor buses.
+        </para>
+
+        <para>
           Eavesdropping is mainly useful for debugging tools, such as
           the <literal>dbus-monitor</literal> tool in the reference
           implementation of D-Bus. Tools which eavesdrop on the message bus
@@ -4376,13 +4384,6 @@
           a match rule results in an error reply, the client may fall back to
           adding the same rule with the <literal>eavesdrop</literal> match
           omitted.
-        </para>
-
-        <para>
-          Eavesdropping interacts poorly with buses with non-trivial
-          access control restrictions. The
-          <xref linkend="bus-messages-become-monitor"/> method provides
-          an alternative way to monitor buses.
         </para>
       </sect3>
 
@@ -4405,7 +4406,9 @@
         <para>
           Match rules can also be used for eavesdropping
           (see <xref linkend="message-bus-routing-eavesdropping"/>),
-          if the security policy of the message bus allows it.
+          if the security policy of the message bus allows it, but this
+          usage is deprecated in favour of the <literal>BecomeMonitor</literal>
+          method (see <xref linkend="bus-messages-become-monitor"/>).
         </para>
         <para>
           Match rules are added using the AddMatch bus method
@@ -4611,20 +4614,37 @@
                 <row>
                   <entry><literal>eavesdrop</literal></entry>
                   <entry><literal>'true'</literal>, <literal>'false'</literal></entry>
-                  <entry>Since D-Bus 1.5.6, match rules do not
-                    match messages which have a <literal>DESTINATION</literal>
-                    field unless the match rule specifically
-                    requests this
-                    (see <xref linkend="message-bus-routing-eavesdropping"/>)
-                    by specifying <literal>eavesdrop='true'</literal>
-                    in the match rule.  <literal>eavesdrop='false'</literal>
-                    restores the default behaviour. Messages are
-                    delivered to their <literal>DESTINATION</literal>
-                    regardless of match rules, so this match does not
-                    affect normal delivery of unicast messages.
-                    In older versions of D-Bus, this match was not allowed
-                    in match rules, and all match rules behaved as if
-                    <literal>eavesdrop='true'</literal> had been used.
+                  <entry>
+                    <para>
+                      Since D-Bus 1.5.6, match rules do not
+                      match messages which have a <literal>DESTINATION</literal>
+                      field unless the match rule specifically
+                      requests this
+                      (see <xref linkend="message-bus-routing-eavesdropping"/>)
+                      by specifying <literal>eavesdrop='true'</literal>
+                      in the match rule.  <literal>eavesdrop='false'</literal>
+                      restores the default behaviour. Messages are
+                      delivered to their <literal>DESTINATION</literal>
+                      regardless of match rules, so this match does not
+                      affect normal delivery of unicast messages.
+                      In older versions of D-Bus, this match was not allowed
+                      in match rules, and all match rules behaved as if
+                      <literal>eavesdrop='true'</literal> had been used.
+                    </para>
+                    <para>
+                      Use of <literal>eavesdrop='true'</literal> is
+                      deprecated. Monitors should prefer to use the
+                      <literal>BecomeMonitor</literal> method (see
+                      <xref linkend="bus-messages-become-monitor"/>),
+                      which was introduced in version 0.26 of the D-Bus
+                      specification and version 1.9.10 of the reference
+                      dbus-daemon.
+                    </para>
+                    <para>
+                      Message bus implementations may restrict match rules
+                      with <literal>eavesdrop='true'</literal> so that they
+                      can only be added by privileged connections.
+                    </para>
                   </entry>
                 </row>
               </tbody>
