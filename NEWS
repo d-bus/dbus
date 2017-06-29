@@ -1,5 +1,7 @@
-D-Bus 1.10.20 (UNRELEASED)
+D-Bus 1.10.20 (2017-06-29)
 ==
+
+The “suggesting a delivery gone horribly wrong” release.
 
 Fixes:
 
