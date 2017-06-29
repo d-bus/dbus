@@ -7,7 +7,7 @@
   <articleinfo>
     <title>D-Bus Specification</title>
     <releaseinfo>Version 0.31</releaseinfo>
-    <date>(not yet released)</date>
+    <date>2017-06-29</date>
     <authorgroup>
       <author>
         <firstname>Havoc</firstname>
@@ -70,13 +70,43 @@
       </author>
     </authorgroup>
    <revhistory>
-     <revision>
-       <revnumber>0.31</revnumber>
+     <!--<revision>
+       <revnumber>latest</revnumber>
        <date>(not yet released)</date>
        <authorinitials>n/a</authorinitials>
        <revremark>
          See <ulink url='http://cgit.freedesktop.org/dbus/dbus/log/doc/dbus-specification.xml'>commit log</ulink>
        </revremark>
+     </revision>-->
+     <revision>
+       <revnumber>0.31</revnumber>
+       <date>2017-06-29</date>
+       <authorinitials>smcv, TG</authorinitials>
+       <revdescription>
+         <itemizedlist>
+           <listitem><simpara>Don't require implementation-specific search
+               paths to be lowest priority</simpara></listitem>
+           <listitem><simpara>Correct regex syntax for optionally-escaped
+               bytes in addresses so it includes hyphen-minus, forward slash
+               and underscore as intended</simpara></listitem>
+           <listitem><simpara>Describe all message bus methods in the same
+               section</simpara></listitem>
+           <listitem><simpara>Clarify the correct object path for method calls
+               to the message bus</simpara></listitem>
+           <listitem><simpara>Document that the message bus implements
+               Introspectable, Peer and Properties</simpara></listitem>
+           <listitem><simpara>Add new Features and Interfaces properties for
+               message bus feature-discovery</simpara></listitem>
+           <listitem><simpara>Add unix:dir=..., which resembles
+               unix:tmpdir=... but never uses abstract
+               sockets</simpara></listitem>
+           <listitem><simpara>Don't require eavesdrop='true' to be accepted
+               from connections not sufficiently privileged to use it
+               successfully</simpara></listitem>
+           <listitem><simpara>Formally deprecate eavesdropping in favour of
+               BecomeMonitor</simpara></listitem>
+         </itemizedlist>
+       </revdescription>
      </revision>
      <revision>
        <revnumber>0.30</revnumber>
