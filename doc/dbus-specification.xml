@@ -4371,9 +4371,7 @@
         <para>
           Clients may attempt to eavesdrop by adding match rules
           (see <xref linkend="message-bus-routing-match-rules"/>) containing
-          the <literal>eavesdrop='true'</literal> match. If the message bus'
-          security policy does not allow eavesdropping, the match rule can
-          still be added, but will not have any practical effect. For
+          the <literal>eavesdrop='true'</literal> match. For
           compatibility with older message bus implementations, if adding such
           a match rule results in an error reply, the client may fall back to
           adding the same rule with the <literal>eavesdrop</literal> match
@@ -4624,9 +4622,6 @@
                     delivered to their <literal>DESTINATION</literal>
                     regardless of match rules, so this match does not
                     affect normal delivery of unicast messages.
-                    If the message bus has a security policy which forbids
-                    eavesdropping, this match may still be used without error,
-                    but will not have any practical effect.
                     In older versions of D-Bus, this match was not allowed
                     in match rules, and all match rules behaved as if
                     <literal>eavesdrop='true'</literal> had been used.
