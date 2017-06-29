@@ -6,8 +6,8 @@
 <article id="index">
   <articleinfo>
     <title>D-Bus Specification</title>
-    <releaseinfo>Version 0.31</releaseinfo>
-    <date>2017-06-29</date>
+    <releaseinfo>Version 0.32</releaseinfo>
+    <date>(not yet released)</date>
     <authorgroup>
       <author>
         <firstname>Havoc</firstname>
@@ -70,14 +70,14 @@
       </author>
     </authorgroup>
    <revhistory>
-     <!--<revision>
+     <revision>
        <revnumber>latest</revnumber>
        <date>(not yet released)</date>
        <authorinitials>n/a</authorinitials>
        <revremark>
          See <ulink url='http://cgit.freedesktop.org/dbus/dbus/log/doc/dbus-specification.xml'>commit log</ulink>
        </revremark>
-     </revision>-->
+     </revision>
      <revision>
        <revnumber>0.31</revnumber>
        <date>2017-06-29</date>
