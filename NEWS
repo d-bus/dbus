@@ -55,7 +55,9 @@ Enhancements:
     Properties
   · Add new Features and Interfaces properties for message bus
     feature-discovery
-  (fd.o #99825, #100686, #100795, #101256, #101257;
+  · Add unix:dir=..., which resembles unix:tmpdir=... but never uses
+    abstract sockets
+  (fd.o #99825, #100686, #100795, #101256, #101257, #101567;
   Simon McVittie, Tom Gundersen)
 
 • Implement the Properties and Peer interfaces in dbus-daemon
@@ -84,6 +86,10 @@ Enhancements:
   images without needing to run dbus-uuidgen, and supports older D-Bus
   implementations that do not necessarily read /etc/machine-id themselves.
   (fd.o #101570, Simon McVittie)
+
+• Implement unix:dir=..., which resembles unix:tmpdir=... but never uses
+  abstract sockets. This is preferable when used with Linux containers.
+  (fd.o #101567, Simon McVittie)
 
 Fixes:
 
