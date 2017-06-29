@@ -4645,6 +4645,13 @@
                       with <literal>eavesdrop='true'</literal> so that they
                       can only be added by privileged connections.
                     </para>
+                    <para>
+                      <emphasis>
+                        This match key was added in version 0.18 of the
+                        D-Bus specification and implemented by the bus
+                        daemon in dbus 1.5.6 and later.
+                      </emphasis>
+                    </para>
                   </entry>
                 </row>
               </tbody>
