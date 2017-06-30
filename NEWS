@@ -1,7 +1,14 @@
 D-Bus 1.11.16 (UNRELEASED)
 ==
 
-...
+Build-time configuration changes:
+
+• The Autotools build system now supports varying ${runstatedir}
+  independently of ${localstatedir}, if using an Autoconf version
+  that has that feature; version 2.70 will eventually have this, but
+  many Linux distributions add it to version 2.69 as a patch.
+  A typical use is to set prefix=/usr, sysconfdir=/etc, localstatedir=/var
+  and runstatedir=/run. (fd.o #101569, Simon McVittie)
 
 D-Bus 1.11.14 (2017-06-29)
 ==
