@@ -67,6 +67,8 @@
            send_interface="org.freedesktop.DBus" />
     <allow send_destination="org.freedesktop.DBus"
            send_interface="org.freedesktop.DBus.Introspectable"/>
+    <allow send_destination="org.freedesktop.DBus"
+           send_interface="org.freedesktop.DBus.Properties"/>
     <!-- But disallow some specific bus services -->
     <deny send_destination="org.freedesktop.DBus"
           send_interface="org.freedesktop.DBus"
