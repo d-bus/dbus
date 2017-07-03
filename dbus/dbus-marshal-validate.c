@@ -1214,33 +1214,6 @@ _dbus_validate_bus_namespace (const DBusString  *str,
   return _dbus_validate_bus_name_full (str, start, len, TRUE);
 }
 
-/**
- * Checks that the given range of the string is a valid message type
- * signature in the D-Bus protocol.
- *
- * @todo this is inconsistent with most of DBusString in that
- * it allows a start,len range that extends past the string end.
- *
- * @param str the string
- * @param start first byte index to check
- * @param len number of bytes to check
- * @returns #TRUE if the byte range exists and is a valid signature
- */
-dbus_bool_t
-_dbus_validate_signature (const DBusString  *str,
-                          int                start,
-                          int                len)
-{
-  _dbus_assert (start >= 0);
-  _dbus_assert (start <= _dbus_string_get_length (str));
-  _dbus_assert (len >= 0);
-
-  if (len > _dbus_string_get_length (str) - start)
-    return FALSE;
-
-  return _dbus_validate_signature_with_reason (str, start, len) == DBUS_VALID;
-}
-
 /** define _dbus_check_is_valid_path() */
 DEFINE_DBUS_NAME_CHECK(path)
 /** define _dbus_check_is_valid_interface() */

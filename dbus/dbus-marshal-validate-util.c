@@ -436,10 +436,10 @@ _dbus_marshal_validate_test (void)
     {
       _dbus_string_init_const (&str, valid_signatures[i]);
 
-      if (!_dbus_validate_signature (&str, 0,
-                                     _dbus_string_get_length (&str)))
+      if (_dbus_validate_signature_with_reason (&str, 0,
+            _dbus_string_get_length (&str)) != DBUS_VALID)
         {
-          _dbus_warn ("Signature \"%s\" should have been valid", valid_signatures[i]);
+          _dbus_warn ("Signature \"%s\" should have been valid and OOM should not have occurred", valid_signatures[i]);
           _dbus_assert_not_reached ("invalid signature");
         }
 
@@ -449,12 +449,18 @@ _dbus_marshal_validate_test (void)
   i = 0;
   while (i < (int) _DBUS_N_ELEMENTS (invalid_signatures))
     {
+      DBusValidity validity;
+
       _dbus_string_init_const (&str, invalid_signatures[i]);
 
-      if (_dbus_validate_signature (&str, 0,
-                                    _dbus_string_get_length (&str)))
+      validity = _dbus_validate_signature_with_reason (&str, 0,
+          _dbus_string_get_length (&str));
+
+      /* Validity values less than DBUS_VALID are OOM or unknown validity.
+       * TODO: specify in which way each one should be invalid */
+      if (validity <= DBUS_VALID)
         {
-          _dbus_warn ("Signature \"%s\" should have been invalid", invalid_signatures[i]);
+          _dbus_warn ("Signature \"%s\" should have been invalid and OOM should not have occurred", invalid_signatures[i]);
           _dbus_assert_not_reached ("valid signature");
         }
 
@@ -473,10 +479,6 @@ _dbus_marshal_validate_test (void)
   _dbus_string_init_const (&str, "abc");
   if (_dbus_validate_member (&str, 0, 4))
     _dbus_assert_not_reached ("validated too-long string");
-
-  _dbus_string_init_const (&str, "sss");
-  if (_dbus_validate_signature (&str, 0, 4))
-    _dbus_assert_not_reached ("validated too-long signature");
 
   /* Validate string exceeding max name length */
   if (!_dbus_string_init (&str))
