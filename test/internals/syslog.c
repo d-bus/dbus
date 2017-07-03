@@ -50,25 +50,6 @@ setup (Fixture *f,
 #define MESSAGE "regression test for _dbus_log(): "
 
 static void
-test_syslog_fatal (Fixture *f,
-    gconstpointer data)
-{
-  if (g_test_subprocess ())
-    {
-      _dbus_init_system_log ("test-syslog",
-          DBUS_LOG_FLAGS_SYSTEM_LOG | DBUS_LOG_FLAGS_STDERR);
-      _dbus_log (DBUS_SYSTEM_LOG_FATAL, MESSAGE "%d", 23);
-      /* should not be reached: exit 0 so the assertion in the main process
-       * will fail */
-      exit (0);
-    }
-
-  g_test_trap_subprocess (NULL, 0, 0);
-  g_test_trap_assert_failed ();
-  g_test_trap_assert_stderr ("*" MESSAGE "23\n*");
-}
-
-static void
 test_syslog_normal (Fixture *f,
     gconstpointer data)
 {
@@ -79,6 +60,7 @@ test_syslog_normal (Fixture *f,
       _dbus_log (DBUS_SYSTEM_LOG_INFO, MESSAGE "%d", 42);
       _dbus_log (DBUS_SYSTEM_LOG_WARNING, MESSAGE "%d", 45);
       _dbus_log (DBUS_SYSTEM_LOG_SECURITY, MESSAGE "%d", 666);
+      _dbus_log (DBUS_SYSTEM_LOG_ERROR, MESSAGE "%d", 23);
 
       _dbus_init_system_log ("test-syslog-stderr", DBUS_LOG_FLAGS_STDERR);
       _dbus_log (DBUS_SYSTEM_LOG_INFO,
@@ -99,6 +81,7 @@ test_syslog_normal (Fixture *f,
   g_test_trap_assert_stderr ("*" MESSAGE "42\n"
                              "*" MESSAGE "45\n"
                              "*" MESSAGE "666\n"
+                             "*" MESSAGE "23\n"
                              "*test-syslog-stderr*" MESSAGE
                                "this should not appear in the syslog\n"
                              "*test-syslog-both*" MESSAGE
@@ -121,8 +104,6 @@ main (int argc,
 {
   test_init (&argc, &argv);
 
-  g_test_add ("/syslog/fatal", Fixture, NULL, setup, test_syslog_fatal,
-              teardown);
   g_test_add ("/syslog/normal", Fixture, NULL, setup, test_syslog_normal,
               teardown);
 

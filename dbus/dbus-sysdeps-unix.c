@@ -4614,9 +4614,6 @@ _dbus_init_system_log (const char   *tag,
  * @param severity a severity value
  * @param msg a printf-style format string
  * @param args arguments for the format string
- *
- * If the FATAL severity is given, this function will terminate the program
- * with an error code.
  */
 void
 _dbus_logv (DBusSystemLogSeverity  severity,
@@ -4639,7 +4636,7 @@ _dbus_logv (DBusSystemLogSeverity  severity,
           case DBUS_SYSTEM_LOG_SECURITY:
             flags = LOG_AUTH | LOG_NOTICE;
             break;
-          case DBUS_SYSTEM_LOG_FATAL:
+          case DBUS_SYSTEM_LOG_ERROR:
             flags = LOG_DAEMON|LOG_CRIT;
             break;
           default:
@@ -4662,9 +4659,6 @@ _dbus_logv (DBusSystemLogSeverity  severity,
       fputc ('\n', stderr);
       va_end (tmp);
     }
-
-  if (severity == DBUS_SYSTEM_LOG_FATAL)
-    exit (1);
 }
 
 /* tests in dbus-sysdeps-util.c */

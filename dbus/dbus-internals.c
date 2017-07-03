@@ -237,7 +237,7 @@ _dbus_warn (const char *format,
     init_warnings ();
 
   if (fatal_warnings)
-    severity = DBUS_SYSTEM_LOG_FATAL;
+    severity = DBUS_SYSTEM_LOG_ERROR;
 
   va_start (args, format);
   _dbus_logv (severity, format, args);
@@ -269,7 +269,7 @@ _dbus_warn_check_failed(const char *format,
     init_warnings ();
 
   if (fatal_warnings_on_check_failed)
-    severity = DBUS_SYSTEM_LOG_FATAL;
+    severity = DBUS_SYSTEM_LOG_ERROR;
 
   va_start (args, format);
   _dbus_logv (severity, format, args);

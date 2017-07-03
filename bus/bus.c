@@ -25,6 +25,7 @@
 #include "bus.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "activation.h"
 #include "connection.h"
@@ -963,7 +964,10 @@ bus_context_new (const DBusString *config_file,
 
   if (!bus_selinux_full_init ())
     {
-      bus_context_log (context, DBUS_SYSTEM_LOG_FATAL, "SELinux enabled but D-Bus initialization failed; check system log\n");
+      bus_context_log (context, DBUS_SYSTEM_LOG_ERROR,
+                       "SELinux enabled but D-Bus initialization failed; "
+                       "check system log");
+      exit (1);
     }
 
   if (!bus_apparmor_full_init (error))
