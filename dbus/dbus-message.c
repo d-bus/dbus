@@ -2701,6 +2701,8 @@ dbus_message_iter_append_basic (DBusMessageIter *iter,
 #ifndef DBUS_DISABLE_CHECKS
   switch (type)
     {
+      DBusString str;
+      DBusValidity signature_validity;
       const char * const *string_p;
       const dbus_bool_t *bool_p;
 
@@ -2716,7 +2718,15 @@ dbus_message_iter_append_basic (DBusMessageIter *iter,
 
       case DBUS_TYPE_SIGNATURE:
         string_p = value;
-        _dbus_return_val_if_fail (_dbus_check_is_valid_signature (*string_p), FALSE);
+        _dbus_string_init_const (&str, *string_p);
+        signature_validity = _dbus_validate_signature_with_reason (&str,
+                                                                   0,
+                                                                   _dbus_string_get_length (&str));
+
+        if (signature_validity == DBUS_VALIDITY_UNKNOWN_OOM_ERROR)
+          return FALSE;
+
+        _dbus_return_val_if_fail (signature_validity == DBUS_VALID, FALSE);
         break;
 
       case DBUS_TYPE_BOOLEAN:
@@ -2887,6 +2897,7 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
   DBusMessageRealIter *real = (DBusMessageRealIter *)iter;
   DBusMessageRealIter *real_sub = (DBusMessageRealIter *)sub;
   DBusString contained_str;
+  DBusValidity contained_signature_validity;
 
   _dbus_return_val_if_fail (_dbus_message_iter_append_check (real), FALSE);
   _dbus_return_val_if_fail (real->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER, FALSE);
@@ -2905,9 +2916,25 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
    * dict entries are invalid signatures standalone (they must be in
    * an array)
    */
+  if (contained_signature != NULL)
+    {
+      _dbus_string_init_const (&contained_str, contained_signature);
+      contained_signature_validity = _dbus_validate_signature_with_reason (&contained_str,
+          0,
+          _dbus_string_get_length (&contained_str));
+
+      if (contained_signature_validity == DBUS_VALIDITY_UNKNOWN_OOM_ERROR)
+        return FALSE;
+    }
+  else
+    {
+      /* just some placeholder value */
+      contained_signature_validity = DBUS_VALID_BUT_INCOMPLETE;
+    }
+
   _dbus_return_val_if_fail ((type == DBUS_TYPE_ARRAY && contained_signature && *contained_signature == DBUS_DICT_ENTRY_BEGIN_CHAR) ||
-                            (contained_signature == NULL ||
-                             _dbus_check_is_valid_signature (contained_signature)),
+                            contained_signature == NULL ||
+                            contained_signature_validity == DBUS_VALID,
                             FALSE);
 
   if (!_dbus_message_iter_open_signature (real))
