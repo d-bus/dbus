@@ -205,8 +205,6 @@ DECLARE_DBUS_NAME_CHECK(member);
 DECLARE_DBUS_NAME_CHECK(error_name);
 /** defines _dbus_check_is_valid_bus_name() */
 DECLARE_DBUS_NAME_CHECK(bus_name);
-/** defines _dbus_check_is_valid_signature() */
-DECLARE_DBUS_NAME_CHECK(signature);
 /** defines _dbus_check_is_valid_utf8() */
 DECLARE_DBUS_NAME_CHECK(utf8);
 
