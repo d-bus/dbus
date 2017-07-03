@@ -434,50 +434,6 @@ set_or_delete_string_field (DBusMessage *message,
                                          &value);
 }
 
-#if 0
-/* Probably we don't need to use this */
-/**
- * Sets the signature of the message, i.e. the arguments in the
- * message payload. The signature includes only "in" arguments for
- * #DBUS_MESSAGE_TYPE_METHOD_CALL and only "out" arguments for
- * #DBUS_MESSAGE_TYPE_METHOD_RETURN, so is slightly different from
- * what you might expect (it does not include the signature of the
- * entire C++-style method).
- *
- * The signature is a string made up of type codes such as
- * #DBUS_TYPE_INT32. The string is terminated with nul (nul is also
- * the value of #DBUS_TYPE_INVALID). The macros such as
- * #DBUS_TYPE_INT32 evaluate to integers; to assemble a signature you
- * may find it useful to use the string forms, such as
- * #DBUS_TYPE_INT32_AS_STRING.
- *
- * An "unset" or #NULL signature is considered the same as an empty
- * signature. In fact dbus_message_get_signature() will never return
- * #NULL.
- *
- * @param message the message
- * @param signature the type signature or #NULL to unset
- * @returns #FALSE if no memory
- */
-static dbus_bool_t
-_dbus_message_set_signature (DBusMessage *message,
-                             const char  *signature)
-{
-  _dbus_return_val_if_fail (message != NULL, FALSE);
-  _dbus_return_val_if_fail (!message->locked, FALSE);
-  _dbus_return_val_if_fail (signature == NULL ||
-                            _dbus_check_is_valid_signature (signature));
-  /* can't delete the signature if you have a message body */
-  _dbus_return_val_if_fail (_dbus_string_get_length (&message->body) == 0 ||
-                            signature != NULL);
-
-  return set_or_delete_string_field (message,
-                                     DBUS_HEADER_FIELD_SIGNATURE,
-                                     DBUS_TYPE_SIGNATURE,
-                                     signature);
-}
-#endif
-
 /* Message Cache
  *
  * We cache some DBusMessage to reduce the overhead of allocating
