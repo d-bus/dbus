@@ -2878,8 +2878,8 @@ dbus_message_iter_append_fixed_array (DBusMessageIter *iter,
 }
 
 /**
- * Appends a container-typed value to the message; you are required to
- * append the contents of the container using the returned
+ * Appends a container-typed value to the message. On success, you are
+ * required to append the contents of the container using the returned
  * sub-iterator, and then call
  * dbus_message_iter_close_container(). Container types are for
  * example struct, variant, and array. For variants, the
@@ -2891,6 +2891,10 @@ dbus_message_iter_append_fixed_array (DBusMessageIter *iter,
  *
  * @todo If this fails due to lack of memory, the message is hosed and
  * you have to start over building the whole message.
+ *
+ * If this function fails, the sub-iterator remains invalid, and must
+ * not be closed with dbus_message_iter_close_container() or abandoned
+ * with dbus_message_iter_abandon_container().
  *
  * @param iter the append iterator
  * @param type the type of the value
@@ -2983,6 +2987,10 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
  * out more information to the message known only after the entire
  * container is written, and may free resources created by
  * dbus_message_iter_open_container().
+ *
+ * Even if this function fails due to lack of memory, the sub-iterator sub
+ * has been closed and invalidated. It must not be closed again with this
+ * function, or abandoned with dbus_message_iter_abandon_container().
  *
  * @todo If this fails due to lack of memory, the message is hosed and
  * you have to start over building the whole message.
