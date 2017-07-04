@@ -2908,6 +2908,7 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
   DBusMessageRealIter *real_sub = (DBusMessageRealIter *)sub;
   DBusString contained_str;
   DBusValidity contained_signature_validity;
+  dbus_bool_t ret;
 
   _dbus_return_val_if_fail (_dbus_message_iter_append_check (real), FALSE);
   _dbus_return_val_if_fail (real->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER, FALSE);
@@ -2950,24 +2951,30 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
   if (!_dbus_message_iter_open_signature (real))
     return FALSE;
 
+  ret = FALSE;
   *real_sub = *real;
 
   if (contained_signature != NULL)
     {
       _dbus_string_init_const (&contained_str, contained_signature);
 
-      return _dbus_type_writer_recurse (&real->u.writer,
-                                        type,
-                                        &contained_str, 0,
-                                        &real_sub->u.writer);
+      ret = _dbus_type_writer_recurse (&real->u.writer,
+                                       type,
+                                       &contained_str, 0,
+                                       &real_sub->u.writer);
     }
   else
     {
-      return _dbus_type_writer_recurse (&real->u.writer,
-                                        type,
-                                        NULL, 0,
-                                        &real_sub->u.writer);
-    } 
+      ret = _dbus_type_writer_recurse (&real->u.writer,
+                                       type,
+                                       NULL, 0,
+                                       &real_sub->u.writer);
+    }
+
+  if (!ret)
+    _dbus_message_iter_abandon_signature (real);
+
+  return ret;
 }
 
 
