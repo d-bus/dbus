@@ -301,6 +301,8 @@ void _dbus_set_error_valist (DBusError  *error,
                              const char *format,
                              va_list     args) _DBUS_GNUC_PRINTF (3, 0);
 
+typedef dbus_bool_t (* DBusTestMemoryFunction)  (void *data);
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 /* Memory debugging */
 void        _dbus_set_fail_alloc_counter        (int  until_next_fail);
@@ -312,7 +314,6 @@ dbus_bool_t _dbus_disable_mem_pools             (void);
 DBUS_PRIVATE_EXPORT
 int         _dbus_get_malloc_blocks_outstanding (void);
 
-typedef dbus_bool_t (* DBusTestMemoryFunction)  (void *data);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_test_oom_handling (const char             *description,
                                      DBusTestMemoryFunction  func,
@@ -326,7 +327,9 @@ dbus_bool_t _dbus_test_oom_handling (const char             *description,
  */
 #define _dbus_decrement_fail_alloc_counter() (FALSE)
 #define _dbus_disable_mem_pools()            (FALSE)
-#define _dbus_get_malloc_blocks_outstanding  (0)
+#define _dbus_get_malloc_blocks_outstanding() (0)
+
+#define _dbus_test_oom_handling(description, func, data) ((*func) (data))
 #endif /* !DBUS_ENABLE_EMBEDDED_TESTS */
 
 typedef void (* DBusShutdownFunction) (void *data);
