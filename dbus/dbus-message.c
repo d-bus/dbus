@@ -2538,6 +2538,9 @@ _dbus_message_iter_open_signature (DBusMessageRealIter *real)
 
   real->sig_refcount = 1;
 
+  /* If this assertion failed, then str would be neither stored in u.writer
+   * nor freed by this function, resulting in a memory leak. */
+  _dbus_assert (real->u.writer.type_str == NULL);
   _dbus_type_writer_add_types (&real->u.writer,
                                str, _dbus_string_get_length (str));
   return TRUE;
