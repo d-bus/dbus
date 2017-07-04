@@ -1891,6 +1891,7 @@ dbus_message_append_args_valist (DBusMessage *message,
               _dbus_warn ("arrays of %s can't be appended with %s for now",
                           _dbus_type_to_string (element_type),
                           _DBUS_FUNCTION_NAME);
+              dbus_message_iter_abandon_container (&iter, &array);
               goto failed;
             }
 
