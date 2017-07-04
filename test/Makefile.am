@@ -165,6 +165,7 @@ installable_tests += \
 	test-dbus-daemon \
 	test-dbus-daemon-eavesdrop \
 	test-fdpass \
+	test-message \
 	test-monitor \
 	test-loopback \
 	test-marshal \
@@ -327,6 +328,15 @@ endif
 test_marshal_SOURCES = marshal.c
 test_marshal_LDADD = \
     libdbus-testutils.la \
+    $(GLIB_LIBS) \
+    $(NULL)
+
+test_message_SOURCES = \
+    message.c \
+    $(NULL)
+test_message_LDADD = \
+    libdbus-testutils.la \
+    $(top_builddir)/dbus/libdbus-internal.la \
     $(GLIB_LIBS) \
     $(NULL)
 
