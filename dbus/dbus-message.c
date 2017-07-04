@@ -2754,20 +2754,22 @@ dbus_message_iter_append_basic (DBusMessageIter *iter,
       int *fds;
       dbus_uint32_t u;
 
+      ret = FALSE;
+
       /* First step, include the fd in the fd list of this message */
       if (!(fds = expand_fd_array(real->message, 1)))
-        return FALSE;
+        goto out;
 
       *fds = _dbus_dup(*(int*) value, NULL);
       if (*fds < 0)
-        return FALSE;
+        goto out;
 
       u = real->message->n_unix_fds;
 
       /* Second step, write the index to the fd */
       if (!(ret = _dbus_type_writer_write_basic (&real->u.writer, DBUS_TYPE_UNIX_FD, &u))) {
         _dbus_close(*fds, NULL);
-        return FALSE;
+        goto out;
       }
 
       real->message->n_unix_fds += 1;
@@ -2786,6 +2788,9 @@ dbus_message_iter_append_basic (DBusMessageIter *iter,
          freed. */
 #else
       ret = FALSE;
+      /* This is redundant (we could just fall through), but it avoids
+       * -Wunused-label in builds that don't HAVE_UNIX_FD_PASSING */
+      goto out;
 #endif
     }
   else
@@ -2793,6 +2798,7 @@ dbus_message_iter_append_basic (DBusMessageIter *iter,
       ret = _dbus_type_writer_write_basic (&real->u.writer, type, value);
     }
 
+out:
   if (!_dbus_message_iter_close_signature (real))
     ret = FALSE;
 
