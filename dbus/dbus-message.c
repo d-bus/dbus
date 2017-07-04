@@ -709,6 +709,19 @@ dbus_message_cache_or_finalize (DBusMessage *message)
     dbus_message_finalize (message);
 }
 
+/*
+ * Arrange for iter to be something that _dbus_message_iter_check() would
+ * reject as not a valid iterator.
+ */
+static void
+_dbus_message_real_iter_zero (DBusMessageRealIter *iter)
+{
+  _dbus_assert (iter != NULL);
+  _DBUS_ZERO (*iter);
+  /* NULL is not, strictly speaking, guaranteed to be all-bits-zero */
+  iter->message = NULL;
+}
+
 #if defined(DBUS_ENABLE_CHECKS) || defined(DBUS_ENABLE_ASSERT)
 static dbus_bool_t
 _dbus_message_iter_check (DBusMessageRealIter *iter)
@@ -718,6 +731,13 @@ _dbus_message_iter_check (DBusMessageRealIter *iter)
   if (iter == NULL)
     {
       _dbus_warn_check_failed ("dbus message iterator is NULL");
+      return FALSE;
+    }
+
+  if (iter->message == NULL || iter->iter_type == 0)
+    {
+      _dbus_warn_check_failed ("dbus message iterator has already been "
+                               "closed, or is uninitialized or corrupt");
       return FALSE;
     }
 
@@ -2914,10 +2934,14 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
   DBusValidity contained_signature_validity;
   dbus_bool_t ret;
 
+  _dbus_return_val_if_fail (sub != NULL, FALSE);
+  /* Do our best to make sure the sub-iterator doesn't contain something
+   * valid-looking on failure */
+  _dbus_message_real_iter_zero (real_sub);
+
   _dbus_return_val_if_fail (_dbus_message_iter_append_check (real), FALSE);
   _dbus_return_val_if_fail (real->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER, FALSE);
   _dbus_return_val_if_fail (dbus_type_is_container (type), FALSE);
-  _dbus_return_val_if_fail (sub != NULL, FALSE);
   _dbus_return_val_if_fail ((type == DBUS_TYPE_STRUCT &&
                              contained_signature == NULL) ||
                             (type == DBUS_TYPE_DICT_ENTRY &&
@@ -3014,6 +3038,7 @@ dbus_message_iter_close_container (DBusMessageIter *iter,
 
   ret = _dbus_type_writer_unrecurse (&real->u.writer,
                                      &real_sub->u.writer);
+  _dbus_message_real_iter_zero (real_sub);
 
   if (!_dbus_message_iter_close_signature (real))
     ret = FALSE;
@@ -3037,9 +3062,9 @@ dbus_message_iter_abandon_container (DBusMessageIter *iter,
                                      DBusMessageIter *sub)
 {
   DBusMessageRealIter *real = (DBusMessageRealIter *)iter;
-#ifndef DBUS_DISABLE_CHECKS
   DBusMessageRealIter *real_sub = (DBusMessageRealIter *)sub;
 
+#ifndef DBUS_DISABLE_CHECKS
   _dbus_return_if_fail (_dbus_message_iter_append_check (real));
   _dbus_return_if_fail (real->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER);
   _dbus_return_if_fail (_dbus_message_iter_append_check (real_sub));
@@ -3047,6 +3072,7 @@ dbus_message_iter_abandon_container (DBusMessageIter *iter,
 #endif
 
   _dbus_message_iter_abandon_signature (real);
+  _dbus_message_real_iter_zero (real_sub);
 }
 
 /**
