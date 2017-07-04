@@ -176,6 +176,80 @@ out:
   return !g_test_failed ();
 }
 
+/* Similar to test_array(), but making use of
+ * dbus_message_iter_abandon_container_if_open().
+ *
+ * Return TRUE if the right thing happens, but the right thing might include
+ * OOM. */
+static dbus_bool_t
+test_zero_iter (void *ignored)
+{
+  DBusMessage *m;
+  DBusMessageIter iter = DBUS_MESSAGE_ITER_INIT_CLOSED;
+  DBusMessageIter arr_iter = DBUS_MESSAGE_ITER_INIT_CLOSED;
+  DBusMessageIter inner_iter;
+  dbus_int32_t fortytwo = 42;
+  dbus_bool_t message_should_be_complete = FALSE;
+
+  /* This one was left uninitialized, just so we could exercise this
+   * function */
+  dbus_message_iter_init_closed (&inner_iter);
+
+  m = dbus_message_new_signal ("/", "a.b", "c");
+
+  if (m == NULL)
+    goto out;
+
+  dbus_message_iter_init_append (m, &iter);
+
+  if (!dbus_message_iter_open_container (&iter, DBUS_TYPE_ARRAY,
+                                         "ai", &arr_iter))
+    goto out;
+
+  if (!dbus_message_iter_open_container (&arr_iter, DBUS_TYPE_ARRAY, "i",
+                                         &inner_iter))
+    goto out;
+
+  if (!dbus_message_iter_append_basic (&inner_iter, DBUS_TYPE_INT32, &fortytwo))
+    goto out;
+
+  if (!dbus_message_iter_close_container (&arr_iter, &inner_iter))
+    goto out;
+
+  if (!dbus_message_iter_close_container (&iter, &arr_iter))
+    goto out;
+
+  message_should_be_complete = TRUE;
+
+out:
+  dbus_message_iter_abandon_container_if_open (&arr_iter, &inner_iter);
+  dbus_message_iter_abandon_container_if_open (&iter, &arr_iter);
+  /* Redundant calls are OK */
+  dbus_message_iter_abandon_container_if_open (&iter, &arr_iter);
+
+  /* dbus_message_iter_abandon_container_if_open does not leave the message
+   * in what seems to be consistently documented as a "hosed" state */
+  if (message_should_be_complete)
+    {
+      DBusBasicValue read_back;
+
+      _DBUS_ZERO (read_back);
+      dbus_message_iter_init (m, &iter);
+      dbus_message_iter_recurse (&iter, &arr_iter);
+      dbus_message_iter_recurse (&arr_iter, &inner_iter);
+      dbus_message_iter_get_basic (&inner_iter, &read_back);
+      g_assert_cmpint (read_back.i32, ==, 42);
+    }
+
+  if (m != NULL)
+    dbus_message_unref (m);
+
+  dbus_shutdown ();
+  g_assert_cmpint (_dbus_get_malloc_blocks_outstanding (), ==, 0);
+
+  return !g_test_failed ();
+}
+
 typedef struct
 {
   const gchar *name;
@@ -228,6 +302,7 @@ main (int argc,
   add_oom_test ("/message/array/dict", test_array, "{ss}");
   add_oom_test ("/message/array/variant", test_array, "v");
   add_oom_test ("/message/fd", test_fd, NULL);
+  add_oom_test ("/message/zero-iter", test_zero_iter, NULL);
 
   ret = g_test_run ();
 
