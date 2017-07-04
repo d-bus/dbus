@@ -66,7 +66,9 @@ run_validity_tests (const ValidityTest *tests,
 
 static const ValidityTest signature_tests[] = {
   { "", DBUS_VALID },
+  { "sss", DBUS_VALID },
   { "i", DBUS_VALID },
+  { "b", DBUS_VALID },
   { "ai", DBUS_VALID },
   { "(i)", DBUS_VALID },
   { "w", DBUS_INVALID_UNKNOWN_TYPECODE },
@@ -95,6 +97,13 @@ static const ValidityTest signature_tests[] = {
   { "a{ia}", DBUS_INVALID_MISSING_ARRAY_ELEMENT_TYPE },
   { "a{}", DBUS_INVALID_DICT_ENTRY_HAS_NO_FIELDS },
   { "a{aii}", DBUS_INVALID_DICT_KEY_MUST_BE_BASIC_TYPE },
+  { " ", DBUS_INVALID_UNKNOWN_TYPECODE },
+  { "not a valid signature", DBUS_INVALID_UNKNOWN_TYPECODE },
+  { "123", DBUS_INVALID_UNKNOWN_TYPECODE },
+  { ".", DBUS_INVALID_UNKNOWN_TYPECODE },
+  /* https://bugs.freedesktop.org/show_bug.cgi?id=17803 */
+  { "a{(ii)i}", DBUS_INVALID_DICT_KEY_MUST_BE_BASIC_TYPE },
+
   /* { "a{i}", DBUS_INVALID_DICT_ENTRY_HAS_ONLY_ONE_FIELD }, */
   /* { "{is}", DBUS_INVALID_DICT_ENTRY_NOT_INSIDE_ARRAY }, */
   /* { "a{isi}", DBUS_INVALID_DICT_ENTRY_HAS_TOO_MANY_FIELDS }, */
@@ -211,22 +220,6 @@ _dbus_marshal_validate_test (void)
     "",
     "   ",
     "foo bar"
-  };
-
-  const char *valid_signatures[] = {
-    "",
-    "sss",
-    "i",
-    "b"
-  };
-
-  const char *invalid_signatures[] = {
-    " ",
-    "not a valid signature",
-    "123",
-    ".",
-    "(",
-    "a{(ii)i}" /* https://bugs.freedesktop.org/show_bug.cgi?id=17803 */
   };
 
   /* Signature with reason */
@@ -425,43 +418,6 @@ _dbus_marshal_validate_test (void)
         {
           _dbus_warn ("Member \"%s\" should have been invalid", invalid_members[i]);
           _dbus_assert_not_reached ("valid member");
-        }
-
-      ++i;
-    }
-
-  /* Signature validation */
-  i = 0;
-  while (i < (int) _DBUS_N_ELEMENTS (valid_signatures))
-    {
-      _dbus_string_init_const (&str, valid_signatures[i]);
-
-      if (_dbus_validate_signature_with_reason (&str, 0,
-            _dbus_string_get_length (&str)) != DBUS_VALID)
-        {
-          _dbus_warn ("Signature \"%s\" should have been valid and OOM should not have occurred", valid_signatures[i]);
-          _dbus_assert_not_reached ("invalid signature");
-        }
-
-      ++i;
-    }
-
-  i = 0;
-  while (i < (int) _DBUS_N_ELEMENTS (invalid_signatures))
-    {
-      DBusValidity validity;
-
-      _dbus_string_init_const (&str, invalid_signatures[i]);
-
-      validity = _dbus_validate_signature_with_reason (&str, 0,
-          _dbus_string_get_length (&str));
-
-      /* Validity values less than DBUS_VALID are OOM or unknown validity.
-       * TODO: specify in which way each one should be invalid */
-      if (validity <= DBUS_VALID)
-        {
-          _dbus_warn ("Signature \"%s\" should have been invalid and OOM should not have occurred", invalid_signatures[i]);
-          _dbus_assert_not_reached ("valid signature");
         }
 
       ++i;
