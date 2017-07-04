@@ -103,10 +103,9 @@ static const ValidityTest signature_tests[] = {
   { ".", DBUS_INVALID_UNKNOWN_TYPECODE },
   /* https://bugs.freedesktop.org/show_bug.cgi?id=17803 */
   { "a{(ii)i}", DBUS_INVALID_DICT_KEY_MUST_BE_BASIC_TYPE },
-
-  /* { "a{i}", DBUS_INVALID_DICT_ENTRY_HAS_ONLY_ONE_FIELD }, */
-  /* { "{is}", DBUS_INVALID_DICT_ENTRY_NOT_INSIDE_ARRAY }, */
-  /* { "a{isi}", DBUS_INVALID_DICT_ENTRY_HAS_TOO_MANY_FIELDS }, */
+  { "a{i}", DBUS_INVALID_DICT_ENTRY_HAS_ONLY_ONE_FIELD },
+  { "{is}", DBUS_INVALID_DICT_ENTRY_NOT_INSIDE_ARRAY },
+  { "a{isi}", DBUS_INVALID_DICT_ENTRY_HAS_TOO_MANY_FIELDS },
 };
 
 dbus_bool_t
