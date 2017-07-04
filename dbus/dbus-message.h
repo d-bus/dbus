@@ -76,6 +76,28 @@ struct DBusMessageIter
   void *pad3;           /**< Don't use this */
 };
 
+/**
+ * A message iterator for which dbus_message_iter_abandon_container_if_open()
+ * is the only valid operation.
+ */
+#define DBUS_MESSAGE_ITER_INIT_CLOSED \
+{ \
+  NULL, /* dummy1 */ \
+  NULL, /* dummy2 */ \
+  0, /* dummy3 */ \
+  0, /* dummy4 */ \
+  0, /* dummy5 */ \
+  0, /* dummy6 */ \
+  0, /* dummy7 */ \
+  0, /* dummy8 */ \
+  0, /* dummy9 */ \
+  0, /* dummy10 */ \
+  0, /* dummy11 */ \
+  0, /* pad1 */ \
+  NULL, /* pad2 */ \
+  NULL /* pad3 */ \
+}
+
 DBUS_EXPORT
 DBusMessage* dbus_message_new               (int          message_type);
 DBUS_EXPORT
@@ -218,6 +240,8 @@ DBUS_EXPORT
 dbus_bool_t dbus_message_contains_unix_fds    (DBusMessage *message);
 
 DBUS_EXPORT
+void        dbus_message_iter_init_closed        (DBusMessageIter *iter);
+DBUS_EXPORT
 dbus_bool_t dbus_message_iter_init             (DBusMessage     *message,
                                                 DBusMessageIter *iter);
 DBUS_EXPORT
@@ -275,6 +299,10 @@ dbus_bool_t dbus_message_iter_close_container    (DBusMessageIter *iter,
 DBUS_EXPORT
 void        dbus_message_iter_abandon_container  (DBusMessageIter *iter,
                                                   DBusMessageIter *sub);
+
+DBUS_EXPORT
+void        dbus_message_iter_abandon_container_if_open (DBusMessageIter *iter,
+                                                         DBusMessageIter *sub);
 
 DBUS_EXPORT
 void dbus_message_lock    (DBusMessage  *message);

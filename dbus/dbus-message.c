@@ -722,6 +722,25 @@ _dbus_message_real_iter_zero (DBusMessageRealIter *iter)
   iter->message = NULL;
 }
 
+/**
+ * Initialize iter as if with #DBUS_MESSAGE_ITER_INIT_CLOSED. The only valid
+ * operation for such an iterator is
+ * dbus_message_iter_abandon_container_if_open(), which does nothing.
+ */
+void
+dbus_message_iter_init_closed (DBusMessageIter *iter)
+{
+  _dbus_return_if_fail (iter != NULL);
+  _dbus_message_real_iter_zero ((DBusMessageRealIter *) iter);
+}
+
+static dbus_bool_t
+_dbus_message_real_iter_is_zeroed (DBusMessageRealIter *iter)
+{
+  return (iter != NULL && iter->message == NULL && iter->changed_stamp == 0 &&
+          iter->iter_type == 0 && iter->sig_refcount == 0);
+}
+
 #if defined(DBUS_ENABLE_CHECKS) || defined(DBUS_ENABLE_ASSERT)
 static dbus_bool_t
 _dbus_message_iter_check (DBusMessageRealIter *iter)
@@ -2914,7 +2933,9 @@ dbus_message_iter_append_fixed_array (DBusMessageIter *iter,
  *
  * If this function fails, the sub-iterator remains invalid, and must
  * not be closed with dbus_message_iter_close_container() or abandoned
- * with dbus_message_iter_abandon_container().
+ * with dbus_message_iter_abandon_container(). However, after this
+ * function has either succeeded or failed, it is valid to call
+ * dbus_message_iter_abandon_container_if_open().
  *
  * @param iter the append iterator
  * @param type the type of the value
@@ -3015,6 +3036,8 @@ dbus_message_iter_open_container (DBusMessageIter *iter,
  * Even if this function fails due to lack of memory, the sub-iterator sub
  * has been closed and invalidated. It must not be closed again with this
  * function, or abandoned with dbus_message_iter_abandon_container().
+ * However, it remains valid to call
+ * dbus_message_iter_abandon_container_if_open().
  *
  * @todo If this fails due to lack of memory, the message is hosed and
  * you have to start over building the whole message.
@@ -3071,6 +3094,96 @@ dbus_message_iter_abandon_container (DBusMessageIter *iter,
   _dbus_return_if_fail (real_sub->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER);
 #endif
 
+  _dbus_message_iter_abandon_signature (real);
+  _dbus_message_real_iter_zero (real_sub);
+}
+
+/**
+ * Abandons creation of a contained-typed value and frees resources created
+ * by dbus_message_iter_open_container().  Once this returns, the message
+ * is hosed and you have to start over building the whole message.
+ *
+ * Unlike dbus_message_iter_abandon_container(), it is valid to call this
+ * function on an iterator that was initialized with
+ * #DBUS_MESSAGE_ITER_INIT_CLOSED, or an iterator that was already closed
+ * or abandoned. However, it is not valid to call this function on
+ * uninitialized memory. This is intended to be used in error cleanup
+ * code paths, similar to this pattern:
+ *
+ *       DBusMessageIter outer = DBUS_MESSAGE_ITER_INIT_CLOSED;
+ *       DBusMessageIter inner = DBUS_MESSAGE_ITER_INIT_CLOSED;
+ *       dbus_bool_t result = FALSE;
+ *
+ *       if (!dbus_message_iter_open_container (iter, ..., &outer))
+ *         goto out;
+ *
+ *       if (!dbus_message_iter_open_container (&outer, ..., &inner))
+ *         goto out;
+ *
+ *       if (!dbus_message_iter_append_basic (&inner, ...))
+ *         goto out;
+ *
+ *       if (!dbus_message_iter_close_container (&outer, ..., &inner))
+ *         goto out;
+ *
+ *       if (!dbus_message_iter_close_container (iter, ..., &outer))
+ *         goto out;
+ *
+ *       result = TRUE;
+ *
+ *     out:
+ *       dbus_message_iter_abandon_container_if_open (&outer, &inner);
+ *       dbus_message_iter_abandon_container_if_open (iter, &outer);
+ *       return result;
+ *
+ * @param iter the append iterator
+ * @param sub sub-iterator to close
+ */
+void
+dbus_message_iter_abandon_container_if_open (DBusMessageIter *iter,
+                                             DBusMessageIter *sub)
+{
+  DBusMessageRealIter *real = (DBusMessageRealIter *)iter;
+  DBusMessageRealIter *real_sub = (DBusMessageRealIter *)sub;
+
+  /* If both the parent and the child are zeroed out, then either we didn't
+   * even get as far as successfully recursing into the parent, or we already
+   * closed both the child and the parent. For example, in the code sample
+   * in the doc-comment above, this happens for
+   * abandon_container_if_open (&outer, &inner) if the first open_container
+   * call failed, or if we reached result = TRUE and fell through. */
+  if (_dbus_message_real_iter_is_zeroed (real) &&
+      _dbus_message_real_iter_is_zeroed (real_sub))
+    return;
+
+#ifndef DBUS_DISABLE_CHECKS
+  /* If the child is not zeroed out, but the parent is, then something has
+   * gone horribly wrong (in practice that would probably mean both are
+   * uninitialized or corrupt, and the parent happens to have ended up
+   * all-bytes-zero). */
+  _dbus_return_if_fail (_dbus_message_iter_append_check (real));
+  _dbus_return_if_fail (real->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER);
+#endif
+
+  /* If the parent is not zeroed out, but the child is, then either we did
+   * not successfully open the child, or we already closed the child. This
+   * means we do not own a reference to the parent's signature, so it would
+   * be wrong to release it; so we must not call abandon_signature() here.
+   * In the code sample in the doc-comment above, this happens for
+   * abandon_container_if_open (&outer, &inner) if the second open_container
+   * call failed, or if the second close_container call failed. */
+  if (_dbus_message_real_iter_is_zeroed (real_sub))
+    return;
+
+#ifndef DBUS_DISABLE_CHECKS
+  _dbus_return_if_fail (_dbus_message_iter_append_check (real_sub));
+  _dbus_return_if_fail (real_sub->iter_type == DBUS_MESSAGE_ITER_TYPE_WRITER);
+#endif
+
+  /* If neither the parent nor the child is zeroed out, then we genuinely
+   * have an open container; close it. In the code sample in the doc-comment,
+   * this happens for abandon_container_if_open (&outer, &inner) if the
+   * append_basic call failed. */
   _dbus_message_iter_abandon_signature (real);
   _dbus_message_real_iter_zero (real_sub);
 }
