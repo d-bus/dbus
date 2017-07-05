@@ -147,6 +147,7 @@ setup (Fixture *f,
       /* we're relying on being single-threaded for this to be safe */
       f->saved_runtime_dir = g_strdup (g_getenv ("XDG_RUNTIME_DIR"));
       g_setenv ("XDG_RUNTIME_DIR", f->tmp_runtime_dir, TRUE);
+      g_unsetenv ("DBUS_SESSION_BUS_ADDRESS");
     }
 
   address = test_get_dbus_daemon (config ? config->config_file : NULL,
