@@ -10,6 +10,43 @@ Build-time configuration changes:
   A typical use is to set prefix=/usr, sysconfdir=/etc, localstatedir=/var
   and runstatedir=/run. (fd.o #101569, Simon McVittie)
 
+Enhancements:
+
+• New APIs DBUS_MESSAGE_ITER_INIT_CLOSED, dbus_message_iter_init_closed()
+  and dbus_message_iter_abandon_container_if_open() simplify the
+  single-exit-point ("goto out") style of resource cleanup. The API
+  documentation around DBusMessageIter and containers has also been
+  clarified. (fd.o #101568, Simon McVittie)
+
+Fixes:
+
+• dbus_message_iter_append_basic() no longer leaks memory if it fails to
+  append a file descriptor to a message. (fd.o #101568, Simon McVittie)
+
+• dbus_message_iter_open_container() no longer leaks memory if it runs out
+  of memory. (fd.o #101568, Simon McVittie)
+
+• dbus_message_append_args_valist() no longer leaks memory if given an
+  unsupported type. This situation is still considered to be a programming
+  error which needs to be corrected by the user of libdbus.
+  (fd.o #101568, Simon McVittie)
+
+• dbus_message_iter_append_basic() and dbus_message_iter_open_container()
+  will no longer report that their arguments were invalid if they run out
+  of memory at exactly the wrong time. (fd.o #101568, Simon McVittie)
+
+Internal changes relevant to dbus developers:
+
+• DBusVariant is a new mechanism to copy single values from a message into
+  a buffer without copying the entire message (fd.o #101568, Simon McVittie)
+
+• DBUS_SYSTEM_LOG_FATAL has been replaced by DBUS_SYSTEM_LOG_ERROR.
+  Logging an ERROR message does not make the process exit; the caller
+  is responsible for calling abort() or exit(), whichever is more appropriate.
+  (fd.o #101568, Simon McVittie)
+
+• Better test coverage (fd.o #101568, Simon McVittie)
+
 D-Bus 1.11.14 (2017-06-29)
 ==
 
