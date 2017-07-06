@@ -1,7 +1,23 @@
 D-Bus 1.10.22 (UNRELEASED)
 ==
 
-...
+Fixes:
+
+• dbus_message_iter_append_basic() no longer leaks memory if it fails to
+  append a file descriptor to a message. (fd.o #101568, Simon McVittie)
+
+• dbus_message_iter_open_container() no longer leaks memory if it runs out
+  of memory. (fd.o #101568, Simon McVittie)
+
+• dbus_message_append_args_valist() no longer leaks memory if given an
+  unsupported type. This situation is still considered to be a programming
+  error which needs to be corrected by the user of libdbus.
+  (fd.o #101568, Simon McVittie)
+
+• Wrap test-pending-call-disconnected with dbus-run-session so that it can
+  pass in environments that are not already running a D-Bus session bus,
+  fixing a build-time test regression in 1.10.20
+  (fd.o #101698, Simon McVittie)
 
 D-Bus 1.10.20 (2017-06-29)
 ==
