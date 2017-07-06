@@ -473,6 +473,30 @@ test_try_connect_to_bus_as_user (TestMainContext *ctx,
   return conn;
 }
 
+/*
+ * Raise G_IO_ERROR_NOT_SUPPORTED if the requested user is impossible.
+ */
+GDBusConnection *
+test_try_connect_gdbus_as_user (const char *address,
+                                TestUser user,
+                                GError **error)
+{
+  GDBusConnection *conn;
+
+  if (user != TEST_USER_ME && !become_other_user (user, error))
+    return NULL;
+
+  conn = g_dbus_connection_new_for_address_sync (address,
+      (G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION |
+       G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT),
+      NULL, NULL, error);
+
+  if (user != TEST_USER_ME)
+    back_to_root ();
+
+  return conn;
+}
+
 static void
 pid_died (GPid pid,
           gint status,

@@ -29,6 +29,7 @@
 
 #include <dbus/dbus.h>
 
+#include <gio/gio.h>
 #include <glib.h>
 
 #include "test-utils.h"
@@ -79,6 +80,9 @@ DBusConnection *test_try_connect_to_bus (TestMainContext *ctx,
     GError **error);
 DBusConnection *test_try_connect_to_bus_as_user (TestMainContext *ctx,
     const char *address,
+    TestUser user,
+    GError **error);
+GDBusConnection *test_try_connect_gdbus_as_user (const char *address,
     TestUser user,
     GError **error);
 
