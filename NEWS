@@ -20,6 +20,9 @@ Enhancements:
 
 Fixes:
 
+• Make the dbus-daemon's Properties interface, as introduced in 1.11.14,
+  available to all users on the system bus (fd.o #101700, Simon McVittie)
+
 • dbus_message_iter_append_basic() no longer leaks memory if it fails to
   append a file descriptor to a message. (fd.o #101568, Simon McVittie)
 
