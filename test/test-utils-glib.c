@@ -357,29 +357,21 @@ fail:
   return FALSE;
 }
 
-/*
- * Raise G_IO_ERROR_NOT_SUPPORTED if the requested user is impossible.
- * Do not mark the test as skipped: we might have more to test anyway.
- */
-DBusConnection *
-test_try_connect_to_bus_as_user (TestMainContext *ctx,
-    const char *address,
-    TestUser user,
-    GError **error)
+static gboolean
+become_other_user (TestUser user,
+                   GError **error)
 {
   /* For now we only do tests like this on Linux, because I don't know how
    * safe this use of setresuid() is on other platforms */
 #if defined(HAVE_GETRESUID) && defined(HAVE_SETRESUID) && defined(__linux__)
   uid_t ruid, euid, suid;
   const struct passwd *pwd;
-  DBusConnection *conn;
   const char *username;
+
+  g_return_val_if_fail (user != TEST_USER_ME, FALSE);
 
   switch (user)
     {
-      case TEST_USER_ME:
-        return test_try_connect_to_bus (ctx, address, error);
-
       case TEST_USER_ROOT:
         username = "root";
         break;
@@ -392,8 +384,9 @@ test_try_connect_to_bus_as_user (TestMainContext *ctx,
         username = DBUS_TEST_USER;
         break;
 
+      case TEST_USER_ME:
       default:
-        g_return_val_if_reached (NULL);
+        g_return_val_if_reached (FALSE);
     }
 
   if (getresuid (&ruid, &euid, &suid) != 0)
@@ -404,7 +397,7 @@ test_try_connect_to_bus_as_user (TestMainContext *ctx,
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
           "not uid 0 (ruid=%ld euid=%ld suid=%ld)",
           (unsigned long) ruid, (unsigned long) euid, (unsigned long) suid);
-      return NULL;
+      return FALSE;
     }
 
   pwd = getpwnam (username);
@@ -413,7 +406,7 @@ test_try_connect_to_bus_as_user (TestMainContext *ctx,
     {
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
           "getpwnam(\"%s\"): %s", username, g_strerror (errno));
-      return NULL;
+      return FALSE;
     }
 
   /* Impersonate the desired user while we connect to the bus.
@@ -422,34 +415,62 @@ test_try_connect_to_bus_as_user (TestMainContext *ctx,
     g_error ("setresuid(%ld, (same), 0): %s",
         (unsigned long) pwd->pw_uid, g_strerror (errno));
 
-  conn = test_connect_to_bus (ctx, address);
-
-  /* go back to our saved uid */
-  if (setresuid (0, 0, 0) != 0)
-    g_error ("setresuid(0, 0, 0): %s", g_strerror (errno));
-
-  return conn;
+  return TRUE;
 
 #else
+  g_return_val_if_fail (user != TEST_USER_ME, FALSE);
 
   switch (user)
     {
-      case TEST_USER_ME:
-        return test_try_connect_to_bus (ctx, address, error);
-
       case TEST_USER_ROOT:
       case TEST_USER_MESSAGEBUS:
       case TEST_USER_OTHER:
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
             "setresuid() not available, or unsure about "
             "credentials-passing semantics on this platform");
-        return NULL;
+        return FALSE;
 
+      case TEST_USER_ME:
       default:
-        g_return_val_if_reached (NULL);
+        g_return_val_if_reached (FALSE);
     }
 
 #endif
+}
+
+/* Undo the effect of a successful call to become_other_user() */
+static void
+back_to_root (void)
+{
+#if defined(HAVE_GETRESUID) && defined(HAVE_SETRESUID) && defined(__linux__)
+  if (setresuid (0, 0, 0) != 0)
+    g_error ("setresuid(0, 0, 0): %s", g_strerror (errno));
+#else
+  g_error ("become_other_user() cannot succeed on this platform");
+#endif
+}
+
+/*
+ * Raise G_IO_ERROR_NOT_SUPPORTED if the requested user is impossible.
+ * Do not mark the test as skipped: we might have more to test anyway.
+ */
+DBusConnection *
+test_try_connect_to_bus_as_user (TestMainContext *ctx,
+    const char *address,
+    TestUser user,
+    GError **error)
+{
+  DBusConnection *conn;
+
+  if (user != TEST_USER_ME && !become_other_user (user, error))
+    return NULL;
+
+  conn = test_try_connect_to_bus (ctx, address, error);
+
+  if (user != TEST_USER_ME)
+    back_to_root ();
+
+  return conn;
 }
 
 static void
