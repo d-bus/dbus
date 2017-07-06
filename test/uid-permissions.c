@@ -29,6 +29,8 @@
 
 #include "test-utils-glib.h"
 
+#include <gio/gio.h>
+
 typedef struct {
     gboolean skip;
 
@@ -69,12 +71,18 @@ setup (Fixture *f,
       return;
     }
 
-  f->conn = test_connect_to_bus_as_user (f->ctx, address,
-      config ? config->user : TEST_USER_ME);
+  f->conn = test_try_connect_to_bus_as_user (f->ctx, address,
+      config ? config->user : TEST_USER_ME, &f->ge);
 
-  if (f->conn == NULL)
-    f->skip = TRUE;
+  if (f->conn == NULL &&
+      g_error_matches (f->ge, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED))
+    {
+      g_test_skip (f->ge->message);
+      g_clear_error (&f->ge);
+      f->skip = TRUE;
+    }
 
+  g_assert_no_error (f->ge);
   g_free (address);
 }
 

@@ -42,6 +42,7 @@
 
 #include <glib.h>
 #include <glib/gstdio.h>
+#include <gio/gio.h>
 
 #include <dbus/dbus.h>
 
@@ -319,27 +320,52 @@ DBusConnection *
 test_connect_to_bus (TestMainContext *ctx,
     const gchar *address)
 {
-  DBusConnection *conn;
-  DBusError error = DBUS_ERROR_INIT;
-  dbus_bool_t ok;
+  GError *error = NULL;
+  DBusConnection *conn = test_try_connect_to_bus (ctx, address, &error);
 
-  conn = dbus_connection_open_private (address, &error);
-  test_assert_no_error (&error);
+  g_assert_no_error (error);
   g_assert (conn != NULL);
-
-  ok = dbus_bus_register (conn, &error);
-  test_assert_no_error (&error);
-  g_assert (ok);
-  g_assert (dbus_bus_get_unique_name (conn) != NULL);
-
-  test_connection_setup (ctx, conn);
   return conn;
 }
 
 DBusConnection *
-test_connect_to_bus_as_user (TestMainContext *ctx,
+test_try_connect_to_bus (TestMainContext *ctx,
+    const gchar *address,
+    GError **gerror)
+{
+  DBusConnection *conn;
+  DBusError error = DBUS_ERROR_INIT;
+
+  conn = dbus_connection_open_private (address, &error);
+
+  if (conn == NULL)
+    goto fail;
+
+  if (!dbus_bus_register (conn, &error))
+    goto fail;
+
+  g_assert (dbus_bus_get_unique_name (conn) != NULL);
+
+  test_connection_setup (ctx, conn);
+  return conn;
+
+fail:
+  if (gerror != NULL)
+    *gerror = g_dbus_error_new_for_dbus_error (error.name, error.message);
+
+  dbus_error_free (&error);
+  return FALSE;
+}
+
+/*
+ * Raise G_IO_ERROR_NOT_SUPPORTED if the requested user is impossible.
+ * Do not mark the test as skipped: we might have more to test anyway.
+ */
+DBusConnection *
+test_try_connect_to_bus_as_user (TestMainContext *ctx,
     const char *address,
-    TestUser user)
+    TestUser user,
+    GError **error)
 {
   /* For now we only do tests like this on Linux, because I don't know how
    * safe this use of setresuid() is on other platforms */
@@ -352,7 +378,7 @@ test_connect_to_bus_as_user (TestMainContext *ctx,
   switch (user)
     {
       case TEST_USER_ME:
-        return test_connect_to_bus (ctx, address);
+        return test_try_connect_to_bus (ctx, address, error);
 
       case TEST_USER_ROOT:
         username = "root";
@@ -375,9 +401,9 @@ test_connect_to_bus_as_user (TestMainContext *ctx,
 
   if (ruid != 0 || euid != 0 || suid != 0)
     {
-      g_test_message ("not uid 0 (ruid=%ld euid=%ld suid=%ld)",
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+          "not uid 0 (ruid=%ld euid=%ld suid=%ld)",
           (unsigned long) ruid, (unsigned long) euid, (unsigned long) suid);
-      g_test_skip ("not uid 0");
       return NULL;
     }
 
@@ -385,13 +411,13 @@ test_connect_to_bus_as_user (TestMainContext *ctx,
 
   if (pwd == NULL)
     {
-      g_test_message ("getpwnam(\"%s\"): %s", username, g_strerror (errno));
-      g_test_skip ("not uid 0");
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+          "getpwnam(\"%s\"): %s", username, g_strerror (errno));
       return NULL;
     }
 
   /* Impersonate the desired user while we connect to the bus.
-   * This should work, because we're root. */
+   * This should work, because we're root; so if it fails, we just crash. */
   if (setresuid (pwd->pw_uid, pwd->pw_uid, 0) != 0)
     g_error ("setresuid(%ld, (same), 0): %s",
         (unsigned long) pwd->pw_uid, g_strerror (errno));
@@ -409,12 +435,13 @@ test_connect_to_bus_as_user (TestMainContext *ctx,
   switch (user)
     {
       case TEST_USER_ME:
-        return test_connect_to_bus (ctx, address);
+        return test_try_connect_to_bus (ctx, address, error);
 
       case TEST_USER_ROOT:
       case TEST_USER_MESSAGEBUS:
       case TEST_USER_OTHER:
-        g_test_skip ("setresuid() not available, or unsure about "
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+            "setresuid() not available, or unsure about "
             "credentials-passing semantics on this platform");
         return NULL;
 
