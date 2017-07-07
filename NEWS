@@ -38,6 +38,9 @@ Fixes:
   will no longer report that their arguments were invalid if they run out
   of memory at exactly the wrong time. (fd.o #101568, Simon McVittie)
 
+• Ensure that tests fail if they would otherwise have tried to connect to
+  the real session bus (fd.o #101698, Simon McVittie)
+
 Internal changes relevant to dbus developers:
 
 • DBusVariant is a new mechanism to copy single values from a message into

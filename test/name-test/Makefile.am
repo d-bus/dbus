@@ -32,6 +32,7 @@ TESTS =
 if DBUS_ENABLE_EMBEDDED_TESTS
 if DBUS_UNIX
 AM_TESTS_ENVIRONMENT = \
+        export DBUS_SESSION_BUS_ADDRESS=do-not-use-real-session:; \
         export DBUS_TOP_BUILDDIR=@abs_top_builddir@; \
         export DBUS_TOP_SRCDIR=@abs_top_srcdir@; \
         export PATH="@abs_top_builddir@/bus:$$PATH"; \
