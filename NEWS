@@ -22,6 +22,9 @@ Fixes:
 • Ensure that tests fail if they would otherwise have tried to connect to
   the real session bus (fd.o #101698, Simon McVittie)
 
+• Make build-time tests cope with finding Python 3, but not Python 2
+  (fd.o #101716, Simon McVittie)
+
 D-Bus 1.10.20 (2017-06-29)
 ==
 
