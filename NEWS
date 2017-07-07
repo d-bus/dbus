@@ -19,6 +19,9 @@ Fixes:
   fixing a build-time test regression in 1.10.20
   (fd.o #101698, Simon McVittie)
 
+• Ensure that tests fail if they would otherwise have tried to connect to
+  the real session bus (fd.o #101698, Simon McVittie)
+
 D-Bus 1.10.20 (2017-06-29)
 ==
 
