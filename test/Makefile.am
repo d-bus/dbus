@@ -481,6 +481,7 @@ static_data = \
 	data/invalid-config-files/circular-3.conf \
 	data/invalid-config-files/not-well-formed.conf \
 	data/invalid-config-files/truncated-file.conf \
+	data/invalid-config-files/send-and-receive.conf \
 	data/invalid-messages/array-of-nil.message \
 	data/invalid-messages/array-with-mixed-types.message \
 	data/invalid-messages/bad-boolean-array.message \
