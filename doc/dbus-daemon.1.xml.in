@@ -929,14 +929,18 @@ requested. [send|receive]_requested_reply="true" indicates that the rule applies
 always, regardless of pending reply state.</para>
 
 
-<para>user and group denials mean that the given user or group may
-not connect to the message bus.</para>
-
-
-<para>For "name", "username", "groupname", etc.
-the character "*" can be substituted, meaning "any." Complex globs
-like "foo.bar.*" aren't allowed for now because they'd be work to
-implement and maybe encourage sloppy security anyway.</para>
+<para>
+  Rules with the <literal>user</literal> or <literal>group</literal>
+  attribute are checked when a new connection to the message bus is
+  established, and control whether the connection can continue.
+  Each of these attributes cannot be combined with any other
+  attribute. As a special case, both <literal>user="*"</literal> and
+  <literal>group="*"</literal> match any connection. If there are
+  no rules of this form, the default is to allow connections from the same
+  user ID that owns the <command>dbus-daemon</command> process. The well-known
+  session bus normally uses that default behaviour, while the well-known
+  system bus normally allows any connection.
+</para>
 
 <para>
   Rules with the <literal>own</literal> or <literal>own_prefix</literal>
