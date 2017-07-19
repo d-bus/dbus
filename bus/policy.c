@@ -996,7 +996,27 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
               continue;
             }
         }
-      
+
+      if (rule->d.send.broadcast != BUS_POLICY_TRISTATE_ANY)
+        {
+          if (dbus_message_get_destination (message) == NULL &&
+              dbus_message_get_type (message) == DBUS_MESSAGE_TYPE_SIGNAL)
+            {
+              /* it's a broadcast */
+              if (rule->d.send.broadcast == BUS_POLICY_TRISTATE_FALSE)
+                {
+                  _dbus_verbose ("  (policy) skipping rule because message is a broadcast\n");
+                  continue;
+                }
+            }
+          /* else it isn't a broadcast: there is some destination */
+          else if (rule->d.send.broadcast == BUS_POLICY_TRISTATE_TRUE)
+            {
+              _dbus_verbose ("  (policy) skipping rule because message is not a broadcast\n");
+              continue;
+            }
+        }
+
       if (rule->d.send.destination != NULL)
         {
           /* receiver can be NULL for messages that are sent to the

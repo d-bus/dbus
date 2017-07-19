@@ -1294,6 +1294,7 @@ append_rule_from_element (BusConfigParser   *parser,
   const char *send_path;
   const char *send_type;
   const char *send_requested_reply;
+  const char *send_broadcast;
   /* TRUE if any send_ attribute is present */
   dbus_bool_t any_send_attribute;
 
@@ -1331,6 +1332,7 @@ append_rule_from_element (BusConfigParser   *parser,
                           "send_destination", &send_destination,
                           "send_path", &send_path,
                           "send_type", &send_type,
+                          "send_broadcast", &send_broadcast,
                           "receive_interface", &receive_interface,
                           "receive_member", &receive_member,
                           "receive_error", &receive_error,
@@ -1349,6 +1351,7 @@ append_rule_from_element (BusConfigParser   *parser,
     return FALSE;
 
   any_send_attribute = (send_destination != NULL ||
+                        send_broadcast != NULL ||
                         send_path != NULL ||
                         send_type != NULL ||
                         send_interface != NULL ||
@@ -1399,7 +1402,7 @@ append_rule_from_element (BusConfigParser   *parser,
    *     interface + member
    *     error
    * 
-   *   base send_ can combine with send_destination, send_path, send_type, send_requested_reply, eavesdrop
+   *   base send_ can combine with send_destination, send_path, send_type, send_requested_reply, send_broadcast, eavesdrop
    *   base receive_ with receive_sender, receive_path, receive_type, receive_requested_reply, eavesdrop
    *
    *   user, group, own, own_prefix must occur alone
@@ -1496,6 +1499,16 @@ append_rule_from_element (BusConfigParser   *parser,
           return FALSE;
         }
 
+      if (send_broadcast &&
+          !(strcmp (send_broadcast, "true") == 0 ||
+            strcmp (send_broadcast, "false") == 0))
+        {
+          dbus_set_error (error, DBUS_ERROR_FAILED,
+                          "Bad value \"%s\" for %s attribute, must be true or false",
+                          send_broadcast, "send_broadcast");
+          return FALSE;
+        }
+
       if (send_requested_reply &&
           !(strcmp (send_requested_reply, "true") == 0 ||
             strcmp (send_requested_reply, "false") == 0))
@@ -1518,6 +1531,18 @@ append_rule_from_element (BusConfigParser   *parser,
 
       if (send_requested_reply)
         rule->d.send.requested_reply = (strcmp (send_requested_reply, "true") == 0);
+
+      if (send_broadcast)
+        {
+          if (strcmp (send_broadcast, "true") == 0)
+            rule->d.send.broadcast = BUS_POLICY_TRISTATE_TRUE;
+          else
+            rule->d.send.broadcast = BUS_POLICY_TRISTATE_FALSE;
+        }
+      else
+        {
+          rule->d.send.broadcast = BUS_POLICY_TRISTATE_ANY;
+        }
 
       rule->d.send.message_type = message_type;
       rule->d.send.path = _dbus_strdup (send_path);

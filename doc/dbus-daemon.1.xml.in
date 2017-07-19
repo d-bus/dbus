@@ -842,6 +842,7 @@ statements, and works just like &lt;deny&gt; but with the inverse meaning.</para
    send_interface="interface_name" | "*"
    send_member="method_or_signal_name" | "*"
    send_error="error_name" | "*"
+   send_broadcast="true" | "false"
    send_destination="name" | "*"
    send_type="method_call" | "method_return" | "signal" | "error" | "*"
    send_path="/path/name" | "*"
@@ -913,6 +914,16 @@ will not work either. As a special case,
 <literal>send_destination="*"</literal> matches any message
 (whether it has a destination specified or not), and
 <literal>receive_sender="*"</literal> similarly matches any message.</para>
+
+<para>
+  Rules with <literal>send_broadcast="true"</literal> match signal messages
+  with no destination (broadcasts). Rules with
+  <literal>send_broadcast="false"</literal> are the inverse: they match any
+  unicast destination (unicast signals, together with all method calls, replies
+  and errors) but do not match messages with no destination (broadcasts). This
+  is not the same as <literal>send_destination="*"</literal>, which matches any
+  sent message, regardless of whether it has a destination or not.
+</para>
 
 <para>
   The other <literal>send_</literal>* and <literal>receive_</literal>*
