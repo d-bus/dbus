@@ -879,6 +879,32 @@ statements, and works just like &lt;deny&gt; but with the inverse meaning.</para
 particular action. If it matches, the action is denied (unless later
 rules in the config file allow it).</para>
 
+<para>
+  Rules with one or more of the <literal>send_</literal>* family of attributes
+  are checked in order when a connection attempts to send a message. The last
+  rule that matches the message determines whether it may be sent.
+  The well-known session bus normally allows sending any message.
+  The well-known system bus normally allows sending any signal, selected
+  method calls to the <command>dbus-daemon</command>, and exactly one
+  reply to each previously-sent method call (either success or an error).
+  Either of these can be overridden by configuration; on the system bus,
+  services that will receive method calls must install configuration that
+  allows them to do so, usually via rules of the form
+  <literal>&lt;policy context="default"&gt;&lt;allow send_destination="&hellip;"/&gt;&lt;policy&gt;</literal>.
+</para>
+
+<para>
+  Rules with one or more of the <literal>receive_</literal>* family of
+  attributes, or with the <literal>eavesdrop</literal> attribute and no others,
+  are checked for each recipient of a message (there might be more than one
+  recipient if the message is a broadcast or a connection is eavesdropping).
+  The last rule that matches the message determines whether it may be received.
+  The well-known session bus normally allows receiving any message, including
+  eavesdropping. The well-known system bus normally allows receiving any
+  message that was not eavesdropped (any unicast message addressed to the
+  recipient, and any broadcast message).
+</para>
+
 <para>send_destination and receive_sender rules mean that messages may not be
 sent to or received from the *owner* of the given name, not that
 they may not be sent *to that name*. That is, if a connection
