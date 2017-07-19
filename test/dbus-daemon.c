@@ -1048,6 +1048,147 @@ test_pending_fd_timeout (Fixture *f,
   g_object_unref (socket);
 }
 
+typedef struct
+{
+  const gchar *path;
+  guint n_fds;
+  gboolean should_work;
+} CountFdsVector;
+
+static const CountFdsVector count_fds_vectors[] =
+{
+  /* Deny sending if number of fds <= 2 */
+  { "/test/DenySendMax2", 1, FALSE },
+  { "/test/DenySendMax2", 2, FALSE },
+  { "/test/DenySendMax2", 3, TRUE },
+  { "/test/DenySendMax2", 4, TRUE },
+
+  /* Deny receiving if number of fds <= 3 */
+  { "/test/DenyReceiveMax3", 2, FALSE },
+  { "/test/DenyReceiveMax3", 3, FALSE },
+  { "/test/DenyReceiveMax3", 4, TRUE },
+  { "/test/DenyReceiveMax3", 5, TRUE },
+
+  /* Deny sending if number of fds >= 4 */
+  { "/test/DenySendMin4", 2, TRUE },
+  { "/test/DenySendMin4", 3, TRUE },
+  { "/test/DenySendMin4", 4, FALSE },
+  { "/test/DenySendMin4", 5, FALSE },
+
+  /* Deny receiving if number of fds >= 5 */
+  { "/test/DenyReceiveMin5", 3, TRUE },
+  { "/test/DenyReceiveMin5", 4, TRUE },
+  { "/test/DenyReceiveMin5", 5, FALSE },
+  { "/test/DenyReceiveMin5", 6, FALSE },
+};
+
+static void
+test_count_fds (Fixture *f,
+    gconstpointer context)
+{
+  GQueue received = G_QUEUE_INIT;
+  DBusMessage *m;
+  DBusPendingCall *pc;
+  guint i;
+  DBusError error = DBUS_ERROR_INIT;
+  const int stdin_fd = 0;
+
+  if (f->skip)
+    return;
+
+  add_hold_filter (f);
+
+  for (i = 0; i < G_N_ELEMENTS (count_fds_vectors); i++)
+    {
+      const CountFdsVector *vector = &count_fds_vectors[i];
+      guint j;
+
+      m = dbus_message_new_method_call (
+          dbus_bus_get_unique_name (f->right_conn), vector->path,
+          "com.example", "Spam");
+
+      if (m == NULL)
+        g_error ("OOM");
+
+      for (j = 0; j < vector->n_fds; j++)
+        {
+          if (!dbus_message_append_args (m,
+                                         DBUS_TYPE_UNIX_FD, &stdin_fd,
+                                         DBUS_TYPE_INVALID))
+            g_error ("OOM");
+        }
+
+      if (!dbus_connection_send_with_reply (f->left_conn, m, &pc,
+                                            DBUS_TIMEOUT_INFINITE) ||
+          pc == NULL)
+        g_error ("OOM");
+
+      if (dbus_pending_call_get_completed (pc))
+        pc_enqueue (pc, &received);
+      else if (!dbus_pending_call_set_notify (pc, pc_enqueue, &received,
+            NULL))
+        g_error ("OOM");
+
+      dbus_pending_call_unref (pc);
+      dbus_message_unref (m);
+
+      if (vector->should_work)
+        {
+          DBusMessage *reply;
+
+          while (g_queue_get_length (&f->held_messages) < 1)
+            test_main_context_iterate (f->ctx, TRUE);
+
+          g_assert_cmpint (g_queue_get_length (&f->held_messages), ==, 1);
+
+          m = g_queue_pop_head (&f->held_messages);
+
+          g_assert_cmpint (g_queue_get_length (&f->held_messages), ==, 0);
+
+          reply = dbus_message_new_method_return (m);
+
+          if (reply == NULL)
+            g_error ("OOM");
+
+          if (!dbus_connection_send (f->right_conn, reply, NULL))
+            g_error ("OOM");
+
+          dbus_message_unref (reply);
+          dbus_message_unref (m);
+        }
+
+      while (g_queue_get_length (&received) < 1)
+        test_main_context_iterate (f->ctx, TRUE);
+
+      g_assert_cmpint (g_queue_get_length (&received), ==, 1);
+      m = g_queue_pop_head (&received);
+      g_assert (m != NULL);
+      g_assert_cmpint (g_queue_get_length (&received), ==, 0);
+
+      if (vector->should_work)
+        {
+          if (dbus_set_error_from_message (&error, m))
+            g_error ("Unexpected error: %s: %s", error.name, error.message);
+
+          g_test_message ("Sending %u fds to %s was not denied, as expected",
+                          vector->n_fds, vector->path);
+        }
+      else if (!dbus_set_error_from_message (&error, m))
+        {
+          g_error ("Unexpected success");
+        }
+      else
+        {
+          g_assert_cmpstr (error.name, ==, DBUS_ERROR_ACCESS_DENIED);
+          dbus_error_free (&error);
+          g_test_message ("Sending %u fds to %s was denied, as expected",
+                          vector->n_fds, vector->path);
+        }
+
+      dbus_message_unref (m);
+    }
+}
+
 #endif
 
 static void
@@ -2010,6 +2151,11 @@ static Config pending_fd_timeout_config = {
     NULL, 1, "valid-config-files/pending-fd-timeout.conf",
     SPECIFY_ADDRESS
 };
+
+static Config count_fds_config = {
+    NULL, 1, "valid-config-files/count-fds.conf",
+    SPECIFY_ADDRESS
+};
 #endif
 
 int
@@ -2076,6 +2222,8 @@ main (int argc,
   g_test_add ("/limits/pending-fd-timeout", Fixture,
       &pending_fd_timeout_config,
       setup, test_pending_fd_timeout, teardown);
+  g_test_add ("/policy/count-fds", Fixture, &count_fds_config,
+      setup, test_count_fds, teardown);
 #endif
 
 #ifdef DBUS_UNIX

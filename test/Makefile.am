@@ -420,6 +420,7 @@ in_data = \
 	data/systemd-activation/com.example.SystemdActivatable3.service.in \
 	data/valid-config-files-system/debug-allow-all-fail.conf.in \
 	data/valid-config-files-system/debug-allow-all-pass.conf.in \
+	data/valid-config-files/count-fds.conf.in \
 	data/valid-config-files/debug-allow-all-sha1.conf.in \
 	data/valid-config-files/debug-allow-all.conf.in \
 	data/valid-config-files/finite-timeout.conf.in \
