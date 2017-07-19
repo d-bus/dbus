@@ -938,6 +938,17 @@ the character "*" can be substituted, meaning "any." Complex globs
 like "foo.bar.*" aren't allowed for now because they'd be work to
 implement and maybe encourage sloppy security anyway.</para>
 
+<para>
+  Rules with the <literal>own</literal> or <literal>own_prefix</literal>
+  attribute are checked when a connection attempts to own a well-known bus
+  names. As a special case, <literal>own="*"</literal> matches any well-known
+  bus name. The well-known session bus normally allows any connection to
+  own any name, while the well-known system bus normally does not allow any
+  connection to own any name, except where allowed by further configuration.
+  System services that will own a name must install configuration that allows
+  them to do so, usually via rules of the form
+  <literal>&lt;policy user="some-system-user"&gt;&lt;allow own="&hellip;"/&gt;&lt;/policy&gt;</literal>.
+</para>
 
 <para>&lt;allow own_prefix="a.b"/&gt; allows you to own the name "a.b" or any
 name whose first dot-separated elements are "a.b": in particular,
