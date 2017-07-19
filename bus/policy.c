@@ -29,6 +29,7 @@
 #include <dbus/dbus-list.h>
 #include <dbus/dbus-hash.h>
 #include <dbus/dbus-internals.h>
+#include <dbus/dbus-message-internal.h>
 
 BusPolicyRule*
 bus_policy_rule_new (BusPolicyRuleType type,
@@ -1063,6 +1064,20 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
             }
         }
 
+      if (rule->d.send.min_fds > 0 ||
+          rule->d.send.max_fds < DBUS_MAXIMUM_MESSAGE_UNIX_FDS)
+        {
+          unsigned int n_fds = _dbus_message_get_n_unix_fds (message);
+
+          if (n_fds < rule->d.send.min_fds || n_fds > rule->d.send.max_fds)
+            {
+              _dbus_verbose ("  (policy) skipping rule because message has %u fds "
+                             "and that is outside range [%u,%u]",
+                             n_fds, rule->d.send.min_fds, rule->d.send.max_fds);
+              continue;
+            }
+        }
+
       /* Use this rule */
       allowed = rule->allow;
       *log = rule->d.send.log;
@@ -1263,7 +1278,22 @@ bus_client_policy_check_can_receive (BusClientPolicy *policy,
                 }
             }
         }
-      
+
+      if (rule->d.receive.min_fds > 0 ||
+          rule->d.receive.max_fds < DBUS_MAXIMUM_MESSAGE_UNIX_FDS)
+        {
+          unsigned int n_fds = _dbus_message_get_n_unix_fds (message);
+
+          if (n_fds < rule->d.receive.min_fds || n_fds > rule->d.receive.max_fds)
+            {
+              _dbus_verbose ("  (policy) skipping rule because message has %u fds "
+                             "and that is outside range [%u,%u]",
+                             n_fds, rule->d.receive.min_fds,
+                             rule->d.receive.max_fds);
+              continue;
+            }
+        }
+
       /* Use this rule */
       allowed = rule->allow;
       (*toggles)++;

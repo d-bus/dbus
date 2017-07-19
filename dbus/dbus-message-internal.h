@@ -55,6 +55,7 @@ void _dbus_message_get_unix_fds      (DBusMessage *message,
                                       const int **fds,
                                       unsigned *n_fds);
 
+unsigned int _dbus_message_get_n_unix_fds       (DBusMessage  *message);
 void        _dbus_message_lock                  (DBusMessage  *message);
 void        _dbus_message_unlock                (DBusMessage  *message);
 dbus_bool_t _dbus_message_add_counter           (DBusMessage  *message,

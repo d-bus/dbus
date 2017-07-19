@@ -906,6 +906,13 @@ rules in the config file allow it).</para>
   recipient, and any broadcast message).
 </para>
 
+<para>
+  The <literal>eavesdrop</literal>, <literal>min_fds</literal> and
+  <literal>max_fds</literal> attributes are modifiers that can be applied
+  to either <literal>send_</literal>* or <literal>receive_</literal>*
+  rules, and are documented below.
+</para>
+
 <para>send_destination and receive_sender rules mean that messages may not be
 sent to or received from the *owner* of the given name, not that
 they may not be sent *to that name*. That is, if a connection
@@ -969,6 +976,19 @@ the rule matches only when the reply was not
 requested. [send|receive]_requested_reply="true" indicates that the rule applies
 always, regardless of pending reply state.</para>
 
+<para>
+  The <literal>min_fds</literal> and <literal>max_fds</literal> attributes
+  modify either <literal>send_</literal>* or <literal>receive_</literal>*
+  rules. A rule with the <literal>min_fds</literal> attribute only matches
+  messages if they have at least that many Unix file descriptors attached.
+  Conversely, a rule with the <literal>max_fds</literal> attribute only
+  matches messages if they have no more than that many file descriptors
+  attached. In practice, rules with these attributes will most commonly
+  take the form
+  <literal>&lt;allow send_destination="&hellip;" max_fds="0"/&gt;</literal>,
+  <literal>&lt;deny send_destination="&hellip;" min_fds="1"/&gt;</literal> or
+  <literal>&lt;deny receive_sender="*" min_fds="1"/&gt;</literal>.
+</para>
 
 <para>
   Rules with the <literal>user</literal> or <literal>group</literal>

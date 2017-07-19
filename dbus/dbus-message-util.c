@@ -45,6 +45,22 @@
  * @{
  */
 
+/**
+ * Gets the number of unix fds attached to this message.
+ *
+ * @param message the message
+ * @returns the number of file descriptors
+ */
+unsigned int
+_dbus_message_get_n_unix_fds (DBusMessage *message)
+{
+#ifdef HAVE_UNIX_FD_PASSING
+  return message->n_unix_fds;
+#else
+  return 0;
+#endif
+}
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 /**
  * Reads arguments from a message iterator given a variable argument

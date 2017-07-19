@@ -70,6 +70,8 @@ struct BusPolicyRule
       char *member;
       char *error;
       char *destination;
+      unsigned int max_fds;
+      unsigned int min_fds;
       unsigned int eavesdrop : 1;
       unsigned int requested_reply : 1;
       unsigned int log : 1;
@@ -86,6 +88,8 @@ struct BusPolicyRule
       char *member;
       char *error;
       char *origin;
+      unsigned int max_fds;
+      unsigned int min_fds;
       unsigned int eavesdrop : 1;
       unsigned int requested_reply : 1;
     } receive;

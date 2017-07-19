@@ -1276,6 +1276,43 @@ start_busconfig_child (BusConfigParser   *parser,
     }
 }
 
+/*
+ * Parse an attribute named name, whose content is content, or NULL if
+ * missing. It is meant to be a (long) integer between min and max inclusive.
+ * If it is missing, use def as the default value (which does not
+ * necessarily need to be between min and max).
+ */
+static dbus_bool_t
+parse_int_attribute (const char *name,
+                     const char *content,
+                     long        min,
+                     long        max,
+                     long        def,
+                     long       *value,
+                     DBusError  *error)
+{
+  DBusString parse_string;
+
+  *value = def;
+
+  if (content == NULL)
+    return TRUE;
+
+  _dbus_string_init_const (&parse_string, content);
+
+  if (!_dbus_string_parse_int (&parse_string, 0, value, NULL) ||
+      *value < min || *value > max)
+    {
+      dbus_set_error (error, DBUS_ERROR_FAILED,
+                      "Bad value \"%s\" for %s attribute, must be an "
+                      "integer in range %ld to %ld inclusive",
+                      content, name, min, max);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 static dbus_bool_t
 append_rule_from_element (BusConfigParser   *parser,
                           const char        *element_name,
@@ -1311,6 +1348,10 @@ append_rule_from_element (BusConfigParser   *parser,
 
   /* Group: message-matching modifiers that can go on send_ or receive_ */
   const char *eavesdrop;
+  const char *max_fds_attr;
+  long max_fds = DBUS_MAXIMUM_MESSAGE_UNIX_FDS;
+  const char *min_fds_attr;
+  long min_fds = 0;
   /* TRUE if any message-matching modifier is present */
   dbus_bool_t any_message_attribute;
 
@@ -1340,6 +1381,8 @@ append_rule_from_element (BusConfigParser   *parser,
                           "receive_path", &receive_path,
                           "receive_type", &receive_type,
                           "eavesdrop", &eavesdrop,
+                          "max_fds", &max_fds_attr,
+                          "min_fds", &min_fds_attr,
                           "send_requested_reply", &send_requested_reply,
                           "receive_requested_reply", &receive_requested_reply,
                           "own", &own,
@@ -1373,7 +1416,9 @@ append_rule_from_element (BusConfigParser   *parser,
                            (!any_send_attribute && eavesdrop != NULL));
   any_message_attribute = (any_send_attribute ||
                            any_receive_attribute ||
-                           eavesdrop != NULL);
+                           eavesdrop != NULL ||
+                           max_fds_attr != NULL ||
+                           min_fds_attr != NULL);
 
   if (!(any_send_attribute ||
         any_receive_attribute ||
@@ -1518,7 +1563,19 @@ append_rule_from_element (BusConfigParser   *parser,
                           "send_requested_reply", send_requested_reply);
           return FALSE;
         }
-      
+
+      /* Matching only messages with DBUS_MAXIMUM_MESSAGE_UNIX_FDS or fewer
+       * fds is the same as matching all messages, so we always set a maximum,
+       * but perhaps an unrealistically high one. */
+      if (!parse_int_attribute ("max_fds", max_fds_attr,
+                                0, DBUS_MAXIMUM_MESSAGE_UNIX_FDS,
+                                DBUS_MAXIMUM_MESSAGE_UNIX_FDS, &max_fds,
+                                error) ||
+          !parse_int_attribute ("min_fds", min_fds_attr,
+                                0, DBUS_MAXIMUM_MESSAGE_UNIX_FDS, 0, &min_fds,
+                                error))
+        return FALSE;
+
       rule = bus_policy_rule_new (BUS_POLICY_RULE_SEND, allow); 
       if (rule == NULL)
         goto nomem;
@@ -1550,6 +1607,9 @@ append_rule_from_element (BusConfigParser   *parser,
       rule->d.send.member = _dbus_strdup (send_member);
       rule->d.send.error = _dbus_strdup (send_error);
       rule->d.send.destination = _dbus_strdup (send_destination);
+      rule->d.send.max_fds = max_fds;
+      rule->d.send.min_fds = min_fds;
+
       if (send_path && rule->d.send.path == NULL)
         goto nomem;
       if (send_interface && rule->d.send.interface == NULL)
@@ -1611,7 +1671,16 @@ append_rule_from_element (BusConfigParser   *parser,
                           "receive_requested_reply", receive_requested_reply);
           return FALSE;
         }
-      
+
+      if (!parse_int_attribute ("max_fds", max_fds_attr,
+                                0, DBUS_MAXIMUM_MESSAGE_UNIX_FDS,
+                                DBUS_MAXIMUM_MESSAGE_UNIX_FDS, &max_fds,
+                                error) ||
+          !parse_int_attribute ("min_fds", min_fds_attr,
+                                0, DBUS_MAXIMUM_MESSAGE_UNIX_FDS, 0, &min_fds,
+                                error))
+        return FALSE;
+
       rule = bus_policy_rule_new (BUS_POLICY_RULE_RECEIVE, allow); 
       if (rule == NULL)
         goto nomem;
@@ -1628,6 +1697,8 @@ append_rule_from_element (BusConfigParser   *parser,
       rule->d.receive.member = _dbus_strdup (receive_member);
       rule->d.receive.error = _dbus_strdup (receive_error);
       rule->d.receive.origin = _dbus_strdup (receive_sender);
+      rule->d.receive.max_fds = max_fds;
+      rule->d.receive.min_fds = min_fds;
 
       if (receive_path && rule->d.receive.path == NULL)
         goto nomem;
