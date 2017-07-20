@@ -20,6 +20,10 @@ Enhancements:
 
 Fixes:
 
+• Fix the implementation of re-enabling a timeout (again) so that its
+  countdown is always restarted as intended. (fd.o #95619,
+  Michal Koutný)
+
 • Make the dbus-daemon's Properties interface, as introduced in 1.11.14,
   available to all users on the system bus (fd.o #101700, Simon McVittie)
 
