@@ -935,6 +935,14 @@ AC_SUBST(DBUS_PATH_OR_ABSTRACT)
 
 PKG_CHECK_MODULES([EXPAT], [expat])
 
+save_cflags="$CFLAGS"
+save_libs="$LIBS"
+CFLAGS="$CFLAGS $EXPAT_CFLAGS"
+LIBS="$LIBS $EXPAT_LIBS"
+AC_CHECK_FUNCS([XML_SetHashSalt])
+CFLAGS="$save_cflags"
+LIBS="$save_libs"
+
 # Thread lib detection
 AC_ARG_VAR([THREAD_LIBS])
 save_libs="$LIBS"
