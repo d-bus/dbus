@@ -28,6 +28,7 @@
 #define DBUS_CONNECTION_H
 
 #include <dbus/dbus-errors.h>
+#include <dbus/dbus-macros.h>
 #include <dbus/dbus-memory.h>
 #include <dbus/dbus-message.h>
 #include <dbus/dbus-shared.h>
@@ -437,6 +438,35 @@ dbus_bool_t dbus_connection_get_unix_fd            (DBusConnection              
 DBUS_EXPORT
 dbus_bool_t dbus_connection_get_socket             (DBusConnection              *connection,
                                                     int                         *fd);
+
+/**
+ * Clear a variable or struct member that contains a #DBusConnection.
+ * If it does not contain #NULL, the connection that was previously
+ * there is unreferenced with dbus_connection_unref().
+ *
+ * For example, this function and the similar functions for
+ * other reference-counted types can be used in code like this:
+ *
+ * @code
+ * DBusConnection *conn = NULL;
+ * struct { ...; DBusMessage *m; ... } *larger_structure = ...;
+ *
+ * ... code that might set conn or m to be non-NULL ...
+ *
+ * dbus_clear_connection (&conn);
+ * dbus_clear_message (&larger_structure->m);
+ * @endcode
+ *
+ * @param pointer_to_connection A pointer to a variable or struct member.
+ * pointer_to_connection must not be #NULL, but *pointer_to_connection
+ * may be #NULL.
+ */
+static inline void
+dbus_clear_connection (DBusConnection **pointer_to_connection)
+{
+  _dbus_clear_pointer_impl (DBusConnection, pointer_to_connection,
+                            dbus_connection_unref);
+}
 
 /** @} */
 

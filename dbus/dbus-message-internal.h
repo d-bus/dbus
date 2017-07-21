@@ -135,6 +135,12 @@ const DBusString  *_dbus_variant_peek                            (DBusVariant *s
 DBUS_PRIVATE_EXPORT
 const char        *_dbus_variant_get_signature                   (DBusVariant *self);
 
+static inline void
+_dbus_clear_variant (DBusVariant **variant_p)
+{
+  _dbus_clear_pointer_impl (DBusVariant, variant_p, _dbus_variant_free);
+}
+
 typedef struct DBusInitialFDs DBusInitialFDs;
 DBusInitialFDs *_dbus_check_fdleaks_enter (void);
 void            _dbus_check_fdleaks_leave (DBusInitialFDs *fds);

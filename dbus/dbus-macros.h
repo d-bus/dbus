@@ -215,6 +215,26 @@
 #  define DBUS_PRIVATE_EXPORT /* no decoration */
 #endif
 
+/* Implementation for dbus_clear_message() etc. This is not API,
+ * do not use it directly.
+ *
+ * We're using a specific type (T ** and T *) instead of void ** and
+ * void * partly for type-safety, partly to be strict-aliasing-compliant,
+ * and partly to keep C++ compilers happy. This code is inlined into
+ * users of libdbus, so we can't rely on it having dbus' own compiler
+ * settings. */
+#define _dbus_clear_pointer_impl(T, pointer_to_pointer, destroy) \
+  do { \
+    T **_pp = (pointer_to_pointer); \
+    T *_value = *_pp; \
+    \
+    *_pp = NULL; \
+    \
+    if (_value != NULL) \
+      destroy (_value); \
+  } while (0)
+/* Not (destroy) (_value) in case destroy() is a function-like macro */
+
 /** @} */
 
 #endif /* DBUS_MACROS_H */

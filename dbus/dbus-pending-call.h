@@ -72,6 +72,25 @@ DBUS_EXPORT
 void*       dbus_pending_call_get_data           (DBusPendingCall  *pending,
                                                   dbus_int32_t      slot);
 
+/**
+ * Clear a variable or struct member that contains a #DBusPendingCall.
+ * If it does not contain #NULL, the pending call that was previously
+ * there is unreferenced with dbus_pending_call_unref().
+ *
+ * This is very similar to dbus_clear_connection(): see that function
+ * for more details.
+ *
+ * @param pointer_to_pending_call A pointer to a variable or struct member.
+ * pointer_to_pending_call must not be #NULL, but *pointer_to_pending_call
+ * may be #NULL.
+ */
+static inline void
+dbus_clear_pending_call (DBusPendingCall **pointer_to_pending_call)
+{
+  _dbus_clear_pointer_impl (DBusPendingCall, pointer_to_pending_call,
+                            dbus_pending_call_unref);
+}
+
 /** @} */
 
 DBUS_END_DECLS

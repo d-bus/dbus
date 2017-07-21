@@ -28,6 +28,7 @@
 #define DBUS_SERVER_H
 
 #include <dbus/dbus-errors.h>
+#include <dbus/dbus-macros.h>
 #include <dbus/dbus-message.h>
 #include <dbus/dbus-connection.h>
 #include <dbus/dbus-protocol.h>
@@ -98,6 +99,24 @@ dbus_bool_t dbus_server_set_data           (DBusServer       *server,
 DBUS_EXPORT
 void*       dbus_server_get_data           (DBusServer       *server,
                                             int               slot);
+
+/**
+ * Clear a variable or struct member that contains a #DBusServer.
+ * If it does not contain #NULL, the server that was previously
+ * there is unreferenced with dbus_server_unref().
+ *
+ * This is very similar to dbus_clear_connection(): see that function
+ * for more details.
+ *
+ * @param pointer_to_server A pointer to a variable or struct member.
+ * pointer_to_server must not be #NULL, but *pointer_to_server
+ * may be #NULL.
+ */
+static inline void
+dbus_clear_server (DBusServer **pointer_to_server)
+{
+  _dbus_clear_pointer_impl (DBusServer, pointer_to_server, dbus_server_unref);
+}
 
 /** @} */
 

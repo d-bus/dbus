@@ -210,6 +210,12 @@ _dbus_hash_table_insert_pollable (DBusHashTable *table,
 #endif
 }
 
+static inline void
+_dbus_clear_hash_table (DBusHashTable **table_p)
+{
+  _dbus_clear_pointer_impl (DBusHashTable, table_p, _dbus_hash_table_unref);
+}
+
 /** @} */
 
 DBUS_END_DECLS

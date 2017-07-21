@@ -351,6 +351,25 @@ DBUS_EXPORT
 dbus_bool_t dbus_message_get_allow_interactive_authorization (
     DBusMessage *message);
 
+/**
+ * Clear a variable or struct member that contains a #DBusMessage.
+ * If it does not contain #NULL, the message that was previously
+ * there is unreferenced with dbus_message_unref().
+ *
+ * This is very similar to dbus_clear_connection(): see that function
+ * for more details.
+ *
+ * @param pointer_to_message A pointer to a variable or struct member.
+ * pointer_to_message must not be #NULL, but *pointer_to_message
+ * may be #NULL.
+ */
+static inline void
+dbus_clear_message (DBusMessage **pointer_to_message)
+{
+  _dbus_clear_pointer_impl (DBusMessage, pointer_to_message,
+                            dbus_message_unref);
+}
+
 /** @} */
 
 DBUS_END_DECLS
