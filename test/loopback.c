@@ -316,8 +316,7 @@ test_bad_guid (Fixture *f,
   g_assert_cmpstr (dbus_message_get_signature (incoming), ==, "");
   g_assert_cmpstr (dbus_message_get_path (incoming), ==, DBUS_PATH_LOCAL);
 
-  dbus_message_unref (incoming);
-
+  dbus_clear_message (&incoming);
   dbus_free (address);
 }
 
@@ -360,9 +359,8 @@ test_message (Fixture *f,
   g_assert_cmpstr (dbus_message_get_path (incoming), ==, "/com/example/Hello");
   g_assert_cmpuint (dbus_message_get_serial (incoming), ==, serial);
 
-  dbus_message_unref (incoming);
-
-  dbus_message_unref (outgoing);
+  dbus_clear_message (&incoming);
+  dbus_clear_message (&outgoing);
 }
 
 static void
@@ -370,26 +368,18 @@ teardown (Fixture *f,
     gconstpointer addr G_GNUC_UNUSED)
 {
   if (f->client_conn != NULL)
-    {
-      dbus_connection_close (f->client_conn);
-      dbus_connection_unref (f->client_conn);
-      f->client_conn = NULL;
-    }
+    dbus_connection_close (f->client_conn);
 
   if (f->server_conn != NULL)
-    {
-      dbus_connection_close (f->server_conn);
-      dbus_connection_unref (f->server_conn);
-      f->server_conn = NULL;
-    }
+    dbus_connection_close (f->server_conn);
+
+  dbus_clear_connection (&f->client_conn);
+  dbus_clear_connection (&f->server_conn);
 
   if (f->server != NULL)
-    {
-      dbus_server_disconnect (f->server);
-      dbus_server_unref (f->server);
-      f->server = NULL;
-    }
+    dbus_server_disconnect (f->server);
 
+  dbus_clear_server (&f->server);
   test_main_context_unref (f->ctx);
 }
 

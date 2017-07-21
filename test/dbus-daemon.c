@@ -125,7 +125,7 @@ echo_filter (DBusConnection *connection,
   if (!dbus_connection_send (connection, reply, NULL))
     g_error ("OOM");
 
-  dbus_message_unref (reply);
+  dbus_clear_message (&reply);
 
   return DBUS_HANDLER_RESULT_HANDLED;
 }
@@ -287,8 +287,8 @@ test_echo (Fixture *f,
             NULL))
         g_error ("OOM");
 
-      dbus_pending_call_unref (pc);
-      dbus_message_unref (m);
+      dbus_clear_pending_call (&pc);
+      dbus_clear_message (&m);
     }
 
   while (received < count)
@@ -341,8 +341,8 @@ test_no_reply (Fixture *f,
         &reply, NULL))
     g_error ("OOM");
 
-  dbus_pending_call_unref (pc);
-  dbus_message_unref (m);
+  dbus_clear_pending_call (&pc);
+  dbus_clear_message (&m);
 
   if (mode == DISCONNECT)
     {
@@ -351,8 +351,7 @@ test_no_reply (Fixture *f,
 
       dbus_connection_remove_filter (f->right_conn, echo_filter, f);
       dbus_connection_close (f->right_conn);
-      dbus_connection_unref (f->right_conn);
-      f->right_conn = NULL;
+      dbus_clear_connection (&f->right_conn);
     }
 
   while (reply == NULL)
@@ -373,7 +372,7 @@ test_no_reply (Fixture *f,
     g_assert_cmpstr (f->e.message, ==,
         "Message did not receive a reply (timeout by message bus)");
 
-  dbus_message_unref (reply);
+  dbus_clear_message (&reply);
 }
 
 static void
@@ -408,8 +407,7 @@ test_creds (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -534,8 +532,8 @@ test_creds (Fixture *f,
   g_assert (seen & SEEN_WINDOWS_SID);
 #endif
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -562,8 +560,7 @@ test_processid (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -607,8 +604,8 @@ test_processid (Fixture *f,
       g_error ("Unexpected error: %s: %s", error.name, error.message);
     }
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -637,8 +634,7 @@ test_canonical_path_uae (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -653,9 +649,8 @@ test_canonical_path_uae (Fixture *f,
   g_assert_cmpint (dbus_message_get_type (m), ==,
       DBUS_MESSAGE_TYPE_METHOD_RETURN);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
-  pc = NULL;
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 
   /* Now try with the wrong object path */
   m = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
@@ -677,8 +672,7 @@ test_canonical_path_uae (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -695,8 +689,8 @@ test_canonical_path_uae (Fixture *f,
       DBUS_ERROR_ACCESS_DENIED);
   g_assert_cmpstr (dbus_message_get_signature (m), ==, "s");
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -733,13 +727,11 @@ test_max_connections (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_LIMITS_EXCEEDED);
 
   if (failing_conn != NULL)
-    {
-      dbus_connection_close (failing_conn);
-      dbus_connection_unref (failing_conn);
-    }
+    dbus_connection_close (failing_conn);
 
+  dbus_clear_connection (&failing_conn);
   dbus_connection_close (third_conn);
-  dbus_connection_unref (third_conn);
+  dbus_clear_connection (&third_conn);
 }
 
 static void
@@ -827,8 +819,8 @@ test_max_replies_per_connection (Fixture *f,
       if (!dbus_connection_send (f->right_conn, reply, NULL))
         g_error ("OOM");
 
-      dbus_message_unref (reply);
-      dbus_message_unref (m);
+      dbus_clear_message (&m);
+      dbus_clear_message (&reply);
     }
 
   /* Wait for all 5 replies to come in. */
@@ -844,7 +836,7 @@ test_max_replies_per_connection (Fixture *f,
       if (dbus_set_error_from_message (&error, m))
         g_error ("Unexpected error: %s: %s", error.name, error.message);
 
-      dbus_message_unref (m);
+      dbus_clear_message (&m);
     }
 
   /* The last two failed. */
@@ -858,7 +850,7 @@ test_max_replies_per_connection (Fixture *f,
 
       g_assert_cmpstr (error.name, ==, DBUS_ERROR_LIMITS_EXCEEDED);
       dbus_error_free (&error);
-      dbus_message_unref (m);
+      dbus_clear_message (&m);
     }
 
   g_assert_cmpuint (g_queue_get_length (&received), ==, 0);
@@ -1234,8 +1226,7 @@ test_peer_get_machine_id (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1255,8 +1246,8 @@ test_peer_get_machine_id (Fixture *f,
   g_assert_nonnull (what_daemon_thinks);
   g_assert_cmpuint (strlen (what_daemon_thinks), ==, 32);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
   dbus_free (what_i_think);
 }
 
@@ -1281,8 +1272,7 @@ test_peer_ping (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1296,8 +1286,8 @@ test_peer_ping (Fixture *f,
   if (!dbus_message_get_args (m, &error, DBUS_TYPE_INVALID))
     g_error ("%s: %s", error.name, error.message);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1324,8 +1314,7 @@ test_get_invalid_path (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1343,8 +1332,8 @@ test_get_invalid_path (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1371,8 +1360,7 @@ test_get_invalid_iface (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1389,8 +1377,8 @@ test_get_invalid_iface (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1417,8 +1405,7 @@ test_get_invalid (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1435,8 +1422,8 @@ test_get_invalid (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_PROPERTY);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1461,8 +1448,7 @@ test_get_all_invalid_iface (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1479,8 +1465,8 @@ test_get_all_invalid_iface (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1505,8 +1491,7 @@ test_get_all_invalid_path (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1524,8 +1509,8 @@ test_get_all_invalid_path (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1563,8 +1548,7 @@ test_set_invalid_iface (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1581,8 +1565,8 @@ test_set_invalid_iface (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1620,8 +1604,7 @@ test_set_invalid_path (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1638,8 +1621,8 @@ test_set_invalid_path (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_INTERFACE);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1677,8 +1660,7 @@ test_set_invalid (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1695,8 +1677,8 @@ test_set_invalid (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_UNKNOWN_PROPERTY);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1734,8 +1716,7 @@ test_set (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1752,8 +1733,8 @@ test_set (Fixture *f,
   g_assert_cmpstr (error.name, ==, DBUS_ERROR_PROPERTY_READ_ONLY);
   dbus_error_free (&error);
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1819,8 +1800,7 @@ test_features (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1843,8 +1823,8 @@ test_features (Fixture *f,
   if (dbus_message_iter_next (&args_iter))
     g_error ("Reply has too many arguments");
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1925,8 +1905,7 @@ test_interfaces (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -1949,8 +1928,8 @@ test_interfaces (Fixture *f,
   if (dbus_message_iter_next (&args_iter))
     g_error ("Reply has too many arguments");
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -1980,8 +1959,7 @@ test_get_all (Fixture *f,
       pc == NULL)
     g_error ("OOM");
 
-  dbus_message_unref (m);
-  m = NULL;
+  dbus_clear_message (&m);
 
   if (dbus_pending_call_get_completed (pc))
     test_pending_call_store_reply (pc, &m);
@@ -2032,8 +2010,8 @@ test_get_all (Fixture *f,
   if (dbus_message_iter_next (&args_iter))
     g_error ("Reply has too many arguments");
 
-  dbus_message_unref (m);
-  dbus_pending_call_unref (pc);
+  dbus_clear_message (&m);
+  dbus_clear_pending_call (&pc);
 }
 
 static void
@@ -2044,11 +2022,7 @@ teardown (Fixture *f,
   g_clear_error (&f->ge);
 
   if (f->left_conn != NULL)
-    {
-      dbus_connection_close (f->left_conn);
-      dbus_connection_unref (f->left_conn);
-      f->left_conn = NULL;
-    }
+    dbus_connection_close (f->left_conn);
 
   if (f->right_conn != NULL)
     {
@@ -2068,9 +2042,10 @@ teardown (Fixture *f,
       g_queue_clear (&f->held_messages);
 
       dbus_connection_close (f->right_conn);
-      dbus_connection_unref (f->right_conn);
-      f->right_conn = NULL;
     }
+
+  dbus_clear_connection (&f->left_conn);
+  dbus_clear_connection (&f->right_conn);
 
   if (f->daemon_pid != 0)
     {
