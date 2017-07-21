@@ -203,6 +203,20 @@ bus_config_load (const DBusString      *file,
       goto failed;
     }
 
+  /* We do not need protection against hash collisions (CVE-2012-0876)
+   * because we are only parsing trusted XML; and if we let Expat block
+   * waiting for the CSPRNG to be initialized, as it does by default to
+   * defeat CVE-2012-0876, it can cause timeouts during early boot on
+   * entropy-starved embedded devices.
+   *
+   * TODO: When Expat gets a more explicit API for this than
+   * XML_SetHashSalt, check for that too, and use it preferentially.
+   * https://github.com/libexpat/libexpat/issues/91 */
+#if defined(HAVE_XML_SETHASHSALT)
+  /* Any nonzero number will do. https://xkcd.com/221/ */
+  XML_SetHashSalt (expat, 4);
+#endif
+
   if (!_dbus_string_get_dirname (file, &dirname))
     {
       dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);

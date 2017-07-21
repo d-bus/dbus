@@ -938,6 +938,14 @@ XML_CFLAGS=
 AC_SUBST([XML_CFLAGS])
 AC_SUBST([XML_LIBS])
 
+save_cflags="$CFLAGS"
+save_libs="$LIBS"
+CFLAGS="$CFLAGS $XML_CFLAGS"
+LIBS="$LIBS $XML_LIBS"
+AC_CHECK_FUNCS([XML_SetHashSalt])
+CFLAGS="$save_cflags"
+LIBS="$save_libs"
+
 # Thread lib detection
 AC_ARG_VAR([THREAD_LIBS])
 save_libs="$LIBS"
