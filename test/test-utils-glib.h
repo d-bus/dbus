@@ -91,4 +91,19 @@ void test_mkdir (const gchar *path, gint mode);
 
 void test_timeout_reset (void);
 
+#if !GLIB_CHECK_VERSION(2, 44, 0)
+#define g_steal_pointer(x) backported_g_steal_pointer (x)
+/* A simplified version of g_steal_pointer without type-safety. */
+static inline gpointer
+backported_g_steal_pointer (gpointer pointer_to_pointer)
+{
+  gpointer *pp = pointer_to_pointer;
+  gpointer ret;
+
+  ret = *pp;
+  *pp = NULL;
+  return ret;
+}
+#endif
+
 #endif
