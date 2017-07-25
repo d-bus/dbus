@@ -258,6 +258,9 @@ fi
 # default (unless you don't have GLib), because they don't bloat the library
 # or binaries.
 
+dnl Don't do anything too subtle here, because the CMake build system
+dnl parses these lines with regular expressions. If necessary, adjust
+dnl cmake/modules/MacrosAutotools.cmake to compensate.
 AC_DEFINE([GLIB_VERSION_MIN_REQUIRED], [GLIB_VERSION_2_40], [Ignore post-2.40 deprecations])
 AC_DEFINE([GLIB_VERSION_MAX_ALLOWED], [GLIB_VERSION_2_40], [Prevent post-2.40 APIs])
 
