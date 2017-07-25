@@ -125,6 +125,10 @@ case "$ci_buildsys" in
                 # Full developer/debug build.
                 set _ "$@"
                 set "$@" --enable-developer --enable-tests
+                # Enable optional features that are off by default
+                if [ "$ci_host" != mingw ]; then
+                    set "$@" --enable-user-session
+                fi
                 shift
                 # The test coverage for OOM-safety is too
                 # verbose to be useful on travis-ci.
@@ -147,6 +151,10 @@ case "$ci_buildsys" in
                 set "$@" --disable-launchd --disable-systemd
                 # No libaudit or valgrind
                 set "$@" --disable-libaudit --without-valgrind
+                # Disable optional features, some of which are on by
+                # default
+                set "$@" --disable-stats
+                set "$@" --disable-user-session
                 shift
                 ;;
 
