@@ -38,7 +38,7 @@ AC_DEFINE_UNQUOTED(DBUS_DAEMON_NAME,"dbus-daemon",[Name of executable])
 #
 
 ## increment if the interface has additions, changes, removals.
-LT_CURRENT=20
+LT_CURRENT=21
 
 ## increment any time the source changes; set to
 ##  0 if you increment CURRENT
@@ -47,7 +47,7 @@ LT_REVISION=0
 ## increment if any interfaces have been added; set to 0
 ## if any interfaces have been changed or removed. removal has
 ## precedence over adding, so set to 0 if both happened.
-LT_AGE=17
+LT_AGE=18
 
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
