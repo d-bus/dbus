@@ -1,5 +1,7 @@
-D-Bus 1.11.16 (UNRELEASED)
+D-Bus 1.11.16 (2017-07-27)
 ==
+
+The “south facing garden” release.
 
 Build-time configuration changes:
 
