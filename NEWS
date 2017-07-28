@@ -20,6 +20,14 @@ Enhancements:
   <allow send_destination="..." max_unix_fds="4"/>
   (fd.o #101848, Simon McVittie)
 
+• On Unix platforms, the DBUS_COOKIE_SHA1 authentication mechanism
+  now respects the HOME environment variable on the client side, and
+  on the server side when the uid attempting to connect is the same
+  as the uid of the server. This allows the automated tests to pass in
+  environments where the user's "official" home directory in /etc/passwd
+  is nonexistent, such as Debian autobuilders.
+  (fd.o #101960, Simon McVittie)
+
 Fixes:
 
 • When parsing dbus-daemon configuration, tell Expat not to use
