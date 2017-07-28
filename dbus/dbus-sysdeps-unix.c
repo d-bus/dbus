@@ -4253,7 +4253,8 @@ _dbus_append_keyring_directory_for_credentials (DBusString      *directory,
         static dbus_bool_t already_warned = FALSE;
         if (!already_warned)
           {
-            _dbus_warn ("Using your real home directory for testing, set DBUS_TEST_HOMEDIR to avoid");
+            _dbus_warn ("Using %s for testing, set DBUS_TEST_HOMEDIR to avoid",
+                _dbus_string_get_const_data (&homedir));
             already_warned = TRUE;
           }
       }
