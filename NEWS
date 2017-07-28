@@ -1,7 +1,16 @@
 D-Bus 1.11.18 (UNRELEASED)
 ==
 
-...
+Fixes:
+
+• When parsing dbus-daemon configuration, tell Expat not to use
+  cryptographic-quality entropy as a salt for its hash tables: we trust
+  the configuration files, so we are not concerned about algorithmic
+  complexity attacks via hash table collisions. This prevents
+  dbus-daemon --system from holding up the boot process (and causing
+  early-boot system services like systemd, logind, networkd to time
+  out) on entropy-starved embedded systems.
+  (fd.o #101858, Simon McVittie)
 
 D-Bus 1.11.16 (2017-07-27)
 ==
