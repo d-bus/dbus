@@ -9,6 +9,17 @@ Enhancements:
   are not broadcast signals, respectively.
   (fd.o #29853, Simon McVittie)
 
+• <allow> and <deny> rules can now be configured to apply only to
+  messages with or without Unix file descriptors attached. This would
+  typically be used in rules like these:
+  <allow send_destination="..." max_unix_fds="0"/>
+  <deny send_destination="..." min_unix_fds="1"/>
+  <deny receive_sender="..." min_unix_fds="1"/>
+  but can also be used to set a nonzero upper limit on the number of
+  file descriptors:
+  <allow send_destination="..." max_unix_fds="4"/>
+  (fd.o #101848, Simon McVittie)
+
 Fixes:
 
 • When parsing dbus-daemon configuration, tell Expat not to use
