@@ -1,6 +1,14 @@
 D-Bus 1.11.18 (UNRELEASED)
 ==
 
+Enhancements:
+
+• <allow> and <deny> rules in dbus-daemon configuration can now
+  include send_broadcast="true" or send_broadcast="false", which make
+  the rule only match broadcast signals, or only match messages that
+  are not broadcast signals, respectively.
+  (fd.o #29853, Simon McVittie)
+
 Fixes:
 
 • When parsing dbus-daemon configuration, tell Expat not to use
