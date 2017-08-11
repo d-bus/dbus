@@ -2052,13 +2052,13 @@ _dbus_read_credentials_socket  (DBusSocket       client_fd,
     ucred_t * ucred = NULL;
     if (getpeerucred (client_fd.fd, &ucred) == 0)
       {
+#ifdef HAVE_ADT
+        adt_session_data_t *adth = NULL;
+#endif
         pid_read = ucred_getpid (ucred);
         uid_read = ucred_geteuid (ucred);
 #ifdef HAVE_ADT
         /* generate audit session data based on socket ucred */
-        adt_session_data_t *adth = NULL;
-        adt_export_data_t *data = NULL;
-        size_t size = 0;
         if (adt_start_session (&adth, NULL, 0) || (adth == NULL))
           {
             _dbus_verbose ("Failed to adt_start_session(): %s\n", _dbus_strerror (errno));
@@ -2071,7 +2071,8 @@ _dbus_read_credentials_socket  (DBusSocket       client_fd,
               }
             else
               {
-                size = adt_export_session_data (adth, &data);
+                adt_export_data_t *data = NULL;
+                size_t size = adt_export_session_data (adth, &data);
                 if (size <= 0)
                   {
                     _dbus_verbose ("Failed to adt_export_session_data(): %s\n", _dbus_strerror (errno));
