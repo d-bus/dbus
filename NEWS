@@ -39,6 +39,9 @@ Fixes:
   out) on entropy-starved embedded systems.
   (fd.o #101858, Simon McVittie)
 
+• Avoid a -Werror=declaration-after-statement build failure on Solaris
+  (fd.o #102145, Alan Coopersmith)
+
 D-Bus 1.11.16 (2017-07-27)
 ==
 
