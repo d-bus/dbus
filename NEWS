@@ -16,6 +16,9 @@ Fixes:
   minimizing failed connections under heavy load
   (fd.o #95264, Lennart Poettering)
 
+• Avoid a -Werror=declaration-after-statement build failure on Solaris
+  (fd.o #102145, Alan Coopersmith)
+
 D-Bus 1.10.22 (2017-07-27)
 ==
 
