@@ -12,6 +12,10 @@ Fixes:
   out) on entropy-starved embedded systems.
   (fd.o #101858, Simon McVittie)
 
+• Increase listen() backlog of AF_UNIX sockets to the maximum possible,
+  minimizing failed connections under heavy load
+  (fd.o #95264, Lennart Poettering)
+
 D-Bus 1.10.22 (2017-07-27)
 ==
 
