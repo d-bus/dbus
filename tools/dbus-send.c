@@ -485,6 +485,7 @@ main (int argc, char *argv[])
       DBusMessageIter container_iter;
 
       type2 = DBUS_TYPE_INVALID;
+      secondary_type = DBUS_TYPE_INVALID;
       arg = argv[i++];
       c = strchr (arg, ':');
 
@@ -565,6 +566,7 @@ main (int argc, char *argv[])
 	}
       else if (container_type == DBUS_TYPE_DICT_ENTRY)
 	{
+	  _dbus_assert (secondary_type != DBUS_TYPE_INVALID);
 	  append_dict (target_iter, type2, secondary_type, c);
 	}
       else
