@@ -14,6 +14,31 @@ Build-time configuration changes:
   fd.o #101629 indicates that this would be problematic.
   (fd.o #101629, Simon McVittie)
 
+• LSB-style init scripts for Red Hat and Slackware, and a non-LSB init
+  script for Cygwin, are no longer provided in the upstream dbus
+  source. We recommend that distributors who support non-systemd service
+  management should maintain their own init scripts or other service
+  manager integration as part of their downstream packaging, similar to
+  the way Debian distributes a Debian-specific LSB init script for dbus.
+
+  The systemd unit continues to be maintained as part of the upstream
+  dbus source, because it receives regular testing and maintenance.
+
+  (fd.o #101706, Simon McVittie)
+
+• The process ID file created by the system bus is no longer influenced
+  by the --with-init-scripts=redhat configure option or the presence of
+  /etc/redhat-release at build time. If your OS's init script or other
+  service management relies on the Red Hat-style pid file, it can be
+  restored by specifying --with-system-pid-file=/run/messagebus.pid at
+  configure time or using the <pidfile> directive in bus configuration.
+
+  Note that the upstream-supplied systemd unit runs dbus-daemon with
+  the --nopidfile option, so it does not normally write a pid file,
+  regardless of whether the OS is Red-Hat-derived or not.
+
+  (fd.o #101706, Simon McVittie)
+
 Enhancements:
 
 • <allow> and <deny> rules in dbus-daemon configuration can now

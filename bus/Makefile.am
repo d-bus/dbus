@@ -41,7 +41,7 @@ AM_CFLAGS = \
 
 EFENCE=
 
-CONFIG_IN_FILES=				\
+EXTRA_DIST =					\
 	session.conf.in				\
 	system.conf.in				\
 	legacy-config/session.conf.in		\
@@ -276,44 +276,7 @@ install-exec-hook:
 	fi
 endif
 
-#### Init scripts fun
-SCRIPT_IN_FILES=messagebus.in \
-		messagebus-config.in \
-		rc.messagebus.in
-
-## Red Hat start
-if DBUS_INIT_SCRIPTS_RED_HAT
-
-initddir=$(sysconfdir)/rc.d/init.d
-
-initd_SCRIPTS= 	\
-	messagebus
-
-endif
- ## Red Hat end
-
-## Slackware start
-if DBUS_INIT_SCRIPTS_SLACKWARE
-
-initddir=$(sysconfdir)/rc.d/
-
-initd_SCRIPTS= 	\
-	rc.messagebus
-
-endif
-## Slackware end
-
-## Cygwin start
-if DBUS_INIT_SCRIPTS_CYGWIN
-
-bin_SCRIPTS= 	\
-	messagebus-config
-
-endif
-## Cygwin end
-
-if HAVE_SYSTEMD
-SCRIPT_IN_FILES += \
+EXTRA_DIST += \
 	dbus.service.in \
 	dbus.socket.in \
 	systemd-user/dbus.service.in \
@@ -322,6 +285,7 @@ SCRIPT_IN_FILES += \
 	tmpfiles.d/dbus.conf.in \
 	$(NULL)
 
+if HAVE_SYSTEMD
 systemdsystemunit_DATA = \
 	dbus.service \
 	dbus.socket
@@ -343,7 +307,3 @@ endif
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
 @CODE_COVERAGE_RULES@
-
-#### Extra dist
-
-EXTRA_DIST=$(CONFIG_IN_FILES) $(SCRIPT_IN_FILES)

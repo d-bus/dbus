@@ -211,7 +211,6 @@ AC_ARG_ENABLE(console-owner-file, AS_HELP_STRING([--enable-console-owner-file],[
 AC_ARG_ENABLE(launchd, AS_HELP_STRING([--enable-launchd],[build with launchd auto-launch support]),enable_launchd=$enableval,enable_launchd=auto)
 AC_ARG_ENABLE(systemd, AS_HELP_STRING([--enable-systemd],[build with systemd at_console support]),enable_systemd=$enableval,enable_systemd=auto)
 
-AC_ARG_WITH(init-scripts, AS_HELP_STRING([--with-init-scripts=[redhat]],[Style of init scripts to install]))
 AC_ARG_WITH(session-socket-dir, AS_HELP_STRING([--with-session-socket-dir=[dirname]],[Where to put sockets for the per-login-session message bus]))
 AC_ARG_WITH(test-socket-dir, AS_HELP_STRING([--with-test-socket-dir=[dirname]],[Where to put sockets for make check]))
 AC_ARG_WITH(system-pid-file, AS_HELP_STRING([--with-system-pid-file=[pidfile]],[PID file for systemwide daemon]))
@@ -1513,35 +1512,6 @@ AS_AC_EXPAND(EXPANDED_LIBEXECDIR, "$libexecdir")
 AS_AC_EXPAND(EXPANDED_DATADIR, "$datadir")
 AS_AC_EXPAND(EXPANDED_RUNSTATEDIR, "$runstatedir")
 
-#### Check our operating system
-operating_system=unknown
-if test -f /etc/redhat-release || test -f $EXPANDED_SYSCONFDIR/redhat-release ; then
-   operating_system=redhat
-fi
-
-if test -f /etc/slackware-version || test -f $EXPANDED_SYSCONFDIR/slackware-version ; then
-   operating_system=slackware
-fi
-
-if test -f /usr/bin/cygwin1.dll || test -f $EXPANDED_BINDIR/cygwin1.dll ; then
-   operating_system=cygwin
-fi
-
-#### Sort out init scripts
-
-if test x$with_init_scripts = x; then
-    case x$operating_system in
-        xredhat)	with_init_scripts=redhat ;;
-        xslackware)	with_init_scripts=slackware ;;
-        xcygwin)	with_init_scripts=cygwin ;;
-        *)			with_init_scripts=none ;;
-    esac
-fi
-
-AM_CONDITIONAL(DBUS_INIT_SCRIPTS_RED_HAT, test x$with_init_scripts = xredhat)
-AM_CONDITIONAL(DBUS_INIT_SCRIPTS_SLACKWARE, test x$with_init_scripts = xslackware)
-AM_CONDITIONAL(DBUS_INIT_SCRIPTS_CYGWIN, test x$with_init_scripts = xcygwin)
-
 ##### systemd unit files
 AC_ARG_WITH([systemdsystemunitdir],
 AS_HELP_STRING([--with-systemdsystemunitdir=DIR], [Directory for systemd service files]),
@@ -1597,8 +1567,6 @@ AC_DEFINE_UNQUOTED(DBUS_SYSTEM_BUS_DEFAULT_ADDRESS, "$DBUS_SYSTEM_BUS_DEFAULT_AD
 #### Set up the pid file
 if ! test -z "$with_system_pid_file"; then
    DBUS_SYSTEM_PID_FILE=$with_system_pid_file
-elif test x$with_init_scripts = xredhat ; then
-   DBUS_SYSTEM_PID_FILE="${EXPANDED_RUNSTATEDIR}/messagebus.pid"
 else
    DBUS_SYSTEM_PID_FILE="${EXPANDED_RUNSTATEDIR}/dbus/pid"
 fi
@@ -1887,10 +1855,7 @@ bus/legacy-config/system.conf
 bus/legacy-config/session.conf
 bus/example-system-enable-stats.conf
 bus/example-session-disable-stats.conf
-bus/messagebus
-bus/messagebus-config
 bus/org.freedesktop.dbus-session.plist
-bus/rc.messagebus
 bus/dbus.service
 bus/dbus.socket
 bus/systemd-user/dbus.service
@@ -1969,7 +1934,6 @@ echo "
         Building Ducktype docs:   ${enable_ducktype_docs}
         Building XML docs:        ${enable_xml_docs}
         Building launchd support: ${have_launchd}
-        Init scripts style:       ${with_init_scripts}
         Abstract socket names:    ${ac_cv_have_abstract_sockets}
         System bus socket:        ${DBUS_SYSTEM_SOCKET}
         System bus address:       ${DBUS_SYSTEM_BUS_DEFAULT_ADDRESS}
