@@ -1554,6 +1554,19 @@ append_rule_from_element (BusConfigParser   *parser,
           return FALSE;
         }
 
+      if (send_destination != NULL &&
+          send_broadcast != NULL &&
+          strcmp (send_broadcast, "true") == 0)
+        {
+          /* Broadcast messages have no destination, so this cannot
+           * possibly match */
+          dbus_set_error (error, DBUS_ERROR_FAILED,
+                          "Rule with send_broadcast=\"true\" and "
+                          "send_destination=\"%s\" cannot match anything",
+                          send_destination);
+          return FALSE;
+        }
+
       if (send_requested_reply &&
           !(strcmp (send_requested_reply, "true") == 0 ||
             strcmp (send_requested_reply, "false") == 0))
