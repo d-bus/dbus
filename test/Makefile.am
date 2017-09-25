@@ -482,6 +482,7 @@ static_data = \
 	data/invalid-config-files/circular-1.conf \
 	data/invalid-config-files/circular-2.conf \
 	data/invalid-config-files/circular-3.conf \
+	data/invalid-config-files/impossible-send.conf \
 	data/invalid-config-files/not-well-formed.conf \
 	data/invalid-config-files/truncated-file.conf \
 	data/invalid-config-files/send-and-receive.conf \
