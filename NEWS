@@ -14,10 +14,13 @@ Fixes:
 
 • Increase listen() backlog of AF_UNIX sockets to the maximum possible,
   minimizing failed connections under heavy load
-  (fd.o #95264, Lennart Poettering)
+  (fd.o #95264, Lennart Poettering) (backported from 1.11.4)
 
 • Avoid a -Werror=declaration-after-statement build failure on Solaris
   (fd.o #102145, Alan Coopersmith)
+
+• When using the Monitoring interface, match messages' destinations
+  (fd.o #92074, Simon McVittie) (backported from 1.11.8)
 
 D-Bus 1.10.22 (2017-07-27)
 ==
