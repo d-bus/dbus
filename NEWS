@@ -42,6 +42,10 @@ Fixes:
 • Avoid a -Werror=declaration-after-statement build failure on Solaris
   (fd.o #102145, Alan Coopersmith)
 
+• On Unix platform, drop DBUS_SYSTEM_LOG_INFO messages from LOG_NOTICE
+  to LOG_INFO, matching how we use this log level in practice
+  (fd.o #102686, Simon McVittie)
+
 D-Bus 1.11.16 (2017-07-27)
 ==
 
