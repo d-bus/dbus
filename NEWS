@@ -1,5 +1,7 @@
-D-Bus 1.11.18 (UNRELEASED)
+D-Bus 1.11.18 (2017-09-25)
 ==
+
+The “vampire conquistador” release.
 
 Build-time configuration changes:
 
