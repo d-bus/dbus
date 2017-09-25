@@ -20,7 +20,7 @@ Fixes:
   (fd.o #102145, Alan Coopersmith)
 
 • When using the Monitoring interface, match messages' destinations
-  (fd.o #92074, Simon McVittie) (backported from 1.11.8)
+  (fd.o #92074, Simon McVittie) (backported from 1.11.0)
 
 D-Bus 1.10.22 (2017-07-27)
 ==
