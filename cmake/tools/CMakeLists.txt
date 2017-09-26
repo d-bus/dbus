@@ -62,6 +62,15 @@ add_executable(dbus-test-tool ${dbus_test_tool_SOURCES})
 target_link_libraries(dbus-test-tool ${DBUS_LIBRARIES})
 install(TARGETS dbus-test-tool ${INSTALL_TARGETS_DEFAULT_ARGS})
 
+if(WIN32)
+    # avoid dbus-update-activation-environment triggering UAC
+    # 1 is the resource ID, ID_MANIFEST
+    # 24 is the resource type, RT_MANIFEST
+    # constants are used because of a bug in windres
+    # see https://stackoverflow.com/questions/33000158/embed-manifest-file-to-require-administrator-execution-level-with-mingw32
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/disable-uac.rc "1 24 \"${CMAKE_SOURCE_DIR}/../tools/Win32.Manifest\"\n")
+    list(APPEND dbus_update_activation_environment_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/disable-uac.rc)
+endif()
 add_executable(dbus-update-activation-environment ${dbus_update_activation_environment_SOURCES})
 target_link_libraries(dbus-update-activation-environment ${DBUS_LIBRARIES})
 install(TARGETS dbus-update-activation-environment ${INSTALL_TARGETS_DEFAULT_ARGS})
