@@ -158,6 +158,9 @@ setup (Fixture *f,
 {
   const Config *config = context;
 
+  /* Some tests are fairly slow, so make the test timeout per-test */
+  test_timeout_reset ();
+
   f->ctx = test_main_context_get ();
   f->ge = NULL;
   dbus_error_init (&f->e);

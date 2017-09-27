@@ -485,18 +485,20 @@ wrap_abort (int signal)
 }
 #endif
 
-void
-test_init (int *argcp, char ***argvp)
+static void
+set_timeout (void)
 {
-  g_test_init (argcp, argvp, NULL);
-  g_test_bug_base ("https://bugs.freedesktop.org/show_bug.cgi?id=");
+  static guint timeout = 0;
 
   /* Prevent tests from hanging forever. This is intended to be long enough
    * that any reasonable regression test on any reasonable hardware would
    * have finished. */
 #define TIMEOUT 60
 
-  g_timeout_add_seconds (TIMEOUT, time_out, NULL);
+  if (timeout != 0)
+    g_source_remove (timeout);
+
+  timeout = g_timeout_add_seconds (TIMEOUT, time_out, NULL);
 #ifdef G_OS_UNIX
   /* The GLib main loop might not be running (we don't use it in every
    * test). Die with SIGALRM shortly after if necessary. */
@@ -511,6 +513,35 @@ test_init (int *argcp, char ***argvp)
       sigaction (SIGALRM, &act, NULL);
     }
 #endif
+}
+
+void
+test_init (int *argcp, char ***argvp)
+{
+  g_test_init (argcp, argvp, NULL);
+  g_test_bug_base ("https://bugs.freedesktop.org/show_bug.cgi?id=");
+  set_timeout ();
+}
+
+static void
+report_and_destroy (gpointer p)
+{
+  GTimer *timer = p;
+
+  g_test_message ("Time since timeout reset %p: %.3f seconds",
+      timer, g_timer_elapsed (timer, NULL));
+  g_timer_destroy (timer);
+}
+
+void
+test_timeout_reset (void)
+{
+  GTimer *timer = g_timer_new ();
+
+  g_test_message ("Resetting test timeout (reference: %p)", timer);
+  set_timeout ();
+
+  g_test_queue_destroy (report_and_destroy, timer);
 }
 
 void

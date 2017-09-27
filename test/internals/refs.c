@@ -201,6 +201,9 @@ setup (Fixture *f,
   if (!dbus_threads_init_default ())
     g_error ("OOM");
 
+  /* This can be fairly slow, so make the test timeout per-test */
+  test_timeout_reset ();
+
   f->n_threads = N_THREADS;
   f->n_refs = N_REFS;
 
