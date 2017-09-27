@@ -541,12 +541,6 @@ dbus_bool_t _dbus_command_for_pid (unsigned long  pid,
                                    int            max_len,
                                    DBusError     *error);
 
-/** A UNIX signal handler */
-typedef void (* DBusSignalHandler) (int sig);
-
-void _dbus_set_signal_handler (int               sig,
-                               DBusSignalHandler handler);
-
 dbus_bool_t _dbus_user_at_console (const char *username,
                                    DBusError  *error);
 

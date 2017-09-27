@@ -296,18 +296,6 @@ _dbus_rlimit_free (DBusRLimit *lim)
   _dbus_assert (lim == NULL);
 }
 
-/** Installs a signal handler
- *
- * @param sig the signal to handle
- * @param handler the handler
- */
-void
-_dbus_set_signal_handler (int               sig,
-                          DBusSignalHandler handler)
-{
-  _dbus_verbose ("has to be implemented\n");
-}
-
 /**
  * stat() wrapper.
  *

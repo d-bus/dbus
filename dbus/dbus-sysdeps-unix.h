@@ -165,6 +165,12 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_ensure_standard_fds (DBusEnsureStandardFdsFlags   flags,
                                        const char                 **error_str_p);
 
+/** A UNIX signal handler */
+typedef void (* DBusSignalHandler) (int sig);
+
+void _dbus_set_signal_handler (int               sig,
+                               DBusSignalHandler handler);
+
 /** @} */
 
 DBUS_END_DECLS
