@@ -67,6 +67,10 @@ typedef enum
 static void
 signal_handler (int sig)
 {
+  /* Signal handlers that might set errno must save and restore the errno
+   * that the interrupted function might have been relying on. */
+  int saved_errno = errno;
+
   switch (sig)
     {
     case SIGHUP:
@@ -134,6 +138,8 @@ signal_handler (int sig)
        * signal, but keep -Wswitch-default happy */
       break;
     }
+
+  errno = saved_errno;
 }
 #endif /* DBUS_UNIX */
 

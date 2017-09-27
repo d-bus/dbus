@@ -1138,11 +1138,17 @@ static int babysit_sigchld_pipe = -1;
 static void
 babysit_signal_handler (int signo)
 {
+  /* Signal handlers that might set errno must save and restore the errno
+   * that the interrupted function might have been relying on. */
+  int saved_errno = errno;
   char b = '\0';
+
  again:
   if (write (babysit_sigchld_pipe, &b, 1) <= 0) 
     if (errno == EINTR)
       goto again;
+
+  errno = saved_errno;
 }
 
 static void babysit (pid_t grandchild_pid,
