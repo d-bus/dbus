@@ -459,7 +459,9 @@ test_kill_pid (GPid pid)
 static gboolean
 time_out (gpointer data)
 {
-  g_error ("timed out");
+  puts ("Bail out! Test timed out (GLib main loop timeout callback reached)");
+  fflush (stdout);
+  abort ();
   return FALSE;
 }
 
@@ -469,6 +471,16 @@ static void wrap_abort (int signal) _DBUS_GNUC_NORETURN;
 static void
 wrap_abort (int signal)
 {
+  /* We might be halfway through writing out something else, so force this
+   * onto its own line */
+  const char message [] = "\nBail out! Test timed out (SIGALRM received)\n";
+
+  if (write (STDOUT_FILENO, message, sizeof (message) - 1) <
+      (ssize_t) sizeof (message) - 1)
+    {
+      /* ignore short write - what would we do about it? */
+    }
+
   abort ();
 }
 #endif
@@ -490,7 +502,7 @@ test_init (int *argcp, char ***argvp)
    * test). Die with SIGALRM shortly after if necessary. */
   alarm (TIMEOUT + 10);
 
-  /* Get a core dump from the SIGALRM. */
+  /* Get a log message and a core dump from the SIGALRM. */
     {
       struct sigaction act = { };
 
