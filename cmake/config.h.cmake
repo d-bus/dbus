@@ -49,10 +49,6 @@
 /* doxygen */
 #cmakedefine DBUS_GCOV_ENABLED 1
 
-/* abstract-sockets */
-
-#cmakedefine HAVE_ABSTRACT_SOCKETS 1
-
 /* selinux */
 /* kqueue */
 #cmakedefine HAVE_CONSOLE_OWNER_FILE 1

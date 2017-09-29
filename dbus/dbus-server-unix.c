@@ -145,7 +145,7 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
             {
               dir = tmpdir;
 
-#ifdef HAVE_ABSTRACT_SOCKETS
+#ifdef __linux__
               /* Use abstract sockets for tmpdir if supported, so that it
                * never needs to be cleaned up. Use dir instead if you want a
                * path-based socket. */

@@ -121,7 +121,6 @@ if (WIN32)
 endif (WIN32)
 
 if(NOT WIN32)
-	option (DBUS_ENABLE_ABSTRACT_SOCKETS "enable support for abstract sockets" ON)
 	set (CMAKE_THREAD_PREFER_PTHREAD ON)
 	include (FindThreads)
 endif(NOT WIN32)

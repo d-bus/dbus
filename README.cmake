@@ -158,10 +158,6 @@ DBUS_BUS_ENABLE_INOTIFY:BOOL=ON
 // enable kqueue as dir watch backend
 DBUS_BUS_ENABLE_KQUEUE:BOOL=ON
 
-not available on windows:
-// enable abstract socket transport
-DBUS_ENABLE_ABSTRACT_SOCKETS:BOOL=ON
-
 x11 only:
 // Build with X11 auto launch support
 DBUS_BUILD_X11:BOOL=ON

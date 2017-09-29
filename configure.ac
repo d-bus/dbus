@@ -198,7 +198,6 @@ AC_ARG_ENABLE([ducktype-docs],
               AS_HELP_STRING([--enable-ducktype-docs],
                              [build Ducktype documentation (requires Ducktype)]),
               [enable_ducktype_docs=$enableval], [enable_ducktype_docs=auto])
-AC_ARG_ENABLE(abstract-sockets, AS_HELP_STRING([--enable-abstract-sockets],[use abstract socket namespace (linux only)]),enable_abstract_sockets=$enableval,enable_abstract_sockets=auto)
 AC_ARG_ENABLE(selinux, AS_HELP_STRING([--enable-selinux],[build with SELinux support]),enable_selinux=$enableval,enable_selinux=auto)
 AC_ARG_ENABLE([apparmor],
   [AS_HELP_STRING([--enable-apparmor], [build with AppArmor support])],
@@ -849,77 +848,6 @@ AC_CHECK_MEMBER([struct unpcbid.unp_pid],
 AC_CHECK_FUNCS(getpeerucred getpeereid)
 
 AC_CHECK_FUNCS(pipe2 accept4)
-
-#### Abstract sockets
-
-if test x$enable_abstract_sockets = xauto; then
-AC_LANG_PUSH(C)
-warn_on_xcompile=no
-AC_CACHE_CHECK([abstract socket namespace],
-		ac_cv_have_abstract_sockets,
-		[AC_RUN_IFELSE([AC_LANG_PROGRAM(
-[[
-#include <sys/types.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <sys/socket.h>
-#include <sys/un.h>
-#include <errno.h>
-]],
-[[
-  size_t slen;
-  int listen_fd;
-  struct sockaddr_un addr;
-
-  listen_fd = socket (PF_UNIX, SOCK_STREAM, 0);
-
-  if (listen_fd < 0)
-    {
-      fprintf (stderr, "socket() failed: %s\n", strerror (errno));
-      exit (1);
-    }
-
-  memset (&addr, '\0', sizeof (addr));
-  addr.sun_family = AF_UNIX;
-  strcpy (addr.sun_path, "X/tmp/dbus-fake-socket-path-used-in-configure-test");
-  /* SUN_LEN uses strlen() so need to calculate it before adding \0 at the
-   * beginning.
-   */
-  slen = SUN_LEN(&addr);
-  addr.sun_path[0] = '\0'; /* this is what makes it abstract */
-
-  if (bind (listen_fd, (struct sockaddr*) &addr, slen) < 0)
-    {
-       fprintf (stderr, "Abstract socket namespace bind() failed: %s\n",
-                strerror (errno));
-       exit (1);
-    }
-  else
-    exit (0);
-]])],
-              [ac_cv_have_abstract_sockets=yes],
-              [ac_cv_have_abstract_sockets=no],
-              [
-                ac_cv_have_abstract_sockets=no
-                warn_on_xcompile=yes
-              ]
-)])
-if test x$warn_on_xcompile = xyes ; then
-  AC_MSG_WARN([Cannot check for abstract sockets when cross-compiling, please use --enable-abstract-sockets])
-fi
-AC_LANG_POP(C)
-fi
-
-if test x$enable_abstract_sockets = xyes; then
-    if test x$ac_cv_have_abstract_sockets = xno; then
-	AC_MSG_ERROR([Abstract sockets explicitly required, and support not detected.])
-    fi
-fi
-
-if test x$enable_abstract_sockets = xno; then
-   ac_cv_have_abstract_sockets=no;
-fi
 
 PKG_CHECK_MODULES([EXPAT], [expat])
 
@@ -1923,7 +1851,6 @@ echo "
         Building Ducktype docs:   ${enable_ducktype_docs}
         Building XML docs:        ${enable_xml_docs}
         Building launchd support: ${have_launchd}
-        Abstract socket names:    ${ac_cv_have_abstract_sockets}
         System bus socket:        ${DBUS_SYSTEM_SOCKET}
         System bus address:       ${DBUS_SYSTEM_BUS_DEFAULT_ADDRESS}
         System bus PID file:      ${DBUS_SYSTEM_PID_FILE}

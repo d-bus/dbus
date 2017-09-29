@@ -933,7 +933,7 @@ _dbus_connect_unix_socket (const char     *path,
 
   if (abstract)
     {
-#ifdef HAVE_ABSTRACT_SOCKETS
+#ifdef __linux__
       addr.sun_path[0] = '\0'; /* this is what says "use abstract" */
       path_len++; /* Account for the extra nul byte added to the start of sun_path */
 
@@ -947,12 +947,12 @@ _dbus_connect_unix_socket (const char     *path,
 
       strncpy (&addr.sun_path[1], path, path_len);
       /* _dbus_verbose_bytes (addr.sun_path, sizeof (addr.sun_path)); */
-#else /* HAVE_ABSTRACT_SOCKETS */
+#else /* !__linux__ */
       dbus_set_error (error, DBUS_ERROR_NOT_SUPPORTED,
                       "Operating system does not support abstract socket namespace\n");
       _dbus_close (fd, NULL);
       return -1;
-#endif /* ! HAVE_ABSTRACT_SOCKETS */
+#endif /* !__linux__ */
     }
   else
     {
@@ -1134,7 +1134,7 @@ _dbus_listen_unix_socket (const char     *path,
 
   if (abstract)
     {
-#ifdef HAVE_ABSTRACT_SOCKETS
+#ifdef __linux__
       /* remember that abstract names aren't nul-terminated so we rely
        * on sun_path being filled in with zeroes above.
        */
@@ -1151,12 +1151,12 @@ _dbus_listen_unix_socket (const char     *path,
 
       strncpy (&addr.sun_path[1], path, path_len);
       /* _dbus_verbose_bytes (addr.sun_path, sizeof (addr.sun_path)); */
-#else /* HAVE_ABSTRACT_SOCKETS */
+#else /* !__linux__ */
       dbus_set_error (error, DBUS_ERROR_NOT_SUPPORTED,
                       "Operating system does not support abstract socket namespace\n");
       _dbus_close (listen_fd, NULL);
       return -1;
-#endif /* ! HAVE_ABSTRACT_SOCKETS */
+#endif /* !__linux__ */
     }
   else
     {
