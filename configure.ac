@@ -921,17 +921,6 @@ if test x$enable_abstract_sockets = xno; then
    ac_cv_have_abstract_sockets=no;
 fi
 
-if test x$ac_cv_have_abstract_sockets = xyes ; then
-   DBUS_PATH_OR_ABSTRACT=abstract
-   AC_DEFINE(HAVE_ABSTRACT_SOCKETS,1,[Have abstract socket namespace])
-else
-   DBUS_PATH_OR_ABSTRACT=path
-fi
-
-# this is used in addresses to prefer abstract, e.g.
-# unix:path=/foo or unix:abstract=/foo
-AC_SUBST(DBUS_PATH_OR_ABSTRACT)
-
 PKG_CHECK_MODULES([EXPAT], [expat])
 
 save_cflags="$CFLAGS"

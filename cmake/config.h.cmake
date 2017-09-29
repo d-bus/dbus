@@ -53,16 +53,6 @@
 
 #cmakedefine HAVE_ABSTRACT_SOCKETS 1
 
-#cmakedefine DBUS_PATH_OR_ABSTRACT_VALUE 1
-
-#if (defined DBUS_PATH_OR_ABSTRACT_VALUE)
-#define DBUS_PATH_OR_ABSTRACT @DBUS_PATH_OR_ABSTRACT_VALUE@
-#endif
-
-#ifdef DBUS_PATH_OR_ABSTRACT_VALUE
-#undef DBUS_PATH_OR_ABSTRACT_VALUE
-#endif
-
 /* selinux */
 /* kqueue */
 #cmakedefine HAVE_CONSOLE_OWNER_FILE 1
