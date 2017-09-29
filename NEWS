@@ -1,7 +1,33 @@
 D-Bus 1.11.20 (UNRELEASED)
 ==
 
-...
+Build-time configuration changes:
+
+• The --enable-abstract-sockets and --disable-abstract-sockets options
+  no longer exist. They are now unconditionally enabled on Linux and
+  disabled everywhere else. (fd.o #34905, Simon McVittie)
+
+Enhancements:
+
+• Make slower tests less likely to time out, and improve diagnostics if
+  tests do time out (fd.o #103009, Simon McVittie)
+
+• On Windows, don't compile an unused stub implementation of
+  _dbus_set_signal_handler() (fd.o #103010, Simon McVittie)
+
+Fixes:
+
+• Be more careful to save and restore errno in POSIX async signal
+  handlers (fd.o #103010, Simon McVittie)
+
+• On Windows, embed a manifest in dbus-update-activation-environment.exe
+  so that the heuristics used for UAC do not assume it needs elevated
+  privileges due to its name containing "update"
+  (fd.o #102558, Ralf Habacker)
+
+• On Windows with Automake, embed version information in libdbus-1,
+  as was meant to happen in all versions since 2009
+  (fd.o #103015, Simon McVittie)
 
 D-Bus 1.11.18 (2017-09-25)
 ==
