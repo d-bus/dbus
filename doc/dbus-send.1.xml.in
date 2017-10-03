@@ -65,7 +65,7 @@ may include containers (arrays, dicts, and variants) as described below.</para>
 &lt;array&gt;      ::= array:&lt;type&gt;:&lt;value&gt;[,&lt;value&gt;...]
 &lt;dict&gt;       ::= dict:&lt;type&gt;:&lt;type&gt;:&lt;key&gt;,&lt;value&gt;[,&lt;key&gt;,&lt;value&gt;...]
 &lt;variant&gt;    ::= variant:&lt;type&gt;:&lt;value&gt;
-&lt;type&gt;       ::= string | int16 | uint 16 | int32 | uint32 | int64 | uint64 | double | byte | boolean | objpath
+&lt;type&gt;       ::= string | int16 | uint16 | int32 | uint32 | int64 | uint64 | double | byte | boolean | objpath
 </literallayout> <!-- .fi -->
 
 <para>D-Bus supports more types than these, but <command>dbus-send</command> currently
