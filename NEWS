@@ -1,5 +1,12 @@
+D-Bus 1.11.22 (UNRELEASED)
+==
+
+...
+
 D-Bus 1.11.20 (2017-10-03)
 ==
+
+The “wraith stun” release.
 
 Build-time configuration changes:
 
