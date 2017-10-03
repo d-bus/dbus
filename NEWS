@@ -4,8 +4,9 @@ D-Bus 1.11.20 (UNRELEASED)
 Build-time configuration changes:
 
 • The --enable-abstract-sockets and --disable-abstract-sockets options
-  no longer exist. They are now unconditionally enabled on Linux and
-  disabled everywhere else. (fd.o #34905, Simon McVittie)
+  no longer exist. Support for Linux's abstract AF_UNIX sockets is now
+  unconditionally enabled on Linux and disabled everywhere else.
+  (fd.o #34905, Simon McVittie)
 
 Enhancements:
 
