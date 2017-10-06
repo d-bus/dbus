@@ -246,7 +246,6 @@ if (MSVC)
     
     configure_file(${DBUS_DIR}/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo.rc)
     list(APPEND libdbus_SOURCES versioninfo.rc)
-    set_source_files_properties(versioninfo.rc COMPILE_FLAGS "-D__LINE__=1")
 endif (MSVC)
 
 if(MSVC_IDE)
