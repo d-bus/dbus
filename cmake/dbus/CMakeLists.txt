@@ -245,7 +245,6 @@ if (MSVC)
     set (BUILD_TIMESTAMP ${DBUS_BUILD_TIMESTAMP})
     
     configure_file(${DBUS_DIR}/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo.rc)
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/afxres.h "")
     list(APPEND libdbus_SOURCES versioninfo.rc)
     set_source_files_properties(versioninfo.rc COMPILE_FLAGS "-D__LINE__=1")
 endif (MSVC)
