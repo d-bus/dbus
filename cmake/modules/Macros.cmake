@@ -10,7 +10,7 @@ if(DBUS_BUILD_TESTS AND CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Win
             PATHS /proc/sys/fs/binfmt_misc
             NO_SYSTEM_PATH NO_CMAKE_FIND_ROOT_PATH
         )
-        if(BINFMT_WINE_SUPPORT_FILE)
+        if(EXISTS BINFMT_WINE_SUPPORT_FILE)
             file(READ ${BINFMT_WINE_SUPPORT_FILE} CONTENT)
             if(${CONTENT} MATCHES "enabled")
                 set(HAVE_BINFMT_WINE_SUPPORT 1)
