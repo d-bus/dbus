@@ -62,7 +62,7 @@ add_executable(dbus-test-tool ${dbus_test_tool_SOURCES})
 target_link_libraries(dbus-test-tool ${DBUS_LIBRARIES})
 install(TARGETS dbus-test-tool ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-if(WIN32)
+if(WIN32 AND NOT MSVC)
     # avoid dbus-update-activation-environment triggering UAC
     # 1 is the resource ID, ID_MANIFEST
     # 24 is the resource type, RT_MANIFEST
