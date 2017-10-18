@@ -44,6 +44,8 @@ autopackage(
 
 include(Macros)
 string(TIMESTAMP DBUS_BUILD_TIMESTAMP "%Y%m%d%H%M" UTC)
+set (BUILD_FILEVERSION ${DBUS_MAJOR_VERSION},${DBUS_MINOR_VERSION},${DBUS_MICRO_VERSION},${DBUS_PATCH_VERSION})
+set (BUILD_TIMESTAMP ${DBUS_BUILD_TIMESTAMP})
 
 ########### basic vars ###############
 

@@ -151,6 +151,13 @@ if test "$dbus_win" = yes; then
     # Assume DBUS_VERSION is always three numbers
     BUILD_FILEVERSION=`echo "$DBUS_VERSION" | sed -e 's/\./,/g'`,0
     AC_SUBST(BUILD_FILEVERSION)
+    # In the CMake build system we generate multiple files, versioninfo-*.rc, with a
+    # different "internal name" and "original filename", for embedding in multiple
+    # executables. In the Autotools build system, we currently only generate
+    # versioninfo.rc and embed it in libdbus-1-${SOVERSION}.dll.
+    AC_SUBST([DBUS_VER_INTERNAL_NAME], [libdbus-1-${SOVERSION}])
+    AC_SUBST([DBUS_VER_ORIGINAL_NAME], [libdbus-1-${SOVERSION}.dll])
+    AC_SUBST([DBUS_VER_FILE_TYPE], [VFT_DLL])
     AS_IF([test -z "$RC"],
         [AC_MSG_ERROR([An implementation of windres is required])])
     if test "$dbus_wince" = yes; then
