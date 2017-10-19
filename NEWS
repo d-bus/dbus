@@ -1,5 +1,88 @@
+dbus 1.12.0 (UNRELEASED)
+========================
+
+1.12.x will be a new stable branch, recommended for use in OS
+distributions. It has not yet been released, but will be soon.
+Until then, wider testing of the 1.11.x branch would be appreciated.
+
+Summary of major changes between 1.10.x and 1.12.0
+--------------------------------------------------
+
+Dependencies:
+
+• Expat >= 2.1.0 is required
+• GLib >= 2.40 is required if full test coverage is enabled.
+• [Linux] libselinux >= 2.0.86 is required if SELinux support is
+  enabled.
+• [Unix] dbus now requires an <inttypes.h> that defines C99 constants
+  such as PRId64 and PRIu64, except when building for Windows.
+• [Autotools] Building from git (but not from tarballs) with Autotools
+  now requires macros from the GNU Autoconf Archive.
+• [CMake] Builds done using CMake now require CMake 3.0.2
+
+Build-time configuration changes:
+
+• Expat is now found using pkg-config. See the release notes for
+  1.11.14.
+• The --disable-compiler-optimisations and --enable-compiler-coverage
+  options no longer exist.  See the release notes for 1.11.4 and 1.11.8.
+• [Unix] The --enable-abstract-sockets and --disable-abstract-sockets
+  options no longer exist. See the release notes for 1.11.20.
+• [Unix] Flag files in /var/run/console/${username} are no longer
+  checked for at_console by default. See the release notes for 1.11.18.
+  This feature will probably be removed entirely in 1.13.x.
+• [Unix, Cygwin] Init scripts are no longer provided by upstream dbus,
+  and packagers will now need to add these downstream (most already do).
+  See the release notes for 1.11.18.
+• [Unix] The process ID file no longer has a different location on
+  Red Hat derivatives. See the release notes for 1.11.18.
+• [Unix] ${runstatedir} is now independent of ${localstatedir}.
+  See the release notes for 1.11.16.
+• [Windows] The WINDRES variable is no longer used. See the release
+  notes for 1.11.22.
+
+Deprecations:
+
+• Eavesdropping is officially deprecated in favour of BecomeMonitor.
+  See the release notes for spec version 0.31 (in dbus 1.11.14).
+• [Unix] Flag files in /var/run/console/${username} are deprecated.
+  See the release notes for 1.11.18.
+
+New APIs:
+
+• <allow> and <deny> rules in dbus-daemon configuration can now
+  include send_broadcast="true", send_broadcast="false",
+  max_unix_fds="N", min_unix_fds="N" (for some integer N).
+  See the release notes for 1.11.18.
+• dbus_try_get_local_machine_id() is like
+  dbus_get_local_machine_id(), but returns a DBusError.
+• New APIs around DBusMessageIter to simplify cleanup.
+  See the release notes for 1.11.16.
+• The message bus daemon now implements the standard Introspectable,
+  Peer and Properties interfaces. See the release notes for
+  dbus 1.11.14 and spec version 0.31.
+• DTDs for introspection XML and bus configuration are installed.
+• dbus can be compiled to be relocatable, making it more suitable for
+  binary bundling with other software. On Windows, this is on by
+  default.
+• [Unix] A new unix:dir=… address family resembles unix:tmpdir=… but
+  never uses Linux abstract sockets, which is advantageous for
+  containers. On non-Linux it is equivalent to unix:tmpdir=….
+  See the release notes for dbus 1.11.14 and spec version 0.31.
+• [Unix] New option "dbus-launch --exit-with-x11".
+• [Unix] Session managers can create transient .service files in
+  $XDG_RUNTIME_DIR/dbus-1/services. See the release notes for 1.11.12.
+• [Unix] A sysusers.d snippet can create the messagebus user on-demand.
+
+Miscellaneous behaviour changes:
+
+• [Unix] The session bus now logs to syslog if it was started by
+  dbus-launch.
+• [Unix] Internal warnings are logged to syslog if configured.
+• [Unix] Exceeding an anti-DoS limit is logged to syslog or stderr.
+
 D-Bus 1.11.22 (UNRELEASED)
-==
+==========================
 
 Build-time configuration changes:
 
