@@ -12,6 +12,11 @@ Dependencies:
 
 • Builds done using CMake now require CMake 3.0.2.
 
+Enhancements:
+
+• When building for Windows, improve quality of metadata in
+  libdbus-1-3.dll (fd.o #103015, Ralf Habacker)
+
 Fixes:
 
 • Fix a typo "uint 16" in dbus-send(1) man page
