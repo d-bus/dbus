@@ -127,7 +127,6 @@ set (TESTDIRS
     test/data/valid-config-files/session.d
     test/data/valid-config-files-system
     test/data/valid-config-files-system/system.d
-    test/data/valid-introspection-files
     test/data/valid-messages
     test/data/valid-service-files
     test/data/valid-service-files-system
