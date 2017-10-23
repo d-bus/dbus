@@ -81,6 +81,13 @@ Miscellaneous behaviour changes:
 • [Unix] Exceeding an anti-DoS limit is logged to syslog if configured,
   or to stderr.
 
+D-Bus 1.11.24 (UNRELEASED)
+==========================
+
+This is the second release-candidate for the 1.12.0 stable release.
+
+...
+
 D-Bus 1.11.22 (2017-10-23)
 ==========================
 
