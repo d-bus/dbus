@@ -109,6 +109,9 @@ Fixes:
   information. Previously, this was missing if using CMake and any
   non-MSVC compiler. (fd.o #103015, Ralf Habacker)
 
+• Fix the build with MSVC, which regressed with the #102558 fix in
+  1.11.20. (fd.o #102558, Ralf Habacker)
+
 Internal changes:
 
 • Simplify Windows resource embedding
