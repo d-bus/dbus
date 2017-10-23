@@ -7,11 +7,6 @@ cmakeconfigdir = $(libdir)/cmake/DBus1
 cmakeconfig_DATA = cmake/DBus1Config.cmake       \
                    cmake/DBus1ConfigVersion.cmake
 
-DISTCLEANFILES = 		\
-	${pkgconfig_DATA}       \
-	${cmakeconfig_DATA}     \
-	$(NULL)
-
 EXTRA_DIST =			\
 	autogen.sh		\
 	HACKING			\
