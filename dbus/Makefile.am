@@ -37,6 +37,9 @@ dbusarchincludedir=$(libdir)/dbus-1.0/include/dbus
 
 lib_LTLIBRARIES=libdbus-1.la
 
+# Initialize to empty so that we can append later
+nodist_libdbus_1_la_SOURCES =
+
 #
 # Deal with W32 .def and version-info.rc stuff
 #
@@ -57,7 +60,10 @@ if DBUS_WIN
 DBUS_LIB_arch_sources = 			\
 	dbus-server-win.c 			\
 	dbus-server-win.h			\
-	versioninfo.rc				\
+	$(NULL)
+
+nodist_libdbus_1_la_SOURCES += \
+	versioninfo.rc \
 	$(NULL)
 
 if DBUS_WINCE
