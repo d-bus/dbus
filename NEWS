@@ -3,14 +3,14 @@ dbus 1.12.0 (UNRELEASED)
 
 1.12.x will be a new stable branch, recommended for use in OS
 distributions. It has not yet been released, but will be soon.
-Until then, wider testing of the 1.11.x branch would be appreciated.
+Please test the release candidate version, 1.11.22.
 
 Summary of major changes between 1.10.x and 1.12.0
 --------------------------------------------------
 
 Dependencies:
 
-• Expat >= 2.1.0 is required
+• Expat >= 2.1.0 is required.
 • GLib >= 2.40 is required if full test coverage is enabled.
 • [Linux] libselinux >= 2.0.86 is required if SELinux support is
   enabled.
@@ -18,7 +18,7 @@ Dependencies:
   such as PRId64 and PRIu64, except when building for Windows.
 • [Autotools] Building from git (but not from tarballs) with Autotools
   now requires macros from the GNU Autoconf Archive.
-• [CMake] Builds done using CMake now require CMake 3.0.2
+• [CMake] Builds done using CMake now require CMake 3.0.2.
 
 Build-time configuration changes:
 
@@ -30,14 +30,13 @@ Build-time configuration changes:
   options no longer exist. See the release notes for 1.11.20.
 • [Unix] Flag files in /var/run/console/${username} are no longer
   checked for at_console by default. See the release notes for 1.11.18.
-  This feature will probably be removed entirely in 1.13.x.
 • [Unix, Cygwin] Init scripts are no longer provided by upstream dbus,
   and packagers will now need to add these downstream (most already do).
   See the release notes for 1.11.18.
-• [Unix] The process ID file no longer has a different location on
-  Red Hat derivatives. See the release notes for 1.11.18.
-• [Unix] ${runstatedir} is now independent of ${localstatedir}.
-  See the release notes for 1.11.16.
+• [Unix] The process ID file no longer has a different default location
+  on Red Hat derivatives. See the release notes for 1.11.18.
+• [Unix] ${runstatedir} is now independent of ${localstatedir} with
+  recent Autotools versions. See the release notes for 1.11.16.
 • [Windows] The WINDRES variable is no longer used. See the release
   notes for 1.11.22.
 
@@ -79,10 +78,15 @@ Miscellaneous behaviour changes:
 • [Unix] The session bus now logs to syslog if it was started by
   dbus-launch.
 • [Unix] Internal warnings are logged to syslog if configured.
-• [Unix] Exceeding an anti-DoS limit is logged to syslog or stderr.
+• [Unix] Exceeding an anti-DoS limit is logged to syslog if configured,
+  or to stderr.
 
-D-Bus 1.11.22 (UNRELEASED)
+D-Bus 1.11.22 (2017-10-23)
 ==========================
+
+The “fire surface” release.
+
+This is the first release-candidate for the 1.12.0 stable release.
 
 Build-time configuration changes:
 
