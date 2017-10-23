@@ -514,10 +514,12 @@ static_data = \
 	data/systemd-activation/org.freedesktop.systemd1.service \
 	data/valid-config-files/basic.conf \
 	data/valid-config-files/basic.d/basic.conf \
+	data/valid-config-files/check-own-rules.conf \
 	data/valid-config-files/entities.conf \
 	data/valid-config-files/listen-unix-runtime.conf \
 	data/valid-config-files/many-rules.conf \
 	data/valid-config-files/standard-session-dirs.conf \
+	data/valid-config-files-system/many-rules.conf \
 	data/valid-config-files-system/system.d/test.conf \
 	data/valid-messages/array-of-array-of-uint32.message \
 	data/valid-messages/dict-simple.message \
