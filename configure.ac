@@ -323,9 +323,12 @@ fi
 dnl Intentional:
 dnl - $DISABLE_WARNINGS disables unused-label warnings if not
 dnl   checking or not asserting (tested further below)
+dnl - we are not going to stop using deprecated functions on a stable
+dnl   branch
 dnl - missing field initializers being 0 is a C feature, not a bug
 dnl - unused-parameter is to make writing callbacks less annoying
 DISABLE_WARNINGS="$DISABLE_WARNINGS
+                  -Wno-deprecated-declarations
                   -Wno-missing-field-initializers
                   -Wno-unused-parameter"
 
