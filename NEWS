@@ -1,9 +1,10 @@
-dbus 1.12.0 (UNRELEASED)
+dbus 1.12.0 (2017-10-30)
 ========================
 
-1.12.x will be a new stable branch, recommended for use in OS
-distributions. It has not yet been released, but will be soon.
-Please test the release candidate version, 1.11.22.
+The “gingerbread skull” release.
+
+1.12.x is a new stable branch, recommended for use in OS
+distributions.
 
 Summary of major changes between 1.10.x and 1.12.0
 --------------------------------------------------
@@ -81,10 +82,12 @@ Miscellaneous behaviour changes:
 • [Unix] Exceeding an anti-DoS limit is logged to syslog if configured,
   or to stderr.
 
-D-Bus 1.11.24 (UNRELEASED)
-==========================
+Changes since 1.11.22 release candidate
+---------------------------------------
 
-This is the second release-candidate for the 1.12.0 stable release.
+Standard stable-branch changes:
+
+• Disable warnings about use of deprecated functions (Simon McVittie)
 
 Fixes:
 
