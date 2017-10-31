@@ -6,6 +6,11 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Fixes:
+
+• Make use of $(MKDIR_P) compatible with install-sh, fixing build when a
+  GNU-compatible `mkdir -p` is not available (fd.o #103521, ilovezfs)
+
 dbus 1.12.0 (2017-10-30)
 ========================
 
