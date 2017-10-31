@@ -11,6 +11,10 @@ Fixes:
 • Make use of $(MKDIR_P) compatible with install-sh, fixing build when a
   GNU-compatible `mkdir -p` is not available (fd.o #103521, ilovezfs)
 
+• When building for Windows with Autotools, avoid `echo -e`, fixing
+  cross-compilation on non-GNU platforms like macOS
+  (fd.o #103493, Tony Theodore)
+
 dbus 1.12.0 (2017-10-30)
 ========================
 
