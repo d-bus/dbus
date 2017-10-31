@@ -3,6 +3,11 @@ dbus 1.12.1 (UNRELEASED)
 
 ...
 
+Fixes:
+
+• Make use of $(MKDIR_P) compatible with install-sh, fixing build when a
+  GNU-compatible `mkdir -p` is not available (fd.o #103521, ilovezfs)
+
 dbus 1.12.0 (2017-10-30)
 ========================
 
