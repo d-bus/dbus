@@ -165,24 +165,36 @@ _dbus_read_nonce (const DBusString *fname, DBusString *nonce, DBusError* error)
 DBusSocket
 _dbus_accept_with_noncefile (DBusSocket listen_fd, const DBusNonceFile *noncefile)
 {
-  DBusSocket fd;
+  DBusSocket fd = _dbus_socket_get_invalid ();
   DBusString nonce;
 
   _dbus_assert (noncefile != NULL);
+
+  /* Make it valid to "free" this even if _dbus_string_init() runs
+   * out of memory: see comment in do_check_nonce() */
+  _dbus_string_init_const (&nonce, "");
+
   if (!_dbus_string_init (&nonce))
-    return _dbus_socket_get_invalid ();
+    goto out;
+
   //PENDING(kdab): set better errors
   if (_dbus_read_nonce (_dbus_noncefile_get_path(noncefile), &nonce, NULL) != TRUE)
-    return _dbus_socket_get_invalid ();
+    goto out;
+
   fd = _dbus_accept (listen_fd);
+
   if (!_dbus_socket_is_valid (fd))
-    return fd;
+    goto out;
+
   if (do_check_nonce(fd, &nonce, NULL) != TRUE) {
     _dbus_verbose ("nonce check failed. Closing socket.\n");
     _dbus_close_socket(fd, NULL);
-    return _dbus_socket_get_invalid ();
+    _dbus_socket_invalidate (&fd);
+    goto out;
   }
 
+out:
+  _dbus_string_free (&nonce);
   return fd;
 }
 
