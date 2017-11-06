@@ -280,6 +280,12 @@ do_noncefile_create (DBusNonceFile *noncefile,
 
     _dbus_assert (noncefile);
 
+    /* Make it valid to "free" these even if _dbus_string_init() runs
+     * out of memory: see comment in do_check_nonce() */
+    _dbus_string_init_const (&randomStr, "");
+    _dbus_string_init_const (&noncefile->dir, "");
+    _dbus_string_init_const (&noncefile->path, "");
+
     if (!_dbus_string_init (&randomStr))
       {
         dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
