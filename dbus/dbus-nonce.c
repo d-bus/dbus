@@ -43,6 +43,20 @@ do_check_nonce (DBusSocket fd, const DBusString *nonce, DBusError *error)
 
   nleft = 16;
 
+  /* This is a trick to make it safe to call _dbus_string_free on these
+   * strings during error unwinding, even if allocating memory for them
+   * fails. A constant DBusString is considered to be valid to "free",
+   * even though there is nothing to free (of course the free operation
+   * is trivial, because it does not own its own buffer); but
+   * unlike a mutable DBusString, initializing a constant DBusString
+   * cannot fail.
+   *
+   * We must successfully re-initialize the strings to be mutable before
+   * writing to them, of course.
+   */
+  _dbus_string_init_const (&buffer, "");
+  _dbus_string_init_const (&p, "");
+
   if (   !_dbus_string_init (&buffer)
       || !_dbus_string_init (&p) ) {
         dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
