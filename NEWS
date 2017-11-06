@@ -15,6 +15,11 @@ Fixes:
   cross-compilation on non-GNU platforms like macOS
   (fd.o #103493, Tony Theodore)
 
+Internal changes:
+
+• Preparations for future support for restricted sockets used by
+  app containers like Flatpak (fd.o #101354, Simon McVittie)
+
 dbus 1.12.0 (2017-10-30)
 ========================
 
