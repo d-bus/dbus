@@ -402,7 +402,7 @@ _dbus_string_get_const_udata_len (const DBusString *str, int start, int len)
 #define _DBUS_STRING_DEFINE_STATIC(name, str)                           \
   static const char _dbus_static_string_##name[] = str;                 \
   static const DBusString name = { _dbus_static_string_##name,          \
-                                   sizeof(_dbus_static_string_##name),  \
+                                   sizeof(_dbus_static_string_##name) - 1, \
                                    sizeof(_dbus_static_string_##name) + \
                                    _DBUS_STRING_ALLOCATION_PADDING,     \
                                    TRUE, TRUE, FALSE, 0 }
