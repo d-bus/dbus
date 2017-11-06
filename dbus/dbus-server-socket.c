@@ -75,9 +75,7 @@ socket_finalize (DBusServer *server)
   dbus_free (socket_server->fds);
   dbus_free (socket_server->watch);
   dbus_free (socket_server->socket_name);
-  if (socket_server->noncefile)
-	_dbus_noncefile_delete (socket_server->noncefile, NULL);
-  dbus_free (socket_server->noncefile);
+  _dbus_noncefile_delete (&socket_server->noncefile, NULL);
   dbus_free (server);
 }
 
@@ -409,7 +407,7 @@ _dbus_server_new_for_tcp_socket (const char     *host,
   DBusString address;
   DBusString host_str;
   DBusString port_str;
-  DBusNonceFile *noncefile;
+  DBusNonceFile *noncefile = NULL;
   
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
@@ -466,47 +464,29 @@ _dbus_server_new_for_tcp_socket (const char     *host,
 
   if (use_nonce)
     {
-      noncefile = dbus_new0 (DBusNonceFile, 1);
-      if (noncefile == NULL)
+      if (!_dbus_noncefile_create (&noncefile, error) ||
+          !_dbus_string_append (&address, ",noncefile=") ||
+          !_dbus_address_append_escaped (&address, _dbus_noncefile_get_path (noncefile)))
         {
           dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
           goto failed_2;
         }
-
-      if (!_dbus_noncefile_create (noncefile, error))
-          goto failed_3;
-
-      if (!_dbus_string_append (&address, ",noncefile=") ||
-          !_dbus_address_append_escaped (&address, _dbus_noncefile_get_path (noncefile)))
-        {
-          dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
-          goto failed_4;
-        }
-
     }
 
   server = _dbus_server_new_for_socket (listen_fds, nlisten_fds, &address, noncefile, error);
   if (server == NULL)
-    {
-      if (noncefile != NULL)
-        goto failed_4;
-      else
-        goto failed_2;
-    }
+    goto failed_2;
 
+  /* server has taken ownership of noncefile and the fds in listen_fds */
   _dbus_string_free (&port_str);
   _dbus_string_free (&address);
   dbus_free(listen_fds);
 
   return server;
 
- failed_4:
-  _dbus_noncefile_delete (noncefile, NULL);
-
- failed_3:
-  dbus_free (noncefile);
-
  failed_2:
+  _dbus_noncefile_delete (&noncefile, NULL);
+
   for (i = 0 ; i < nlisten_fds ; i++)
     _dbus_close_socket (listen_fds[i], NULL);
   dbus_free(listen_fds);

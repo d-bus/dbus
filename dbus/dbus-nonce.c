@@ -30,6 +30,12 @@
 
 #include <stdio.h>
 
+struct DBusNonceFile
+{
+  DBusString path;
+  DBusString dir;
+};
+
 static dbus_bool_t
 do_check_nonce (DBusSocket fd, const DBusString *nonce, DBusError *error)
 {
@@ -281,16 +287,20 @@ _dbus_send_nonce (DBusSocket        fd,
 }
 
 static dbus_bool_t
-do_noncefile_create (DBusNonceFile *noncefile,
+do_noncefile_create (DBusNonceFile **noncefile_out,
                      DBusError *error,
                      dbus_bool_t use_subdir)
 {
+    DBusNonceFile *noncefile = NULL;
     DBusString randomStr;
     const char *tmp;
 
     _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-    _dbus_assert (noncefile);
+    _dbus_assert (noncefile_out != NULL);
+    _dbus_assert (*noncefile_out == NULL);
+
+    noncefile = dbus_new0 (DBusNonceFile, 1);
 
     /* Make it valid to "free" these even if _dbus_string_init() runs
      * out of memory: see comment in do_check_nonce() */
@@ -363,6 +373,7 @@ do_noncefile_create (DBusNonceFile *noncefile,
       }
     _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
+    *noncefile_out = noncefile;
     _dbus_string_free (&randomStr);
 
     return TRUE;
@@ -371,6 +382,7 @@ do_noncefile_create (DBusNonceFile *noncefile,
       _dbus_delete_directory (&noncefile->dir, NULL);
     _dbus_string_free (&noncefile->dir);
     _dbus_string_free (&noncefile->path);
+    dbus_free (noncefile);
     _dbus_string_free (&randomStr);
     return FALSE;
 }
@@ -379,33 +391,49 @@ do_noncefile_create (DBusNonceFile *noncefile,
 /**
  * creates a nonce file in a user-readable location and writes a generated nonce to it
  *
- * @param noncefile returns the nonce file location
+ * @param noncefile_out returns the nonce file location
  * @param error error details if creating the nonce file fails
  * @return TRUE iff the nonce file was successfully created
  */
 dbus_bool_t
-_dbus_noncefile_create (DBusNonceFile *noncefile,
+_dbus_noncefile_create (DBusNonceFile **noncefile_out,
                         DBusError *error)
 {
-    return do_noncefile_create (noncefile, error, /*use_subdir=*/FALSE);
+    return do_noncefile_create (noncefile_out, error, /*use_subdir=*/FALSE);
 }
 
 /**
  * deletes the noncefile and frees the DBusNonceFile object.
  *
- * @param noncefile the nonce file to delete. Contents will be freed.
+ * If noncefile_location points to #NULL, nothing is freed or deleted,
+ * similar to dbus_error_free().
+ *
+ * @param noncefile_location the nonce file to delete. Contents will be freed and cleared to #NULL.
  * @param error error details if the nonce file could not be deleted
  * @return TRUE
  */
 dbus_bool_t
-_dbus_noncefile_delete (DBusNonceFile *noncefile,
+_dbus_noncefile_delete (DBusNonceFile **noncefile_location,
                         DBusError *error)
 {
+    DBusNonceFile *noncefile;
+
     _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+    _dbus_assert (noncefile_location != NULL);
+
+    noncefile = *noncefile_location;
+    *noncefile_location = NULL;
+
+    if (noncefile == NULL)
+      {
+        /* Nothing to do */
+        return TRUE;
+      }
 
     _dbus_delete_file (&noncefile->path, error);
     _dbus_string_free (&noncefile->dir);
     _dbus_string_free (&noncefile->path);
+    dbus_free (noncefile);
     return TRUE;
 }
 
@@ -414,33 +442,49 @@ _dbus_noncefile_delete (DBusNonceFile *noncefile,
  * creates a nonce file in a user-readable location and writes a generated nonce to it.
  * Initializes the noncefile object.
  *
- * @param noncefile returns the nonce file location
+ * @param noncefile_out returns the nonce file location
  * @param error error details if creating the nonce file fails
  * @return TRUE iff the nonce file was successfully created
  */
 dbus_bool_t
-_dbus_noncefile_create (DBusNonceFile *noncefile,
+_dbus_noncefile_create (DBusNonceFile **noncefile_out,
                         DBusError *error)
 {
-    return do_noncefile_create (noncefile, error, /*use_subdir=*/TRUE);
+    return do_noncefile_create (noncefile_out, error, /*use_subdir=*/TRUE);
 }
 
 /**
  * deletes the noncefile and frees the DBusNonceFile object.
  *
- * @param noncefile the nonce file to delete. Contents will be freed.
+ * If noncefile_location points to #NULL, nothing is freed or deleted,
+ * similar to dbus_error_free().
+ *
+ * @param noncefile_location the nonce file to delete. Contents will be freed and cleared to #NULL.
  * @param error error details if the nonce file could not be deleted
  * @return TRUE
  */
 dbus_bool_t
-_dbus_noncefile_delete (DBusNonceFile *noncefile,
+_dbus_noncefile_delete (DBusNonceFile **noncefile_location,
                         DBusError *error)
 {
+    DBusNonceFile *noncefile;
+
     _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+    _dbus_assert (noncefile_location != NULL);
+
+    noncefile = *noncefile_location;
+    *noncefile_location = NULL;
+
+    if (noncefile == NULL)
+      {
+        /* Nothing to do */
+        return TRUE;
+      }
 
     _dbus_delete_directory (&noncefile->dir, error);
     _dbus_string_free (&noncefile->dir);
     _dbus_string_free (&noncefile->path);
+    dbus_free (noncefile);
     return TRUE;
 }
 #endif

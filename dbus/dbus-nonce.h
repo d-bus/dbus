@@ -33,18 +33,12 @@ DBUS_BEGIN_DECLS
 
 typedef struct DBusNonceFile DBusNonceFile;
 
-struct DBusNonceFile
-{
-  DBusString path;
-  DBusString dir;
-};
-
 // server
 
-dbus_bool_t _dbus_noncefile_create (DBusNonceFile *noncefile,
+dbus_bool_t _dbus_noncefile_create (DBusNonceFile **noncefile_out,
                                     DBusError *error);
 
-dbus_bool_t _dbus_noncefile_delete (DBusNonceFile *noncefile,
+dbus_bool_t _dbus_noncefile_delete (DBusNonceFile **noncefile_location,
                                     DBusError *error);
 
 dbus_bool_t _dbus_noncefile_check_nonce (DBusSocket fd,
