@@ -212,6 +212,8 @@ test_roundtrips (TestRoundtripFunc func)
   }
 }
 
+_DBUS_STRING_DEFINE_STATIC (test_static_string, "hello");
+
 /**
  * @ingroup DBusStringInternals
  * Unit test for DBusString.
@@ -231,6 +233,16 @@ _dbus_string_test (void)
   long v;
   int lens[] = { 0, 1, 2, 3, 4, 5, 10, 16, 17, 18, 25, 31, 32, 33, 34, 35, 63, 64, 65, 66, 67, 68, 69, 70, 71, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136 };
   char *s;
+  DBusRealString *real_test_static_string = (DBusRealString *) &test_static_string;
+
+  _dbus_assert (real_test_static_string->str != NULL);
+  _dbus_assert (strcmp ((const char *) real_test_static_string->str, "hello") == 0);
+  _dbus_assert (real_test_static_string->len == 5);
+  _dbus_assert (real_test_static_string->allocated > 5);
+  _dbus_assert (real_test_static_string->constant);
+  _dbus_assert (real_test_static_string->locked);
+  _dbus_assert (!real_test_static_string->invalid);
+  _dbus_assert (real_test_static_string->align_offset == 0);
 
   /* Test shortening and setting length */
   i = 0;
