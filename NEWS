@@ -1,4 +1,4 @@
-dbus 1.12.1 (UNRELEASED)
+dbus 1.12.2 (UNRELEASED)
 ========================
 
 ...
@@ -11,6 +11,16 @@ Fixes:
 • When building for Windows with Autotools, avoid `echo -e`, fixing
   cross-compilation on non-GNU platforms like macOS
   (fd.o #103493, Tony Theodore)
+
+• Fix crashes in the server side of the nonce-tcp: transport under
+  various error conditions. This transport should normally only be used
+  on Windows, where AF_UNIX sockets are unavailable; the unix: transport
+  is the only one recommended for production use on Unix platforms.
+  (fd.o #103597, Simon McVittie)
+
+Internal changes:
+
+• Improve test coverage on Travis-CI (Simon McVittie)
 
 dbus 1.12.0 (2017-10-30)
 ========================
