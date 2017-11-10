@@ -6,6 +6,12 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Enhancements:
+
+• Log a warning if a new connection cannot be accepted due to an
+  out-of-memory condition or failure to identify its AppArmor or
+  SELinux context (fd.o #103592, Simon McVittie)
+
 Fixes:
 
 • Make use of $(MKDIR_P) compatible with install-sh, fixing build when a
