@@ -15,10 +15,24 @@ Fixes:
   cross-compilation on non-GNU platforms like macOS
   (fd.o #103493, Tony Theodore)
 
+• Fix crashes in the server side of the nonce-tcp: transport under
+  various error conditions. This transport should normally only be used
+  on Windows, where AF_UNIX sockets are unavailable; the unix: transport
+  is the only one recommended for production use on Unix platforms.
+  (fd.o #103597, Simon McVittie)
+
 Internal changes:
 
 • Preparations for future support for restricted sockets used by
   app containers like Flatpak (fd.o #101354, Simon McVittie)
+
+• Harden the nonce-tcp: transport against resource leaks and
+  use-after-free (fd.o #103597, Simon McVittie)
+
+• Improve test coverage on Travis-CI (Simon McVittie)
+
+• Make _DBUS_STRING_DEFINE_STATIC more consistent with
+  _dbus_string_init_const() (fd.o #89104, Simon McVittie)
 
 dbus 1.12.0 (2017-10-30)
 ========================
