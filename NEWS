@@ -3,6 +3,12 @@ dbus 1.12.2 (UNRELEASED)
 
 ...
 
+Enhancements:
+
+• Log a warning if a new connection cannot be accepted due to an
+  out-of-memory condition or failure to identify its AppArmor or
+  SELinux context (fd.o #103592, Simon McVittie)
+
 Fixes:
 
 • Make use of $(MKDIR_P) compatible with install-sh, fixing build when a
