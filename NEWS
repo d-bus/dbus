@@ -6,6 +6,22 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Internal changes:
+
+• Preparations for future support for restricted sockets used by
+  app containers like Flatpak (fd.o #101354, Simon McVittie)
+
+• Harden the nonce-tcp: transport against resource leaks and
+  use-after-free (fd.o #103597, Simon McVittie)
+
+• Make _DBUS_STRING_DEFINE_STATIC more consistent with
+  _dbus_string_init_const() (fd.o #89104, Simon McVittie)
+
+dbus 1.12.2 (2017-11-13)
+========================
+
+The “spider pumpkin” release.
+
 Enhancements:
 
 • Log a warning if a new connection cannot be accepted due to an
@@ -29,16 +45,7 @@ Fixes:
 
 Internal changes:
 
-• Preparations for future support for restricted sockets used by
-  app containers like Flatpak (fd.o #101354, Simon McVittie)
-
-• Harden the nonce-tcp: transport against resource leaks and
-  use-after-free (fd.o #103597, Simon McVittie)
-
 • Improve test coverage on Travis-CI (Simon McVittie)
-
-• Make _DBUS_STRING_DEFINE_STATIC more consistent with
-  _dbus_string_init_const() (fd.o #89104, Simon McVittie)
 
 dbus 1.12.0 (2017-10-30)
 ========================
