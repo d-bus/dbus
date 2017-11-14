@@ -438,7 +438,7 @@ update_desktop_file_entry (BusActivation       *activation,
       else if (bus_context_get_servicehelper (activation->context) != NULL)
         {
           bus_context_log (activation->context, DBUS_SYSTEM_LOG_WARNING,
-                           "Service file \"%s\" should have been named \"%s\""
+                           "Service file \"%s\" should have been named \"%s\" "
                            "and will not work with system bus activation",
                            _dbus_string_get_const_data (&file_path),
                            _dbus_string_get_const_data (&expected_name));
