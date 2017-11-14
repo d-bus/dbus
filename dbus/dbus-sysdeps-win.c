@@ -3099,7 +3099,6 @@ _dbus_get_autolaunch_address (const char *scope, DBusString *address,
   _snprintf(dbus_args, sizeof(dbus_args) - 1, "\"%s\" %s", dbus_exe_path,  " --session");
 
 //  argv[i] = "--config-file=bus\\session.conf";
-//  printf("create process \"%s\" %s\n", dbus_exe_path, dbus_args);
   if(CreateProcessA(dbus_exe_path, dbus_args, NULL, NULL, FALSE, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
     {
       CloseHandle (pi.hThread);

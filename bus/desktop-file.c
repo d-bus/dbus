@@ -598,27 +598,6 @@ report_error (BusDesktopFileParser *parser,
                     "Error at line %d: %s\n", parser->line_num, message);
 }
 
-#if 0
-static void
-dump_desktop_file (BusDesktopFile *file)
-{
-  int i;
-
-  for (i = 0; i < file->n_sections; i++)
-    {
-      int j;
-      
-      printf ("[%s]\n", file->sections[i].section_name);
-
-      for (j = 0; j < file->sections[i].n_lines; j++)
-	{
-	  printf ("%s=%s\n", file->sections[i].lines[j].key,
-		  file->sections[i].lines[j].value);
-	}
-    }
-}
-#endif
-
 BusDesktopFile*
 bus_desktop_file_load (DBusString *filename,
 		       DBusError  *error)

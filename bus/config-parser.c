@@ -2016,8 +2016,6 @@ bus_config_parser_start_element (BusConfigParser   *parser,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-  /* printf ("START: %s\n", element_name); */
-  
   t = top_element_type (parser);
 
   if (t == ELEMENT_NONE)
@@ -2217,8 +2215,6 @@ bus_config_parser_end_element (BusConfigParser   *parser,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-  /* printf ("END: %s\n", element_name); */
-  
   t = top_element_type (parser);
 
   if (t == ELEMENT_NONE)
@@ -2566,16 +2562,6 @@ bus_config_parser_content (BusConfigParser   *parser,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
-#if 0
-  {
-    const char *c_str;
-    
-    _dbus_string_get_const_data (content, &c_str);
-
-    printf ("CONTENT %d bytes: %s\n", _dbus_string_get_length (content), c_str);
-  }
-#endif
-  
   e = peek_element (parser);
   if (e == NULL)
     {
