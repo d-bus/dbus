@@ -54,7 +54,8 @@ get_test_exec (const char *exe,
 }
 
 static dbus_bool_t
-check_spawn_nonexistent (void *data)
+check_spawn_nonexistent (void        *data,
+                         dbus_bool_t  have_memory)
 {
   static const char arg_does_not_exist[] = "/this/does/not/exist/32542sdgafgafdg";
 
@@ -98,7 +99,8 @@ check_spawn_nonexistent (void *data)
 }
 
 static dbus_bool_t
-check_spawn_segfault (void *data)
+check_spawn_segfault (void        *data,
+                      dbus_bool_t  have_memory)
 {
   char *argv[4] = { NULL, NULL, NULL, NULL };
   DBusBabysitter *sitter = NULL;
@@ -153,7 +155,8 @@ check_spawn_segfault (void *data)
 }
 
 static dbus_bool_t
-check_spawn_exit (void *data)
+check_spawn_exit (void        *data,
+                  dbus_bool_t  have_memory)
 {
   char *argv[4] = { NULL, NULL, NULL, NULL };
   DBusBabysitter *sitter = NULL;
@@ -204,7 +207,8 @@ check_spawn_exit (void *data)
 }
 
 static dbus_bool_t
-check_spawn_and_kill (void *data)
+check_spawn_and_kill (void        *data,
+                      dbus_bool_t  have_memory)
 {
   char *argv[4] = { NULL, NULL, NULL, NULL };
   DBusBabysitter *sitter = NULL;

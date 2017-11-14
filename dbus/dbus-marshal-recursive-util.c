@@ -1357,7 +1357,8 @@ run_test_delete_values (NodeIterationData *nid)
 }
 
 static dbus_bool_t
-run_test_nodes_iteration (void *data)
+run_test_nodes_iteration (void        *data,
+                          dbus_bool_t  have_memory)
 {
   NodeIterationData *nid = data;
   DBusTypeReader reader;
@@ -1478,7 +1479,7 @@ run_test_nodes_in_one_configuration (TestTypeNode    **nodes,
     }
   else
     {
-      if (!run_test_nodes_iteration (&nid))
+      if (!run_test_nodes_iteration (&nid, TRUE))
         _dbus_test_fatal ("no memory");
     }
 

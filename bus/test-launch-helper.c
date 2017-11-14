@@ -58,7 +58,8 @@ test_post_hook (const char *name)
 
 /* returns true if good things happen, or if we get OOM */
 static dbus_bool_t
-bus_activation_helper_oom_test (void *data)
+bus_activation_helper_oom_test (void        *data,
+                                dbus_bool_t  have_memory)
 {
   const char *service;
   DBusError error;
@@ -68,6 +69,7 @@ bus_activation_helper_oom_test (void *data)
   retval = TRUE;
 
   dbus_error_init (&error);
+
   if (!run_launch_helper (service, &error))
     {
       _DBUS_ASSERT_ERROR_IS_SET (&error);

@@ -474,7 +474,8 @@ assert_message_as_expected (DBusMessage *m)
 
 /* Return TRUE on success or OOM, as per DBusTestMemoryFunction signature */
 static dbus_bool_t
-test_once (void *data)
+test_once (void        *data,
+           dbus_bool_t  have_memory)
 {
   gboolean *really_succeeded = data;
   Fixture fixture = { NULL, NULL };
@@ -545,7 +546,7 @@ test_simple (void)
 {
   gboolean really_succeeded = FALSE;
 
-  if (!test_once (&really_succeeded))
+  if (!test_once (&really_succeeded, TRUE))
     g_error ("Test failed");
 
   if (!really_succeeded)

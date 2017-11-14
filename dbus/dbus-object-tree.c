@@ -1674,7 +1674,8 @@ find_subtree_registered_or_unregistered (DBusObjectTree *tree,
 /* Returns TRUE if the right thing happens, but the right thing might
  * be OOM. */
 static dbus_bool_t
-object_tree_test_iteration (void *data)
+object_tree_test_iteration (void        *data,
+                            dbus_bool_t  have_memory)
 {
   const char *path0[] = { NULL };
   const char *path1[] = { "foo", NULL };

@@ -4371,20 +4371,28 @@ typedef struct
 } Check1Data;
 
 static dbus_bool_t
-check_oom_check1_func (void *data)
+check_oom_check1_func (void        *data,
+                       dbus_bool_t  have_memory)
 {
+  dbus_bool_t ret = TRUE;
   Check1Data *d = data;
 
-  if (! (* d->func) (d->context))
-    return FALSE;
+  if (!have_memory)
+    bus_context_quiet_log_begin (d->context);
 
-  if (!check_no_leftovers (d->context))
+  if (! (* d->func) (d->context))
+    ret = FALSE;
+
+  if (!have_memory)
+    bus_context_quiet_log_end (d->context);
+
+  if (ret && !check_no_leftovers (d->context))
     {
       _dbus_warn ("Messages were left over, should be covered by test suite");
-      return FALSE;
+      ret = FALSE;
     }
 
-  return TRUE;
+  return ret;
 }
 
 static void
@@ -4754,20 +4762,28 @@ typedef struct
 } Check2Data;
 
 static dbus_bool_t
-check_oom_check2_func (void *data)
+check_oom_check2_func (void        *data,
+                       dbus_bool_t  have_memory)
 {
+  dbus_bool_t ret = TRUE;
   Check2Data *d = data;
 
-  if (! (* d->func) (d->context, d->connection))
-    return FALSE;
+  if (!have_memory)
+    bus_context_quiet_log_begin (d->context);
 
-  if (!check_no_leftovers (d->context))
+  if (! (* d->func) (d->context, d->connection))
+    ret = FALSE;
+
+  if (!have_memory)
+    bus_context_quiet_log_end (d->context);
+
+  if (ret && !check_no_leftovers (d->context))
     {
       _dbus_warn ("Messages were left over, should be covered by test suite");
-      return FALSE;
+      ret = FALSE;
     }
 
-  return TRUE;
+  return ret;
 }
 
 static void

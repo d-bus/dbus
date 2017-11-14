@@ -74,6 +74,9 @@ struct BusContext
   unsigned int keep_umask : 1;
   unsigned int allow_anonymous : 1;
   unsigned int systemd_activation : 1;
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+  unsigned int quiet_log : 1;
+#endif
   dbus_bool_t watches_enabled;
 };
 
@@ -1386,7 +1389,11 @@ bus_context_log (BusContext *context, DBusSystemLogSeverity severity, const char
       if (!_dbus_string_append_printf_valist (&full_msg, msg, args))
         goto oom_out;
 
-      _dbus_log (severity, "%s", _dbus_string_get_const_data (&full_msg));
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+      if (severity > DBUS_SYSTEM_LOG_WARNING || !context->quiet_log)
+#endif
+        _dbus_log (severity, "%s", _dbus_string_get_const_data (&full_msg));
+
     oom_out:
       _dbus_string_free (&full_msg);
     }
@@ -1828,3 +1835,17 @@ bus_context_check_all_watches (BusContext *context)
       _dbus_server_toggle_all_watches (server, enabled);
     }
 }
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+void
+bus_context_quiet_log_begin (BusContext *context)
+{
+  context->quiet_log = TRUE;
+}
+
+void
+bus_context_quiet_log_end (BusContext *context)
+{
+  context->quiet_log = FALSE;
+}
+#endif

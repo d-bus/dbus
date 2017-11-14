@@ -2245,7 +2245,8 @@ assert_large_rule (BusMatchRule *rule)
 }
 
 static dbus_bool_t
-test_parsing (void *data)
+test_parsing (void        *data,
+              dbus_bool_t  have_memory)
 {
   BusMatchRule *rule;
 

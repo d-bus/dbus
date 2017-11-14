@@ -146,4 +146,9 @@ dbus_bool_t       bus_context_check_security_policy              (BusContext    
                                                                   DBusError        *error);
 void              bus_context_check_all_watches                  (BusContext       *context);
 
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+void              bus_context_quiet_log_begin                    (BusContext *context);
+void              bus_context_quiet_log_end                      (BusContext *context);
+#endif
+
 #endif /* BUS_BUS_H */

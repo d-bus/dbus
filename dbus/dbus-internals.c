@@ -1006,7 +1006,7 @@ run_failing_each_malloc (int                    n_mallocs,
                      description, n_mallocs,
                      _dbus_get_fail_alloc_failures ());
 
-      if (!(* func) (data))
+      if (!(* func) (data, FALSE))
         return FALSE;
       
       n_mallocs -= 1;
@@ -1046,7 +1046,7 @@ _dbus_test_oom_handling (const char             *description,
 
   _dbus_verbose ("Running once to count mallocs\n");
   
-  if (!(* func) (data))
+  if (!(* func) (data, TRUE))
     return FALSE;
   
   approx_mallocs = _DBUS_INT_MAX - _dbus_get_fail_alloc_counter ();

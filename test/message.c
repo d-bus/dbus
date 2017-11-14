@@ -37,7 +37,8 @@
 /* Return TRUE if the right thing happens, but the right thing might include
  * OOM. */
 static dbus_bool_t
-test_array (void *contained_signature)
+test_array (void        *contained_signature,
+            dbus_bool_t  have_memory)
 {
   DBusMessage *m;
   DBusMessageIter iter;
@@ -149,7 +150,8 @@ out:
 /* Return TRUE if the right thing happens, but the right thing might include
  * OOM or inability to pass fds. */
 static dbus_bool_t
-test_fd (void *ignored)
+test_fd (void        *ignored,
+         dbus_bool_t  have_memory)
 {
   DBusMessage *m = NULL;
   DBusPipe pipe;
@@ -182,7 +184,8 @@ out:
  * Return TRUE if the right thing happens, but the right thing might include
  * OOM. */
 static dbus_bool_t
-test_zero_iter (void *ignored)
+test_zero_iter (void        *ignored,
+                dbus_bool_t  have_memory)
 {
   DBusMessage *m;
   DBusMessageIter iter = DBUS_MESSAGE_ITER_INIT_CLOSED;

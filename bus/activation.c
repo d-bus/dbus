@@ -2531,7 +2531,8 @@ typedef struct
 } CheckData;
 
 static dbus_bool_t
-check_func (void *data)
+check_func (void        *data,
+            dbus_bool_t  have_memory)
 {
   CheckData          *d;
   BusActivationEntry *entry;
@@ -2575,7 +2576,7 @@ do_test (const char *description, dbus_bool_t oom_test, CheckData *data)
   if (oom_test)
     err = !_dbus_test_oom_handling (description, check_func, data);
   else
-    err = !check_func (data);
+    err = !check_func (data, TRUE);
 
   if (err)
     _dbus_test_fatal ("Test failed");
