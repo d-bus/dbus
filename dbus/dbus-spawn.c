@@ -34,6 +34,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <stdio.h>
 #include <stdlib.h>
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
@@ -1362,6 +1363,11 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
     }
 #endif
 
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   pid = fork ();
   
   if (pid < 0)
@@ -1385,7 +1391,10 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
       /* Close the parent's end of the pipes. */
       close_and_invalidate (&child_err_report_pipe[READ_END]);
       close_and_invalidate (&babysitter_pipe[0].fd);
-      
+
+      fflush (stdout);
+      fflush (stderr);
+
       /* Create the child that will exec () */
       grandchild_pid = fork ();
       

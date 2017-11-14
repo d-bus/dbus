@@ -354,6 +354,11 @@ main (int argc, char **argv)
       return 127;
     }
 
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   bus_pid = fork ();
 
   if (bus_pid < 0)
@@ -400,6 +405,9 @@ main (int argc, char **argv)
       !dbus_setenv ("DBUS_STARTER_ADDRESS", NULL) ||
       !dbus_setenv ("DBUS_STARTER_BUS_TYPE", NULL))
     oom ();
+
+  fflush (stdout);
+  fflush (stderr);
 
   app_pid = fork ();
 

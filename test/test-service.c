@@ -1,6 +1,7 @@
 #include <config.h>
 
 #include "test-utils.h"
+#include <stdio.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -424,7 +425,14 @@ main (int    argc,
 #ifndef DBUS_WIN
    if (do_fork)
     {
-      pid_t pid = fork ();
+      pid_t pid;
+
+      /* Make sure our output buffers aren't redundantly printed by both the
+       * parent and the child */
+      fflush (stdout);
+      fflush (stderr);
+
+      pid = fork ();
       if (pid != 0)
         exit (0);
       sleep (1);

@@ -35,6 +35,7 @@
 #include "dbus-test.h"
 
 #include <sys/types.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -99,6 +100,12 @@ _dbus_become_daemon (const DBusString *pidfile,
     }
 
   _dbus_verbose ("forking...\n");
+
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   switch ((child_pid = fork ()))
     {
     case -1:

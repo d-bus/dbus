@@ -1040,6 +1040,11 @@ _dbus_connect_exec (const char     *path,
       _dbus_fd_set_close_on_exec (fds[1]);
     }
 
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   pid = fork ();
   if (pid < 0)
     {
@@ -3622,6 +3627,11 @@ _read_subprocess_line_argv (const char *progpath,
                      progpath, _dbus_strerror (errno));
       goto out;
     }
+
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
 
   pid = fork ();
   if (pid < 0)

@@ -656,6 +656,11 @@ babysit (int   exit_with_session,
       exit (1);
     }
 
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   ret = fork ();
 
   if (ret < 0)
@@ -1125,6 +1130,11 @@ main (int argc, char **argv)
       exit (1);
     }
 
+  /* Make sure our output buffers aren't redundantly printed by both the
+   * parent and the child */
+  fflush (stdout);
+  fflush (stderr);
+
   ret = fork ();
   if (ret < 0)
     {
@@ -1150,7 +1160,9 @@ main (int argc, char **argv)
       verbose ("=== Babysitter's intermediate parent created\n");
 
       /* Fork once more to create babysitter */
-      
+
+      fflush (stdout);
+      fflush (stderr);
       ret = fork ();
       if (ret < 0)
         {
