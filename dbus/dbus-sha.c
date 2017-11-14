@@ -529,10 +529,10 @@ check_sha_binary (const unsigned char *input,
   _dbus_string_init_const (&expected_str, expected);
 
   if (!_dbus_string_init (&results))
-    _dbus_assert_not_reached ("no memory for SHA-1 results");
+    _dbus_test_fatal ("no memory for SHA-1 results");
 
   if (!_dbus_sha_compute (&input_str, &results))
-    _dbus_assert_not_reached ("no memory for SHA-1 results");
+    _dbus_test_fatal ("no memory for SHA-1 results");
 
   if (!_dbus_string_equal (&expected_str, &results))
     {
@@ -622,7 +622,7 @@ decode_compact_string (const DBusString *line,
           if (byte_containing_next_bit >= _dbus_string_get_length (decoded))
             {
               if (!_dbus_string_set_length (decoded, byte_containing_next_bit + 1))
-                _dbus_assert_not_reached ("no memory to extend to next byte");
+                _dbus_test_fatal ("no memory to extend to next byte");
             }
 
           old_byte = _dbus_string_get_byte (decoded, byte_containing_next_bit);
@@ -666,7 +666,7 @@ get_next_expected_result (DBusString *results,
   retval = FALSE;
   
   if (!_dbus_string_init (&line))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
   
  next_iteration:
   while (_dbus_string_pop_line (results, &line))
@@ -689,7 +689,7 @@ get_next_expected_result (DBusString *results,
           int i;
           
           if (!_dbus_string_move (&line, 0, result, 0))
-            _dbus_assert_not_reached ("no memory");
+            _dbus_test_fatal ("no memory");
 
           i = 0;
           while (i < _dbus_string_get_length (result))
@@ -723,7 +723,7 @@ get_next_expected_result (DBusString *results,
                   break;
                 default:
                   if ((c < '0' || c > '9') && (c < 'a' || c > 'f'))
-                    _dbus_assert_not_reached ("invalid SHA-1 test script");
+                    _dbus_test_fatal ("invalid SHA-1 test script");
                 }
 
               ++i;
@@ -757,33 +757,33 @@ process_test_data (const char *test_data_dir)
   retval = FALSE;
   
   if (!_dbus_string_init (&tests_file))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_init (&results_file))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_init (&tests))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_init (&results))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_init (&line))
-    _dbus_assert_not_reached ("no memory");
-  
+    _dbus_test_fatal ("no memory");
+
   if (!_dbus_string_append (&tests_file, test_data_dir))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_append (&results_file, test_data_dir))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   _dbus_string_init_const (&tmp, "sha-1/byte-messages.sha1");
   if (!_dbus_concat_dir_and_file (&tests_file, &tmp))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   _dbus_string_init_const (&tmp, "sha-1/byte-hashes.sha1");
   if (!_dbus_concat_dir_and_file (&results_file, &tmp))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_file_get_contents (&tests, &tests_file, &error))
     {
@@ -845,16 +845,16 @@ process_test_data (const char *test_data_dir)
           success = FALSE;
           
           if (!_dbus_string_init (&next_line))
-            _dbus_assert_not_reached ("no memory");
+            _dbus_test_fatal ("no memory");
 
           if (!_dbus_string_init (&expected))
-            _dbus_assert_not_reached ("no memory");
+            _dbus_test_fatal ("no memory");
           
           if (!_dbus_string_init (&test))
-            _dbus_assert_not_reached ("no memory");
+            _dbus_test_fatal ("no memory");
 
           if (!_dbus_string_init (&result))
-            _dbus_assert_not_reached ("no memory");
+            _dbus_test_fatal ("no memory");
 
           /* the "compact strings" are "^"-terminated not
            * newline-terminated so readahead to find the
@@ -866,7 +866,7 @@ process_test_data (const char *test_data_dir)
               if (!_dbus_string_append_byte (&line, ' ') ||
                   !_dbus_string_move (&next_line, 0, &line,
                                       _dbus_string_get_length (&line)))
-                _dbus_assert_not_reached ("no memory");
+                _dbus_test_fatal ("no memory");
             }
           
           if (!decode_compact_string (&line, &test))
@@ -877,7 +877,7 @@ process_test_data (const char *test_data_dir)
             }
           
           if (!_dbus_sha_compute (&test, &result))
-            _dbus_assert_not_reached ("no memory for SHA-1 result");
+            _dbus_test_fatal ("no memory for SHA-1 result");
 
           if (!get_next_expected_result (&results, &expected))
             {

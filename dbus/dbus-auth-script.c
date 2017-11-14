@@ -226,17 +226,17 @@ auth_set_unix_credentials(DBusAuth  *auth,
 
   credentials = _dbus_credentials_new ();
   if (credentials == NULL)
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (uid != DBUS_UID_UNSET)
     {
       if (!_dbus_credentials_add_unix_uid (credentials, uid))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
   if (pid != DBUS_PID_UNSET)
     {
       if (!_dbus_credentials_add_pid (credentials, pid))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
   _dbus_auth_set_credentials (auth, credentials);
 

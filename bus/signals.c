@@ -29,6 +29,7 @@
 #include "services.h"
 #include "utils.h"
 #include <dbus/dbus-marshal-validate.h>
+#include <dbus/dbus-test-tap.h>
 
 struct BusMatchRule
 {
@@ -2739,7 +2740,7 @@ test_matching (void)
   message1 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message1 != NULL);
   if (!dbus_message_set_member (message1, "Frobated"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   v_STRING = "foobar";
   v_INT32 = 3;
@@ -2747,8 +2748,8 @@ test_matching (void)
                                  DBUS_TYPE_STRING, &v_STRING,
                                  DBUS_TYPE_INT32, &v_INT32,
                                  NULL))
-    _dbus_assert_not_reached ("oom");
-  
+    _dbus_test_fatal ("oom");
+
   check_matching (message1, 1,
                   should_match_message_1,
                   should_not_match_message_1);
@@ -2758,14 +2759,14 @@ test_matching (void)
   message2 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message2 != NULL);
   if (!dbus_message_set_member (message2, "NameOwnerChanged"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   /* Obviously this isn't really a NameOwnerChanged signal. */
   v_STRING = EXAMPLE_NAME;
   if (!dbus_message_append_args (message2,
                                  DBUS_TYPE_STRING, &v_STRING,
                                  NULL))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   check_matching (message2, 2,
                   should_match_message_2,
@@ -2814,12 +2815,12 @@ test_path_match (int type,
 
   _dbus_assert (message != NULL);
   if (!dbus_message_set_member (message, "Foo"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   if (!dbus_message_append_args (message,
                                  type, &path,
                                  NULL))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   matched = match_rule_matches (rule, NULL, NULL, message, 0);
 
@@ -2924,22 +2925,22 @@ test_matching_path_namespace (void)
   message1 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message1 != NULL);
   if (!dbus_message_set_path (message1, "/foo/TheObjectManager"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   message2 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message2 != NULL);
   if (!dbus_message_set_path (message2, "/foo/TheObjectManager/child_object"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   message3 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message3 != NULL);
   if (!dbus_message_set_path (message3, "/foo/TheObjectManagerOther"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   message4 = dbus_message_new (DBUS_MESSAGE_TYPE_SIGNAL);
   _dbus_assert (message4 != NULL);
   if (!dbus_message_set_path (message4, "/"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   check_matching (message1, 1,
                   path_namespace_should_match_message_1,
@@ -2971,7 +2972,7 @@ bus_signals_test (const DBusString *test_data_dir)
   bus_matchmaker_unref (matchmaker);
 
   if (!_dbus_test_oom_handling ("parsing match rules", test_parsing, NULL))
-    _dbus_assert_not_reached ("Parsing match rules test failed");
+    _dbus_test_fatal ("Parsing match rules test failed");
 
   test_equality ();
   test_matching ();

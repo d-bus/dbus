@@ -38,7 +38,7 @@ do_byteswap_test (int byte_order)
   int opposite_order;
 
   if (!_dbus_string_init (&signature) || !_dbus_string_init (&body))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   opposite_order = byte_order == DBUS_LITTLE_ENDIAN ? DBUS_BIG_ENDIAN : DBUS_LITTLE_ENDIAN;
   
@@ -52,10 +52,10 @@ do_byteswap_test (int byte_order)
       DBusTypeReader copy_reader;
 
       if (!_dbus_string_init (&copy))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       if (!_dbus_string_copy (&body, 0, &copy, 0))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       _dbus_marshal_byteswap (&signature, 0,
                               byte_order,

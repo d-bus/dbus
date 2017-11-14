@@ -26,6 +26,7 @@
 #include "dbus-list.h"
 #include "dbus-mempool.h"
 #include "dbus-threads-internal.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusList Linked list
@@ -963,10 +964,10 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
-      
+        _dbus_test_fatal ("could not allocate for append");
+
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("count not allocate for prepend");
+        _dbus_test_fatal ("count not allocate for prepend");
       ++i;
 
       verify_list (&list1);
@@ -992,9 +993,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1037,9 +1038,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1089,9 +1090,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
 
       verify_list (&list1);
@@ -1149,9 +1150,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1161,9 +1162,9 @@ _dbus_list_test (void)
       if ((i % 2) == 0)
         {
           if (!_dbus_list_remove (&list1, _DBUS_INT_TO_POINTER (i)))
-            _dbus_assert_not_reached ("element should have been in list");
+            _dbus_test_fatal ("element should have been in list");
           if (!_dbus_list_remove (&list2, _DBUS_INT_TO_POINTER (i)))
-            _dbus_assert_not_reached ("element should have been in list");
+            _dbus_test_fatal ("element should have been in list");
 
           verify_list (&list1);
           verify_list (&list2);
@@ -1183,9 +1184,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1195,9 +1196,9 @@ _dbus_list_test (void)
       if ((i % 2) != 0)
         {
           if (!_dbus_list_remove (&list1, _DBUS_INT_TO_POINTER (i)))
-            _dbus_assert_not_reached ("element should have been in list");
+            _dbus_test_fatal ("element should have been in list");
           if (!_dbus_list_remove (&list2, _DBUS_INT_TO_POINTER (i)))
-            _dbus_assert_not_reached ("element should have been in list");
+            _dbus_test_fatal ("element should have been in list");
 
           verify_list (&list1);
           verify_list (&list2);
@@ -1225,9 +1226,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1276,9 +1277,9 @@ _dbus_list_test (void)
   while (i < 10)
     {
       if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for append");
+        _dbus_test_fatal ("could not allocate for append");
       if (!_dbus_list_prepend (&list2, _DBUS_INT_TO_POINTER (i)))
-        _dbus_assert_not_reached ("could not allocate for prepend");
+        _dbus_test_fatal ("could not allocate for prepend");
       ++i;
     }
 
@@ -1346,11 +1347,11 @@ _dbus_list_test (void)
 
   /* using remove_last */
   if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (2)))
-    _dbus_assert_not_reached ("could not allocate for append");
+    _dbus_test_fatal ("could not allocate for append");
   if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (1)))
-    _dbus_assert_not_reached ("could not allocate for append");
+    _dbus_test_fatal ("could not allocate for append");
   if (!_dbus_list_append (&list1, _DBUS_INT_TO_POINTER (3)))
-    _dbus_assert_not_reached ("could not allocate for append");
+    _dbus_test_fatal ("could not allocate for append");
 
   _dbus_list_remove_last (&list1, _DBUS_INT_TO_POINTER (2));
   

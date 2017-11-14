@@ -1064,9 +1064,9 @@ _dbus_keyring_test (void)
   _dbus_assert (!_dbus_keyring_validate_context (&context));
   
   if (!_dbus_string_init (&context))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
   if (!_dbus_string_append_byte (&context, '\0'))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
   _dbus_assert (!_dbus_keyring_validate_context (&context));
   _dbus_string_free (&context);
 

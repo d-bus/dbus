@@ -39,6 +39,7 @@
 #include <dbus/dbus-spawn.h>
 #include <dbus/dbus-timeout.h>
 #include <dbus/dbus-sysdeps.h>
+#include <dbus/dbus-test-tap.h>
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
@@ -2577,7 +2578,7 @@ do_test (const char *description, dbus_bool_t oom_test, CheckData *data)
     err = !check_func (data);
 
   if (err)
-    _dbus_assert_not_reached ("Test failed");
+    _dbus_test_fatal ("Test failed");
 
   return TRUE;
 }
@@ -2698,7 +2699,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
 
   /* Do normal tests */
   if (!init_service_reload_test (&directory))
-    _dbus_assert_not_reached ("could not initiate service reload test");
+    _dbus_test_fatal ("could not initiate service reload test");
 
   if (!do_service_reload_test (test_data_dir, &directory, FALSE))
     {
@@ -2710,7 +2711,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
 
   /* Do OOM tests */
   if (!init_service_reload_test (&directory))
-    _dbus_assert_not_reached ("could not initiate service reload test");
+    _dbus_test_fatal ("could not initiate service reload test");
 
   if (!do_service_reload_test (test_data_dir, &directory, TRUE))
     {

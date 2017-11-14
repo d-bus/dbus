@@ -3077,9 +3077,9 @@ do_check_own_rules (BusPolicy  *policy)
       dbus_bool_t ret;
 
       if (!_dbus_string_init (&service_name))
-        _dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
       if (!_dbus_string_append (&service_name, checks[i].name))
-        _dbus_assert_not_reached ("couldn't append string");
+        _dbus_test_fatal ("couldn't append string");
 
       ret = bus_policy_check_can_own (policy, &service_name);
       _dbus_test_diag ("        Check name %s: %s", checks[i].name,
@@ -3190,20 +3190,20 @@ process_test_valid_subdir (const DBusString *test_base_dir,
   dir = NULL;
 
   if (!_dbus_string_init (&test_directory))
-    _dbus_assert_not_reached ("didn't allocate test_directory");
+    _dbus_test_fatal ("didn't allocate test_directory");
 
   _dbus_string_init_const (&filename, subdir);
 
   if (!_dbus_string_copy (test_base_dir, 0,
                           &test_directory, 0))
-    _dbus_assert_not_reached ("couldn't copy test_base_dir to test_directory");
+    _dbus_test_fatal ("couldn't copy test_base_dir to test_directory");
 
   if (!_dbus_concat_dir_and_file (&test_directory, &filename))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_free (&filename);
   if (!_dbus_string_init (&filename))
-    _dbus_assert_not_reached ("didn't allocate filename string");
+    _dbus_test_fatal ("didn't allocate filename string");
 
   dbus_error_init (&error);
   dir = _dbus_directory_open (&test_directory, &error);
@@ -3230,13 +3230,13 @@ process_test_valid_subdir (const DBusString *test_base_dir,
       LoaderOomData d;
 
       if (!_dbus_string_init (&full_path))
-        _dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
 
       if (!_dbus_string_copy (&test_directory, 0, &full_path, 0))
-        _dbus_assert_not_reached ("couldn't copy dir to full_path");
+        _dbus_test_fatal ("couldn't copy dir to full_path");
 
       if (!_dbus_concat_dir_and_file (&full_path, &filename))
-        _dbus_assert_not_reached ("couldn't concat file to dir");
+        _dbus_test_fatal ("couldn't concat file to dir");
 
       if (!_dbus_string_ends_with_c_str (&full_path, ".conf"))
         {
@@ -3264,8 +3264,8 @@ process_test_valid_subdir (const DBusString *test_base_dir,
        */
       /* if (!_dbus_test_oom_handling ("config-loader", check_loader_oom_func, &d)) */
       if (!check_loader_oom_func (&d))
-        _dbus_assert_not_reached ("test failed");
-      
+        _dbus_test_fatal ("test failed");
+
       _dbus_string_free (&full_path);
     }
 
@@ -3525,7 +3525,7 @@ all_are_equiv (const DBusString *target_directory)
   retval = FALSE;
 
   if (!_dbus_string_init (&filename))
-    _dbus_assert_not_reached ("didn't allocate filename string");
+    _dbus_test_fatal ("didn't allocate filename string");
 
   dbus_error_init (&error);
   dir = _dbus_directory_open (target_directory, &error);
@@ -3546,13 +3546,13 @@ all_are_equiv (const DBusString *target_directory)
       DBusString full_path;
 
       if (!_dbus_string_init (&full_path))
-	_dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
 
       if (!_dbus_string_copy (target_directory, 0, &full_path, 0))
-        _dbus_assert_not_reached ("couldn't copy dir to full_path");
+        _dbus_test_fatal ("couldn't copy dir to full_path");
 
       if (!_dbus_concat_dir_and_file (&full_path, &filename))
-        _dbus_assert_not_reached ("couldn't concat file to dir");
+        _dbus_test_fatal ("couldn't concat file to dir");
 
       if (!_dbus_string_ends_with_c_str (&full_path, ".conf"))
         {
@@ -3618,20 +3618,20 @@ process_test_equiv_subdir (const DBusString *test_base_dir,
   retval = FALSE;
 
   if (!_dbus_string_init (&test_directory))
-    _dbus_assert_not_reached ("didn't allocate test_directory");
+    _dbus_test_fatal ("didn't allocate test_directory");
 
   _dbus_string_init_const (&filename, subdir);
 
   if (!_dbus_string_copy (test_base_dir, 0,
 			  &test_directory, 0))
-    _dbus_assert_not_reached ("couldn't copy test_base_dir to test_directory");
+    _dbus_test_fatal ("couldn't copy test_base_dir to test_directory");
 
   if (!_dbus_concat_dir_and_file (&test_directory, &filename))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_free (&filename);
   if (!_dbus_string_init (&filename))
-    _dbus_assert_not_reached ("didn't allocate filename string");
+    _dbus_test_fatal ("didn't allocate filename string");
 
   dbus_error_init (&error);
   dir = _dbus_directory_open (&test_directory, &error);
@@ -3653,14 +3653,14 @@ process_test_equiv_subdir (const DBusString *test_base_dir,
 	continue;
 
       if (!_dbus_string_init (&full_path))
-	_dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
 
       if (!_dbus_string_copy (&test_directory, 0, &full_path, 0))
-        _dbus_assert_not_reached ("couldn't copy dir to full_path");
+        _dbus_test_fatal ("couldn't copy dir to full_path");
 
       if (!_dbus_concat_dir_and_file (&full_path, &filename))
-        _dbus_assert_not_reached ("couldn't concat file to dir");
-      
+        _dbus_test_fatal ("couldn't concat file to dir");
+
       equal = all_are_equiv (&full_path);
       _dbus_string_free (&full_path);
 
@@ -3732,21 +3732,21 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
       !_dbus_string_init (&data_home_based) ||
       !_dbus_string_init (&data_dirs_based) ||
       !_dbus_string_init (&data_dirs_based2))
-    _dbus_assert_not_reached ("OOM allocating strings");
+    _dbus_test_fatal ("OOM allocating strings");
 
   if (!_dbus_string_copy (test_base_dir, 0,
                           &full_path, 0))
-    _dbus_assert_not_reached ("couldn't copy test_base_dir to full_path");
+    _dbus_test_fatal ("couldn't copy test_base_dir to full_path");
 
   _dbus_string_init_const (&tmp, "valid-config-files");
 
   if (!_dbus_concat_dir_and_file (&full_path, &tmp))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_init_const (&tmp, "standard-session-dirs.conf");
 
   if (!_dbus_concat_dir_and_file (&full_path, &tmp))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
 #ifdef DBUS_WIN
   if (!_dbus_string_append (&install_root_based, DBUS_DATADIR) ||
@@ -3793,21 +3793,21 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
       !_dbus_string_append (&runtime_dir_based, xdg_runtime_dir) ||
       !_dbus_string_append (&data_home_based, xdg_data_home) ||
       !_dbus_string_append (&data_home_based, "/dbus-1/services"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
 
   if (!_dbus_ensure_directory (&runtime_dir_based, NULL))
-    _dbus_assert_not_reached ("Unable to create fake XDG_RUNTIME_DIR");
+    _dbus_test_fatal ("Unable to create fake XDG_RUNTIME_DIR");
 
   if (!_dbus_string_append (&runtime_dir_based, "/dbus-1/services"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
 
   /* Sanity check: the Makefile sets this up. We assume that if this is
    * right, the XDG_DATA_DIRS will be too. */
   if (!_dbus_string_starts_with_c_str (&data_home_based, dbus_test_builddir))
-    _dbus_assert_not_reached ("$XDG_DATA_HOME should start with $DBUS_TEST_BUILDDIR");
+    _dbus_test_fatal ("$XDG_DATA_HOME should start with $DBUS_TEST_BUILDDIR");
 
   if (!_dbus_string_starts_with_c_str (&runtime_dir_based, dbus_test_builddir))
-    _dbus_assert_not_reached ("$XDG_RUNTIME_DIR should start with $DBUS_TEST_BUILDDIR");
+    _dbus_test_fatal ("$XDG_RUNTIME_DIR should start with $DBUS_TEST_BUILDDIR");
 
   test_session_service_dir_matches[0] = _dbus_string_get_const_data (
       &runtime_dir_based);
@@ -3822,7 +3822,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   parser = bus_config_load (&full_path, TRUE, NULL, &error);
 
   if (parser == NULL)
-    _dbus_assert_not_reached (error.message);
+    _dbus_test_fatal ("%s", error.message);
 
   dirs = bus_config_parser_get_service_dirs (parser);
 
@@ -3872,7 +3872,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
     }
 
   if (!bus_config_parser_get_watched_dirs (parser, &watched_dirs))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
 
 #ifdef DBUS_WIN
   /* We expect all directories to be watched (not that it matters on Windows,
@@ -3952,7 +3952,7 @@ test_default_system_servicedirs (void)
   dirs = NULL;
 
   if (!_dbus_get_standard_system_servicedirs (&dirs))
-    _dbus_assert_not_reached ("couldn't get stardard dirs");
+    _dbus_test_fatal ("couldn't get stardard dirs");
 
   /* make sure we read and parse the env variable correctly */
   i = 0;

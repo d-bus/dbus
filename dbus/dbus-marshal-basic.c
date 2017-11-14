@@ -26,6 +26,7 @@
 #include "dbus-internals.h"
 #include "dbus-marshal-basic.h"
 #include "dbus-signature.h"
+#include <dbus/dbus-test-tap.h>
 
 #include <string.h>
 
@@ -1512,7 +1513,7 @@ swap_test_array (void *array,
      if (!_dbus_marshal_write_basic (&str, pos, DBUS_TYPE_##typename,   \
                                     &v_##typename,                      \
                                     byte_order, NULL))                  \
-       _dbus_assert_not_reached ("no memory");                          \
+       _dbus_test_fatal ("no memory");                                  \
    } while (0)
 
 #define DEMARSHAL_BASIC(typename, byte_order)                                   \
@@ -1528,7 +1529,7 @@ swap_test_array (void *array,
       {                                                                                 \
         _dbus_verbose_bytes_of_string (&str, dump_pos,                                  \
                                      _dbus_string_get_length (&str) - dump_pos);        \
-        _dbus_assert_not_reached ("demarshaled wrong value");                           \
+        _dbus_test_fatal ("demarshaled wrong value");                                   \
       }                                                                                 \
   } while (0)
 
@@ -1549,7 +1550,7 @@ swap_test_array (void *array,
         _dbus_verbose_bytes_of_string (&str, dump_pos,                                  \
                                        _dbus_string_get_length (&str) - dump_pos);      \
         _dbus_warn ("literal '%s'\nvalue  '%s'", literal, v_##typename);              \
-        _dbus_assert_not_reached ("demarshaled wrong value");                           \
+        _dbus_test_fatal ("demarshaled wrong value");                                   \
       }                                                                                 \
   } while (0)
 
@@ -1559,12 +1560,12 @@ swap_test_array (void *array,
      v_UINT32 = sizeof(literal);                                                                \
      if (!_dbus_marshal_write_basic (&str, pos, DBUS_TYPE_UINT32, &v_UINT32,                    \
                                      byte_order, &next))                                        \
-       _dbus_assert_not_reached ("no memory");                                                  \
+       _dbus_test_fatal ("no memory");                                                          \
      v_ARRAY_##typename = literal;                                                              \
      if (!_dbus_marshal_write_fixed_multi (&str, next, DBUS_TYPE_##typename,                    \
                                            &v_ARRAY_##typename, _DBUS_N_ELEMENTS(literal),      \
                                            byte_order, NULL))                                   \
-       _dbus_assert_not_reached ("no memory");                                                  \
+       _dbus_test_fatal ("no memory");                                                          \
    } while (0)
 
 #define DEMARSHAL_FIXED_ARRAY(typename, byte_order)                                             \
@@ -1591,7 +1592,7 @@ swap_test_array (void *array,
         _dbus_verbose_bytes ((const unsigned char *) literal, sizeof (literal), 0);                      \
         _dbus_verbose ("READ DATA\n");                                                  \
         _dbus_verbose_bytes ((const unsigned char *) v_ARRAY_##typename, sizeof (literal), 0);           \
-        _dbus_assert_not_reached ("demarshaled wrong fixed array value");               \
+        _dbus_test_fatal ("demarshaled wrong fixed array value");                                        \
       }                                                                                 \
   } while (0)
 
@@ -1639,7 +1640,7 @@ _dbus_marshal_test (void)
   int byte_order;
 
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   pos = 0;
 
@@ -1648,13 +1649,13 @@ _dbus_marshal_test (void)
   DEMARSHAL_BASIC (DOUBLE, DBUS_BIG_ENDIAN);
   t_DOUBLE = 3.14;
   if (!_DBUS_DOUBLES_BITWISE_EQUAL (t_DOUBLE, v_DOUBLE))
-    _dbus_assert_not_reached ("got wrong double value");
+    _dbus_test_fatal ("got wrong double value");
 
   MARSHAL_BASIC (DOUBLE, DBUS_LITTLE_ENDIAN, 3.14);
   DEMARSHAL_BASIC (DOUBLE, DBUS_LITTLE_ENDIAN);
   t_DOUBLE = 3.14;
   if (!_DBUS_DOUBLES_BITWISE_EQUAL (t_DOUBLE, v_DOUBLE))
-    _dbus_assert_not_reached ("got wrong double value");
+    _dbus_test_fatal ("got wrong double value");
 
   /* Marshal signed 16 integers */
   MARSHAL_TEST (INT16, DBUS_BIG_ENDIAN, -12345);

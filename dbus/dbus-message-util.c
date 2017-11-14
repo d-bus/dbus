@@ -389,7 +389,7 @@ check_loader_results (DBusMessageLoader      *loader,
                       DBusValidity            expected_validity)
 {
   if (!_dbus_message_loader_queue_messages (loader))
-    _dbus_assert_not_reached ("no memory to queue messages");
+    _dbus_test_fatal ("no memory to queue messages");
 
   if (expected_validity == DBUS_VALID)
     return check_have_valid_message (loader);
@@ -461,7 +461,7 @@ dbus_internal_do_not_use_try_message_file (const DBusString    *filename,
   retval = FALSE;
 
   if (!_dbus_string_init (&data))
-    _dbus_assert_not_reached ("could not allocate string");
+    _dbus_test_fatal ("could not allocate string");
 
   if (!dbus_internal_do_not_use_load_message_file (filename, &data))
     goto failed;
@@ -614,20 +614,20 @@ process_test_subdir (const DBusString          *test_base_dir,
   dir = NULL;
 
   if (!_dbus_string_init (&test_directory))
-    _dbus_assert_not_reached ("didn't allocate test_directory");
+    _dbus_test_fatal ("didn't allocate test_directory");
 
   _dbus_string_init_const (&filename, subdir);
 
   if (!_dbus_string_copy (test_base_dir, 0,
                           &test_directory, 0))
-    _dbus_assert_not_reached ("couldn't copy test_base_dir to test_directory");
+    _dbus_test_fatal ("couldn't copy test_base_dir to test_directory");
 
   if (!_dbus_concat_dir_and_file (&test_directory, &filename))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_free (&filename);
   if (!_dbus_string_init (&filename))
-    _dbus_assert_not_reached ("didn't allocate filename string");
+    _dbus_test_fatal ("didn't allocate filename string");
 
   dir = _dbus_directory_open (&test_directory, &error);
   if (dir == NULL)
@@ -647,13 +647,13 @@ process_test_subdir (const DBusString          *test_base_dir,
       DBusString full_path;
 
       if (!_dbus_string_init (&full_path))
-        _dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
 
       if (!_dbus_string_copy (&test_directory, 0, &full_path, 0))
-        _dbus_assert_not_reached ("couldn't copy dir to full_path");
+        _dbus_test_fatal ("couldn't copy dir to full_path");
 
       if (!_dbus_concat_dir_and_file (&full_path, &filename))
-        _dbus_assert_not_reached ("couldn't concat file to dir");
+        _dbus_test_fatal ("couldn't concat file to dir");
 
       if (_dbus_string_ends_with_c_str (&filename, ".message-raw"))
         ;
@@ -757,33 +757,33 @@ dbus_internal_do_not_use_foreach_message_file (const char                *test_d
 #define GET_AND_CHECK(iter, typename, literal)                                  \
   do {                                                                          \
     if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_##typename)         \
-      _dbus_assert_not_reached ("got wrong argument type from message iter");   \
+      _dbus_test_fatal ("got wrong argument type from message iter");   \
     dbus_message_iter_get_basic (&iter, &v_##typename);                         \
     if (v_##typename != literal)                                                \
-      _dbus_assert_not_reached ("got wrong value from message iter");           \
+      _dbus_test_fatal ("got wrong value from message iter");           \
   } while (0)
 
 #define GET_AND_CHECK_STRCMP(iter, typename, literal)                           \
   do {                                                                          \
     if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_##typename)         \
-      _dbus_assert_not_reached ("got wrong argument type from message iter");   \
+      _dbus_test_fatal ("got wrong argument type from message iter");   \
     dbus_message_iter_get_basic (&iter, &v_##typename);                         \
     if (strcmp (v_##typename, literal) != 0)                                    \
-      _dbus_assert_not_reached ("got wrong value from message iter");           \
+      _dbus_test_fatal ("got wrong value from message iter");           \
   } while (0)
 
 #define GET_AND_CHECK_AND_NEXT(iter, typename, literal)         \
   do {                                                          \
     GET_AND_CHECK(iter, typename, literal);                     \
     if (!dbus_message_iter_next (&iter))                        \
-      _dbus_assert_not_reached ("failed to move iter to next"); \
+      _dbus_test_fatal ("failed to move iter to next"); \
   } while (0)
 
 #define GET_AND_CHECK_STRCMP_AND_NEXT(iter, typename, literal)  \
   do {                                                          \
     GET_AND_CHECK_STRCMP(iter, typename, literal);              \
     if (!dbus_message_iter_next (&iter))                        \
-      _dbus_assert_not_reached ("failed to move iter to next"); \
+      _dbus_test_fatal ("failed to move iter to next"); \
   } while (0)
 
 static void
@@ -812,10 +812,10 @@ message_iter_test (DBusMessage *message)
   GET_AND_CHECK_AND_NEXT (iter, DOUBLE, 3.14159);
 
   if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_ARRAY)
-    _dbus_assert_not_reached ("Argument type not an array");
+    _dbus_test_fatal ("Argument type not an array");
 
   if (dbus_message_iter_get_element_type (&iter) != DBUS_TYPE_DOUBLE)
-    _dbus_assert_not_reached ("Array type not double");
+    _dbus_test_fatal ("Array type not double");
 
   dbus_message_iter_recurse (&iter, &array);
 
@@ -823,32 +823,32 @@ message_iter_test (DBusMessage *message)
   GET_AND_CHECK (array, DOUBLE, 2.5);
 
   if (dbus_message_iter_next (&array))
-    _dbus_assert_not_reached ("Didn't reach end of array");
+    _dbus_test_fatal ("Didn't reach end of array");
 
   if (!dbus_message_iter_next (&iter))
-    _dbus_assert_not_reached ("Reached end of arguments");
+    _dbus_test_fatal ("Reached end of arguments");
 
   GET_AND_CHECK_AND_NEXT (iter, BYTE, 0xF0);
 
   if (dbus_message_iter_get_arg_type (&iter) != DBUS_TYPE_ARRAY)
-    _dbus_assert_not_reached ("no array");
+    _dbus_test_fatal ("no array");
 
   if (dbus_message_iter_get_element_type (&iter) != DBUS_TYPE_INT32)
-    _dbus_assert_not_reached ("Array type not int32");
+    _dbus_test_fatal ("Array type not int32");
 
   /* Empty array */
   dbus_message_iter_recurse (&iter, &array);
 
   if (dbus_message_iter_next (&array))
-    _dbus_assert_not_reached ("Didn't reach end of array");
+    _dbus_test_fatal ("Didn't reach end of array");
 
   if (!dbus_message_iter_next (&iter))
-    _dbus_assert_not_reached ("Reached end of arguments");
+    _dbus_test_fatal ("Reached end of arguments");
 
   GET_AND_CHECK (iter, BYTE, 0xF0);
 
   if (dbus_message_iter_next (&iter))
-    _dbus_assert_not_reached ("Didn't reach end of arguments");
+    _dbus_test_fatal ("Didn't reach end of arguments");
 }
 #endif
 
@@ -917,120 +917,119 @@ verify_test_message (DBusMessage *message)
                                    &our_string_array, &our_string_array_len,
 				   0))
     {
-      _dbus_warn ("error: %s - %s", error.name,
+      _dbus_test_fatal ("Could not get arguments: %s - %s", error.name,
                   (error.message != NULL) ? error.message : "no message");
-      _dbus_assert_not_reached ("Could not get arguments");
     }
 
   if (our_int16 != -0x123)
-    _dbus_assert_not_reached ("16-bit integers differ!");
+    _dbus_test_fatal ("16-bit integers differ!");
 
   if (our_uint16 != 0x123)
-    _dbus_assert_not_reached ("16-bit uints differ!");
+    _dbus_test_fatal ("16-bit uints differ!");
   
   if (our_int != -0x12345678)
-    _dbus_assert_not_reached ("integers differ!");
+    _dbus_test_fatal ("integers differ!");
 
   if (our_uint != 0x12300042)
-    _dbus_assert_not_reached ("uints differ!");
+    _dbus_test_fatal ("uints differ!");
 
   if (our_int64 != DBUS_INT64_CONSTANT (-0x123456789abcd))
-    _dbus_assert_not_reached ("64-bit integers differ!");
+    _dbus_test_fatal ("64-bit integers differ!");
   if (our_uint64 != DBUS_UINT64_CONSTANT (0x123456789abcd))
-    _dbus_assert_not_reached ("64-bit unsigned integers differ!");
+    _dbus_test_fatal ("64-bit unsigned integers differ!");
 
   v_DOUBLE = 3.14159;
   if (! _DBUS_DOUBLES_BITWISE_EQUAL (our_double, v_DOUBLE))
-    _dbus_assert_not_reached ("doubles differ!");
+    _dbus_test_fatal ("doubles differ!");
 
   if (strcmp (our_str, "Test string") != 0)
-    _dbus_assert_not_reached ("strings differ!");
+    _dbus_test_fatal ("strings differ!");
 
   if (!our_bool)
-    _dbus_assert_not_reached ("booleans differ");
+    _dbus_test_fatal ("booleans differ");
 
   if (our_byte_1 != 42)
-    _dbus_assert_not_reached ("bytes differ!");
+    _dbus_test_fatal ("bytes differ!");
 
   if (our_byte_2 != 24)
-    _dbus_assert_not_reached ("bytes differ!");
+    _dbus_test_fatal ("bytes differ!");
 
   if (our_uint32_array_len != 4 ||
       our_uint32_array[0] != 0x12345678 ||
       our_uint32_array[1] != 0x23456781 ||
       our_uint32_array[2] != 0x34567812 ||
       our_uint32_array[3] != 0x45678123)
-    _dbus_assert_not_reached ("uint array differs");
+    _dbus_test_fatal ("uint array differs");
 
   if (our_int32_array_len != 4 ||
       our_int32_array[0] != 0x12345678 ||
       our_int32_array[1] != -0x23456781 ||
       our_int32_array[2] != 0x34567812 ||
       our_int32_array[3] != -0x45678123)
-    _dbus_assert_not_reached ("int array differs");
+    _dbus_test_fatal ("int array differs");
 
   if (our_uint64_array_len != 4 ||
       our_uint64_array[0] != 0x12345678 ||
       our_uint64_array[1] != 0x23456781 ||
       our_uint64_array[2] != 0x34567812 ||
       our_uint64_array[3] != 0x45678123)
-    _dbus_assert_not_reached ("uint64 array differs");
+    _dbus_test_fatal ("uint64 array differs");
 
   if (our_int64_array_len != 4 ||
       our_int64_array[0] != 0x12345678 ||
       our_int64_array[1] != -0x23456781 ||
       our_int64_array[2] != 0x34567812 ||
       our_int64_array[3] != -0x45678123)
-    _dbus_assert_not_reached ("int64 array differs");
+    _dbus_test_fatal ("int64 array differs");
 
   if (our_double_array_len != 3)
-    _dbus_assert_not_reached ("double array had wrong length");
+    _dbus_test_fatal ("double array had wrong length");
 
   /* On all IEEE machines (i.e. everything sane) exact equality
    * should be preserved over the wire
    */
   v_DOUBLE = 0.1234;
   if (! _DBUS_DOUBLES_BITWISE_EQUAL (our_double_array[0], v_DOUBLE))
-    _dbus_assert_not_reached ("double array had wrong values");
+    _dbus_test_fatal ("double array had wrong values");
   v_DOUBLE = 9876.54321;
   if (! _DBUS_DOUBLES_BITWISE_EQUAL (our_double_array[1], v_DOUBLE))
-    _dbus_assert_not_reached ("double array had wrong values");
+    _dbus_test_fatal ("double array had wrong values");
   v_DOUBLE = -300.0;
   if (! _DBUS_DOUBLES_BITWISE_EQUAL (our_double_array[2], v_DOUBLE))
-    _dbus_assert_not_reached ("double array had wrong values");
+    _dbus_test_fatal ("double array had wrong values");
 
   if (our_byte_array_len != 4)
-    _dbus_assert_not_reached ("byte array had wrong length");
+    _dbus_test_fatal ("byte array had wrong length");
 
   if (our_byte_array[0] != 'a' ||
       our_byte_array[1] != 'b' ||
       our_byte_array[2] != 'c' ||
       our_byte_array[3] != 234)
-    _dbus_assert_not_reached ("byte array had wrong values");
+    _dbus_test_fatal ("byte array had wrong values");
 
   if (our_boolean_array_len != 5)
-    _dbus_assert_not_reached ("bool array had wrong length");
+    _dbus_test_fatal ("bool array had wrong length");
 
   if (our_boolean_array[0] != TRUE ||
       our_boolean_array[1] != FALSE ||
       our_boolean_array[2] != TRUE ||
       our_boolean_array[3] != TRUE ||
       our_boolean_array[4] != FALSE)
-    _dbus_assert_not_reached ("bool array had wrong values");
+    _dbus_test_fatal ("bool array had wrong values");
 
   if (our_string_array_len != 4)
-    _dbus_assert_not_reached ("string array was wrong length");
+    _dbus_test_fatal ("string array was wrong length");
 
   if (strcmp (our_string_array[0], "Foo") != 0 ||
       strcmp (our_string_array[1], "bar") != 0 ||
       strcmp (our_string_array[2], "") != 0 ||
       strcmp (our_string_array[3], "woo woo woo woo") != 0)
-    _dbus_assert_not_reached ("string array had wrong values");
+    _dbus_test_fatal ("string array had wrong values");
 
   dbus_free_string_array (our_string_array);
   
   if (dbus_message_iter_next (&iter))
-    _dbus_assert_not_reached ("Didn't reach end of arguments");
+    _dbus_test_fatal ("Didn't reach end of arguments");
 }
 
 static void
@@ -1119,7 +1118,7 @@ verify_test_message_memleak (DBusMessage *message)
     }
   else
     {
-      _dbus_warn ("error: parse with wrong signature: 'uashuu'.");
+      _dbus_test_fatal ("error: parse with wrong signature: 'uashuu'.");
     }
 
   /* parse with wrong signature: "uashuashu" */
@@ -1153,7 +1152,7 @@ verify_test_message_memleak (DBusMessage *message)
     }
   else
     {
-      _dbus_warn ("error: parse with wrong signature: 'uashuashu'.");
+      _dbus_test_fatal ("error: parse with wrong signature: 'uashuashu'.");
     }
 
   /* parse with correct signature: "uashuash" */
@@ -1275,7 +1274,7 @@ _dbus_message_test (const char *test_data_dir)
 
   /* string length including nul byte not a multiple of 4 */
   if (!dbus_message_set_sender (message, "org.foo.bar1"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
 
   _dbus_assert (dbus_message_has_sender (message, "org.foo.bar1"));
   dbus_message_set_reply_serial (message, 5678);
@@ -1286,7 +1285,7 @@ _dbus_message_test (const char *test_data_dir)
                                  _dbus_string_get_length (&message->body));
 
   if (!dbus_message_set_sender (message, NULL))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
 
 
   _dbus_verbose_bytes_of_string (&message->header.data, 0,
@@ -1309,50 +1308,50 @@ _dbus_message_test (const char *test_data_dir)
   /* Set/get some header fields */
 
   if (!dbus_message_set_path (message, "/foo"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_path (message),
                         "/foo") == 0);
 
   if (!dbus_message_set_interface (message, "org.Foo"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_interface (message),
                         "org.Foo") == 0);
 
   if (!dbus_message_set_member (message, "Bar"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_member (message),
                         "Bar") == 0);
 
   /* Set/get them with longer values */
   if (!dbus_message_set_path (message, "/foo/bar"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_path (message),
                         "/foo/bar") == 0);
 
   if (!dbus_message_set_interface (message, "org.Foo.Bar"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_interface (message),
                         "org.Foo.Bar") == 0);
 
   if (!dbus_message_set_member (message, "BarFoo"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_member (message),
                         "BarFoo") == 0);
 
   /* Realloc shorter again */
 
   if (!dbus_message_set_path (message, "/foo"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_path (message),
                         "/foo") == 0);
 
   if (!dbus_message_set_interface (message, "org.Foo"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_interface (message),
                         "org.Foo") == 0);
 
   if (!dbus_message_set_member (message, "Bar"))
-    _dbus_assert_not_reached ("out of memory");
+    _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_member (message),
                         "Bar") == 0);
 
@@ -1573,17 +1572,17 @@ _dbus_message_test (const char *test_data_dir)
 
   /* Now pop back the message */
   if (!_dbus_message_loader_queue_messages (loader))
-    _dbus_assert_not_reached ("no memory to queue messages");
+    _dbus_test_fatal ("no memory to queue messages");
 
   if (_dbus_message_loader_get_is_corrupted (loader))
-    _dbus_assert_not_reached ("message loader corrupted");
+    _dbus_test_fatal ("message loader corrupted");
 
   message = _dbus_message_loader_pop_message (loader);
   if (!message)
-    _dbus_assert_not_reached ("received a NULL message");
+    _dbus_test_fatal ("received a NULL message");
 
   if (dbus_message_get_reply_serial (message) != 5678)
-    _dbus_assert_not_reached ("reply serial fields differ");
+    _dbus_test_fatal ("reply serial fields differ");
 
   dbus_message_unref (message);
 
@@ -1604,7 +1603,7 @@ _dbus_message_test (const char *test_data_dir)
       char garbage_header[DBUS_MINIMUM_HEADER_SIZE] = "xxx";
 
       if (!dbus_message_marshal (message_without_unix_fds, &marshalled, &len))
-        _dbus_assert_not_reached ("failed to marshal message");
+        _dbus_test_fatal ("failed to marshal message");
 
       _dbus_assert (len != 0);
       _dbus_assert (marshalled != NULL);
@@ -1818,7 +1817,7 @@ _dbus_message_test (const char *test_data_dir)
                                                         (DBusForeachMessageFileFunc)
                                                         dbus_internal_do_not_use_try_message_file,
                                                         NULL))
-    _dbus_assert_not_reached ("foreach_message_file test failed");
+    _dbus_test_fatal ("foreach_message_file test failed");
 
   _dbus_check_fdleaks_leave (initial_fds);
 

@@ -1599,14 +1599,14 @@ _dbus_hash_test (void)
 
   keys = dbus_new (char *, N_HASH_KEYS);
   if (keys == NULL)
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   for (i = 0; i < N_HASH_KEYS; i++)
     {
       keys[i] = dbus_malloc (128);
 
       if (keys[i] == NULL)
-	_dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
 
   _dbus_test_diag ("Computing test hash keys...");
@@ -1949,11 +1949,11 @@ _dbus_hash_test (void)
   while (i >= 0)
     {
       if (!_dbus_hash_iter_lookup (table1, keys[i], FALSE, &iter))
-        _dbus_assert_not_reached ("hash entry should have existed");
+        _dbus_test_fatal ("hash entry should have existed");
       _dbus_hash_iter_remove_entry (&iter);
       
       if (!_dbus_hash_iter_lookup (table2, _DBUS_INT_TO_POINTER (i), FALSE, &iter))
-        _dbus_assert_not_reached ("hash entry should have existed");
+        _dbus_test_fatal ("hash entry should have existed");
       _dbus_hash_iter_remove_entry (&iter);
 
       _dbus_assert (count_entries (table1) == i);

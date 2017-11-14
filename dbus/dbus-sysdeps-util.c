@@ -27,6 +27,7 @@
 #include "dbus-internals.h"
 #include "dbus-string.h"
 #include "dbus-test.h"
+#include <dbus/dbus-test-tap.h>
 
 #include <stdlib.h>
 
@@ -92,10 +93,10 @@ check_dirname (const char *filename,
   _dbus_string_init_const (&f, filename);
 
   if (!_dbus_string_init (&d))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_get_dirname (&f, &d))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!_dbus_string_equal_c_str (&d, dirname))
     {

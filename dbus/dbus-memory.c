@@ -27,6 +27,7 @@
 #include "dbus-sysdeps.h"
 #include "dbus-list.h"
 #include "dbus-threads.h"
+#include <dbus/dbus-test-tap.h>
 #include <stdlib.h>
 
 /**
@@ -939,18 +940,18 @@ _dbus_memory_test (void)
   guards = TRUE;
   p = dbus_malloc (4);
   if (p == NULL)
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
   for (size = 4; size < 256; size += 4)
     {
       p = dbus_realloc (p, size);
       if (p == NULL)
-	_dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
   for (size = 256; size != 0; size -= 4)
     {
       p = dbus_realloc (p, size);
       if (p == NULL)
-	_dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
   dbus_free (p);
   guards = old_guards;

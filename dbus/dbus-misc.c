@@ -25,6 +25,7 @@
 #include "dbus-misc.h"
 #include "dbus-internals.h"
 #include "dbus-string.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusMisc Miscellaneous
@@ -276,14 +277,14 @@ _dbus_misc_test (void)
   /* Check DBUS_VERSION_STRING */
 
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   if (!(_dbus_string_append_int (&str, major) &&
         _dbus_string_append_byte (&str, '.') &&
         _dbus_string_append_int (&str, minor) &&
         _dbus_string_append_byte (&str, '.') &&
         _dbus_string_append_int (&str, micro)))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   _dbus_assert (_dbus_string_equal_c_str (&str, DBUS_VERSION_STRING));
 

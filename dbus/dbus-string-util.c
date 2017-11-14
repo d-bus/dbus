@@ -133,29 +133,28 @@ test_hex_roundtrip (const char *data,
     len = strlen (data);
   
   if (!_dbus_string_init (&orig))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
 
   if (!_dbus_string_init (&encoded))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
   
   if (!_dbus_string_init (&decoded))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
 
   if (!_dbus_string_append_len (&orig, data, len))
-    _dbus_assert_not_reached ("couldn't append orig data");
+    _dbus_test_fatal ("couldn't append orig data");
 
   if (!_dbus_string_hex_encode (&orig, 0, &encoded, 0))
-    _dbus_assert_not_reached ("could not encode");
+    _dbus_test_fatal ("could not encode");
 
   if (!_dbus_string_hex_decode (&encoded, 0, &end, &decoded, 0))
-    _dbus_assert_not_reached ("could not decode");
+    _dbus_test_fatal ("could not decode");
     
   _dbus_assert (_dbus_string_get_length (&encoded) == end);
 
   if (!_dbus_string_equal (&orig, &decoded))
     {
       const char *s;
-      
 
       _dbus_test_diag ("Original string %d bytes encoded %d bytes decoded %d bytes",
               _dbus_string_get_length (&orig),
@@ -253,10 +252,10 @@ _dbus_string_test (void)
       int j;
       
       if (!_dbus_string_init (&str))
-        _dbus_assert_not_reached ("failed to init string");
+        _dbus_test_fatal ("failed to init string");
 
       if (!_dbus_string_set_length (&str, lens[i]))
-        _dbus_assert_not_reached ("failed to set string length");
+        _dbus_test_fatal ("failed to set string length");
 
       j = lens[i];
       while (j > 0)
@@ -277,10 +276,10 @@ _dbus_string_test (void)
 
   /* Test equality */
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_string_init_const (&other, "H");
   _dbus_assert (_dbus_string_equal_substring (&str, 0, 1, &other, 0));
@@ -320,18 +319,18 @@ _dbus_string_test (void)
   
   /* Test appending data */
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   i = 0;
   while (i < 10)
     {
       if (!_dbus_string_append (&str, "a"))
-        _dbus_assert_not_reached ("failed to append string to string");
+        _dbus_test_fatal ("failed to append string to string");
 
       _dbus_assert (_dbus_string_get_length (&str) == i * 2 + 1);
 
       if (!_dbus_string_append_byte (&str, 'b'))
-        _dbus_assert_not_reached ("failed to append byte to string");
+        _dbus_test_fatal ("failed to append byte to string");
 
       _dbus_assert (_dbus_string_get_length (&str) == i * 2 + 2);
                     
@@ -343,15 +342,15 @@ _dbus_string_test (void)
   /* Check steal_data */
   
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   i = _dbus_string_get_length (&str);
   
   if (!_dbus_string_steal_data (&str, &s))
-    _dbus_assert_not_reached ("failed to steal data");
+    _dbus_test_fatal ("failed to steal data");
 
   _dbus_assert (_dbus_string_get_length (&str) == 0);
   _dbus_assert (((int)strlen (s)) == i);
@@ -361,33 +360,33 @@ _dbus_string_test (void)
   /* Check move */
   
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   i = _dbus_string_get_length (&str);
 
   if (!_dbus_string_init (&other))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
   
   if (!_dbus_string_move (&str, 0, &other, 0))
-    _dbus_assert_not_reached ("could not move");
+    _dbus_test_fatal ("could not move");
 
   _dbus_assert (_dbus_string_get_length (&str) == 0);
   _dbus_assert (_dbus_string_get_length (&other) == i);
 
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
   
   if (!_dbus_string_move (&str, 0, &other, _dbus_string_get_length (&other)))
-    _dbus_assert_not_reached ("could not move");
+    _dbus_test_fatal ("could not move");
 
   _dbus_assert (_dbus_string_get_length (&str) == 0);
   _dbus_assert (_dbus_string_get_length (&other) == i * 2);
 
     if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
   
   if (!_dbus_string_move (&str, 0, &other, _dbus_string_get_length (&other) / 2))
-    _dbus_assert_not_reached ("could not move");
+    _dbus_test_fatal ("could not move");
 
   _dbus_assert (_dbus_string_get_length (&str) == 0);
   _dbus_assert (_dbus_string_get_length (&other) == i * 3);
@@ -397,21 +396,21 @@ _dbus_string_test (void)
   /* Check copy */
   
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   i = _dbus_string_get_length (&str);
   
   if (!_dbus_string_init (&other))
-    _dbus_assert_not_reached ("could not init string");
-  
+    _dbus_test_fatal ("could not init string");
+
   if (!_dbus_string_copy (&str, 0, &other, 0))
-    _dbus_assert_not_reached ("could not copy");
+    _dbus_test_fatal ("could not copy");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i);
 
   if (!_dbus_string_copy (&str, 0, &other, _dbus_string_get_length (&other)))
-    _dbus_assert_not_reached ("could not copy");
+    _dbus_test_fatal ("could not copy");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i * 2);
@@ -419,7 +418,7 @@ _dbus_string_test (void)
                                           "Hello WorldHello World"));
 
   if (!_dbus_string_copy (&str, 0, &other, _dbus_string_get_length (&other) / 2))
-    _dbus_assert_not_reached ("could not copy");
+    _dbus_test_fatal ("could not copy");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i * 3);
@@ -432,19 +431,19 @@ _dbus_string_test (void)
   /* Check replace */
 
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
-  
+    _dbus_test_fatal ("failed to init string");
+
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   i = _dbus_string_get_length (&str);
   
   if (!_dbus_string_init (&other))
-    _dbus_assert_not_reached ("could not init string");
-  
+    _dbus_test_fatal ("could not init string");
+
   if (!_dbus_string_replace_len (&str, 0, _dbus_string_get_length (&str),
                                  &other, 0, _dbus_string_get_length (&other)))
-    _dbus_assert_not_reached ("could not replace");
+    _dbus_test_fatal ("could not replace");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i);
@@ -452,7 +451,7 @@ _dbus_string_test (void)
   
   if (!_dbus_string_replace_len (&str, 0, _dbus_string_get_length (&str),
                                  &other, 5, 1))
-    _dbus_assert_not_reached ("could not replace center space");
+    _dbus_test_fatal ("could not replace center space");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i * 2 - 1);
@@ -464,8 +463,8 @@ _dbus_string_test (void)
                                  &other,
                                  _dbus_string_get_length (&other) - 1,
                                  1))
-    _dbus_assert_not_reached ("could not replace end character");
-  
+    _dbus_test_fatal ("could not replace end character");
+
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == i * 2 - 1);
   _dbus_assert (_dbus_string_equal_c_str (&other,
@@ -480,24 +479,24 @@ _dbus_string_test (void)
    */
 
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
-  
+    _dbus_test_fatal ("failed to init string");
+
   if (!_dbus_string_append (&str, "Hello World"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   i = _dbus_string_get_length (&str);
   
   if (!_dbus_string_init (&other))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
 
   if (!_dbus_string_append (&other, "Foo String"))
-    _dbus_assert_not_reached ("could not append to string");
+    _dbus_test_fatal ("could not append to string");
 
   a = _dbus_string_get_length (&other);
 
   if (!_dbus_string_replace_len (&str, 0, 6,
                                  &other, 4, 0))
-    _dbus_assert_not_reached ("could not replace 0 length");
+    _dbus_test_fatal ("could not replace 0 length");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 6);
@@ -508,7 +507,7 @@ _dbus_string_test (void)
                                  &other,
                                  _dbus_string_get_length (&other),
                                  0))
-    _dbus_assert_not_reached ("could not replace at the end");
+    _dbus_test_fatal ("could not replace at the end");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 6 + 6);
@@ -519,7 +518,7 @@ _dbus_string_test (void)
                                  &other,
                                  _dbus_string_get_length (&other) - 5,
                                  5))
-    _dbus_assert_not_reached ("could not replace same length");
+    _dbus_test_fatal ("could not replace same length");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 6 + 6);
@@ -528,7 +527,7 @@ _dbus_string_test (void)
 
   if (!_dbus_string_replace_len (&str, 6, 5,
                                  &other, 4, 12))
-    _dbus_assert_not_reached ("could not replace with shorter string");
+    _dbus_test_fatal ("could not replace with shorter string");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 5);
@@ -537,7 +536,7 @@ _dbus_string_test (void)
 
   if (!_dbus_string_replace_len (&str, 0, 1,
                                  &other, 0, 3))
-    _dbus_assert_not_reached ("could not replace at the beginning");
+    _dbus_test_fatal ("could not replace at the beginning");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 3);
@@ -548,7 +547,7 @@ _dbus_string_test (void)
                                  &other,
                                  _dbus_string_get_length (&other) - 5,
                                  5))
-    _dbus_assert_not_reached ("could not replace same length");
+    _dbus_test_fatal ("could not replace same length");
 
   _dbus_assert (_dbus_string_get_length (&str) == i);
   _dbus_assert (_dbus_string_get_length (&other) == a + 3);
@@ -561,10 +560,10 @@ _dbus_string_test (void)
   /* Check insert/set/get byte */
   
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   if (!_dbus_string_append (&str, "Hello"))
-    _dbus_assert_not_reached ("failed to append Hello");
+    _dbus_test_fatal ("failed to append Hello");
 
   _dbus_assert (_dbus_string_get_byte (&str, 0) == 'H');
   _dbus_assert (_dbus_string_get_byte (&str, 1) == 'e');
@@ -576,14 +575,14 @@ _dbus_string_test (void)
   _dbus_assert (_dbus_string_get_byte (&str, 1) == 'q');
 
   if (!_dbus_string_insert_bytes (&str, 0, 1, 255))
-    _dbus_assert_not_reached ("can't insert byte");
+    _dbus_test_fatal ("can't insert byte");
 
   if (!_dbus_string_insert_bytes (&str, 2, 4, 'Z'))
-    _dbus_assert_not_reached ("can't insert byte");
+    _dbus_test_fatal ("can't insert byte");
 
   if (!_dbus_string_insert_bytes (&str, _dbus_string_get_length (&str), 1, 'W'))
-    _dbus_assert_not_reached ("can't insert byte");
-  
+    _dbus_test_fatal ("can't insert byte");
+
   _dbus_assert (_dbus_string_get_byte (&str, 0) == 255);
   _dbus_assert (_dbus_string_get_byte (&str, 1) == 'H');
   _dbus_assert (_dbus_string_get_byte (&str, 2) == 'Z');
@@ -601,15 +600,15 @@ _dbus_string_test (void)
   /* Check append/parse int/double */
   
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   if (!_dbus_string_append_int (&str, 27))
-    _dbus_assert_not_reached ("failed to append int");
+    _dbus_test_fatal ("failed to append int");
 
   i = _dbus_string_get_length (&str);
 
   if (!_dbus_string_parse_int (&str, 0, &v, &end))
-    _dbus_assert_not_reached ("failed to parse int");
+    _dbus_test_fatal ("failed to parse int");
 
   _dbus_assert (v == 27);
   _dbus_assert (end == i);
@@ -618,82 +617,82 @@ _dbus_string_test (void)
 
   /* Test find */
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("failed to init string");
+    _dbus_test_fatal ("failed to init string");
 
   if (!_dbus_string_append (&str, "Hello"))
-    _dbus_assert_not_reached ("couldn't append to string");
+    _dbus_test_fatal ("couldn't append to string");
   
   if (!_dbus_string_find (&str, 0, "He", &i))
-    _dbus_assert_not_reached ("didn't find 'He'");
+    _dbus_test_fatal ("didn't find 'He'");
   _dbus_assert (i == 0);
 
   if (!_dbus_string_find (&str, 0, "Hello", &i))
-    _dbus_assert_not_reached ("didn't find 'Hello'");
+    _dbus_test_fatal ("didn't find 'Hello'");
   _dbus_assert (i == 0);
   
   if (!_dbus_string_find (&str, 0, "ello", &i))
-    _dbus_assert_not_reached ("didn't find 'ello'");
+    _dbus_test_fatal ("didn't find 'ello'");
   _dbus_assert (i == 1);
 
   if (!_dbus_string_find (&str, 0, "lo", &i))
-    _dbus_assert_not_reached ("didn't find 'lo'");
+    _dbus_test_fatal ("didn't find 'lo'");
   _dbus_assert (i == 3);
 
   if (!_dbus_string_find (&str, 2, "lo", &i))
-    _dbus_assert_not_reached ("didn't find 'lo'");
+    _dbus_test_fatal ("didn't find 'lo'");
   _dbus_assert (i == 3);
 
   if (_dbus_string_find (&str, 4, "lo", &i))
-    _dbus_assert_not_reached ("did find 'lo'");
+    _dbus_test_fatal ("did find 'lo'");
   
   if (!_dbus_string_find (&str, 0, "l", &i))
-    _dbus_assert_not_reached ("didn't find 'l'");
+    _dbus_test_fatal ("didn't find 'l'");
   _dbus_assert (i == 2);
 
   if (!_dbus_string_find (&str, 0, "H", &i))
-    _dbus_assert_not_reached ("didn't find 'H'");
+    _dbus_test_fatal ("didn't find 'H'");
   _dbus_assert (i == 0);
 
   if (!_dbus_string_find (&str, 0, "", &i))
-    _dbus_assert_not_reached ("didn't find ''");
+    _dbus_test_fatal ("didn't find ''");
   _dbus_assert (i == 0);
   
   if (_dbus_string_find (&str, 0, "Hello!", NULL))
-    _dbus_assert_not_reached ("Did find 'Hello!'");
+    _dbus_test_fatal ("Did find 'Hello!'");
 
   if (_dbus_string_find (&str, 0, "Oh, Hello", NULL))
-    _dbus_assert_not_reached ("Did find 'Oh, Hello'");
+    _dbus_test_fatal ("Did find 'Oh, Hello'");
   
   if (_dbus_string_find (&str, 0, "ill", NULL))
-    _dbus_assert_not_reached ("Did find 'ill'");
+    _dbus_test_fatal ("Did find 'ill'");
 
   if (_dbus_string_find (&str, 0, "q", NULL))
-    _dbus_assert_not_reached ("Did find 'q'");
+    _dbus_test_fatal ("Did find 'q'");
 
   if (!_dbus_string_find_to (&str, 0, 2, "He", NULL))
-    _dbus_assert_not_reached ("Didn't find 'He'");
+    _dbus_test_fatal ("Didn't find 'He'");
 
   if (_dbus_string_find_to (&str, 0, 2, "Hello", NULL))
-    _dbus_assert_not_reached ("Did find 'Hello'");
+    _dbus_test_fatal ("Did find 'Hello'");
 
   if (!_dbus_string_find_byte_backward (&str, _dbus_string_get_length (&str), 'H', &i))
-    _dbus_assert_not_reached ("Did not find 'H'");
+    _dbus_test_fatal ("Did not find 'H'");
   _dbus_assert (i == 0);
 
   if (!_dbus_string_find_byte_backward (&str, _dbus_string_get_length (&str), 'o', &i))
-    _dbus_assert_not_reached ("Did not find 'o'");
+    _dbus_test_fatal ("Did not find 'o'");
   _dbus_assert (i == _dbus_string_get_length (&str) - 1);
 
   if (_dbus_string_find_byte_backward (&str, _dbus_string_get_length (&str) - 1, 'o', &i))
-    _dbus_assert_not_reached ("Did find 'o'");
+    _dbus_test_fatal ("Did find 'o'");
   _dbus_assert (i == -1);
 
   if (_dbus_string_find_byte_backward (&str, 1, 'e', &i))
-    _dbus_assert_not_reached ("Did find 'e'");
+    _dbus_test_fatal ("Did find 'e'");
   _dbus_assert (i == -1);
 
   if (!_dbus_string_find_byte_backward (&str, 2, 'e', &i))
-    _dbus_assert_not_reached ("Didn't find 'e'");
+    _dbus_test_fatal ("Didn't find 'e'");
   _dbus_assert (i == 1);
   
   _dbus_string_free (&str);
@@ -701,10 +700,10 @@ _dbus_string_test (void)
   /* Hex encoding */
   _dbus_string_init_const (&str, "cafebabe, this is a bogus hex string");
   if (!_dbus_string_init (&other))
-    _dbus_assert_not_reached ("could not init string");
+    _dbus_test_fatal ("could not init string");
 
   if (!_dbus_string_hex_decode (&str, 0, &end, &other, 0))
-    _dbus_assert_not_reached ("deccoded bogus hex string with no error");
+    _dbus_test_fatal ("deccoded bogus hex string with no error");
 
   _dbus_assert (end == 8);
 
@@ -720,25 +719,25 @@ _dbus_string_test (void)
     _dbus_string_init_const (&str, "012\r\n567\n90");
     
     if (!_dbus_string_find_eol (&str, 0, &found, &found_len) || found != 3 || found_len != 2)
-      _dbus_assert_not_reached ("Did not find '\\r\\n'");                                       
-    if (found != 3 || found_len != 2)                                                           
-      _dbus_assert_not_reached ("invalid return values");                                       
-    
-    if (!_dbus_string_find_eol (&str, 5, &found, &found_len))                                    
-      _dbus_assert_not_reached ("Did not find '\\n'");                                          
-    if (found != 8 || found_len != 1)                                                           
-      _dbus_assert_not_reached ("invalid return values");                                       
-    
-    if (_dbus_string_find_eol (&str, 9, &found, &found_len))                                     
-      _dbus_assert_not_reached ("Found not expected '\\n'");                                    
-    else if (found != 11 || found_len != 0)                                                     
-      _dbus_assert_not_reached ("invalid return values '\\n'");                                 
+      _dbus_test_fatal ("Did not find '\\r\\n'");
+    if (found != 3 || found_len != 2)
+      _dbus_test_fatal ("invalid return values");
+
+    if (!_dbus_string_find_eol (&str, 5, &found, &found_len))
+      _dbus_test_fatal ("Did not find '\\n'");
+    if (found != 8 || found_len != 1)
+      _dbus_test_fatal ("invalid return values");
+
+    if (_dbus_string_find_eol (&str, 9, &found, &found_len))
+      _dbus_test_fatal ("Found not expected '\\n'");
+    else if (found != 11 || found_len != 0)
+      _dbus_test_fatal ("invalid return values '\\n'");
 
     found = -1;
     found_len = -1;
     _dbus_string_init_const (&str, "");
     if (_dbus_string_find_eol (&str, 0, &found, &found_len))
-      _dbus_assert_not_reached ("found an eol in an empty string");
+      _dbus_test_fatal ("found an eol in an empty string");
     _dbus_assert (found == 0);
     _dbus_assert (found_len == 0);
     
@@ -746,7 +745,7 @@ _dbus_string_test (void)
     found_len = -1;
     _dbus_string_init_const (&str, "foobar");
     if (_dbus_string_find_eol (&str, 0, &found, &found_len))
-      _dbus_assert_not_reached ("found eol in string that lacks one");
+      _dbus_test_fatal ("found eol in string that lacks one");
     _dbus_assert (found == 6);
     _dbus_assert (found_len == 0);
 
@@ -754,7 +753,7 @@ _dbus_string_test (void)
     found_len = -1;
     _dbus_string_init_const (&str, "foobar\n");
     if (!_dbus_string_find_eol (&str, 0, &found, &found_len))
-      _dbus_assert_not_reached ("did not find eol in string that has one at end");
+      _dbus_test_fatal ("did not find eol in string that has one at end");
     _dbus_assert (found == 6);
     _dbus_assert (found_len == 1);
   }
@@ -769,31 +768,31 @@ _dbus_string_test (void)
 #define FOURTH_LINE "this is a fourth line"
     
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, FIRST_LINE "\n" SECOND_LINE "\r\n" THIRD_LINE "\n" FOURTH_LINE))
-      _dbus_assert_not_reached ("no memory");
-    
+      _dbus_test_fatal ("no memory");
+
     if (!_dbus_string_init (&line))
-      _dbus_assert_not_reached ("no memory");
-    
+      _dbus_test_fatal ("no memory");
+
     if (!_dbus_string_pop_line (&str, &line))
-      _dbus_assert_not_reached ("failed to pop first line");
+      _dbus_test_fatal ("failed to pop first line");
 
     _dbus_assert (_dbus_string_equal_c_str (&line, FIRST_LINE));
     
     if (!_dbus_string_pop_line (&str, &line))
-      _dbus_assert_not_reached ("failed to pop second line");
+      _dbus_test_fatal ("failed to pop second line");
 
     _dbus_assert (_dbus_string_equal_c_str (&line, SECOND_LINE));
     
     if (!_dbus_string_pop_line (&str, &line))
-      _dbus_assert_not_reached ("failed to pop third line");
+      _dbus_test_fatal ("failed to pop third line");
 
     _dbus_assert (_dbus_string_equal_c_str (&line, THIRD_LINE));
     
     if (!_dbus_string_pop_line (&str, &line))
-      _dbus_assert_not_reached ("failed to pop fourth line");
+      _dbus_test_fatal ("failed to pop fourth line");
 
     _dbus_assert (_dbus_string_equal_c_str (&line, FOURTH_LINE));
     
@@ -803,56 +802,56 @@ _dbus_string_test (void)
 
   {
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     for (i = 0; i < 10000; i++)
       if (!_dbus_string_append (&str, "abcdefghijklmnopqrstuvwxyz"))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_set_length (&str, 10))
-      _dbus_assert_not_reached ("failed to set length");
+      _dbus_test_fatal ("failed to set length");
 
     /* actually compact */
     if (!_dbus_string_compact (&str, 2048))
-      _dbus_assert_not_reached ("failed to compact after set_length");
+      _dbus_test_fatal ("failed to compact after set_length");
 
     /* peek inside to make sure it worked */
     if (((DBusRealString *)&str)->allocated > 30)
-      _dbus_assert_not_reached ("compacting string didn't do anything");
+      _dbus_test_fatal ("compacting string didn't do anything");
 
     if (!_dbus_string_equal_c_str (&str, "abcdefghij"))
-      _dbus_assert_not_reached ("unexpected content after compact");
+      _dbus_test_fatal ("unexpected content after compact");
 
     /* compact nothing */
     if (!_dbus_string_compact (&str, 2048))
-      _dbus_assert_not_reached ("failed to compact 2nd time");
+      _dbus_test_fatal ("failed to compact 2nd time");
 
     if (!_dbus_string_equal_c_str (&str, "abcdefghij"))
-      _dbus_assert_not_reached ("unexpected content after 2nd compact");
+      _dbus_test_fatal ("unexpected content after 2nd compact");
 
     /* and make sure it still works...*/
     if (!_dbus_string_append (&str, "123456"))
-      _dbus_assert_not_reached ("failed to append after compact");
+      _dbus_test_fatal ("failed to append after compact");
 
     if (!_dbus_string_equal_c_str (&str, "abcdefghij123456"))
-      _dbus_assert_not_reached ("unexpected content after append");
+      _dbus_test_fatal ("unexpected content after append");
 
     /* after growing automatically, this should do nothing */
     if (!_dbus_string_compact (&str, 20000))
-      _dbus_assert_not_reached ("failed to compact after grow");
+      _dbus_test_fatal ("failed to compact after grow");
 
     /* but this one will do something */
     if (!_dbus_string_compact (&str, 0))
-      _dbus_assert_not_reached ("failed to compact after grow");
+      _dbus_test_fatal ("failed to compact after grow");
 
     if (!_dbus_string_equal_c_str (&str, "abcdefghij123456"))
-      _dbus_assert_not_reached ("unexpected content");
+      _dbus_test_fatal ("unexpected content");
 
     if (!_dbus_string_append (&str, "!@#$%"))
-      _dbus_assert_not_reached ("failed to append after compact");
+      _dbus_test_fatal ("failed to append after compact");
 
     if (!_dbus_string_equal_c_str (&str, "abcdefghij123456!@#$%"))
-      _dbus_assert_not_reached ("unexpected content");
+      _dbus_test_fatal ("unexpected content");
 
     _dbus_string_free (&str);
   }
@@ -861,22 +860,22 @@ _dbus_string_test (void)
     const char two_strings[] = "one\ttwo";
 
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_init (&other))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, two_strings))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_split_on_byte (&str, '\t', &other))
-      _dbus_assert_not_reached ("no memory or delimiter not found");
+      _dbus_test_fatal ("no memory or delimiter not found");
 
     if (strcmp (_dbus_string_get_data (&str), "one") != 0)
-      _dbus_assert_not_reached ("left side after split on tab is wrong");
+      _dbus_test_fatal ("left side after split on tab is wrong");
 
     if (strcmp (_dbus_string_get_data (&other), "two") != 0)
-      _dbus_assert_not_reached ("right side after split on tab is wrong");
+      _dbus_test_fatal ("right side after split on tab is wrong");
 
     _dbus_string_free (&str);
     _dbus_string_free (&other);
@@ -888,28 +887,28 @@ _dbus_string_test (void)
     const char lower2_string[] = "toupperSTRING";
 
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, upper_string))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     _dbus_string_tolower_ascii (&str, 0, _dbus_string_get_length(&str));
 
     if (!_dbus_string_equal_c_str (&str, lower_string))
-      _dbus_assert_not_reached ("_dbus_string_tolower_ascii failed");
+      _dbus_test_fatal ("_dbus_string_tolower_ascii failed");
 
     _dbus_string_free (&str);
 
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, upper_string))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     _dbus_string_tolower_ascii (&str, 0, 7);
 
     if (!_dbus_string_equal_c_str (&str, lower2_string))
-      _dbus_assert_not_reached ("_dbus_string_tolower_ascii failed in partial conversion");
+      _dbus_test_fatal ("_dbus_string_tolower_ascii failed in partial conversion");
 
     _dbus_string_free (&str);
   }
@@ -920,28 +919,28 @@ _dbus_string_test (void)
     const char upper2_string[] = "TOUPPERstring";
 
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, lower_string))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     _dbus_string_toupper_ascii (&str, 0, _dbus_string_get_length(&str));
 
     if (!_dbus_string_equal_c_str (&str, upper_string))
-      _dbus_assert_not_reached ("_dbus_string_toupper_ascii failed");
+      _dbus_test_fatal ("_dbus_string_toupper_ascii failed");
 
     _dbus_string_free (&str);
 
     if (!_dbus_string_init (&str))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     if (!_dbus_string_append (&str, lower_string))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
     _dbus_string_toupper_ascii (&str, 0, 7);
 
     if (!_dbus_string_equal_c_str (&str, upper2_string))
-      _dbus_assert_not_reached ("_dbus_string_toupper_ascii failed in partial conversion");
+      _dbus_test_fatal ("_dbus_string_toupper_ascii failed in partial conversion");
 
     _dbus_string_free (&str);
   }

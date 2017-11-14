@@ -28,6 +28,7 @@
 #include "dbus-list.h"
 #include "dbus-string.h"
 #include "dbus-protocol.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusAddressInternals Address parsing
@@ -713,7 +714,7 @@ _dbus_address_test (void)
 
       escaped = dbus_address_escape_value (test->unescaped);
       if (escaped == NULL)
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       if (strcmp (escaped, test->escaped) != 0)
         {
@@ -766,7 +767,7 @@ _dbus_address_test (void)
   
   if (!dbus_parse_address ("unix:path=/tmp/foo;debug:name=test,sliff=sloff;",
 			   &entries, &len, &error))
-    _dbus_assert_not_reached ("could not parse address");
+    _dbus_test_fatal ("could not parse address");
   _dbus_assert (len == 2);
   _dbus_assert (strcmp (dbus_address_entry_get_value (entries[0], "path"), "/tmp/foo") == 0);
   _dbus_assert (strcmp (dbus_address_entry_get_value (entries[1], "name"), "test") == 0);
@@ -776,47 +777,47 @@ _dbus_address_test (void)
 
   /* Different possible errors */
   if (dbus_parse_address ("", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
 
   if (dbus_parse_address ("foo", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:bar", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:bar,baz", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:bar=foo,baz", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:bar=foo;baz", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:=foo", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
   
   if (dbus_parse_address ("foo:foo=", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
 
   if (dbus_parse_address ("foo:foo,bar=baz", &entries, &len, &error))
-    _dbus_assert_not_reached ("Parsed incorrect address.");
+    _dbus_test_fatal ("Parsed incorrect address.");
   else
     dbus_error_free (&error);
 

@@ -453,16 +453,16 @@ _dbus_userdb_test (const char *test_data_dir)
   DBusError error;
 
   if (!_dbus_username_from_current_process (&username))
-    _dbus_assert_not_reached ("didn't get username");
+    _dbus_test_fatal ("didn't get username");
 
   if (!_dbus_homedir_from_current_process (&homedir))
-    _dbus_assert_not_reached ("didn't get homedir");  
+    _dbus_test_fatal ("didn't get homedir");
 
   if (!_dbus_get_user_id (username, &uid))
-    _dbus_assert_not_reached ("didn't get uid");
+    _dbus_test_fatal ("didn't get uid");
 
   if (!_dbus_groups_from_uid (uid, &group_ids, &n_group_ids))
-    _dbus_assert_not_reached ("didn't get groups");
+    _dbus_test_fatal ("didn't get groups");
 
   _dbus_test_diag ("    Current user: %s homedir: %s gids:",
           _dbus_string_get_const_data (username),

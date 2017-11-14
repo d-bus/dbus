@@ -25,6 +25,7 @@
 #include "dbus-internals.h"
 #include "dbus-test.h"
 #include "dbus-credentials.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @addtogroup DBusCredentials
@@ -90,7 +91,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   creds = make_credentials (12, 511, SAMPLE_SID);
   if (creds == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   /* test refcounting */
   _dbus_credentials_ref (creds);
@@ -110,7 +111,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Test copy */
   creds2 = _dbus_credentials_copy (creds);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (_dbus_credentials_include (creds2, DBUS_CREDENTIAL_UNIX_USER_ID));
   _dbus_assert (_dbus_credentials_include (creds2, DBUS_CREDENTIAL_UNIX_PROCESS_ID));
@@ -127,7 +128,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Same user if both unix and windows are the same */
   creds2 = make_credentials (12, DBUS_PID_UNSET, SAMPLE_SID);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (_dbus_credentials_same_user (creds, creds2));
 
@@ -136,7 +137,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Not the same user if Windows is missing */
   creds2 = make_credentials (12, DBUS_PID_UNSET, NULL);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
@@ -146,7 +147,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Not the same user if Windows is different */
   creds2 = make_credentials (12, DBUS_PID_UNSET, OTHER_SAMPLE_SID);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (!_dbus_credentials_are_superset (creds, creds2));
@@ -156,7 +157,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Not the same user if Unix is missing */
   creds2 = make_credentials (DBUS_UID_UNSET, DBUS_PID_UNSET, SAMPLE_SID);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
@@ -166,7 +167,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Not the same user if Unix is different */
   creds2 = make_credentials (15, DBUS_PID_UNSET, SAMPLE_SID);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (!_dbus_credentials_are_superset (creds, creds2));
@@ -176,7 +177,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* Not the same user if both are missing */
   creds2 = make_credentials (DBUS_UID_UNSET, DBUS_PID_UNSET, NULL);
   if (creds2 == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));

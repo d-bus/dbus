@@ -28,6 +28,7 @@
 #include "dbus-hash.h"
 #include "dbus-protocol.h"
 #include "dbus-string.h"
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -1648,7 +1649,7 @@ run_decompose_tests (void)
               ++i;
             }
           _dbus_warn ("}");
-          _dbus_assert_not_reached ("path decompose failed");
+          _dbus_test_fatal ("path decompose failed");
         }
 
       dbus_free_string_array (result);

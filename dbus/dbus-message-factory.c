@@ -104,9 +104,9 @@ static void
 set_reply_serial (DBusMessage *message)
 {
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
   if (!dbus_message_set_reply_serial (message, 100))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 }
 
 static dbus_bool_t
@@ -137,8 +137,8 @@ generate_trivial_inner (DBusMessageDataIter *iter,
 
       if (!dbus_message_set_error_name (message,
                                         "org.freedesktop.TestErrorName"))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       {
         DBusMessageIter iter2;
         const char *v_STRING = "This is an error";
@@ -147,7 +147,7 @@ generate_trivial_inner (DBusMessageDataIter *iter,
         if (!dbus_message_iter_append_basic (&iter2,
                                              DBUS_TYPE_STRING,
                                              &v_STRING))
-          _dbus_assert_not_reached ("oom");
+          _dbus_test_fatal ("oom");
       }
       
       set_reply_serial (message);
@@ -157,7 +157,7 @@ generate_trivial_inner (DBusMessageDataIter *iter,
     }
   
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   *message_p = message;
   
@@ -179,15 +179,15 @@ generate_many_bodies_inner (DBusMessageDataIter *iter,
                                           "o.z.B",
                                           "Nah");
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   byte_order = _dbus_header_get_byte_order (&message->header);
 
   set_reply_serial (message);
 
   if (!_dbus_string_init (&signature) || !_dbus_string_init (&body))
-    _dbus_assert_not_reached ("oom");
-  
+    _dbus_test_fatal ("oom");
+
   if (dbus_internal_do_not_use_generate_bodies (iter_get_sequence (iter),
                                                 byte_order,
                                                 &signature, &body))
@@ -199,10 +199,10 @@ generate_many_bodies_inner (DBusMessageDataIter *iter,
                                          DBUS_HEADER_FIELD_SIGNATURE,
                                          DBUS_TYPE_SIGNATURE,
                                          &v_SIGNATURE))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       if (!_dbus_string_move (&body, 0, &message->body, 0))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       _dbus_marshal_set_uint32 (&message->header.data, BODY_LENGTH_OFFSET,
                                 _dbus_string_get_length (&message->body),
@@ -235,11 +235,11 @@ generate_from_message (DBusString            *data,
   /* move for efficiency, since we'll nuke the message anyway */
   if (!_dbus_string_move (&message->header.data, 0,
                           data, 0))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   if (!_dbus_string_copy (&message->body, 0,
                           data, _dbus_string_get_length (data)))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 }
 
 static dbus_bool_t
@@ -293,7 +293,7 @@ simple_method_call (void)
                                           "o.b.Z",
                                           "Fro");
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
   return message;
 }
 
@@ -305,7 +305,7 @@ simple_signal (void)
                                      "o.b.Z",
                                      "Fro");
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
   return message;
 }
 
@@ -315,7 +315,7 @@ simple_method_return (void)
   DBusMessage *message;
   message =  dbus_message_new (DBUS_MESSAGE_TYPE_METHOD_RETURN);
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   set_reply_serial (message);
   
@@ -328,11 +328,11 @@ simple_error (void)
   DBusMessage *message;
   message =  dbus_message_new (DBUS_MESSAGE_TYPE_ERROR);
   if (message == NULL)
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   if (!dbus_message_set_error_name (message, "foo.bar"))
-    _dbus_assert_not_reached ("oom");
-  
+    _dbus_test_fatal ("oom");
+
   set_reply_serial (message);
   
   return message;
@@ -368,19 +368,19 @@ message_with_nesting_levels (int levels)
                                              DBUS_TYPE_INT32_AS_STRING :
                                              DBUS_TYPE_VARIANT_AS_STRING,
                                              &children[i]))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
       ++i;
       parents[i] = children[i-1];
     }
   --i;
 
   if (!dbus_message_iter_append_basic (&children[i], DBUS_TYPE_INT32, &v_INT32))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   while (i >= 0)
     {
       if (!dbus_message_iter_close_container (&parents[i], &children[i]))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
       --i;
     }
 
@@ -415,8 +415,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -439,7 +439,7 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       i = 0;
       while (i < (DBUS_MAXIMUM_TYPE_RECURSION_DEPTH + 1))
@@ -454,8 +454,8 @@ generate_special (DBusMessageDataIter   *iter,
                                          DBUS_HEADER_FIELD_SIGNATURE,
                                          DBUS_TYPE_SIGNATURE,
                                          &v_STRING))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -475,7 +475,7 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       i = 0;
       while (i <= (DBUS_MAXIMUM_TYPE_RECURSION_DEPTH + 1))
@@ -499,8 +499,8 @@ generate_special (DBusMessageDataIter   *iter,
                                          DBUS_HEADER_FIELD_SIGNATURE,
                                          DBUS_TYPE_SIGNATURE,
                                          &v_STRING))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -516,8 +516,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -535,8 +535,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -554,8 +554,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -609,8 +609,8 @@ generate_special (DBusMessageDataIter   *iter,
       if (!_dbus_header_set_field_basic (&message->header,
                                          DBUS_HEADER_FIELD_SENDER,
                                          DBUS_TYPE_STRING, &v_STRING))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
 
       *expected_validity = DBUS_INVALID_BAD_SENDER;
@@ -620,8 +620,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_method_call ();
 
       if (!dbus_message_set_interface (message, DBUS_INTERFACE_LOCAL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
 
       *expected_validity = DBUS_INVALID_USES_LOCAL_INTERFACE;
@@ -631,8 +631,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_method_call ();
 
       if (!dbus_message_set_path (message, DBUS_PATH_LOCAL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
 
       *expected_validity = DBUS_INVALID_USES_LOCAL_PATH;
@@ -643,8 +643,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_method_call ();
 
       if (!dbus_message_set_interface (message, NULL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
       
       *expected_validity = DBUS_VALID;
@@ -655,8 +655,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_signal ();
 
       if (!dbus_message_set_interface (message, NULL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
       
       *expected_validity = DBUS_INVALID_MISSING_INTERFACE;
@@ -666,8 +666,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_method_return ();
 
       if (!_dbus_header_delete_field (&message->header, DBUS_HEADER_FIELD_REPLY_SERIAL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
       
       *expected_validity = DBUS_INVALID_MISSING_REPLY_SERIAL;
@@ -677,8 +677,8 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_error ();
 
       if (!dbus_message_set_error_name (message, NULL))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       generate_from_message (data, expected_validity, message);
       
       *expected_validity = DBUS_INVALID_MISSING_ERROR_NAME;
@@ -696,7 +696,7 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
 
       i = 0;
       while (i <= (DBUS_MAXIMUM_TYPE_RECURSION_DEPTH*3 + 3))
@@ -726,8 +726,8 @@ generate_special (DBusMessageDataIter   *iter,
                                          DBUS_HEADER_FIELD_SIGNATURE,
                                          DBUS_TYPE_SIGNATURE,
                                          &v_STRING))
-        _dbus_assert_not_reached ("oom");
-      
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -743,8 +743,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -763,8 +763,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -782,8 +782,8 @@ generate_special (DBusMessageDataIter   *iter,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INT32, &v_INT32,
                                      DBUS_TYPE_INVALID))
-        _dbus_assert_not_reached ("oom");
-                                     
+        _dbus_test_fatal ("oom");
+
       _dbus_header_get_field_raw (&message->header,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
@@ -865,7 +865,7 @@ generate_wrong_length (DBusMessageDataIter *iter,
   else
     {      
       if (!_dbus_string_lengthen (data, adjust))
-        _dbus_assert_not_reached ("oom");
+        _dbus_test_fatal ("oom");
       *expected_validity = DBUS_INVALID_TOO_MUCH_DATA;
     }
 
@@ -1286,8 +1286,8 @@ _dbus_message_data_iter_get_and_next (DBusMessageDataIter *iter,
   func = generators[generator].func;
 
   if (!_dbus_string_init (&data->data))
-    _dbus_assert_not_reached ("oom");
-  
+    _dbus_test_fatal ("oom");
+
   if ((*func)(iter, &data->data, &data->expected_validity))
     ;
   else

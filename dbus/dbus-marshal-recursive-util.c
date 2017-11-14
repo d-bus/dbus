@@ -227,7 +227,7 @@ data_block_verify (DataBlock *block)
       _dbus_verbose_bytes_of_string (&block->signature,
                                      offset,
                                      _dbus_string_get_length (&block->signature) - offset);
-      _dbus_assert_not_reached ("block did not verify: bad bytes at end of signature");
+      _dbus_test_fatal ("block did not verify: bad bytes at end of signature");
     }
   if (!_dbus_string_ends_with_c_str (&block->body,
                                      FENCE_BYTES_STR))
@@ -241,7 +241,7 @@ data_block_verify (DataBlock *block)
       _dbus_verbose_bytes_of_string (&block->body,
                                      offset,
                                      _dbus_string_get_length (&block->body) - offset);
-      _dbus_assert_not_reached ("block did not verify: bad bytes at end of body");
+      _dbus_test_fatal ("block did not verify: bad bytes at end of body");
     }
 
   _dbus_assert (_dbus_string_validate_nul (&block->signature,
@@ -1022,7 +1022,7 @@ node_append_child (TestTypeNode *node,
   _dbus_assert (node->klass->instance_size >= (int) sizeof (TestTypeNodeContainer));
 
   if (!_dbus_list_append (&container->children, child))
-    _dbus_assert_not_reached ("no memory"); /* we never check the return value on node_append_child anyhow - it's run from outside the malloc-failure test code */
+    _dbus_test_fatal ("no memory"); /* we never check the return value on node_append_child anyhow - it's run from outside the malloc-failure test code */
 
   return TRUE;
 }
@@ -1114,7 +1114,7 @@ run_test_copy (NodeIterationData *nid)
       _dbus_verbose ("DEST\n");
       _dbus_verbose_bytes_of_string (&dest.signature, 0,
                                      _dbus_string_get_length (&dest.signature));
-      _dbus_assert_not_reached ("signatures did not match");
+      _dbus_test_fatal ("signatures did not match");
     }
 
   if (!_dbus_string_equal (&src->body, &dest.body))
@@ -1125,7 +1125,7 @@ run_test_copy (NodeIterationData *nid)
       _dbus_verbose ("DEST\n");
       _dbus_verbose_bytes_of_string (&dest.body, 0,
                                      _dbus_string_get_length (&dest.body));
-      _dbus_assert_not_reached ("bodies did not match");
+      _dbus_test_fatal ("bodies did not match");
     }
 
   retval = TRUE;
@@ -1320,7 +1320,7 @@ run_test_delete_values (NodeIterationData *nid)
               while (elem > 0)
                 {
                   if (!_dbus_type_reader_next (&array))
-                    _dbus_assert_not_reached ("should have had another element");
+                    _dbus_test_fatal ("should have had another element");
                   --elem;
                 }
 
@@ -1461,7 +1461,7 @@ run_test_nodes_in_one_configuration (TestTypeNode    **nodes,
   NodeIterationData nid;
 
   if (!data_block_init (&block, byte_order, initial_offset))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   nid.signature = signature;
   nid.block = &block;
@@ -1479,7 +1479,7 @@ run_test_nodes_in_one_configuration (TestTypeNode    **nodes,
   else
     {
       if (!run_test_nodes_iteration (&nid))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
     }
 
   data_block_free (&block);
@@ -1493,13 +1493,13 @@ run_test_nodes (TestTypeNode **nodes,
   DBusString signature;
 
   if (!_dbus_string_init (&signature))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   i = 0;
   while (i < n_nodes)
     {
       if (! node_build_signature (nodes[i], &signature))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
 
       ++i;
     }
@@ -1600,14 +1600,14 @@ build_body (TestTypeNode **nodes,
   while (i < n_nodes)
     {
       if (! node_build_signature (nodes[i], signature))
-        _dbus_assert_not_reached ("no memory");
-      
+        _dbus_test_fatal ("no memory");
+
       ++i;
     }
 
   if (!data_block_init (&block, byte_order, 0))
-    _dbus_assert_not_reached ("no memory");
-  
+    _dbus_test_fatal ("no memory");
+
   data_block_init_reader_writer (&block,
                                  &reader, &writer);
   
@@ -1616,13 +1616,13 @@ build_body (TestTypeNode **nodes,
    */
   if (!_dbus_string_insert_byte (&block.signature,
                                  0, '\0'))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   i = 0;
   while (i < n_nodes)
     {
       if (!node_write_value (nodes[i], &block, &writer, i))
-        _dbus_assert_not_reached ("no memory");
+        _dbus_test_fatal ("no memory");
 
       ++i;
     }
@@ -1630,7 +1630,7 @@ build_body (TestTypeNode **nodes,
   if (!_dbus_string_copy_len (&block.body, 0,
                               _dbus_string_get_length (&block.body) - N_FENCE_BYTES,
                               body, 0))
-    _dbus_assert_not_reached ("oom");
+    _dbus_test_fatal ("oom");
 
   data_block_free (&block);  
 }

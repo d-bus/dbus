@@ -28,6 +28,7 @@
 #include "dbus-marshal-basic.h"
 #include "dbus-internals.h"
 #include "dbus-test.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * Implementation details of #DBusSignatureIter, all fields are private
@@ -581,7 +582,7 @@ _dbus_signature_test (void)
   return TRUE;
 #if 0
  oom:
-  _dbus_assert_not_reached ("out of memory");
+  _dbus_test_fatal ("out of memory");
   return FALSE;
 #endif
 }

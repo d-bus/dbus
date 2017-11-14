@@ -386,49 +386,49 @@ _dbus_marshal_validate_test (void)
   /* Validate claimed length longer than real length */
   _dbus_string_init_const (&str, "abc.efg");
   if (_dbus_validate_bus_name (&str, 0, 8))
-    _dbus_assert_not_reached ("validated too-long string");
+    _dbus_test_fatal ("validated too-long string");
   if (_dbus_validate_interface (&str, 0, 8))
-    _dbus_assert_not_reached ("validated too-long string");
+    _dbus_test_fatal ("validated too-long string");
   if (_dbus_validate_error_name (&str, 0, 8))
-    _dbus_assert_not_reached ("validated too-long string");
+    _dbus_test_fatal ("validated too-long string");
 
   _dbus_string_init_const (&str, "abc");
   if (_dbus_validate_member (&str, 0, 4))
-    _dbus_assert_not_reached ("validated too-long string");
+    _dbus_test_fatal ("validated too-long string");
 
   /* Validate string exceeding max name length */
   if (!_dbus_string_init (&str))
-    _dbus_assert_not_reached ("no memory");
+    _dbus_test_fatal ("no memory");
 
   while (_dbus_string_get_length (&str) <= DBUS_MAXIMUM_NAME_LENGTH)
     if (!_dbus_string_append (&str, "abc.def"))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
   if (_dbus_validate_bus_name (&str, 0, _dbus_string_get_length (&str)))
-    _dbus_assert_not_reached ("validated overmax string");
+    _dbus_test_fatal ("validated overmax string");
   if (_dbus_validate_interface (&str, 0, _dbus_string_get_length (&str)))
-    _dbus_assert_not_reached ("validated overmax string");
+    _dbus_test_fatal ("validated overmax string");
   if (_dbus_validate_error_name (&str, 0, _dbus_string_get_length (&str)))
-    _dbus_assert_not_reached ("validated overmax string");
+    _dbus_test_fatal ("validated overmax string");
 
   /* overlong member */
   _dbus_string_set_length (&str, 0);
   while (_dbus_string_get_length (&str) <= DBUS_MAXIMUM_NAME_LENGTH)
     if (!_dbus_string_append (&str, "abc"))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
   if (_dbus_validate_member (&str, 0, _dbus_string_get_length (&str)))
-    _dbus_assert_not_reached ("validated overmax string");
+    _dbus_test_fatal ("validated overmax string");
 
   /* overlong unique name */
   _dbus_string_set_length (&str, 0);
   _dbus_string_append (&str, ":");
   while (_dbus_string_get_length (&str) <= DBUS_MAXIMUM_NAME_LENGTH)
     if (!_dbus_string_append (&str, "abc"))
-      _dbus_assert_not_reached ("no memory");
+      _dbus_test_fatal ("no memory");
 
   if (_dbus_validate_bus_name (&str, 0, _dbus_string_get_length (&str)))
-    _dbus_assert_not_reached ("validated overmax string");
+    _dbus_test_fatal ("validated overmax string");
 
   _dbus_string_free (&str);
 
@@ -440,7 +440,7 @@ _dbus_marshal_validate_test (void)
     DBusString body;
 
     if (!_dbus_string_init (&signature) || !_dbus_string_init (&body))
-      _dbus_assert_not_reached ("oom");
+      _dbus_test_fatal ("oom");
 
     sequence = 0;
     while (dbus_internal_do_not_use_generate_bodies (sequence,
@@ -459,7 +459,7 @@ _dbus_marshal_validate_test (void)
                         validity, sequence);
             _dbus_verbose_bytes_of_string (&signature, 0, _dbus_string_get_length (&signature));
             _dbus_verbose_bytes_of_string (&body, 0, _dbus_string_get_length (&body));
-            _dbus_assert_not_reached ("test failed");
+            _dbus_test_fatal ("test failed");
           }
 
         _dbus_string_set_length (&signature, 0);
@@ -484,7 +484,7 @@ _dbus_marshal_validate_test (void)
                         validity, sequence);
             _dbus_verbose_bytes_of_string (&signature, 0, _dbus_string_get_length (&signature));
             _dbus_verbose_bytes_of_string (&body, 0, _dbus_string_get_length (&body));
-            _dbus_assert_not_reached ("test failed");
+            _dbus_test_fatal ("test failed");
           }
 
         _dbus_string_set_length (&signature, 0);

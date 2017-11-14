@@ -544,20 +544,20 @@ process_test_valid_subdir (const DBusString *test_base_dir,
   dir = NULL;
 
   if (!_dbus_string_init (&test_directory))
-    _dbus_assert_not_reached ("didn't allocate test_directory");
+    _dbus_test_fatal ("didn't allocate test_directory");
 
   _dbus_string_init_const (&filename, subdir);
 
   if (!_dbus_string_copy (test_base_dir, 0,
                           &test_directory, 0))
-    _dbus_assert_not_reached ("couldn't copy test_base_dir to test_directory");
+    _dbus_test_fatal ("couldn't copy test_base_dir to test_directory");
 
   if (!_dbus_concat_dir_and_file (&test_directory, &filename))
-    _dbus_assert_not_reached ("couldn't allocate full path");
+    _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_free (&filename);
   if (!_dbus_string_init (&filename))
-    _dbus_assert_not_reached ("didn't allocate filename string");
+    _dbus_test_fatal ("didn't allocate filename string");
 
   dbus_error_init (&error);
   dir = _dbus_directory_open (&test_directory, &error);
@@ -584,13 +584,13 @@ process_test_valid_subdir (const DBusString *test_base_dir,
       LoaderOomData d;
 
       if (!_dbus_string_init (&full_path))
-        _dbus_assert_not_reached ("couldn't init string");
+        _dbus_test_fatal ("couldn't init string");
 
       if (!_dbus_string_copy (&test_directory, 0, &full_path, 0))
-        _dbus_assert_not_reached ("couldn't copy dir to full_path");
+        _dbus_test_fatal ("couldn't copy dir to full_path");
 
       if (!_dbus_concat_dir_and_file (&full_path, &filename))
-        _dbus_assert_not_reached ("couldn't concat file to dir");
+        _dbus_test_fatal ("couldn't concat file to dir");
 
       if (!_dbus_string_ends_with_c_str (&full_path, ".conf"))
         {
@@ -616,8 +616,8 @@ process_test_valid_subdir (const DBusString *test_base_dir,
        */
       /* if (!_dbus_test_oom_handling ("config-loader", check_loader_oom_func, &d)) */
       if (!check_loader_oom_func (&d))
-        _dbus_assert_not_reached ("test failed");
-      
+        _dbus_test_fatal ("test failed");
+
       _dbus_string_free (&full_path);
     }
 

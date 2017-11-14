@@ -824,7 +824,7 @@ kill_client_connection (BusContext     *context,
 
   /* Run disconnect handler in test.c */
   if (bus_connection_dispatch_one_message (connection))
-    _dbus_assert_not_reached ("something received on connection being killed other than the disconnect");
+    _dbus_test_fatal ("something received on connection being killed other than the disconnect");
 
   _dbus_assert (!dbus_connection_get_is_connected (connection));
   dbus_connection_unref (connection);
@@ -843,10 +843,10 @@ kill_client_connection (BusContext     *context,
   dbus_free (base_service);
 
   if (socd.failed)
-    _dbus_assert_not_reached ("didn't get the expected NameOwnerChanged (deletion) messages");
+    _dbus_test_fatal ("didn't get the expected NameOwnerChanged (deletion) messages");
 
   if (!check_no_leftovers (context))
-    _dbus_assert_not_reached ("stuff left in message queues after disconnecting a client");
+    _dbus_test_fatal ("stuff left in message queues after disconnecting a client");
 }
 
 static void
@@ -861,7 +861,7 @@ kill_client_connection_unchecked (DBusConnection *connection)
   dbus_connection_close (connection);
   /* dispatching disconnect handler will unref once */
   if (bus_connection_dispatch_one_message (connection))
-    _dbus_assert_not_reached ("message other than disconnect dispatched after failure to register");
+    _dbus_test_fatal ("message other than disconnect dispatched after failure to register");
 
   _dbus_assert (!bus_test_client_listed (connection));
   dbus_connection_unref (connection);
@@ -4399,7 +4399,7 @@ check1_try_iterations (BusContext *context,
 
   if (!_dbus_test_oom_handling (description, check_oom_check1_func,
                                 &d))
-    _dbus_assert_not_reached ("test failed");
+    _dbus_test_fatal ("test failed");
 }
 
 static dbus_bool_t
@@ -4834,7 +4834,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 
   /* save the config name for the activation helper */
   if (!setenv_TEST_LAUNCH_HELPER_CONFIG (test_data_dir, filename))
-    _dbus_assert_not_reached ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
+    _dbus_test_fatal ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
 
   dbus_error_init (&error);
 
@@ -4844,72 +4844,72 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (foo))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, foo);
 
   if (!check_hello_message (context, foo))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_double_hello_message (context, foo))
-    _dbus_assert_not_reached ("double hello message failed");
+    _dbus_test_fatal ("double hello message failed");
 
   if (!check_add_match (context, foo, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   bar = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (bar == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (bar))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, bar);
 
   if (!check_hello_message (context, bar))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_add_match (context, bar, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   baz = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (baz == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (baz))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, baz);
 
   if (!check_hello_message (context, baz))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_add_match (context, baz, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   if (!check_add_match (context, baz, "interface='com.example'"))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
 #ifdef DBUS_ENABLE_STATS
   if (!check_get_all_match_rules (context, baz))
-    _dbus_assert_not_reached ("GetAllMatchRules message failed");
+    _dbus_test_fatal ("GetAllMatchRules message failed");
 #endif
 
   if (!check_get_connection_unix_user (context, baz))
-    _dbus_assert_not_reached ("GetConnectionUnixUser message failed");
+    _dbus_test_fatal ("GetConnectionUnixUser message failed");
 
 #ifdef DBUS_WIN_FIXME
   _dbus_verbose("TODO: testing of GetConnectionUnixProcessID message skipped for now\n");
 #else
   if (!check_get_connection_unix_process_id (context, baz))
-    _dbus_assert_not_reached ("GetConnectionUnixProcessID message failed");
+    _dbus_test_fatal ("GetConnectionUnixProcessID message failed");
 #endif
 
   if (!check_list_services (context, baz))
-    _dbus_assert_not_reached ("ListActivatableNames message failed");
+    _dbus_test_fatal ("ListActivatableNames message failed");
 
   if (!check_no_leftovers (context))
     _dbus_test_fatal ("Messages were left over after setting up initial connections");
@@ -4940,7 +4940,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
   /* specific to launcher */
   if (use_launcher)
     if (!check_launch_service_file_missing (context, foo))
-      _dbus_assert_not_reached ("did not get service file not found error");
+      _dbus_test_fatal ("did not get service file not found error");
 
 #if 0
   /* Note: need to resolve some issues with the testing code in order to run
@@ -4952,10 +4952,10 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 #endif
 
   if (!check_existent_service_auto_start (context, foo))
-    _dbus_assert_not_reached ("existent service auto start failed");
+    _dbus_test_fatal ("existent service auto start failed");
 
   if (!check_shell_service_success_auto_start (context, foo))
-    _dbus_assert_not_reached ("shell success service auto start failed");
+    _dbus_test_fatal ("shell success service auto start failed");
 
   _dbus_verbose ("Disconnecting foo, bar, and baz\n");
 
@@ -4979,7 +4979,7 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 
   /* save the config name for the activation helper */
   if (!setenv_TEST_LAUNCH_HELPER_CONFIG (test_data_dir, filename))
-    _dbus_assert_not_reached ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
+    _dbus_test_fatal ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
 
   dbus_error_init (&error);
 
@@ -4989,33 +4989,33 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (foo))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, foo);
 
   if (!check_hello_message (context, foo))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_double_hello_message (context, foo))
-    _dbus_assert_not_reached ("double hello message failed");
+    _dbus_test_fatal ("double hello message failed");
 
   if (!check_add_match (context, foo, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   /* this only tests the activation.c user check */
   if (!check_launch_service_user_missing (context, foo))
-    _dbus_assert_not_reached ("user missing did not trigger error");
+    _dbus_test_fatal ("user missing did not trigger error");
 
   /* this only tests the desktop.c exec check */
   if (!check_launch_service_exec_missing (context, foo))
-    _dbus_assert_not_reached ("exec missing did not trigger error");
+    _dbus_test_fatal ("exec missing did not trigger error");
 
   /* this only tests the desktop.c service check */
   if (!check_launch_service_service_missing (context, foo))
-    _dbus_assert_not_reached ("service missing did not trigger error");
+    _dbus_test_fatal ("service missing did not trigger error");
 
   _dbus_verbose ("Disconnecting foo\n");
 
@@ -5071,18 +5071,18 @@ bus_dispatch_sha1_test (const DBusString *test_data_dir)
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (foo))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, foo);
 
   if (!check_hello_message (context, foo))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_add_match (context, foo, ""))
-    _dbus_assert_not_reached ("addmatch message failed");
+    _dbus_test_fatal ("addmatch message failed");
 
   if (!check_no_leftovers (context))
     _dbus_test_fatal ("Messages were left over after setting up initial SHA-1 connection");
@@ -5114,67 +5114,67 @@ bus_unix_fds_passing_test(const DBusString *test_data_dir)
 
   context = bus_context_new_test (test_data_dir, "valid-config-files/debug-allow-all.conf");
   if (context == NULL)
-    _dbus_assert_not_reached ("could not alloc context");
+    _dbus_test_fatal ("could not alloc context");
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (foo))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, foo);
 
   if (!check_hello_message (context, foo))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_add_match (context, foo, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   bar = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (bar == NULL)
-    _dbus_assert_not_reached ("could not alloc connection");
+    _dbus_test_fatal ("could not alloc connection");
 
   if (!bus_setup_debug_client (bar))
-    _dbus_assert_not_reached ("could not set up connection");
+    _dbus_test_fatal ("could not set up connection");
 
   spin_connection_until_authenticated (context, bar);
 
   if (!check_hello_message (context, bar))
-    _dbus_assert_not_reached ("hello message failed");
+    _dbus_test_fatal ("hello message failed");
 
   if (!check_add_match (context, bar, ""))
-    _dbus_assert_not_reached ("AddMatch message failed");
+    _dbus_test_fatal ("AddMatch message failed");
 
   if (!(m = dbus_message_new_signal("/", "a.b.c", "d")))
-    _dbus_assert_not_reached ("could not alloc message");
+    _dbus_test_fatal ("could not alloc message");
 
   if (!(_dbus_socketpair (one, one+1, TRUE, &error)))
-    _dbus_assert_not_reached("Failed to allocate pipe #1");
+    _dbus_test_fatal ("Failed to allocate pipe #1");
 
   if (!(_dbus_socketpair (two, two+1, TRUE, &error)))
-    _dbus_assert_not_reached("Failed to allocate pipe #2");
+    _dbus_test_fatal ("Failed to allocate pipe #2");
 
   if (!dbus_message_append_args(m,
                                 DBUS_TYPE_UNIX_FD, one,
                                 DBUS_TYPE_UNIX_FD, two,
                                 DBUS_TYPE_UNIX_FD, two,
                                 DBUS_TYPE_INVALID))
-    _dbus_assert_not_reached("Failed to attach fds.");
+    _dbus_test_fatal ("Failed to attach fds.");
 
   if (!_dbus_close_socket (one[0], &error))
-    _dbus_assert_not_reached("Failed to close pipe #1 ");
+    _dbus_test_fatal ("Failed to close pipe #1 ");
   if (!_dbus_close_socket (two[0], &error))
-    _dbus_assert_not_reached("Failed to close pipe #2 ");
+    _dbus_test_fatal ("Failed to close pipe #2 ");
 
   if (!(dbus_connection_can_send_type(foo, DBUS_TYPE_UNIX_FD)))
-    _dbus_assert_not_reached("Connection cannot do fd passing");
+    _dbus_test_fatal ("Connection cannot do fd passing");
 
   if (!(dbus_connection_can_send_type(bar, DBUS_TYPE_UNIX_FD)))
-    _dbus_assert_not_reached("Connection cannot do fd passing");
+    _dbus_test_fatal ("Connection cannot do fd passing");
 
   if (!dbus_connection_send (foo, m, NULL))
-    _dbus_assert_not_reached("Failed to send fds");
+    _dbus_test_fatal ("Failed to send fds");
 
   dbus_message_unref(m);
 
@@ -5185,20 +5185,20 @@ bus_unix_fds_passing_test(const DBusString *test_data_dir)
   block_connection_until_message_from_bus (context, foo, "unix fd reception on foo");
 
   if (!(m = pop_message_waiting_for_memory (foo)))
-    _dbus_assert_not_reached("Failed to receive msg");
+    _dbus_test_fatal ("Failed to receive msg");
 
   if (!dbus_message_is_signal(m, "a.b.c", "d"))
-    _dbus_assert_not_reached("bogus message received");
+    _dbus_test_fatal ("bogus message received");
 
   dbus_message_unref(m);
 
   block_connection_until_message_from_bus (context, bar, "unix fd reception on bar");
 
   if (!(m = pop_message_waiting_for_memory (bar)))
-    _dbus_assert_not_reached("Failed to receive msg");
+    _dbus_test_fatal ("Failed to receive msg");
 
   if (!dbus_message_is_signal(m, "a.b.c", "d"))
-    _dbus_assert_not_reached("bogus message received");
+    _dbus_test_fatal ("bogus message received");
 
   if (!dbus_message_get_args(m,
                              &error,
@@ -5206,35 +5206,35 @@ bus_unix_fds_passing_test(const DBusString *test_data_dir)
                              DBUS_TYPE_UNIX_FD, &y,
                              DBUS_TYPE_UNIX_FD, &z,
                              DBUS_TYPE_INVALID))
-    _dbus_assert_not_reached("Failed to parse fds.");
+    _dbus_test_fatal ("Failed to parse fds.");
 
   dbus_message_unref(m);
 
   if (write(x, "X", 1) != 1)
-    _dbus_assert_not_reached("Failed to write to pipe #1");
+    _dbus_test_fatal ("Failed to write to pipe #1");
   if (write(y, "Y", 1) != 1)
-    _dbus_assert_not_reached("Failed to write to pipe #2");
+    _dbus_test_fatal ("Failed to write to pipe #2");
   if (write(z, "Z", 1) != 1)
-    _dbus_assert_not_reached("Failed to write to pipe #2/2nd fd");
+    _dbus_test_fatal ("Failed to write to pipe #2/2nd fd");
 
   if (!_dbus_close(x, &error))
-    _dbus_assert_not_reached("Failed to close pipe #1/other side ");
+    _dbus_test_fatal ("Failed to close pipe #1/other side ");
   if (!_dbus_close(y, &error))
-    _dbus_assert_not_reached("Failed to close pipe #2/other side ");
+    _dbus_test_fatal ("Failed to close pipe #2/other side ");
   if (!_dbus_close(z, &error))
-    _dbus_assert_not_reached("Failed to close pipe #2/other size 2nd fd ");
+    _dbus_test_fatal ("Failed to close pipe #2/other size 2nd fd ");
 
   if (read(one[1].fd, &r, 1) != 1 || r != 'X')
-    _dbus_assert_not_reached("Failed to read value from pipe.");
+    _dbus_test_fatal ("Failed to read value from pipe.");
   if (read(two[1].fd, &r, 1) != 1 || r != 'Y')
-    _dbus_assert_not_reached("Failed to read value from pipe.");
+    _dbus_test_fatal ("Failed to read value from pipe.");
   if (read(two[1].fd, &r, 1) != 1 || r != 'Z')
-    _dbus_assert_not_reached("Failed to read value from pipe.");
+    _dbus_test_fatal ("Failed to read value from pipe.");
 
   if (!_dbus_close_socket (one[1], &error))
-    _dbus_assert_not_reached("Failed to close pipe #1 ");
+    _dbus_test_fatal ("Failed to close pipe #1 ");
   if (!_dbus_close_socket (two[1], &error))
-    _dbus_assert_not_reached("Failed to close pipe #2 ");
+    _dbus_test_fatal ("Failed to close pipe #2 ");
 
   _dbus_verbose ("Disconnecting foo\n");
   kill_client_connection_unchecked (foo);
