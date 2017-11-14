@@ -70,25 +70,21 @@ TEST_BINARIES = \
 
 ## These are conceptually part of directories that come earlier in SUBDIRS
 ## order, but we don't want to run them til we arrive in this directory,
-## since they depend on stuff from this directory. We wrap them in a
+## since they depend on stuff from this directory. We wrap some of them in a
 ## simple shell script to get TAP output.
 
 wrap_bus_tests = test-bus.sh
-wrap_dbus_tests = test-dbus.sh
 
 if DBUS_UNIX
 wrap_bus_tests += test-bus-launch-helper.sh
 wrap_bus_tests += test-bus-system.sh
 endif
 
-TESTS += $(wrap_bus_tests) $(wrap_dbus_tests)
-CLEANFILES += $(wrap_bus_tests) $(wrap_dbus_tests)
+TESTS += $(wrap_bus_tests)
+TESTS += ../dbus/test-dbus$(EXEEXT)
+CLEANFILES += $(wrap_bus_tests)
 
 $(wrap_bus_tests): test-bus%.sh: ../bus/test-bus%$(EXEEXT) tap-test.sh.in Makefile
-	sed -e 's![@]RUN[@]!$<!' \
-		< $(srcdir)/tap-test.sh.in > $@
-
-$(wrap_dbus_tests): test-dbus%.sh: ../dbus/test-dbus%$(EXEEXT) tap-test.sh.in Makefile
 	sed -e 's![@]RUN[@]!$<!' \
 		< $(srcdir)/tap-test.sh.in > $@
 

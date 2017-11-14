@@ -25,6 +25,7 @@
 #include <config.h>
 #include "dbus-types.h"
 #include "dbus-test.h"
+#include "dbus-test-tap.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,8 +62,7 @@ main (int    argc,
     specific_test = argv[2];
   else
     specific_test = NULL;
-  
-  dbus_internal_do_not_use_run_tests (test_data_dir, specific_test);
-  
-  return 0;
+
+  _dbus_run_tests (test_data_dir, specific_test);
+  return _dbus_test_done_testing ();
 }

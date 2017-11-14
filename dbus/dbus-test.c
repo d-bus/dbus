@@ -30,49 +30,50 @@
 #include <stdlib.h>
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
-static void
-check_memleaks (void)
-{
-  dbus_shutdown ();
-
-  _dbus_test_diag ("%s: checking for memleaks", "test-dbus");
-  if (_dbus_get_malloc_blocks_outstanding () != 0)
-    _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
-                      _dbus_get_malloc_blocks_outstanding ());
-}
-
 typedef dbus_bool_t (*TestFunc)(void);
 typedef dbus_bool_t (*TestDataFunc)(const char *data);
 
 static void
 run_test (const char             *test_name,
-	  const char             *specific_test,
-	  TestFunc                test)
+          const char             *specific_test,
+          TestFunc                test)
 {
-  if (!specific_test || strcmp (specific_test, test_name) == 0)
+  if (specific_test != NULL && strcmp (specific_test, test_name) != 0)
     {
-      _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
-      if (!test ())
-        _dbus_test_fatal ("%s test failed", test_name);
-
-      check_memleaks ();
+      _dbus_test_skip ("%s - Only intending to run %s", test_name, specific_test);
+      return;
     }
+
+  _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
+
+  if (test ())
+    _dbus_test_ok ("%s", test_name);
+  else
+    _dbus_test_not_ok ("%s", test_name);
+
+  _dbus_test_check_memleaks (test_name);
 }
 
 static void
 run_data_test (const char             *test_name,
-	       const char             *specific_test,
-	       TestDataFunc            test,
-	       const char             *test_data_dir)
+               const char             *specific_test,
+               TestDataFunc            test,
+               const char             *test_data_dir)
 {
-  if (!specific_test || strcmp (specific_test, test_name) == 0)
+  if (specific_test != NULL && strcmp (specific_test, test_name) != 0)
     {
-      _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
-      if (!test (test_data_dir))
-        _dbus_test_fatal ("%s test failed", test_name);
-
-      check_memleaks ();
+      _dbus_test_skip ("%s - Only intending to run %s", test_name, specific_test);
+      return;
     }
+
+  _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
+
+  if (test (test_data_dir))
+    _dbus_test_ok ("%s", test_name);
+  else
+    _dbus_test_not_ok ("%s", test_name);
+
+  _dbus_test_check_memleaks (test_name);
 }
 
 /**
@@ -86,7 +87,8 @@ run_data_test (const char             *test_name,
  * @param specific_test run specific test or #NULL to run all tests
  */
 void
-dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *specific_test)
+_dbus_run_tests (const char   *test_data_dir,
+                 const char   *specific_test)
 {
   if (!_dbus_threads_init_debug ())
     _dbus_test_fatal ("debug threads init failed");
@@ -152,8 +154,6 @@ dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *speci
   run_data_test ("sha", specific_test, _dbus_sha_test, test_data_dir);
   
   run_data_test ("auth", specific_test, _dbus_auth_test, test_data_dir);
-
-  _dbus_test_diag ("%s: completed successfully", "test-dbus");
 }
 
 #endif /* DBUS_ENABLE_EMBEDDED_TESTS */
