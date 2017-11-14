@@ -2220,6 +2220,11 @@ bus_activation_activate_service (BusActivation  *activation,
 
   dbus_error_init (&tmp_error);
 
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+  if (bus_context_get_quiet_log (activation->context))
+    flags |= DBUS_SPAWN_SILENCE_OUTPUT;
+#endif
+
   if (bus_context_get_using_syslog (activation->context))
     flags |= DBUS_SPAWN_REDIRECT_OUTPUT;
 

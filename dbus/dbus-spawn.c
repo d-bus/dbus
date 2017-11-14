@@ -1260,11 +1260,9 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
   int child_err_report_pipe[2] = { -1, -1 };
   DBusSocket babysitter_pipe[2] = { DBUS_SOCKET_INIT, DBUS_SOCKET_INIT };
   pid_t pid;
-#ifdef HAVE_SYSTEMD
   int fd_out = -1;
   int fd_err = -1;
-#endif
-  
+
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
   _dbus_assert (argv[0] != NULL);
 
@@ -1351,8 +1349,27 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
+  if (flags & DBUS_SPAWN_SILENCE_OUTPUT)
+    {
+      fd_out = open ("/dev/null", O_RDONLY);
+
+      if (fd_out < 0)
+        {
+          dbus_set_error (error, _dbus_error_from_errno (errno),
+                          "Failed to open /dev/null: %s",
+                          _dbus_strerror (errno));
+          goto cleanup_and_fail;
+        }
+
+      _dbus_fd_set_close_on_exec (fd_out);
+
+      fd_err = _dbus_dup (fd_out, error);
+
+      if (fd_err < 0)
+        goto cleanup_and_fail;
+    }
 #ifdef HAVE_SYSTEMD
-  if (flags & DBUS_SPAWN_REDIRECT_OUTPUT)
+  else if (flags & DBUS_SPAWN_REDIRECT_OUTPUT)
     {
       /* This may fail, but it's not critical.
        * In particular, if we were compiled with journald support but are now
@@ -1431,15 +1448,16 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
           signal (SIGPIPE, SIG_IGN);
 
           close_and_invalidate (&babysitter_pipe[1].fd);
-#ifdef HAVE_SYSTEMD
-	  /* log to systemd journal if possible */
+
+          /* Redirect stdout, stderr to systemd Journal or /dev/null
+           * as requested, if possible */
 	  if (fd_out >= 0)
             dup2 (fd_out, STDOUT_FILENO);
 	  if (fd_err >= 0)
             dup2 (fd_err, STDERR_FILENO);
           close_and_invalidate (&fd_out);
           close_and_invalidate (&fd_err);
-#endif
+
 	  do_exec (child_err_report_pipe[WRITE_END],
 		   argv,
 		   env,
@@ -1449,10 +1467,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
       else
 	{
           close_and_invalidate (&child_err_report_pipe[WRITE_END]);
-#ifdef HAVE_SYSTEMD
           close_and_invalidate (&fd_out);
           close_and_invalidate (&fd_err);
-#endif
           babysit (grandchild_pid, babysitter_pipe[1].fd);
           _dbus_assert_not_reached ("Got to code after babysit()");
 	}
@@ -1462,10 +1478,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
       /* Close the uncared-about ends of the pipes */
       close_and_invalidate (&child_err_report_pipe[WRITE_END]);
       close_and_invalidate (&babysitter_pipe[1].fd);
-#ifdef HAVE_SYSTEMD
       close_and_invalidate (&fd_out);
       close_and_invalidate (&fd_err);
-#endif
 
       sitter->socket_to_babysitter = babysitter_pipe[0];
       babysitter_pipe[0].fd = -1;
@@ -1495,10 +1509,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter          **sitter_p,
   close_and_invalidate (&child_err_report_pipe[WRITE_END]);
   close_and_invalidate (&babysitter_pipe[0].fd);
   close_and_invalidate (&babysitter_pipe[1].fd);
-#ifdef HAVE_SYSTEMD
   close_and_invalidate (&fd_out);
   close_and_invalidate (&fd_err);
-#endif
 
   if (sitter != NULL)
     _dbus_babysitter_unref (sitter);

@@ -149,6 +149,7 @@ void              bus_context_check_all_watches                  (BusContext    
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 void              bus_context_quiet_log_begin                    (BusContext *context);
 void              bus_context_quiet_log_end                      (BusContext *context);
+dbus_bool_t       bus_context_get_quiet_log                      (BusContext *context);
 #endif
 
 #endif /* BUS_BUS_H */

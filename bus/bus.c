@@ -1848,4 +1848,10 @@ bus_context_quiet_log_end (BusContext *context)
 {
   context->quiet_log = FALSE;
 }
+
+dbus_bool_t
+bus_context_get_quiet_log (BusContext *context)
+{
+  return context->quiet_log;
+}
 #endif

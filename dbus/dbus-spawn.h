@@ -40,6 +40,7 @@ typedef void (* DBusBabysitterFinishedFunc) (DBusBabysitter *sitter,
 
 typedef enum {
   DBUS_SPAWN_REDIRECT_OUTPUT = (1 << 0),
+  DBUS_SPAWN_SILENCE_OUTPUT = (1 << 1),
   DBUS_SPAWN_NONE = 0
 } DBusSpawnFlags;
 
