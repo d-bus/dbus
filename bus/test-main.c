@@ -40,20 +40,9 @@
 # include <dbus/dbus-sysdeps-unix.h>
 #endif
 
-static void
-check_memleaks (const char *name)
-{
-  dbus_shutdown ();
-  
-  _dbus_test_diag ("%s: checking for memleaks", name);
-  if (_dbus_get_malloc_blocks_outstanding () != 0)
-    {
-      _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
-                        _dbus_get_malloc_blocks_outstanding ());
-    }
-}
-
+static const char *only;
 static DBusInitialFDs *initial_fds = NULL;
+static DBusString test_data_dir;
 
 static void
 test_pre_hook (void)
@@ -67,27 +56,43 @@ test_pre_hook (void)
   initial_fds = _dbus_check_fdleaks_enter ();
 }
 
-static const char *progname = "";
-
 static void
-test_post_hook (void)
+test_post_hook (const char *name)
 {
   if (_dbus_getenv ("DBUS_TEST_SELINUX"))
     bus_selinux_shutdown ();
-  check_memleaks (progname);
 
+  _dbus_test_check_memleaks (name);
   _dbus_check_fdleaks_leave (initial_fds);
   initial_fds = NULL;
+}
+
+static void
+test_one (const char *name,
+          dbus_bool_t (*func) (const DBusString *))
+{
+  if (only != NULL && strcmp (only, name) != 0)
+    {
+      _dbus_test_skip ("%s - Only intending to run %s", name, only);
+      return;
+    }
+
+  _dbus_test_diag ("Running test: %s", name);
+
+  test_pre_hook ();
+
+  if (func (&test_data_dir))
+    _dbus_test_ok ("%s", name);
+  else
+    _dbus_test_not_ok ("%s", name);
+
+  test_post_hook (name);
 }
 
 int
 main (int argc, char **argv)
 {
   const char *dir;
-  const char *only;
-  DBusString test_data_dir;
-
-  progname = argv[0];
 
   if (argc > 1 && strcmp (argv[1], "--tap") != 0)
     dir = argv[1];
@@ -112,72 +117,18 @@ main (int argc, char **argv)
   if (!_dbus_threads_init_debug ())
     _dbus_test_fatal ("OOM initializing debug threads");
 
-  if (only == NULL || strcmp (only, "expire-list") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running expire list test", argv[0]);
-      if (!bus_expire_list_test (&test_data_dir))
-        _dbus_test_fatal ("expire list test failed");
-      test_post_hook ();
-    }
-
-  if (only == NULL || strcmp (only, "config-parser") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running config file parser test", argv[0]);
-      if (!bus_config_parser_test (&test_data_dir))
-        _dbus_test_fatal ("parser test failed");
-      test_post_hook ();
-    }
-
-  if (only == NULL || strcmp (only, "signals") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running signals test", argv[0]);
-      if (!bus_signals_test (&test_data_dir))
-        _dbus_test_fatal ("signals test failed");
-      test_post_hook ();
-    }
-
-  if (only == NULL || strcmp (only, "dispatch-sha1") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running SHA1 connection test", argv[0]);
-      if (!bus_dispatch_sha1_test (&test_data_dir))
-        _dbus_test_fatal ("sha1 test failed");
-      test_post_hook ();
-    }
-
-  if (only == NULL || strcmp (only, "dispatch") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running message dispatch test", argv[0]);
-      if (!bus_dispatch_test (&test_data_dir)) 
-        _dbus_test_fatal ("dispatch test failed");
-      test_post_hook ();
-    }
-
-  if (only == NULL || strcmp (only, "activation-service-reload") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running service files reloading test", argv[0]);
-      if (!bus_activation_service_reload_test (&test_data_dir))
-        _dbus_test_fatal ("service reload test failed");
-      test_post_hook ();
-    }
+  test_one ("expire-list", bus_expire_list_test);
+  test_one ("config-parser", bus_config_parser_test);
+  test_one ("signals", bus_signals_test);
+  test_one ("dispatch-sha1", bus_dispatch_sha1_test);
+  test_one ("dispatch", bus_dispatch_test);
+  test_one ("activation-service-reload", bus_activation_service_reload_test);
 
 #ifdef HAVE_UNIX_FD_PASSING
-  if (only == NULL || strcmp (only, "unix-fds-passing") == 0)
-    {
-      test_pre_hook ();
-      _dbus_test_diag ("%s: Running unix fd passing test", argv[0]);
-      if (!bus_unix_fds_passing_test (&test_data_dir))
-        _dbus_test_fatal ("unix fd passing test failed");
-      test_post_hook ();
-    }
+  test_one ("unix-fds-passing", bus_unix_fds_passing_test);
+#else
+  _dbus_test_skip ("fd-passing not supported on this platform");
 #endif
 
-  _dbus_test_diag ("%s: Success", argv[0]);
-
-  return 0;
+  return _dbus_test_done_testing ();
 }

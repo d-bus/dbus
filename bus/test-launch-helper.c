@@ -35,25 +35,6 @@
 #error This file is only relevant for the embedded tests on Unix
 #endif
 
-static void
-check_memleaks (const char *name)
-{
-  dbus_shutdown ();
-
-  _dbus_test_diag ("%s: checking for memleaks", name);
-  if (_dbus_get_malloc_blocks_outstanding () != 0)
-    {
-      _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
-                        _dbus_get_malloc_blocks_outstanding ());
-    }
-}
-
-static void
-test_post_hook (const char *name)
-{
-  check_memleaks (name);
-}
-
 #ifdef ACTIVATION_LAUNCHER_DO_OOM
 
 /* returns true if good things happen, or if we get OOM */
@@ -123,9 +104,10 @@ main (int argc, char **argv)
                                 (char *) "org.freedesktop.DBus.TestSuiteEchoService"))
     _dbus_test_fatal ("OOM test failed");
 
-  test_post_hook (argv[0]);
+  /* ... otherwise it must have passed */
+  _dbus_test_ok ("%s", argv[0]);
 
-  _dbus_test_diag ("%s: Success", argv[0]);
+  _dbus_test_check_memleaks (argv[0]);
 
-  return 0;
+  return _dbus_test_done_testing ();
 }

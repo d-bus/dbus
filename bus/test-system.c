@@ -35,19 +35,6 @@
 #endif
 
 static void
-check_memleaks (const char *name)
-{
-  dbus_shutdown ();
-
-  _dbus_test_diag ("%s: checking for memleaks", name);
-  if (_dbus_get_malloc_blocks_outstanding () != 0)
-    {
-      _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
-                        _dbus_get_malloc_blocks_outstanding ());
-    }
-}
-
-static void
 test_pre_hook (void)
 {
 }
@@ -56,7 +43,7 @@ static const char *progname = "";
 static void
 test_post_hook (void)
 {
-  check_memleaks (progname);
+  _dbus_test_check_memleaks (progname);
 }
 
 int
@@ -84,9 +71,10 @@ main (int argc, char **argv)
   _dbus_test_diag ("%s: Running config file parser (trivial) test", argv[0]);
   if (!bus_config_parser_trivial_test (&test_data_dir))
     _dbus_test_fatal ("OOM creating parser");
+
+  /* All failure modes for this test are currently fatal */
+  _dbus_test_ok ("%s", argv[0]);
   test_post_hook ();
 
-  _dbus_test_diag ("%s: Success", argv[0]);
-
-  return 0;
+  return _dbus_test_done_testing ();
 }

@@ -73,20 +73,14 @@ TEST_BINARIES = \
 ## since they depend on stuff from this directory. We wrap some of them in a
 ## simple shell script to get TAP output.
 
-wrap_bus_tests = test-bus.sh
+TESTS += ../bus/test-bus$(EXEEXT)
 
 if DBUS_UNIX
-wrap_bus_tests += test-bus-launch-helper.sh
-wrap_bus_tests += test-bus-system.sh
+TESTS += ../bus/test-bus-launch-helper$(EXEEXT)
+TESTS += ../bus/test-bus-system$(EXEEXT)
 endif
 
-TESTS += $(wrap_bus_tests)
 TESTS += ../dbus/test-dbus$(EXEEXT)
-CLEANFILES += $(wrap_bus_tests)
-
-$(wrap_bus_tests): test-bus%.sh: ../bus/test-bus%$(EXEEXT) tap-test.sh.in Makefile
-	sed -e 's![@]RUN[@]!$<!' \
-		< $(srcdir)/tap-test.sh.in > $@
 
 else !DBUS_ENABLE_EMBEDDED_TESTS
 
