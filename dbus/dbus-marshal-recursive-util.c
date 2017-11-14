@@ -29,6 +29,7 @@
 #include "dbus-marshal-basic.h"
 #include "dbus-signature.h"
 #include "dbus-internals.h"
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 #if !defined(PRIx64) && defined(DBUS_WIN)
@@ -307,12 +308,10 @@ real_check_expected_type (DBusTypeReader *reader,
 
   if (t != expected)
     {
-      _dbus_warn ("Read type %s while expecting %s at %s line %d",
+      _dbus_test_fatal ("Read wrong type: read type %s while expecting %s at %s line %d",
                   _dbus_type_to_string (t),
                   _dbus_type_to_string (expected),
                   funcname, line);
-
-      _dbus_assert_not_reached ("read wrong type");
     }
 }
 
@@ -320,17 +319,15 @@ real_check_expected_type (DBusTypeReader *reader,
 
 #define NEXT_EXPECTING_TRUE(reader)  do { if (!_dbus_type_reader_next (reader))         \
  {                                                                                      \
-    _dbus_warn ("_dbus_type_reader_next() should have returned TRUE at %s %d",          \
+    _dbus_test_fatal ("_dbus_type_reader_next() should have returned TRUE at %s %d",    \
                               _DBUS_FUNCTION_NAME, __LINE__);                           \
-    _dbus_assert_not_reached ("test failed");                                           \
  }                                                                                      \
 } while (0)
 
 #define NEXT_EXPECTING_FALSE(reader) do { if (_dbus_type_reader_next (reader))          \
  {                                                                                      \
-    _dbus_warn ("_dbus_type_reader_next() should have returned FALSE at %s %d",         \
+    _dbus_test_fatal ("_dbus_type_reader_next() should have returned FALSE at %s %d",   \
                               _DBUS_FUNCTION_NAME, __LINE__);                           \
-    _dbus_assert_not_reached ("test failed");                                           \
  }                                                                                      \
  check_expected_type (reader, DBUS_TYPE_INVALID);                                       \
 } while (0)
@@ -1398,11 +1395,10 @@ run_test_nodes_iteration (void *data)
   if (!_dbus_string_equal_substring (nid->signature, 0, _dbus_string_get_length (nid->signature),
                                      &nid->block->signature, nid->type_offset))
     {
-      _dbus_warn ("Expected signature '%s' and got '%s' with initial offset %d",
+      _dbus_test_fatal ("Expected signature '%s' and got '%s' with initial offset %d",
                   _dbus_string_get_const_data (nid->signature),
                   _dbus_string_get_const_data_len (&nid->block->signature, nid->type_offset, 0),
                   nid->type_offset);
-      _dbus_assert_not_reached ("wrong signature");
     }
 
   i = 0;
@@ -2456,11 +2452,7 @@ string_read_value (TestTypeNode   *node,
                     seed);
 
   if (strcmp (buf, v) != 0)
-    {
-      _dbus_warn ("read string '%s' expected '%s'",
-                  v, buf);
-      _dbus_assert_not_reached ("test failed");
-    }
+    _dbus_test_fatal ("read string '%s' expected '%s'", v, buf);
 
   return TRUE;
 }
@@ -2627,13 +2619,10 @@ double_read_value (TestTypeNode   *node,
   expected = double_from_seed (seed);
 
   if (!_DBUS_DOUBLES_BITWISE_EQUAL (v, expected))
-    {
-      _dbus_warn ("Expected double %g got %g\n bits = 0x%" PRIx64 " vs.\n bits = 0x%" PRIx64,
-                  expected, v,
-                  *(dbus_uint64_t*)(char*)&expected,
-                  *(dbus_uint64_t*)(char*)&v);
-      _dbus_assert_not_reached ("test failed");
-    }
+    _dbus_test_fatal ("Expected double %g got %g\n bits = 0x%" PRIx64 " vs.\n bits = 0x%" PRIx64,
+                      expected, v,
+                      *(dbus_uint64_t*)(char*)&expected,
+                      *(dbus_uint64_t*)(char*)&v);
 
   return TRUE;
 }
@@ -2724,11 +2713,7 @@ object_path_read_value (TestTypeNode   *node,
   object_path_from_seed (buf, seed);
 
   if (strcmp (buf, v) != 0)
-    {
-      _dbus_warn ("read object path '%s' expected '%s'",
-                  v, buf);
-      _dbus_assert_not_reached ("test failed");
-    }
+    _dbus_test_fatal ("read object path '%s' expected '%s'", v, buf);
 
   return TRUE;
 }
@@ -2799,11 +2784,7 @@ signature_read_value (TestTypeNode   *node,
   signature_from_seed (buf, seed);
 
   if (strcmp (buf, v) != 0)
-    {
-      _dbus_warn ("read signature value '%s' expected '%s'",
-                  v, buf);
-      _dbus_assert_not_reached ("test failed");
-    }
+    _dbus_test_fatal ("read signature value '%s' expected '%s'", v, buf);
 
   return TRUE;
 }

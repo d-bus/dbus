@@ -30,15 +30,6 @@
 #include <stdlib.h>
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
-static void die (const char *failure) _DBUS_GNUC_NORETURN;
-
-static void
-die (const char *failure)
-{
-  fprintf (stderr, "Unit test failed: %s\n", failure);
-  exit (1);
-}
-
 static void
 check_memleaks (void)
 {
@@ -46,11 +37,8 @@ check_memleaks (void)
 
   _dbus_test_diag ("%s: checking for memleaks", "test-dbus");
   if (_dbus_get_malloc_blocks_outstanding () != 0)
-    {
-      _dbus_warn ("%d dbus_malloc blocks were not freed",
-                  _dbus_get_malloc_blocks_outstanding ());
-      die ("memleaks");
-    }
+    _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
+                      _dbus_get_malloc_blocks_outstanding ());
 }
 
 typedef dbus_bool_t (*TestFunc)(void);
@@ -65,7 +53,7 @@ run_test (const char             *test_name,
     {
       _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
       if (!test ())
-	die (test_name);
+        _dbus_test_fatal ("%s test failed", test_name);
 
       check_memleaks ();
     }
@@ -81,7 +69,7 @@ run_data_test (const char             *test_name,
     {
       _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
       if (!test (test_data_dir))
-	die (test_name);
+        _dbus_test_fatal ("%s test failed", test_name);
 
       check_memleaks ();
     }
@@ -101,8 +89,8 @@ void
 dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *specific_test)
 {
   if (!_dbus_threads_init_debug ())
-    die ("debug threads init");
-  
+    _dbus_test_fatal ("debug threads init failed");
+
   if (test_data_dir == NULL)
     test_data_dir = _dbus_getenv ("DBUS_TEST_DATA");
 

@@ -76,8 +76,7 @@ do_byteswap_test (int byte_order)
           _dbus_verbose_bytes_of_string (&copy, 0,
                                          _dbus_string_get_length (&copy));
 
-          _dbus_warn ("Byte-swapped data did not have same values as original data");
-          _dbus_assert_not_reached ("test failed");
+          _dbus_test_fatal ("Byte-swapped data did not have same values as original data");
         }
       
       _dbus_string_free (&copy);

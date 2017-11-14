@@ -149,9 +149,8 @@ check_memleaks (void)
 
   if (_dbus_get_malloc_blocks_outstanding () != 0)
     {
-      _dbus_warn ("%d dbus_malloc blocks were not freed in %s",
+      _dbus_test_fatal ("%d dbus_malloc blocks were not freed in %s",
                   _dbus_get_malloc_blocks_outstanding (), __FILE__);
-      _dbus_assert_not_reached ("memleaks");
     }
 }
 
@@ -261,8 +260,7 @@ _dbus_check_fdleaks_leave (DBusInitialFDs *fds)
           if (FD_ISSET (fd, &fds->set))
             continue;
 
-          _dbus_warn ("file descriptor %i leaked in %s.", fd, __FILE__);
-          _dbus_assert_not_reached ("fdleaks");
+          _dbus_test_fatal ("file descriptor %i leaked in %s.", fd, __FILE__);
         }
 
       closedir (d);
@@ -1176,9 +1174,8 @@ verify_test_message_memleak (DBusMessage *message)
 #endif
                                    DBUS_TYPE_INVALID))
     {
-      _dbus_warn ("error: %s - %s", error.name,
+      _dbus_test_fatal ("Could not get arguments: %s - %s", error.name,
                   (error.message != NULL) ? error.message : "no message");
-      _dbus_assert_not_reached ("Could not get arguments");
     }
   else
     {
@@ -1793,9 +1790,8 @@ _dbus_message_test (const char *test_data_dir)
         if (!dbus_internal_do_not_use_try_message_data (&mdata.data,
                                                         mdata.expected_validity))
           {
-            _dbus_warn ("expected validity %d and did not get it",
+            _dbus_test_fatal ("expected validity %d and did not get it",
                         mdata.expected_validity);
-            _dbus_assert_not_reached ("message data failed");
           }
 
         _dbus_message_data_free (&mdata);

@@ -35,6 +35,7 @@
 #include "test.h"
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-misc.h>
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 #ifdef HAVE_UNIX_FD_PASSING
@@ -4783,10 +4784,7 @@ check2_try_iterations (BusContext     *context,
 
   if (!_dbus_test_oom_handling (description, check_oom_check2_func,
                                 &d))
-    {
-      _dbus_warn ("%s failed during oom", description);
-      _dbus_assert_not_reached ("test failed");
-    }
+    _dbus_test_fatal ("%s failed during oom", description);
 }
 
 static dbus_bool_t
@@ -4914,10 +4912,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
     _dbus_assert_not_reached ("ListActivatableNames message failed");
 
   if (!check_no_leftovers (context))
-    {
-      _dbus_warn ("Messages were left over after setting up initial connections");
-      _dbus_assert_not_reached ("initial connection setup failed");
-    }
+    _dbus_test_fatal ("Messages were left over after setting up initial connections");
 
   check1_try_iterations (context, "create_and_hello",
                          check_hello_connection);
@@ -5090,10 +5085,7 @@ bus_dispatch_sha1_test (const DBusString *test_data_dir)
     _dbus_assert_not_reached ("addmatch message failed");
 
   if (!check_no_leftovers (context))
-    {
-      _dbus_warn ("Messages were left over after setting up initial SHA-1 connection");
-      _dbus_assert_not_reached ("initial connection setup failed");
-    }
+    _dbus_test_fatal ("Messages were left over after setting up initial SHA-1 connection");
 
   check1_try_iterations (context, "create_and_hello_sha1",
                          check_hello_connection);
