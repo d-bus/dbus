@@ -1,7 +1,9 @@
 dbus 1.12.4 (UNRELEASED)
 ========================
 
-...
+Fixes:
+
+• Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
 
 dbus 1.12.2 (2017-11-13)
 ========================
