@@ -3082,8 +3082,8 @@ _dbus_get_autolaunch_address (const char *scope, DBusString *address,
             {
               dbus_set_error_const (error, DBUS_ERROR_FAILED, "could not find dbus-daemon executable");
               retval = FALSE;
-              printf ("please add the path to %s to your PATH environment variable\n", daemon_name);
-              printf ("or start the daemon manually\n\n");
+              fprintf (stderr, "please add the path to %s to your PATH environment variable\n", daemon_name);
+              fprintf (stderr, "or start the daemon manually\n\n");
               goto out;
             }
           _dbus_verbose( "found dbus daemon executable at %s",dbus_module_path);
