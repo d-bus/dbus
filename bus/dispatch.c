@@ -4848,6 +4848,8 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
   DBusConnection *baz;
   DBusError error;
 
+  _dbus_test_diag ("%s:%s...", _DBUS_FUNCTION_NAME, filename);
+
   /* save the config name for the activation helper */
   if (!setenv_TEST_LAUNCH_HELPER_CONFIG (test_data_dir, filename))
     _dbus_test_fatal ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
@@ -4856,7 +4858,11 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 
   context = bus_context_new_test (test_data_dir, filename);
   if (context == NULL)
-    return FALSE;
+    {
+      _dbus_test_not_ok ("%s:%s - bus_context_new_test() failed",
+          _DBUS_FUNCTION_NAME, filename);
+      return FALSE;
+    }
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
@@ -4930,33 +4936,46 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
   if (!check_no_leftovers (context))
     _dbus_test_fatal ("Messages were left over after setting up initial connections");
 
+  _dbus_test_ok ("%s:%s - connection setup", _DBUS_FUNCTION_NAME, filename);
+
   check1_try_iterations (context, "create_and_hello",
                          check_hello_connection);
+  _dbus_test_ok ("%s:%s - check_hello_connection", _DBUS_FUNCTION_NAME, filename);
 
   check2_try_iterations (context, foo, "nonexistent_service_no_auto_start",
                          check_nonexistent_service_no_auto_start);
+  _dbus_test_ok ("%s:%s - check_nonexistent_service_no_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   check2_try_iterations (context, foo, "segfault_service_no_auto_start",
                          check_segfault_service_no_auto_start);
+  _dbus_test_ok ("%s:%s - check_segfault_service_no_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   check2_try_iterations (context, foo, "existent_service_no_auto_start",
                          check_existent_service_no_auto_start);
+  _dbus_test_ok ("%s:%s - check_existent_service_no_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   check2_try_iterations (context, foo, "nonexistent_service_auto_start",
                          check_nonexistent_service_auto_start);
+  _dbus_test_ok ("%s:%s - check_nonexistent_service_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   /* only do the segfault test if we are not using the launcher */
   check2_try_iterations (context, foo, "segfault_service_auto_start",
                          check_segfault_service_auto_start);
+  _dbus_test_ok ("%s:%s - check_segfault_service_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   /* only do the shell fail test if we are not using the launcher */
   check2_try_iterations (context, foo, "shell_fail_service_auto_start",
                          check_shell_fail_service_auto_start);
+  _dbus_test_ok ("%s:%s - check_shell_fail_service_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   /* specific to launcher */
   if (use_launcher)
-    if (!check_launch_service_file_missing (context, foo))
-      _dbus_test_fatal ("did not get service file not found error");
+    {
+      if (!check_launch_service_file_missing (context, foo))
+        _dbus_test_fatal ("did not get service file not found error");
+
+      _dbus_test_ok ("%s:%s - check_launch_service_file_missing", _DBUS_FUNCTION_NAME, filename);
+    }
 
 #if 0
   /* Note: need to resolve some issues with the testing code in order to run
@@ -4965,13 +4984,16 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
    */
   check2_try_iterations (context, foo, "existent_service_auto_auto_start",
                          check_existent_service_auto_start);
+  _dbus_test_ok ("check_existent_service_auto_start");
 #endif
 
   if (!check_existent_service_auto_start (context, foo))
     _dbus_test_fatal ("existent service auto start failed");
+  _dbus_test_ok ("%s:%s - check_existent_service_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   if (!check_shell_service_success_auto_start (context, foo))
     _dbus_test_fatal ("shell success service auto start failed");
+  _dbus_test_ok ("%s:%s - check_shell_service_success_auto_start", _DBUS_FUNCTION_NAME, filename);
 
   _dbus_verbose ("Disconnecting foo, bar, and baz\n");
 
@@ -4981,6 +5003,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 
   bus_context_unref (context);
 
+  _dbus_test_ok ("%s:%s", _DBUS_FUNCTION_NAME, filename);
   return TRUE;
 }
 
@@ -4993,6 +5016,8 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
   DBusConnection *foo;
   DBusError error;
 
+  _dbus_test_diag ("%s:%s...", _DBUS_FUNCTION_NAME, filename);
+
   /* save the config name for the activation helper */
   if (!setenv_TEST_LAUNCH_HELPER_CONFIG (test_data_dir, filename))
     _dbus_test_fatal ("no memory setting TEST_LAUNCH_HELPER_CONFIG");
@@ -5001,7 +5026,11 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 
   context = bus_context_new_test (test_data_dir, filename);
   if (context == NULL)
-    return FALSE;
+    {
+      _dbus_test_not_ok ("%s:%s - bus_context_new_test() failed",
+          _DBUS_FUNCTION_NAME, filename);
+      return FALSE;
+    }
 
   foo = dbus_connection_open_private (TEST_DEBUG_PIPE, &error);
   if (foo == NULL)
@@ -5039,6 +5068,7 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 
   bus_context_unref (context);
 
+  _dbus_test_ok ("%s:%s", _DBUS_FUNCTION_NAME, filename);
   return TRUE;
 }
 #endif
