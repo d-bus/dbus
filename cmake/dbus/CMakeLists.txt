@@ -127,6 +127,7 @@ set (DBUS_SHARED_SOURCES
 	${DBUS_DIR}/dbus-string.c
 	${DBUS_DIR}/dbus-sysdeps.c
 	${DBUS_DIR}/dbus-pipe.c
+	${DBUS_DIR}/dbus-test-tap.c
 )
 
 set (DBUS_SHARED_HEADERS
@@ -141,6 +142,7 @@ set (DBUS_SHARED_HEADERS
 	${DBUS_DIR}/dbus-string-private.h
 	${DBUS_DIR}/dbus-pipe.h
 	${DBUS_DIR}/dbus-sysdeps.h
+	${DBUS_DIR}/dbus-test-tap.h
 )
 
 ### source code that is generic utility functionality used

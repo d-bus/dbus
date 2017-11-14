@@ -231,6 +231,8 @@ DBUS_SHARED_SOURCES=				\
 	$(DBUS_SHARED_arch_sources)		\
 	dbus-sysdeps.c				\
 	dbus-sysdeps.h				\
+	dbus-test-tap.c				\
+	dbus-test-tap.h				\
 	dbus-valgrind-internal.h
 
 ### source code that is generic utility functionality used
