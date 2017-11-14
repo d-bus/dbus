@@ -6,6 +6,10 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Fixes:
+
+• Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
+
 Internal changes:
 
 • Preparations for future support for restricted sockets used by
