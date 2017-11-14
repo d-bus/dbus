@@ -26,6 +26,7 @@
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 #include "dbus-marshal-byteswap.h"
 #include "dbus-test.h"
+#include <dbus/dbus-test-tap.h>
 #include <stdio.h>
 
 static void
@@ -89,7 +90,7 @@ do_byteswap_test (int byte_order)
   _dbus_string_free (&signature);
   _dbus_string_free (&body);
 
-  printf ("  %d blocks swapped from order '%c' to '%c'\n",
+  _dbus_test_diag ("  %d blocks swapped from order '%c' to '%c'",
           sequence, byte_order, opposite_order);
 }
 

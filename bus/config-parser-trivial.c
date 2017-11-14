@@ -28,6 +28,7 @@
 #include "utils.h"
 #include <dbus/dbus-list.h>
 #include <dbus/dbus-internals.h>
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 /**
@@ -400,7 +401,7 @@ check_return_values (const DBusString *full_path)
   dbus_error_init (&error);
   retval = FALSE;
 
-  printf ("Testing values from: %s\n", _dbus_string_get_const_data (full_path));
+  _dbus_test_diag ("Testing values from: %s", _dbus_string_get_const_data (full_path));
 
   parser = bus_config_load (full_path, TRUE, NULL, &error);
   if (parser == NULL)
@@ -426,7 +427,7 @@ check_return_values (const DBusString *full_path)
       _dbus_warn ("User was invalid; '%s'!", user);
       goto finish;
     }
-  printf ("    <user>dbus</user> OKAY!\n");  
+  _dbus_test_diag ("    <user>dbus</user> OKAY!");
 #endif
   
   /* check type return value is okay */
@@ -441,7 +442,7 @@ check_return_values (const DBusString *full_path)
       _dbus_warn ("Type was invalid; '%s'!", user);
       goto finish;
     }
-  printf ("    <type>system</type> OKAY!\n");
+  _dbus_test_diag ("    <type>system</type> OKAY!");
 
   /* check dirs return value is okay */
   dirs = bus_config_parser_get_service_paths (parser);
@@ -450,7 +451,7 @@ check_return_values (const DBusString *full_path)
       _dbus_warn ("Service dirs are NULL!");
       goto finish;
     }
-  printf ("    <standard_system_service_dirs/> OKAY!\n");
+  _dbus_test_diag ("    <standard_system_service_dirs/> OKAY!");
   /* NOTE: We tested the specific return values in the config-parser tests */
 
   /* woohoo! */
@@ -570,11 +571,11 @@ process_test_valid_subdir (const DBusString *test_base_dir,
     }
 
   if (validity == VALID)
-    printf ("Testing valid files:\n");
+    _dbus_test_diag ("Testing valid files:");
   else if (validity == INVALID)
-    printf ("Testing invalid files:\n");
+    _dbus_test_diag ("Testing invalid files:");
   else
-    printf ("Testing unknown files:\n");
+    _dbus_test_diag ("Testing unknown files:");
 
  next:
   while (_dbus_directory_get_next_file (dir, &filename, &error))
@@ -599,7 +600,7 @@ process_test_valid_subdir (const DBusString *test_base_dir,
           goto next;
         }
 
-      printf ("    %s\n", _dbus_string_get_const_data (&filename));
+      _dbus_test_diag ("    %s", _dbus_string_get_const_data (&filename));
 
       _dbus_verbose (" expecting %s\n",
                      validity == VALID ? "valid" :
@@ -695,14 +696,14 @@ check_file_valid (DBusString *full_path,
   dbus_bool_t retval;
 
   if (validity == VALID)
-    printf ("Testing valid file:\n");
+    _dbus_test_diag ("Testing valid file:");
   else if (validity == INVALID)
-    printf ("Testing invalid file:\n");
+    _dbus_test_diag ("Testing invalid file:");
   else
-    printf ("Testing unknown file:\n");
+    _dbus_test_diag ("Testing unknown file:");
 
   /* print the filename, just so we match the other output */
-  printf ("    %s\n", _dbus_string_get_const_data (full_path));
+  _dbus_test_diag ("    %s", _dbus_string_get_const_data (full_path));
 
   /* only test one file */
   retval = do_load (full_path, validity, TRUE);
@@ -721,7 +722,7 @@ bus_config_parser_trivial_test (const DBusString *test_data_dir)
   if (test_data_dir == NULL ||
       _dbus_string_get_length (test_data_dir) == 0)
     {
-      printf ("No test data\n");
+      _dbus_test_diag ("No test data");
       return TRUE;
     }
   

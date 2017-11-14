@@ -25,6 +25,7 @@
 #include "dbus-internals.h"
 #include "dbus-test.h"
 #include "dbus-auth.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @addtogroup DBusAuth
@@ -76,8 +77,8 @@ process_test_subdir (const DBusString          *test_base_dir,
       goto failed;
     }
 
-  printf ("Testing %s:\n", subdir);
-  
+  _dbus_test_diag ("Testing %s:", subdir);
+
  next:
   while (_dbus_directory_get_next_file (dir, &filename, &error))
     {
@@ -100,8 +101,8 @@ process_test_subdir (const DBusString          *test_base_dir,
           goto next;
         }
 
-      printf ("    %s\n", _dbus_string_get_const_data (&filename));
-      
+      _dbus_test_diag ("    %s", _dbus_string_get_const_data (&filename));
+
       if (!_dbus_auth_script_run (&full_path))
         {
           _dbus_string_free (&full_path);

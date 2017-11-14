@@ -29,6 +29,7 @@
 #include "dbus-message-private.h"
 #include "dbus-signature.h"
 #include "dbus-test.h"
+#include <dbus/dbus-test-tap.h>
 #include <stdio.h>
 
 typedef enum
@@ -1081,7 +1082,7 @@ generate_typecode_changed (DBusMessageDataIter *iter,
   _dbus_assert (iter->depth == (base_depth + 0));
 
 #if 0
-  printf ("Changing byte %d in message %d to %c\n",
+  _dbus_test_diag ("Changing byte %d in message %d to %c",
           byte_seq, iter_get_sequence (iter), typecodes[typecode_seq]);
 #endif
   
@@ -1199,15 +1200,15 @@ generate_uint32_changed (DBusMessageDataIter *iter,
     }
 
 #if 0
-  printf ("body %d change %d pos %d ",
+  _dbus_test_diag ("body %d change %d pos %d ",
           body_seq, change_seq, byte_seq);
 
   if (change->type == CHANGE_TYPE_ADJUST)
-    printf ("adjust by %d", (int) change->value);
+    _dbus_test_diag ("adjust by %d", (int) change->value);
   else
-    printf ("set to %u", change->value);
+    _dbus_test_diag ("set to %u", change->value);
   
-  printf (" \t%u -> %u\n",
+  _dbus_test_diag (" \t%u -> %u",
           _dbus_marshal_read_uint32 (data, byte_seq, byte_order, NULL),
           v_UINT32);
 #endif
@@ -1279,8 +1280,7 @@ _dbus_message_data_iter_get_and_next (DBusMessageDataIter *iter,
   
   if (iter_first_in_series (iter))
     {
-      printf (" testing message loading: %s ", generators[generator].name);
-      fflush (stdout);
+      _dbus_test_diag (" testing message loading: %s ", generators[generator].name);
     }
   
   func = generators[generator].func;
@@ -1296,7 +1296,7 @@ _dbus_message_data_iter_get_and_next (DBusMessageDataIter *iter,
       iter_unrecurse (iter);
       iter_next (iter); /* next generator */
       _dbus_string_free (&data->data);
-      printf ("%d test loads cumulative\n", iter->count);
+      _dbus_test_diag ("%d test loads cumulative", iter->count);
       goto restart;
     }
   iter_unrecurse (iter);

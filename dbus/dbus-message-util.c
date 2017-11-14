@@ -31,6 +31,7 @@
 #ifdef HAVE_UNIX_FD_PASSING
 #include "dbus-sysdeps-unix.h"
 #endif
+#include <dbus/dbus-test-tap.h>
 
 #ifdef __linux__
 /* Necessary for the Linux-specific fd leak checking code only */
@@ -134,7 +135,7 @@ print_validities_seen (dbus_bool_t not_seen)
         ;
       else if ((not_seen && validities_seen[i] == 0) ||
                (!not_seen && validities_seen[i] > 0))
-        printf ("validity %3d seen %d times\n",
+        _dbus_test_diag ("validity %3d seen %d times",
                 i - _DBUS_NEGATIVE_VALIDITY_COUNT,
                 validities_seen[i]);
       ++i;
@@ -640,7 +641,7 @@ process_test_subdir (const DBusString          *test_base_dir,
       goto failed;
     }
 
-  printf ("Testing %s:\n", subdir);
+  _dbus_test_diag ("Testing %s:", subdir);
 
  next:
   while (_dbus_directory_get_next_file (dir, &filename, &error))
@@ -662,7 +663,7 @@ process_test_subdir (const DBusString          *test_base_dir,
         {
           if (_dbus_string_ends_with_c_str (&filename, ".message"))
             {
-              printf ("SKIP: Could not load %s, message builder language no longer supported\n",
+              _dbus_test_diag ("SKIP: Could not load %s, message builder language no longer supported",
                       _dbus_string_get_const_data (&filename));
             }
           
@@ -672,7 +673,7 @@ process_test_subdir (const DBusString          *test_base_dir,
           goto next;
         }
 
-      printf ("    %s\n",
+      _dbus_test_diag ("    %s",
               _dbus_string_get_const_data (&filename));
 
       if (! (*function) (&full_path,
@@ -1802,7 +1803,7 @@ _dbus_message_test (const char *test_data_dir)
         count += 1;
       }
 
-    printf ("%d sample messages tested\n", count);
+    _dbus_test_diag ("%d sample messages tested", count);
 
     print_validities_seen (FALSE);
     print_validities_seen (TRUE);

@@ -29,31 +29,22 @@
 #include <stdlib.h>
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-misc.h>
+#include <dbus/dbus-test-tap.h>
 
 #if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
 #error This file is only relevant for the embedded tests on Unix
 #endif
 
-static void die (const char *failure) _DBUS_GNUC_NORETURN;
-
-static void
-die (const char *failure)
-{
-  fprintf (stderr, "Unit test failed: %s\n", failure);
-  exit (1);
-}
-
 static void
 check_memleaks (const char *name)
 {
   dbus_shutdown ();
-  
-  printf ("%s: checking for memleaks\n", name);
+
+  _dbus_test_diag ("%s: checking for memleaks", name);
   if (_dbus_get_malloc_blocks_outstanding () != 0)
     {
-      _dbus_warn ("%d dbus_malloc blocks were not freed",
-                  _dbus_get_malloc_blocks_outstanding ());
-      die ("memleaks");
+      _dbus_test_fatal ("%d dbus_malloc blocks were not freed",
+                        _dbus_get_malloc_blocks_outstanding ());
     }
 }
 
@@ -110,19 +101,14 @@ main (int argc, char **argv)
     dir = _dbus_getenv ("DBUS_TEST_DATA");
 
   if (dir == NULL)
-    {
-      fprintf (stderr, "Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable\n");
-      return 1;
-    }
+    _dbus_test_fatal ("Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable");
 
-  printf ("%s: Running launch helper OOM checks\n", argv[0]);
+  _dbus_test_diag ("%s: Running launch helper OOM checks", argv[0]);
 
-  if (!_dbus_string_init (&config_file))
-    return 1;
-  if (!_dbus_string_append (&config_file, dir))
-    return 1;
-  if (!_dbus_string_append (&config_file, "/valid-config-files-system/debug-allow-all-pass.conf"))
-    return 1;
+  if (!_dbus_string_init (&config_file) ||
+      !_dbus_string_append (&config_file, dir) ||
+      !_dbus_string_append (&config_file, "/valid-config-files-system/debug-allow-all-pass.conf"))
+    _dbus_test_fatal ("OOM during initialization");
 
   /* use a config file that will actually work... */
   dbus_setenv ("TEST_LAUNCH_HELPER_CONFIG",
@@ -133,11 +119,11 @@ main (int argc, char **argv)
   if (!_dbus_test_oom_handling ("dbus-daemon-launch-helper",
                                 bus_activation_helper_oom_test,
                                 (char *) "org.freedesktop.DBus.TestSuiteEchoService"))
-    die ("OOM failed");
+    _dbus_test_fatal ("OOM test failed");
 
   test_post_hook (argv[0]);
 
-  printf ("%s: Success\n", argv[0]);
+  _dbus_test_diag ("%s: Success", argv[0]);
 
   return 0;
 }

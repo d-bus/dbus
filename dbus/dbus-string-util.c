@@ -27,6 +27,7 @@
 #include "dbus-string.h"
 #define DBUS_CAN_USE_DBUS_STRING_PRIVATE 1
 #include "dbus-string-private.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @addtogroup DBusString
@@ -155,14 +156,15 @@ test_hex_roundtrip (const char *data,
     {
       const char *s;
       
-      printf ("Original string %d bytes encoded %d bytes decoded %d bytes\n",
+
+      _dbus_test_diag ("Original string %d bytes encoded %d bytes decoded %d bytes",
               _dbus_string_get_length (&orig),
               _dbus_string_get_length (&encoded),
               _dbus_string_get_length (&decoded));
-      printf ("Original: %s\n", data);
+      _dbus_test_diag ("Original: %s", data);
       s = _dbus_string_get_const_data (&decoded);
-      printf ("Decoded: %s\n", s);
-      _dbus_assert_not_reached ("original string not the same as string decoded from hex");
+      _dbus_test_diag ("Decoded: %s", s);
+      _dbus_test_fatal ("original string not the same as string decoded from hex");
     }
   
   _dbus_string_free (&orig);

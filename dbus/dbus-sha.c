@@ -26,6 +26,7 @@
 #include "dbus-internals.h"
 #include "dbus-sha.h"
 #include "dbus-marshal-basic.h" /* for byteswap routines */
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 /* The following comments have the history of where this code
@@ -628,7 +629,7 @@ decode_compact_string (const DBusString *line,
           old_byte |= current_b << bit_containing_next_bit;
 
 #if 0
-          printf ("Appending bit %d to byte %d at bit %d resulting in byte 0x%x\n",
+          _dbus_test_diag ("Appending bit %d to byte %d at bit %d resulting in byte 0x%x",
                   current_b, byte_containing_next_bit,
                   bit_containing_next_bit, old_byte);
 #endif
@@ -816,7 +817,7 @@ process_test_data (const char *test_data_dir)
         goto next_iteration;
       else if (_dbus_string_starts_with_c_str (&line, "H>"))
         {
-          printf ("SHA-1: %s\n", _dbus_string_get_const_data (&line));
+          _dbus_test_diag ("SHA-1: %s", _dbus_string_get_const_data (&line));
 
           if (_dbus_string_find (&line, 0, "Type 3", NULL))
             {
@@ -826,7 +827,7 @@ process_test_data (const char *test_data_dir)
                * to use those tests.
                */
               
-              printf (" (ending tests due to Type 3 tests seen - this is normal)\n");
+              _dbus_test_diag (" (ending tests due to Type 3 tests seen - this is normal)");
               break;
             }
         }
@@ -912,7 +913,7 @@ process_test_data (const char *test_data_dir)
 
   retval = TRUE;
 
-  printf ("Passed the %d SHA-1 tests in the test file\n",
+  _dbus_test_diag ("Passed the %d SHA-1 tests in the test file",
           success_count);
   
  out:
@@ -943,7 +944,7 @@ _dbus_sha_test (const char *test_data_dir)
         return FALSE;
     }
   else
-    printf ("No test data dir\n");
+    _dbus_test_diag ("No test data dir");
   
   i = 0;
   while (i < 256)

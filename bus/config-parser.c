@@ -33,6 +33,7 @@
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-misc.h>
 #include <dbus/dbus-sysdeps.h>
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 typedef enum
@@ -3081,7 +3082,7 @@ do_check_own_rules (BusPolicy  *policy)
         _dbus_assert_not_reached ("couldn't append string");
 
       ret = bus_policy_check_can_own (policy, &service_name);
-      printf ("        Check name %s: %s\n", checks[i].name,
+      _dbus_test_diag ("        Check name %s: %s", checks[i].name,
               ret ? "allowed" : "not allowed");
       if (checks[i].allowed && !ret)
         {
@@ -3216,11 +3217,11 @@ process_test_valid_subdir (const DBusString *test_base_dir,
     }
 
   if (validity == VALID)
-    printf ("Testing valid files:\n");
+    _dbus_test_diag ("Testing valid files:");
   else if (validity == INVALID)
-    printf ("Testing invalid files:\n");
+    _dbus_test_diag ("Testing invalid files:");
   else
-    printf ("Testing unknown files:\n");
+    _dbus_test_diag ("Testing unknown files:");
 
  next:
   while (_dbus_directory_get_next_file (dir, &filename, &error))
@@ -3245,7 +3246,7 @@ process_test_valid_subdir (const DBusString *test_base_dir,
           goto next;
         }
 
-      printf ("    %s\n", _dbus_string_get_const_data (&filename));
+      _dbus_test_diag ("    %s", _dbus_string_get_const_data (&filename));
 
       _dbus_verbose (" expecting %s\n",
                      validity == VALID ? "valid" :
@@ -3537,7 +3538,7 @@ all_are_equiv (const DBusString *target_directory)
       goto finished;
     }
 
-  printf ("Comparing equivalent files:\n");
+  _dbus_test_diag ("Comparing equivalent files:");
 
  next:
   while (_dbus_directory_get_next_file (dir, &filename, &error))
@@ -3561,7 +3562,7 @@ all_are_equiv (const DBusString *target_directory)
           goto next;
         }
 
-      printf ("    %s\n", _dbus_string_get_const_data (&filename));
+      _dbus_test_diag ("    %s", _dbus_string_get_const_data (&filename));
 
       parser = bus_config_load (&full_path, TRUE, NULL, &error);
 
@@ -3778,9 +3779,9 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   if (dbus_test_builddir == NULL || xdg_data_home == NULL ||
       xdg_runtime_dir == NULL)
     {
-      printf ("Not testing default session service directories because a "
+      _dbus_test_diag ("Not testing default session service directories because a "
               "build-time testing environment variable is not set: "
-              "see AM_TESTS_ENVIRONMENT in tests/Makefile.am\n");
+              "see AM_TESTS_ENVIRONMENT in tests/Makefile.am");
       ret = TRUE;
       goto out;
     }
@@ -3832,17 +3833,17 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
       BusConfigServiceDir *dir = link->data;
       BusServiceDirFlags expected = BUS_SERVICE_DIR_FLAGS_NONE;
 
-      printf ("    test service dir: '%s'\n", dir->path);
-      printf ("    current standard service dir: '%s'\n", test_session_service_dir_matches[i]);
+      _dbus_test_diag ("    test service dir: '%s'", dir->path);
+      _dbus_test_diag ("    current standard service dir: '%s'", test_session_service_dir_matches[i]);
       if (test_session_service_dir_matches[i] == NULL)
         {
-          printf ("more directories parsed than in match set\n");
+          _dbus_test_diag ("more directories parsed than in match set");
           goto out;
         }
  
       if (strcmp (test_session_service_dir_matches[i], dir->path) != 0)
         {
-          printf ("'%s' directory does not match '%s' in the match set\n",
+          _dbus_test_diag ("'%s' directory does not match '%s' in the match set",
                   dir->path, test_session_service_dir_matches[i]);
           goto out;
         }
@@ -3857,7 +3858,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
 
       if (dir->flags != expected)
         {
-          printf ("'%s' directory has flags 0x%x, should be 0x%x\n",
+          _dbus_test_diag ("'%s' directory has flags 0x%x, should be 0x%x",
                   dir->path, dir->flags, expected);
           goto out;
         }
@@ -3865,7 +3866,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
   
   if (test_session_service_dir_matches[i] != NULL)
     {
-      printf ("extra data %s in the match set was not matched\n",
+      _dbus_test_diag ("extra data %s in the match set was not matched",
               test_session_service_dir_matches[i]);
       goto out;
     }
@@ -3887,20 +3888,20 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
        link != NULL;
        link = _dbus_list_get_next_link (&watched_dirs, link), i++)
     {
-      printf ("    watched service dir: '%s'\n", (const char *) link->data);
-      printf ("    current standard service dir: '%s'\n",
+      _dbus_test_diag ("    watched service dir: '%s'", (const char *) link->data);
+      _dbus_test_diag ("    current standard service dir: '%s'",
               test_session_service_dir_matches[i]);
 
       if (test_session_service_dir_matches[i] == NULL)
         {
-          printf ("more directories parsed than in match set\n");
+          _dbus_test_diag ("more directories parsed than in match set");
           goto out;
         }
 
       if (strcmp (test_session_service_dir_matches[i],
                   (const char *) link->data) != 0)
         {
-          printf ("'%s' directory does not match '%s' in the match set\n",
+          _dbus_test_diag ("'%s' directory does not match '%s' in the match set",
                   (const char *) link->data,
                   test_session_service_dir_matches[i]);
           goto out;
@@ -3909,7 +3910,7 @@ test_default_session_servicedirs (const DBusString *test_base_dir)
 
   if (test_session_service_dir_matches[i] != NULL)
     {
-      printf ("extra data %s in the match set was not matched\n",
+      _dbus_test_diag ("extra data %s in the match set was not matched",
               test_session_service_dir_matches[i]);
       goto out;
     }
@@ -3957,10 +3958,10 @@ test_default_system_servicedirs (void)
   i = 0;
   while ((link = _dbus_list_pop_first_link (&dirs)))
     {
-      printf ("    test service dir: %s\n", (char *)link->data);
+      _dbus_test_diag ("    test service dir: %s", (char *)link->data);
       if (test_system_service_dir_matches[i] == NULL)
         {
-          printf ("more directories parsed than in match set\n");
+          _dbus_test_diag ("more directories parsed than in match set");
           dbus_free (link->data);
           _dbus_list_free_link (link);
           return FALSE;
@@ -3969,7 +3970,7 @@ test_default_system_servicedirs (void)
       if (strcmp (test_system_service_dir_matches[i], 
                   (char *)link->data) != 0)
         {
-          printf ("%s directory does not match %s in the match set\n", 
+          _dbus_test_diag ("%s directory does not match %s in the match set",
                   (char *)link->data,
                   test_system_service_dir_matches[i]);
           dbus_free (link->data);
@@ -3985,7 +3986,7 @@ test_default_system_servicedirs (void)
   
   if (test_system_service_dir_matches[i] != NULL)
     {
-      printf ("extra data %s in the match set was not matched\n",
+      _dbus_test_diag ("extra data %s in the match set was not matched",
               test_system_service_dir_matches[i]);
 
       return FALSE;
@@ -4001,7 +4002,7 @@ bus_config_parser_test (const DBusString *test_data_dir)
   if (test_data_dir == NULL ||
       _dbus_string_get_length (test_data_dir) == 0)
     {
-      printf ("No test data\n");
+      _dbus_test_diag ("No test data");
       return TRUE;
     }
 
@@ -4009,7 +4010,7 @@ bus_config_parser_test (const DBusString *test_data_dir)
     return FALSE;
 
 #ifdef DBUS_WIN
-  printf("default system service dir skipped\n");
+  _dbus_test_diag ("default system service dir skipped");
 #else
   if (!test_default_system_servicedirs())
     return FALSE;

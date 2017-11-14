@@ -27,6 +27,7 @@
 #include "dbus-test.h"
 #include "dbus-internals.h"
 #include "dbus-protocol.h"
+#include <dbus/dbus-test-tap.h>
 #include <string.h>
 
 #ifdef HAVE_SYSTEMD
@@ -463,23 +464,21 @@ _dbus_userdb_test (const char *test_data_dir)
   if (!_dbus_groups_from_uid (uid, &group_ids, &n_group_ids))
     _dbus_assert_not_reached ("didn't get groups");
 
-  printf ("    Current user: %s homedir: %s gids:",
+  _dbus_test_diag ("    Current user: %s homedir: %s gids:",
           _dbus_string_get_const_data (username),
           _dbus_string_get_const_data (homedir));
 
   for (i=0; i<n_group_ids; i++)
-      printf(" %ld", group_ids[i]);
-
-  printf ("\n");
+      _dbus_test_diag ("- %ld", group_ids[i]);
 
   dbus_error_init (&error);
-  printf ("Is Console user: %i\n",
+  _dbus_test_diag ("Is Console user: %i",
           _dbus_is_console_user (uid, &error));
-  printf ("Invocation was OK: %s\n", error.message ? error.message : "yes");
+  _dbus_test_diag ("Invocation was OK: %s", error.message ? error.message : "yes");
   dbus_error_free (&error);
-  printf ("Is Console user 4711: %i\n",
+  _dbus_test_diag ("Is Console user 4711: %i",
           _dbus_is_console_user (4711, &error));
-  printf ("Invocation was OK: %s\n", error.message ? error.message : "yes");
+  _dbus_test_diag ("Invocation was OK: %s", error.message ? error.message : "yes");
   dbus_error_free (&error);
 
   dbus_free (group_ids);

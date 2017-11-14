@@ -25,6 +25,7 @@
 #include "dbus-test.h"
 #include "dbus-sysdeps.h"
 #include "dbus-internals.h"
+#include <dbus/dbus-test-tap.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -43,7 +44,7 @@ check_memleaks (void)
 {
   dbus_shutdown ();
 
-  printf ("%s: checking for memleaks\n", "test-dbus");
+  _dbus_test_diag ("%s: checking for memleaks", "test-dbus");
   if (_dbus_get_malloc_blocks_outstanding () != 0)
     {
       _dbus_warn ("%d dbus_malloc blocks were not freed",
@@ -62,7 +63,7 @@ run_test (const char             *test_name,
 {
   if (!specific_test || strcmp (specific_test, test_name) == 0)
     {
-      printf ("%s: running %s tests\n", "test-dbus", test_name);
+      _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
       if (!test ())
 	die (test_name);
 
@@ -78,7 +79,7 @@ run_data_test (const char             *test_name,
 {
   if (!specific_test || strcmp (specific_test, test_name) == 0)
     {
-      printf ("%s: running %s tests\n", "test-dbus", test_name);
+      _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
       if (!test (test_data_dir))
 	die (test_name);
 
@@ -106,9 +107,9 @@ dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *speci
     test_data_dir = _dbus_getenv ("DBUS_TEST_DATA");
 
   if (test_data_dir != NULL)
-    printf ("Test data in %s\n", test_data_dir);
+    _dbus_test_diag ("Test data in %s", test_data_dir);
   else
-    printf ("No test data!\n");
+    _dbus_test_diag ("No test data!");
 
   run_test ("string", specific_test, _dbus_string_test);
   
@@ -164,7 +165,7 @@ dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *speci
   
   run_data_test ("auth", specific_test, _dbus_auth_test, test_data_dir);
 
-  printf ("%s: completed successfully\n", "test-dbus");
+  _dbus_test_diag ("%s: completed successfully", "test-dbus");
 }
 
 #endif /* DBUS_ENABLE_EMBEDDED_TESTS */

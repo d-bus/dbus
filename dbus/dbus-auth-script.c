@@ -33,6 +33,7 @@
 #include "dbus-hash.h"
 #include "dbus-credentials.h"
 #include "dbus-internals.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusAuthScript code for running unit test scripts for DBusAuth
@@ -346,7 +347,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "UNIX_ONLY"))
         {
           /* skip this file */
-          fprintf (stderr, "skipping unix only auth script\n");
+          _dbus_test_diag ("skipping unix only auth script");
           retval = TRUE;
           goto out;
         }
@@ -362,7 +363,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "WIN_ONLY"))
         {
           /* skip this file */
-          fprintf (stderr, "skipping windows only auth script\n");
+          _dbus_test_diag ("skipping windows only auth script");
           retval = TRUE;
           goto out;
         }

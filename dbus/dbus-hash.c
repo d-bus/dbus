@@ -78,6 +78,7 @@
 #include "dbus-hash.h"
 #include "dbus-internals.h"
 #include "dbus-mempool.h"
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusHashTable Hash table
@@ -1608,7 +1609,7 @@ _dbus_hash_test (void)
 	_dbus_assert_not_reached ("no memory");
     }
 
-  printf ("Computing test hash keys...\n");
+  _dbus_test_diag ("Computing test hash keys...");
   i = 0;
   while (i < N_HASH_KEYS)
     {
@@ -1618,8 +1619,8 @@ _dbus_hash_test (void)
       _dbus_assert (*(keys[i] + len) == '\0');
       ++i;
     }
-  printf ("... done.\n");
-  
+  _dbus_test_diag ("... done.");
+
   table1 = _dbus_hash_table_new (DBUS_HASH_STRING,
                                  dbus_free, dbus_free);
   if (table1 == NULL)

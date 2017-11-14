@@ -27,6 +27,7 @@
 #include <dbus/dbus-string.h>
 #include <dbus/dbus-list.h>
 #include <dbus/dbus-sysdeps.h>
+#include <dbus/dbus-test-tap.h>
 
 /**
  * @defgroup DBusKeyring keyring class
@@ -1128,7 +1129,7 @@ _dbus_keyring_test (void)
       ++i;
     }
 
-  printf (" %d keys in test\n", ring1->n_keys);
+  _dbus_test_diag (" %d keys in test", ring1->n_keys);
 
   /* Test ref/unref */
   _dbus_keyring_ref (ring1);
