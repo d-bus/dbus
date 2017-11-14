@@ -86,8 +86,6 @@ run_data_test (const char             *test_name,
     }
 }
 
-#endif /* DBUS_ENABLE_EMBEDDED_TESTS */
-
 /**
  * An exported symbol to be run in order to execute
  * unit tests. Should not be used by
@@ -101,7 +99,6 @@ run_data_test (const char             *test_name,
 void
 dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *specific_test)
 {
-#ifdef DBUS_ENABLE_EMBEDDED_TESTS
   if (!_dbus_threads_init_debug ())
     die ("debug threads init");
   
@@ -168,8 +165,6 @@ dbus_internal_do_not_use_run_tests (const char *test_data_dir, const char *speci
   run_data_test ("auth", specific_test, _dbus_auth_test, test_data_dir);
 
   printf ("%s: completed successfully\n", "test-dbus");
-#else
-  printf ("Not compiled with unit tests, not running any\n");
-#endif
 }
 
+#endif /* DBUS_ENABLE_EMBEDDED_TESTS */
