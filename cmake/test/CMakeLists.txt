@@ -116,7 +116,6 @@ endif()
 ### keep these in creation order, i.e. uppermost dirs first 
 set (TESTDIRS
     test/data
-    test/data/valid-messages
     test/data/invalid-messages
     test/data/incomplete-messages
     test/data/auth
@@ -127,7 +126,6 @@ set (TESTDIRS
     test/data/valid-config-files/session.d
     test/data/valid-config-files-system
     test/data/valid-config-files-system/system.d
-    test/data/valid-messages
     test/data/valid-service-files
     test/data/valid-service-files-system
     test/data/invalid-config-files

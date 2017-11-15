@@ -719,13 +719,7 @@ dbus_internal_do_not_use_foreach_message_file (const char                *test_d
   retval = FALSE;
 
   _dbus_string_init_const (&test_directory, test_data_dir);
-  
-  if (!process_test_subdir (&test_directory, "valid-messages",
-                            DBUS_VALID, func, user_data))
-    goto failed;
 
-  check_memleaks ();
-  
   if (!process_test_subdir (&test_directory, "invalid-messages",
                             DBUS_INVALID_FOR_UNKNOWN_REASON, func, user_data))
     goto failed;
