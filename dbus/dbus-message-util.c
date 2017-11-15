@@ -659,13 +659,7 @@ process_test_subdir (const DBusString          *test_base_dir,
         ;
       else
         {
-          if (_dbus_string_ends_with_c_str (&filename, ".message"))
-            {
-              _dbus_test_diag ("SKIP: Could not load %s, message builder language no longer supported",
-                      _dbus_string_get_const_data (&filename));
-            }
-          
-          _dbus_verbose ("Skipping non-.message file %s\n",
+          _dbus_verbose ("Skipping non-.message-raw file %s\n",
                          _dbus_string_get_const_data (&filename));
 	  _dbus_string_free (&full_path);
           goto next;

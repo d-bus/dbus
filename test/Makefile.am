@@ -466,7 +466,6 @@ static_data = \
 	data/equiv-config-files/entities/basic.d/basic.conf \
 	data/equiv-config-files/entities/entities-1.conf \
 	data/equiv-config-files/entities/entities-2.conf \
-	data/incomplete-messages/missing-body.message \
 	data/invalid-config-files/badselinux-1.conf \
 	data/invalid-config-files/badselinux-2.conf \
 	data/invalid-config-files/circular-1.conf \
@@ -476,21 +475,7 @@ static_data = \
 	data/invalid-config-files/not-well-formed.conf \
 	data/invalid-config-files/truncated-file.conf \
 	data/invalid-config-files/send-and-receive.conf \
-	data/invalid-messages/array-of-nil.message \
-	data/invalid-messages/array-with-mixed-types.message \
-	data/invalid-messages/bad-boolean-array.message \
-	data/invalid-messages/bad-boolean.message \
-	data/invalid-messages/bad-endian.message \
-	data/invalid-messages/bad-header-field-alignment.message \
 	data/invalid-messages/boolean-has-no-value.message-raw \
-	data/invalid-messages/local-namespace.message \
-	data/invalid-messages/no-dot-in-name.message \
-	data/invalid-messages/not-nul-header-padding.message \
-	data/invalid-messages/overlong-name.message \
-	data/invalid-messages/too-little-header-padding.message \
-	data/invalid-messages/too-much-header-padding-by-far.message \
-	data/invalid-messages/too-much-header-padding.message \
-	data/invalid-messages/too-short-dict.message \
 	data/sha-1/Readme.txt \
 	data/sha-1/bit-hashes.sha1 \
 	data/sha-1/bit-messages.sha1 \
@@ -511,21 +496,6 @@ static_data = \
 	data/valid-config-files/standard-session-dirs.conf \
 	data/valid-config-files-system/many-rules.conf \
 	data/valid-config-files-system/system.d/test.conf \
-	data/valid-messages/array-of-array-of-uint32.message \
-	data/valid-messages/dict-simple.message \
-	data/valid-messages/dict.message \
-	data/valid-messages/emptiness.message \
-	data/valid-messages/lots-of-arguments.message \
-	data/valid-messages/no-padding.message \
-	data/valid-messages/opposite-endian.message \
-	data/valid-messages/recursive-types.message \
-	data/valid-messages/simplest-manual.message \
-	data/valid-messages/simplest.message \
-	data/valid-messages/standard-acquire-service.message \
-	data/valid-messages/standard-hello.message \
-	data/valid-messages/standard-list-services.message \
-	data/valid-messages/standard-service-exists.message \
-	data/valid-messages/unknown-header-field.message \
 	$(NULL)
 
 EXTRA_DIST += $(static_data)

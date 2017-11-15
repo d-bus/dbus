@@ -149,7 +149,7 @@ ENDFOREACH(DIR)
 ### copy tests to builddir so that generated tests and static tests 
 ### are all in one place.
 MESSAGE(STATUS "Copying test files to test directory")
-FOREACH(FILE_TYPE *.message *.message-raw *.auth-script *.sha1 *.txt *.conf *.service)
+FOREACH(FILE_TYPE *.message-raw *.auth-script *.sha1 *.txt *.conf *.service)
     FOREACH(DIR ${TESTDIRS})
         FILE(GLOB FILES "${CMAKE_SOURCE_DIR}/../${DIR}/${FILE_TYPE}" )
         FOREACH(FILE ${FILES})
