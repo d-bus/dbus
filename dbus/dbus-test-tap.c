@@ -75,6 +75,7 @@ _dbus_test_diag (const char *format,
   vprintf (format, ap);
   va_end (ap);
   printf ("\n");
+  fflush (stdout);
 }
 
 /*
