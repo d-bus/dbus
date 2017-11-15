@@ -725,13 +725,7 @@ dbus_internal_do_not_use_foreach_message_file (const char                *test_d
     goto failed;
 
   check_memleaks ();
-  
-  if (!process_test_subdir (&test_directory, "incomplete-messages",
-                            DBUS_VALID_BUT_INCOMPLETE, func, user_data))
-    goto failed;
 
-  check_memleaks ();
-  
   retval = TRUE;
   
  failed:

@@ -117,7 +117,6 @@ endif()
 set (TESTDIRS
     test/data
     test/data/invalid-messages
-    test/data/incomplete-messages
     test/data/auth
     test/data/sha-1
     test/data/systemd-activation
