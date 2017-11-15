@@ -6,6 +6,10 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Enhancements:
+
+• Improve automated test logging (fd.o #103601, Simon McVittie)
+
 Fixes:
 
 • Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
@@ -20,6 +24,9 @@ Internal changes:
 
 • Make _DBUS_STRING_DEFINE_STATIC more consistent with
   _dbus_string_init_const() (fd.o #89104, Simon McVittie)
+
+• Remove automated test data for wire protocol version 0, which has not
+  been supported since 2005 (fd.o #103758, Simon McVittie)
 
 dbus 1.12.2 (2017-11-13)
 ========================
