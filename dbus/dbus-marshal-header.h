@@ -43,20 +43,68 @@ struct DBusHeaderField
 
 /**
  * Message header data and some cached details of it.
+ *
+ * A message looks like this:
+ *
+ * @code
+ *  | 0     | 1     | 2     | 3    | 4   | 5   | 6   | 7   | <- index % 8
+ *  |-------|-------|-------|------|-----|-----|-----|-----|
+ *  | Order | Type  | Flags | Vers | Body length           |
+ *  | Serial                       | Fields array length  [A]
+ * [A] Code |Sig.len| Signature + \0           | Content...| <- first field
+ *  | Content ...                  | Pad to 8-byte boundary|
+ *  | Code  |Sig.len| Signature + \0     | Content...      | <- second field
+ * ...
+ *  | Code  |Sig.len| Signature    | Content...            | <- last field
+ *  | Content ...  [B] Padding to 8-byte boundary         [C]
+ * [C] Body ...                                            |
+ * ...
+ *  | Body ...              [D]           <- no padding after natural length
+ * @endcode
+ *
+ * Each field is a struct<byte,variant>. All structs have 8-byte alignment,
+ * so each field is preceded by 0-7 bytes of padding to an 8-byte boundary
+ * (for the first field it happens to be 0 bytes). The overall header
+ * is followed by 0-7 bytes of padding to align the body.
+ *
+ * Key to content, with variable name references for _dbus_header_load():
+ *
+ * Order: byte order, currently 'l' or 'B' (byte_order)
+ * Type: message type such as DBUS_MESSAGE_TYPE_METHOD_CALL
+ * Flags: message flags such as DBUS_HEADER_FLAG_NO_REPLY_EXPECTED
+ * Vers: D-Bus wire protocol version, currently always 1
+ * Body length: Distance from [C] to [D]
+ * Serial: Message serial number
+ * Fields array length: Distance from [A] to [B] (fields_array_len)
+ *
+ * To understand _dbus_header_load():
+ *
+ * [A] is FIRST_FIELD_OFFSET.
+ * header_len is from 0 to [C].
+ * padding_start is [B].
+ * padding_len is the padding from [B] to [C].
  */
 struct DBusHeader
 {
   DBusString data; /**< Header network data, stored
                     * separately from body so we can
-                    * independently realloc it.
+                    * independently realloc it. Its length includes
+                    * up to 8 bytes of padding to align the body to
+                    * an 8-byte boundary.
+                    *
+                    * In a steady state, this has length [C]. During
+                    * editing, it is temporarily extended to have the
+                    * maximum possible padding.
                     */
 
   DBusHeaderField fields[DBUS_HEADER_FIELD_LAST + 1]; /**< Track the location
                                                        * of each field in header
                                                        */
 
-  dbus_uint32_t padding : 3;        /**< bytes of alignment in header */
-  dbus_uint32_t byte_order : 8;     /**< byte order of header */
+  dbus_uint32_t padding : 3;        /**< 0-7 bytes of alignment in header,
+                                         the distance from [B] to [C] */
+  dbus_uint32_t byte_order : 8;     /**< byte order of header (must always
+                                         match the content of byte 0) */
 };
 
 dbus_bool_t   _dbus_header_init                   (DBusHeader        *header);

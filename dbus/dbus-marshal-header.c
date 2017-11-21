@@ -119,7 +119,9 @@ correct_header_padding (DBusHeader *header)
   header->padding = _dbus_string_get_length (&header->data) - unpadded_len;
 }
 
-/** Compute the end of the header, ignoring padding */
+/**
+ * Compute the end of the header, ignoring padding.
+ * In the #DBusHeader diagram, this is the distance from 0 to [B]. */
 #define HEADER_END_BEFORE_PADDING(header) \
   (_dbus_string_get_length (&(header)->data) - (header)->padding)
 
