@@ -12,7 +12,23 @@ Enhancements:
 
 Fixes:
 
+• Report the correct error if OOM is reached while trying to listen
+  on a TCP socket (fd.o #89104, Simon McVittie)
+
+• Fix a crash and an assertion failure in the server side of the
+  nonce-tcp: transport under error conditions
+  (fd.o #89104, Simon McVittie)
+
+• Fix assertion failures in recovery from OOM while setting up a
+  DBusServer (fd.o #89104, Simon McVittie)
+
+• Don't leak a file descriptor if setting up a launchd server fails
+  (fd.o #89104, Simon McVittie)
+
 • Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
+
+• Fix some memory leaks in automated tests
+  (fd.o #103600, Simon McVittie)
 
 Internal changes:
 
@@ -25,8 +41,19 @@ Internal changes:
 • Make _DBUS_STRING_DEFINE_STATIC more consistent with
   _dbus_string_init_const() (fd.o #89104, Simon McVittie)
 
+• Add _DBUS_STRING_INIT_INVALID, analogous to NULL, and use it to
+  simplify error unwinding code paths (fd.o #89104, Simon McVittie)
+
+• Make the behaviour of _dbus_string_init_const()/_dbus_string_free()
+  consistent with _dbus_string_init()/_dbus_string_free(): it now clears
+  the string to _DBUS_STRING_INIT_INVALID, whereas previously it left
+  the string untouched (fd.o #89104, Simon McVittie)
+
 • Remove automated test data for wire protocol version 0, which has not
   been supported since 2005 (fd.o #103758, Simon McVittie)
+
+• Simplify method calls in automated tests
+  (fd.o #103600, Simon McVittie)
 
 dbus 1.12.2 (2017-11-13)
 ========================
