@@ -108,7 +108,8 @@ test_connection_setup (TestMainContext *ctx,
   
   dbus_connection_set_dispatch_status_function (connection, dispatch_status_function,
                                                 loop, NULL);
-  
+  /* ownership of cd taken */
+
   cd = cdata_new (loop, connection);
   if (cd == NULL)
     goto nomem;
@@ -131,6 +132,9 @@ test_connection_setup (TestMainContext *ctx,
                                               NULL,
                                               cd, cdata_free))
     goto nomem;
+
+  /* ownership taken */
+  cd = NULL;
 
   if (dbus_connection_get_dispatch_status (connection) != DBUS_DISPATCH_COMPLETE)
     {
