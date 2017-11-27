@@ -344,16 +344,16 @@ _dbus_server_new_for_socket (DBusSocket       *fds,
            * we return successfully, so don't let socket_disconnect()
            * close them */
           for (j = 0; j < n_fds; j++)
-            _dbus_socket_invalidate (&socket_server->fds[i]);
+            _dbus_socket_invalidate (&socket_server->fds[j]);
 
           /* socket_disconnect() will try to remove all the watches;
            * make sure it doesn't see the ones that weren't even added
            * yet */
           for (j = i; j < n_fds; j++)
             {
-              _dbus_watch_invalidate (socket_server->watch[i]);
-              _dbus_watch_unref (socket_server->watch[i]);
-              socket_server->watch[i] = NULL;
+              _dbus_watch_invalidate (socket_server->watch[j]);
+              _dbus_watch_unref (socket_server->watch[j]);
+              socket_server->watch[j] = NULL;
             }
 
           _dbus_server_disconnect_unlocked (server);
