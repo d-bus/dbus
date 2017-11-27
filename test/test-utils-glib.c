@@ -569,7 +569,7 @@ wrap_abort (int signal)
 #endif
 
 static void
-set_timeout (void)
+set_timeout (guint factor)
 {
   static guint timeout = 0;
 
@@ -581,11 +581,11 @@ set_timeout (void)
   if (timeout != 0)
     g_source_remove (timeout);
 
-  timeout = g_timeout_add_seconds (TIMEOUT, time_out, NULL);
+  timeout = g_timeout_add_seconds (TIMEOUT * factor, time_out, NULL);
 #ifdef G_OS_UNIX
   /* The GLib main loop might not be running (we don't use it in every
    * test). Die with SIGALRM shortly after if necessary. */
-  alarm (TIMEOUT + 10);
+  alarm ((TIMEOUT * factor) + 10);
 
   /* Get a log message and a core dump from the SIGALRM. */
     {
@@ -603,7 +603,7 @@ test_init (int *argcp, char ***argvp)
 {
   g_test_init (argcp, argvp, NULL);
   g_test_bug_base ("https://bugs.freedesktop.org/show_bug.cgi?id=");
-  set_timeout ();
+  set_timeout (1);
 }
 
 static void
@@ -617,12 +617,13 @@ report_and_destroy (gpointer p)
 }
 
 void
-test_timeout_reset (void)
+test_timeout_reset (guint factor)
 {
   GTimer *timer = g_timer_new ();
 
-  g_test_message ("Resetting test timeout (reference: %p)", timer);
-  set_timeout ();
+  g_test_message ("Resetting test timeout (reference: %p; factor: %u)",
+      timer, factor);
+  set_timeout (factor);
 
   g_test_queue_destroy (report_and_destroy, timer);
 }

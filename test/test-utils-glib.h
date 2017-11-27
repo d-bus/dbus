@@ -97,7 +97,7 @@ void test_rmdir_must_exist (const gchar *path);
 void test_rmdir_if_exists (const gchar *path);
 void test_mkdir (const gchar *path, gint mode);
 
-void test_timeout_reset (void);
+void test_timeout_reset (guint factor);
 
 void test_oom (void) _DBUS_GNUC_NORETURN;
 

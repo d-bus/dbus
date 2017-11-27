@@ -159,7 +159,7 @@ setup (Fixture *f,
   const Config *config = context;
 
   /* Some tests are fairly slow, so make the test timeout per-test */
-  test_timeout_reset ();
+  test_timeout_reset (1);
 
   f->ctx = test_main_context_get ();
   f->ge = NULL;
