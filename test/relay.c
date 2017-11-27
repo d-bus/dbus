@@ -122,7 +122,7 @@ static void
 setup (Fixture *f,
     gconstpointer data G_GNUC_UNUSED)
 {
-  test_timeout_reset ();
+  test_timeout_reset (1);
 
   f->ctx = test_main_context_get ();
   dbus_error_init (&f->e);

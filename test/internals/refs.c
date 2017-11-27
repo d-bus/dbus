@@ -202,7 +202,7 @@ setup (Fixture *f,
     g_error ("OOM");
 
   /* This can be fairly slow, so make the test timeout per-test */
-  test_timeout_reset ();
+  test_timeout_reset (1);
 
   f->n_threads = N_THREADS;
   f->n_refs = N_REFS;
