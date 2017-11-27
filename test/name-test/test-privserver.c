@@ -29,7 +29,7 @@ new_connection_callback (DBusServer     *server,
 {
   TestServiceData *testdata = data;
 
-  if (!test_connection_setup (testdata->loop, new_connection))
+  if (!test_connection_try_setup (testdata->loop, new_connection))
     dbus_connection_close (new_connection);
 }
 
@@ -114,8 +114,7 @@ main (int argc, char *argv[])
   dbus_server_set_new_connection_function (server, new_connection_callback,
                                            testdata, NULL);
 
-  if (!test_server_setup (loop, server))
-    die ("server setup failed");
+  test_server_setup (loop, server);
 
   fprintf (stderr, "server running mainloop\n");
   _dbus_loop_run (loop);

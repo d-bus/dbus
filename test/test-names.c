@@ -64,8 +64,7 @@ main (int    argc,
   if (loop == NULL)
     die ("No memory\n");
   
-  if (!test_connection_setup (loop, connection))
-    die ("No memory\n");
+  test_connection_setup (loop, connection);
 
   TestName(connection, "org.freedesktop.DBus.Test", TRUE);
   TestName(connection, "org.freedesktop.DBus.Test-2", TRUE);

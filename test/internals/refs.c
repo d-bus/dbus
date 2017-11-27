@@ -251,8 +251,7 @@ setup_connection (Fixture *f,
   dbus_server_set_new_connection_function (f->server,
       new_conn_cb, f, NULL);
 
-  if (!test_server_setup (f->loop, f->server))
-    g_error ("failed to set up server");
+  test_server_setup (f->loop, f->server);
 
   address = dbus_server_get_address (f->server);
   g_assert (address != NULL);
@@ -261,8 +260,7 @@ setup_connection (Fixture *f,
   g_assert (f->connection != NULL);
   dbus_free (address);
 
-  if (!test_connection_setup (f->loop, f->connection))
-    g_error ("failed to set up connection");
+  test_connection_setup (f->loop, f->connection);
 
   while (f->server_connection == NULL)
     _dbus_loop_iterate (f->loop, TRUE);

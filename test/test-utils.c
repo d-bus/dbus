@@ -98,8 +98,8 @@ cdata_new (DBusLoop       *loop,
 }
 
 dbus_bool_t
-test_connection_setup (TestMainContext *ctx,
-                       DBusConnection *connection)
+test_connection_try_setup (TestMainContext *ctx,
+                           DBusConnection  *connection)
 {
   DBusLoop *loop = ctx;
   CData *cd;
@@ -163,6 +163,14 @@ die (const char *message)
   printf ("Bail out! %s\n", message);
   fflush (stdout);
   exit (1);
+}
+
+void
+test_connection_setup (TestMainContext *ctx,
+                       DBusConnection  *connection)
+{
+  if (!test_connection_try_setup (ctx, connection))
+    die ("Not enough memory to set up connection");
 }
 
 void
@@ -268,8 +276,8 @@ remove_server_timeout (DBusTimeout *timeout,
 }
 
 dbus_bool_t
-test_server_setup (TestMainContext *ctx,
-                   DBusServer    *server)
+test_server_try_setup (TestMainContext *ctx,
+                       DBusServer      *server)
 {
   DBusLoop *loop = ctx;
   ServerData *sd;
@@ -312,6 +320,14 @@ test_server_setup (TestMainContext *ctx,
 }
 
 void
+test_server_setup (TestMainContext *ctx,
+                   DBusServer      *server)
+{
+  if (!test_server_try_setup (ctx, server))
+    die ("Not enough memory to set up server");
+}
+
+void
 test_server_shutdown (TestMainContext  *ctx,
                       DBusServer       *server)
 {
@@ -332,6 +348,17 @@ test_server_shutdown (TestMainContext  *ctx,
 
 TestMainContext *
 test_main_context_get (void)
+{
+  TestMainContext *ret = _dbus_loop_new ();
+
+  if (ret == NULL)
+    die ("Out of memory");
+
+  return ret;
+}
+
+TestMainContext *
+test_main_context_try_get (void)
 {
   return _dbus_loop_new ();
 }

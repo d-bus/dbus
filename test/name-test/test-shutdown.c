@@ -38,8 +38,7 @@ open_destroy_shared_session_bus_connection (void)
   if (loop == NULL)
     die ("No memory\n");
   
-  if (!test_connection_setup (loop, connection))
-    die ("No memory\n");
+  test_connection_setup (loop, connection);
 
   test_connection_shutdown (loop, connection);
  

@@ -145,9 +145,8 @@ main (int    argc,
   loop = _dbus_loop_new ();
   if (loop == NULL)
     die ("No memory\n");
-  
-  if (!test_connection_setup (loop, connection))
-    die ("No memory\n");
+
+  test_connection_setup (loop, connection);
 
   if (!dbus_connection_add_filter (connection,
                                    filter_func, NULL, NULL))

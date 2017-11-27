@@ -196,8 +196,7 @@ setup (Fixture *f,
       f->right_conn = dbus_bus_get_private (DBUS_BUS_SESSION, &f->e);
       test_assert_no_error (&f->e);
 
-      if (!test_connection_setup (f->ctx, f->right_conn))
-        g_error ("OOM");
+      test_connection_setup (f->ctx, f->right_conn);
     }
   else
     {
