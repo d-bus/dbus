@@ -353,6 +353,12 @@ fail:
   if (gerror != NULL)
     *gerror = g_dbus_error_new_for_dbus_error (error.name, error.message);
 
+  if (conn != NULL)
+    {
+      dbus_connection_close (conn);
+      dbus_connection_unref (conn);
+    }
+
   dbus_error_free (&error);
   return FALSE;
 }
