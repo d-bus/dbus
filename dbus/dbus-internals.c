@@ -26,6 +26,7 @@
 #include "dbus-protocol.h"
 #include "dbus-marshal-basic.h"
 #include "dbus-test.h"
+#include "dbus-test-tap.h"
 #include "dbus-valgrind-internal.h"
 #include <stdio.h>
 #include <stdarg.h>
@@ -1044,15 +1045,15 @@ _dbus_test_oom_handling (const char             *description,
   
   _dbus_set_fail_alloc_counter (_DBUS_INT_MAX);
 
-  _dbus_verbose ("Running once to count mallocs\n");
-  
+  _dbus_test_diag ("Running \"%s\" once to count mallocs", description);
+
   if (!(* func) (data, TRUE))
     return FALSE;
-  
+
   approx_mallocs = _DBUS_INT_MAX - _dbus_get_fail_alloc_counter ();
 
-  _dbus_verbose ("\n=================\n%s: about %d mallocs total\n=================\n",
-                 description, approx_mallocs);
+  _dbus_test_diag ("\"%s\" has about %d mallocs in total",
+                   description, approx_mallocs);
 
   setting = _dbus_getenv ("DBUS_TEST_MALLOC_FAILURES");
   if (setting != NULL)
@@ -1072,21 +1073,26 @@ _dbus_test_oom_handling (const char             *description,
 
   if (max_failures_to_try < 1)
     {
-      _dbus_verbose ("not testing OOM handling\n");
+      _dbus_test_diag ("not testing OOM handling");
       return TRUE;
     }
+
+  _dbus_test_diag ("testing \"%s\" with up to %d consecutive malloc failures",
+                   description, max_failures_to_try);
 
   i = setting ? max_failures_to_try - 1 : 1;
   while (i < max_failures_to_try)
     {
+      _dbus_test_diag ("testing \"%s\" with %d consecutive malloc failures",
+                       description, i + 1);
+
       _dbus_set_fail_alloc_failures (i);
       if (!run_failing_each_malloc (approx_mallocs, description, func, data))
         return FALSE;
       ++i;
     }
   
-  _dbus_verbose ("\n=================\n%s: all iterations passed\n=================\n",
-                 description);
+  _dbus_verbose ("\"%s\" coped OK with malloc failures", description);
 
   return TRUE;
 }
