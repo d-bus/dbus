@@ -3,6 +3,12 @@ dbus 1.12.4 (UNRELEASED)
 
 Fixes:
 
+• Report the correct error if OOM is reached while trying to listen
+  on a TCP socket (fd.o #89104, Simon McVittie)
+
+• Fix assertion failures in recovery from OOM while setting up a
+  DBusServer (fd.o #89104, Simon McVittie)
+
 • Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
 
 dbus 1.12.2 (2017-11-13)
