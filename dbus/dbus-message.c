@@ -4430,8 +4430,7 @@ load_message (DBusMessageLoader *loader,
                           fields_array_len,
                           header_len,
                           body_len,
-                          &loader->data, 0,
-                          _dbus_string_get_length (&loader->data)))
+                          &loader->data))
     {
       _dbus_verbose ("Failed to load header for new message code %d\n", validity);
 

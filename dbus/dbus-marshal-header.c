@@ -961,9 +961,7 @@ load_and_validate_field (DBusHeader     *header,
  * @param fields_array_len claimed length of fields array
  * @param body_len claimed length of body
  * @param header_len claimed length of header
- * @param str a string
- * @param start start of header, 8-aligned
- * @param len length of string to look at
+ * @param str a string starting with the header
  * @returns #FALSE if no memory or data was invalid, #TRUE otherwise
  */
 dbus_bool_t
@@ -974,9 +972,7 @@ _dbus_header_load (DBusHeader        *header,
                    int                fields_array_len,
                    int                header_len,
                    int                body_len,
-                   const DBusString  *str,
-                   int                start,
-                   int                len)
+                   const DBusString  *str)
 {
   int leftover;
   DBusValidity v;
@@ -988,12 +984,14 @@ _dbus_header_load (DBusHeader        *header,
   int padding_start;
   int padding_len;
   int i;
+  int len;
 
-  _dbus_assert (start == (int) _DBUS_ALIGN_VALUE (start, 8));
+  len = _dbus_string_get_length (str);
+
   _dbus_assert (header_len <= len);
   _dbus_assert (_dbus_string_get_length (&header->data) == 0);
 
-  if (!_dbus_string_copy_len (str, start, header_len, &header->data, 0))
+  if (!_dbus_string_copy_len (str, 0, header_len, &header->data, 0))
     {
       _dbus_verbose ("Failed to copy buffer into new header\n");
       *validity = DBUS_VALIDITY_UNKNOWN_OOM_ERROR;
@@ -1002,14 +1000,14 @@ _dbus_header_load (DBusHeader        *header,
 
   if (mode == DBUS_VALIDATION_MODE_WE_TRUST_THIS_DATA_ABSOLUTELY)
     {
-      leftover = len - header_len - body_len - start;
+      leftover = len - header_len - body_len;
     }
   else
     {
       v = _dbus_validate_body_with_reason (&_dbus_header_signature_str, 0,
                                            byte_order,
                                            &leftover,
-                                           str, start, len);
+                                           str, 0, len);
       
       if (v != DBUS_VALID)
         {
@@ -1021,9 +1019,9 @@ _dbus_header_load (DBusHeader        *header,
   _dbus_assert (leftover < len);
 
   padding_len = header_len - (FIRST_FIELD_OFFSET + fields_array_len);
-  padding_start = start + FIRST_FIELD_OFFSET + fields_array_len;
-  _dbus_assert (start + header_len == (int) _DBUS_ALIGN_VALUE (padding_start, 8));
-  _dbus_assert (start + header_len == padding_start + padding_len);
+  padding_start = FIRST_FIELD_OFFSET + fields_array_len;
+  _dbus_assert (header_len == (int) _DBUS_ALIGN_VALUE (padding_start, 8));
+  _dbus_assert (header_len == padding_start + padding_len);
 
   if (mode != DBUS_VALIDATION_MODE_WE_TRUST_THIS_DATA_ABSOLUTELY)
     {
@@ -1049,7 +1047,7 @@ _dbus_header_load (DBusHeader        *header,
   _dbus_type_reader_init (&reader,
                           byte_order,
                           &_dbus_header_signature_str, 0,
-                          str, start);
+                          str, 0);
 
   /* BYTE ORDER */
   _dbus_assert (_dbus_type_reader_get_current_type (&reader) == DBUS_TYPE_BYTE);

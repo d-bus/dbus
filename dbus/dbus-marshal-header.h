@@ -119,9 +119,7 @@ dbus_bool_t   _dbus_header_load                   (DBusHeader        *header,
                                                    int                fields_array_len,
                                                    int                header_len,
                                                    int                body_len,
-                                                   const DBusString  *str,
-                                                   int                start,
-                                                   int                len);
+                                                   const DBusString  *str);
 void          _dbus_header_byteswap               (DBusHeader        *header,
                                                    int                new_order);
 DBUS_PRIVATE_EXPORT
