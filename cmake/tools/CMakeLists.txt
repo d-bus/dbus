@@ -54,6 +54,10 @@ set (dbus_cleanup_sockets_SOURCES
 	../../tools/dbus-cleanup-sockets.c
 )
 
+set (dbus_run_session_SOURCES
+    ../../tools/dbus-run-session.c
+)
+
 if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-send")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
@@ -125,6 +129,12 @@ endif()
 add_executable(dbus-monitor ${dbus_monitor_SOURCES})
 target_link_libraries(dbus-monitor ${DBUS_LIBRARIES})
 install(TARGETS dbus-monitor ${INSTALL_TARGETS_DEFAULT_ARGS})
+
+if(NOT WIN32)
+    add_executable(dbus-run-session ${dbus_run_session_SOURCES})
+    target_link_libraries(dbus-run-session ${DBUS_LIBRARIES})
+    install(TARGETS dbus-run-session ${INSTALL_TARGETS_DEFAULT_ARGS})
+endif()
 
 # create the /var/lib/dbus directory for dbus-uuidgen
 install(DIRECTORY DESTINATION var/lib/dbus)
