@@ -3076,6 +3076,7 @@ features_getter (BusContext      *context,
                  DBusMessageIter *variant_iter)
 {
   DBusMessageIter arr_iter;
+  const char *s;
 
   if (!dbus_message_iter_open_container (variant_iter, DBUS_TYPE_ARRAY,
                                          DBUS_TYPE_STRING_AS_STRING,
@@ -3084,15 +3085,20 @@ features_getter (BusContext      *context,
 
   if (bus_apparmor_enabled ())
     {
-      const char *s = "AppArmor";
+      s = "AppArmor";
 
       if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
         goto abandon;
     }
 
+  s = "HeaderFiltering";
+
+  if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
+    goto abandon;
+
   if (bus_selinux_enabled ())
     {
-      const char *s = "SELinux";
+      s = "SELinux";
 
       if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
         goto abandon;
@@ -3100,7 +3106,7 @@ features_getter (BusContext      *context,
 
   if (bus_context_get_systemd_activation (context))
     {
-      const char *s = "SystemdActivation";
+      s = "SystemdActivation";
 
       if (!dbus_message_iter_append_basic (&arr_iter, DBUS_TYPE_STRING, &s))
         goto abandon;
