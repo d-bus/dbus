@@ -29,6 +29,7 @@ AM_CPPFLAGS = \
 	$(EXPAT_CFLAGS) \
 	$(APPARMOR_CFLAGS) \
 	-DDBUS_SYSTEM_CONFIG_FILE=\""$(dbusdatadir)/system.conf"\" \
+	-DDBUS_RUNSTATEDIR=\""$(runstatedir)"\" \
 	-DDBUS_COMPILATION \
 	$(NULL)
 
@@ -97,6 +98,8 @@ BUS_SOURCES=					\
 	config-parser-common.h			\
 	connection.c				\
 	connection.h				\
+	containers.c				\
+	containers.h				\
 	desktop-file.c				\
 	desktop-file.h				\
 	$(DIR_WATCH_SOURCE)			\

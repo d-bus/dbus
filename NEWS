@@ -8,6 +8,11 @@ a 1.14.0 stable release at an unspecified point in the future.
 
 Enhancements:
 
+• Add experimental support for creating extra servers at runtime, to
+  be used by app containers like Flatpak or Snap. This API is still
+  subject to change and is not compiled in by default.
+  (fd.o #101354, Simon McVittie)
+
 • Improve automated test logging (fd.o #103601, Simon McVittie)
 
 Fixes:
@@ -31,9 +36,6 @@ Fixes:
   (fd.o #103600, Simon McVittie)
 
 Internal changes:
-
-• Preparations for future support for restricted sockets used by
-  app containers like Flatpak (fd.o #101354, Simon McVittie)
 
 • Harden the nonce-tcp: transport against resource leaks and
   use-after-free (fd.o #103597, Simon McVittie)

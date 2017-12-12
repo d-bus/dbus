@@ -187,6 +187,11 @@ test_monitor (Fixture *f,
   dbus_clear_message (&m);
 }
 
+/*
+ * Assert that AddServer() can be called by the owner of the bus
+ * (TEST_USER_MESSAGEBUS) or by root, but cannot be called by other
+ * users for now.
+ */
 static void
 teardown (Fixture *f,
     gconstpointer context G_GNUC_UNUSED)

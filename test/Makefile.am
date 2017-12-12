@@ -181,6 +181,7 @@ installable_helpers += \
 	$(NULL)
 
 installable_tests += \
+	test-containers \
 	test-sd-activation \
 	$(NULL)
 
@@ -285,6 +286,12 @@ test_apparmor_activation_LDADD = \
     $(GLIB_LIBS) \
     $(NULL)
 endif
+
+test_containers_SOURCES = containers.c
+test_containers_LDADD = \
+    libdbus-testutils.la \
+    $(GLIB_LIBS) \
+    $(NULL)
 
 test_corrupt_SOURCES = corrupt.c
 test_corrupt_LDADD = \
@@ -422,8 +429,10 @@ in_data = \
 	data/valid-config-files/finite-timeout.conf.in \
 	data/valid-config-files/forbidding.conf.in \
 	data/valid-config-files/incoming-limit.conf.in \
+	data/valid-config-files/limit-containers.conf.in \
 	data/valid-config-files/max-completed-connections.conf.in \
 	data/valid-config-files/max-connections-per-user.conf.in \
+	data/valid-config-files/max-containers.conf.in \
 	data/valid-config-files/max-match-rules-per-connection.conf.in \
 	data/valid-config-files/max-names-per-connection.conf.in \
 	data/valid-config-files/max-replies-per-connection.conf.in \

@@ -26,6 +26,7 @@
 #include "activation.h"
 #include "apparmor.h"
 #include "connection.h"
+#include "containers.h"
 #include "driver.h"
 #include "dispatch.h"
 #include "services.h"
@@ -109,6 +110,28 @@ bus_driver_get_conn_helper (DBusConnection  *connection,
   return BUS_DRIVER_FOUND_PEER;
 }
 
+static dbus_bool_t
+bus_driver_check_caller_is_not_container (DBusConnection *connection,
+                                          BusTransaction *transaction,
+                                          DBusMessage    *message,
+                                          DBusError      *error)
+{
+  if (bus_containers_connection_is_contained (connection, NULL, NULL, NULL))
+    {
+      const char *method = dbus_message_get_member (message);
+
+      bus_context_log_and_set_error (bus_transaction_get_context (transaction),
+          DBUS_SYSTEM_LOG_SECURITY, error, DBUS_ERROR_ACCESS_DENIED,
+          "rejected attempt to call %s by connection %s (%s) in "
+          "container", method,
+          nonnull (bus_connection_get_name (connection), "(inactive)"),
+          bus_connection_get_loginfo (connection));
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
 /*
  * Log a security warning and set error unless the uid of the connection
  * is either the uid of this process, or on Unix, uid 0 (root).
@@ -128,7 +151,16 @@ bus_driver_check_caller_is_privileged (DBusConnection *connection,
 {
 #ifdef DBUS_UNIX
   unsigned long uid;
+#elif defined(DBUS_WIN)
+  char *windows_sid = NULL;
+  dbus_bool_t ret = FALSE;
+#endif
 
+  if (!bus_driver_check_caller_is_not_container (connection, transaction,
+                                                 message, error))
+    return FALSE;
+
+#ifdef DBUS_UNIX
   if (!dbus_connection_get_unix_user (connection, &uid))
     {
       const char *method = dbus_message_get_member (message);
@@ -168,9 +200,6 @@ bus_driver_check_caller_is_privileged (DBusConnection *connection,
 
   return TRUE;
 #elif defined(DBUS_WIN)
-  char *windows_sid = NULL;
-  dbus_bool_t ret = FALSE;
-
   if (!dbus_connection_get_windows_user (connection, &windows_sid))
     {
       const char *method = dbus_message_get_member (message);
@@ -1886,7 +1915,10 @@ bus_driver_handle_get_connection_credentials (DBusConnection *connection,
   DBusMessageIter array_iter;
   unsigned long ulong_uid, ulong_pid;
   char *s;
+  const char *name;
+  const char *path;
   const char *service;
+  const char *type;
   BusDriverFound found;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
@@ -1972,6 +2004,19 @@ bus_driver_handle_get_connection_credentials (DBusConnection *connection,
         }
 
       dbus_free (s);
+    }
+
+  if (found == BUS_DRIVER_FOUND_PEER &&
+      bus_containers_connection_is_contained (conn, &path, &type, &name))
+    {
+      if (!_dbus_asv_add_object_path (&array_iter,
+                                      DBUS_INTERFACE_CONTAINERS1 ".Instance",
+                                      path) ||
+          !_dbus_asv_add_string (&array_iter,
+                                 DBUS_INTERFACE_CONTAINERS1 ".Type", type) ||
+          !_dbus_asv_add_string (&array_iter,
+                                 DBUS_INTERFACE_CONTAINERS1 ".Name", name))
+        goto oom;
     }
 
   if (!_dbus_asv_close (&reply_iter, &array_iter))
@@ -2368,8 +2413,14 @@ typedef enum
 
   /* If set, callers must be privileged. On Unix, the uid of the connection
    * must either be the uid of this process, or 0 (root). On Windows,
-   * the SID of the connection must be the SID of this process. */
+   * the SID of the connection must be the SID of this process.
+   *
+   * This flag effectively implies METHOD_FLAG_NO_CONTAINERS, because
+   * containers are never privileged. */
   METHOD_FLAG_PRIVILEGED = (1 << 1),
+
+  /* If set, callers must not be associated with a container instance. */
+  METHOD_FLAG_NO_CONTAINERS = (1 << 2),
 
   METHOD_FLAG_NONE = 0
 } MethodFlags;
@@ -2517,6 +2568,27 @@ static const MessageHandler introspectable_message_handlers[] = {
   { NULL, NULL, NULL, NULL }
 };
 
+#ifdef DBUS_ENABLE_CONTAINERS
+static const MessageHandler containers_message_handlers[] = {
+  { "AddServer", "ssa{sv}a{sv}", "oays", bus_containers_handle_add_server,
+    METHOD_FLAG_NO_CONTAINERS },
+  { "StopInstance", "o", "", bus_containers_handle_stop_instance,
+    METHOD_FLAG_NO_CONTAINERS },
+  { "StopListening", "o", "", bus_containers_handle_stop_listening,
+    METHOD_FLAG_NO_CONTAINERS },
+  { "GetConnectionInstance", "s", "ossa{sv}",
+    bus_containers_handle_get_connection_instance,
+    METHOD_FLAG_NONE },
+  { "GetInstanceInfo", "o", "ssa{sv}", bus_containers_handle_get_instance_info,
+    METHOD_FLAG_NONE },
+  { NULL, NULL, NULL, NULL }
+};
+static const PropertyHandler containers_property_handlers[] = {
+  { "SupportedArguments", "as", bus_containers_supported_arguments_getter },
+  { NULL, NULL, NULL }
+};
+#endif
+
 static const MessageHandler monitoring_message_handlers[] = {
   { "BecomeMonitor", "asu", "", bus_driver_handle_become_monitor,
     METHOD_FLAG_PRIVILEGED },
@@ -2526,9 +2598,9 @@ static const MessageHandler monitoring_message_handlers[] = {
 #ifdef DBUS_ENABLE_VERBOSE_MODE
 static const MessageHandler verbose_message_handlers[] = {
   { "EnableVerbose", "", "", bus_driver_handle_enable_verbose,
-    METHOD_FLAG_NONE },
+    METHOD_FLAG_NO_CONTAINERS },
   { "DisableVerbose", "", "", bus_driver_handle_disable_verbose,
-    METHOD_FLAG_NONE },
+    METHOD_FLAG_NO_CONTAINERS },
   { NULL, NULL, NULL, NULL }
 };
 #endif
@@ -2536,11 +2608,11 @@ static const MessageHandler verbose_message_handlers[] = {
 #ifdef DBUS_ENABLE_STATS
 static const MessageHandler stats_message_handlers[] = {
   { "GetStats", "", "a{sv}", bus_stats_handle_get_stats,
-    METHOD_FLAG_NONE },
+    METHOD_FLAG_NO_CONTAINERS },
   { "GetConnectionStats", "s", "a{sv}", bus_stats_handle_get_connection_stats,
-    METHOD_FLAG_NONE },
+    METHOD_FLAG_NO_CONTAINERS },
   { "GetAllMatchRules", "", "a{sas}", bus_stats_handle_get_all_match_rules,
-    METHOD_FLAG_NONE },
+    METHOD_FLAG_NO_CONTAINERS },
   { NULL, NULL, NULL, NULL }
 };
 #endif
@@ -2620,6 +2692,13 @@ static InterfaceHandler interface_handlers[] = {
 #ifdef DBUS_ENABLE_STATS
   { BUS_INTERFACE_STATS, stats_message_handlers, NULL,
     INTERFACE_FLAG_NONE },
+#endif
+#ifdef DBUS_ENABLE_CONTAINERS
+  { DBUS_INTERFACE_CONTAINERS1, containers_message_handlers,
+    "    <signal name=\"InstanceRemoved\">\n"
+    "      <arg type=\"o\" name=\"path\"/>\n"
+    "    </signal>\n",
+    INTERFACE_FLAG_NONE, containers_property_handlers },
 #endif
   { DBUS_INTERFACE_PEER, peer_message_handlers, NULL,
     /* Not in the Interfaces property because it's a pseudo-interface
@@ -2913,12 +2992,25 @@ bus_driver_handle_message (DBusConnection *connection,
 
           _dbus_verbose ("Found driver handler for %s\n", name);
 
-          if ((mh->flags & METHOD_FLAG_PRIVILEGED) &&
-              !bus_driver_check_caller_is_privileged (connection, transaction,
-                                                      message, error))
+          if (mh->flags & METHOD_FLAG_PRIVILEGED)
             {
-              _DBUS_ASSERT_ERROR_IS_SET (error);
-              return FALSE;
+              if (!bus_driver_check_caller_is_privileged (connection,
+                                                          transaction, message,
+                                                          error))
+                {
+                  _DBUS_ASSERT_ERROR_IS_SET (error);
+                  return FALSE;
+                }
+            }
+          else if (mh->flags & METHOD_FLAG_NO_CONTAINERS)
+            {
+              if (!bus_driver_check_caller_is_not_container (connection,
+                                                             transaction,
+                                                             message, error))
+                {
+                  _DBUS_ASSERT_ERROR_IS_SET (error);
+                  return FALSE;
+                }
             }
 
           if (!(is_canonical_path || (mh->flags & METHOD_FLAG_ANY_PATH)))

@@ -29,6 +29,7 @@
 
 #include "activation.h"
 #include "connection.h"
+#include "containers.h"
 #include "services.h"
 #include "utils.h"
 #include "policy.h"
@@ -69,6 +70,7 @@ struct BusContext
   BusMatchmaker *matchmaker;
   BusLimits limits;
   DBusRLimit *initial_fd_limit;
+  BusContainers *containers;
   unsigned int fork : 1;
   unsigned int syslog : 1;
   unsigned int keep_umask : 1;
@@ -100,7 +102,8 @@ server_get_context (DBusServer *server)
 
   bd = BUS_SERVER_DATA (server);
 
-  /* every DBusServer in the dbus-daemon has gone through setup_server() */
+  /* every DBusServer in the dbus-daemon's main loop has gone through
+   * bus_context_setup_server() */
   _dbus_assert (bd != NULL);
 
   context = bd->context;
@@ -173,8 +176,14 @@ new_connection_callback (DBusServer     *server,
                          DBusConnection *new_connection,
                          void           *data)
 {
-  BusContext *context = data;
+  /* If this fails it logs a warning, so we don't need to do that */
+  bus_context_add_incoming_connection (data, new_connection);
+}
 
+dbus_bool_t
+bus_context_add_incoming_connection (BusContext *context,
+                                     DBusConnection *new_connection)
+{
   /* If this fails it logs a warning, so we don't need to do that */
   if (!bus_connections_setup_connection (context->connections, new_connection))
     {
@@ -184,6 +193,8 @@ new_connection_callback (DBusServer     *server,
        * in general.
        */
       dbus_connection_close (new_connection);
+      /* on OOM, we won't have ref'd the connection so it will die. */
+      return FALSE;
     }
 
   dbus_connection_set_max_received_size (new_connection,
@@ -201,7 +212,7 @@ new_connection_callback (DBusServer     *server,
   dbus_connection_set_allow_anonymous (new_connection,
                                        context->allow_anonymous);
 
-  /* on OOM, we won't have ref'd the connection so it will die. */
+  return TRUE;
 }
 
 static void
@@ -218,6 +229,25 @@ setup_server (BusContext *context,
               char      **auth_mechanisms,
               DBusError  *error)
 {
+  if (!bus_context_setup_server (context, server, error))
+    return FALSE;
+
+  if (!dbus_server_set_auth_mechanisms (server, (const char**) auth_mechanisms))
+    {
+      BUS_SET_OOM (error);
+      return FALSE;
+    }
+
+  dbus_server_set_new_connection_function (server, new_connection_callback,
+                                           context, NULL);
+  return TRUE;
+}
+
+dbus_bool_t
+bus_context_setup_server (BusContext                 *context,
+                          DBusServer                 *server,
+                          DBusError                  *error)
+{
   BusServerData *bd;
 
   bd = dbus_new0 (BusServerData, 1);
@@ -231,16 +261,6 @@ setup_server (BusContext *context,
     }
 
   bd->context = context;
-
-  if (!dbus_server_set_auth_mechanisms (server, (const char**) auth_mechanisms))
-    {
-      BUS_SET_OOM (error);
-      return FALSE;
-    }
-
-  dbus_server_set_new_connection_function (server,
-                                           new_connection_callback,
-                                           context, NULL);
 
   if (!dbus_server_set_watch_functions (server,
                                         add_server_watch,
@@ -887,6 +907,14 @@ bus_context_new (const DBusString *config_file,
       goto failed;
     }
 
+  context->containers = bus_containers_new ();
+
+  if (context->containers == NULL)
+    {
+      BUS_SET_OOM (error);
+      goto failed;
+    }
+
   /* check user before we fork */
   if (context->user != NULL)
     {
@@ -1102,6 +1130,9 @@ bus_context_shutdown (BusContext  *context)
 
       link = _dbus_list_get_next_link (&context->servers, link);
     }
+
+  if (context->containers != NULL)
+    bus_containers_stop_listening (context->containers);
 }
 
 BusContext *
@@ -1172,6 +1203,7 @@ bus_context_unref (BusContext *context)
           context->matchmaker = NULL;
         }
 
+      bus_clear_containers (&context->containers);
       dbus_free (context->config_file);
       dbus_free (context->log_prefix);
       dbus_free (context->type);
@@ -1282,6 +1314,12 @@ bus_context_get_policy (BusContext *context)
   return context->policy;
 }
 
+BusContainers *
+bus_context_get_containers (BusContext *context)
+{
+  return context->containers;
+}
+
 BusClientPolicy*
 bus_context_create_client_policy (BusContext      *context,
                                   DBusConnection  *connection,
@@ -1357,6 +1395,26 @@ int
 bus_context_get_reply_timeout (BusContext *context)
 {
   return context->limits.reply_timeout;
+}
+
+int bus_context_get_max_containers (BusContext *context)
+{
+  return context->limits.max_containers;
+}
+
+int bus_context_get_max_containers_per_user (BusContext *context)
+{
+  return context->limits.max_containers_per_user;
+}
+
+int bus_context_get_max_container_metadata_bytes (BusContext *context)
+{
+  return context->limits.max_container_metadata_bytes;
+}
+
+int bus_context_get_max_connections_per_container (BusContext *context)
+{
+  return context->limits.max_connections_per_container;
 }
 
 DBusRLimit *
