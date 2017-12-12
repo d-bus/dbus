@@ -1625,6 +1625,25 @@
         </para>
 
         <para>
+          New header fields controlled by the message bus
+          (similar to <literal>SENDER</literal>) might be added to this
+          specification in future. Such message fields should normally
+          only be added to messages that are going to be delivered to a
+          client that specifically requested them (for example by calling
+          some method), and the message bus should remove those header
+          fields from all other messages that it relays. This design
+          principle serves two main purposes. One is to avoid unnecessary
+          memory and throughput overhead when delivering messages to
+          clients that are not interested in the new header fields.
+          The other is to give clients a reason to call the method that
+          requests those messages (otherwise, the clients would not work).
+          This is desirable because looking at the reply to that method
+          call is a natural way to check that the message bus guarantees
+          to filter out faked header fields that might have been sent by
+          malicious peers.
+        </para>
+
+        <para>
           Here are the currently-defined header fields:
           <informaltable>
             <tgroup cols="5">
