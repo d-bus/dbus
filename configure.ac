@@ -1540,7 +1540,7 @@ AC_DEFINE_UNQUOTED(DBUS_DATADIR,"$DBUS_DATADIR", [Directory for installing DBUS 
 #### Directory to install dbus-daemon
 if test -z "$with_dbus_daemondir" ; then
     DBUS_DAEMONDIR=$EXPANDED_BINDIR
-    dbus_daemondir='$bindir'
+    dbus_daemondir='${bindir}'
 else
     DBUS_DAEMONDIR=$with_dbus_daemondir
     dbus_daemondir=$with_dbus_daemondir
