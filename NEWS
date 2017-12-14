@@ -11,6 +11,9 @@ Fixes:
 
 • Add a missing space to a warning message (fd.o #103729, Thomas Zajic)
 
+• Expand ${bindir} correctly when pkg-config is asked for dbus_daemondir
+  (fd.o #104265, Benedikt Heine)
+
 dbus 1.12.2 (2017-11-13)
 ========================
 
