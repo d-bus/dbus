@@ -35,6 +35,9 @@ Fixes:
 • Fix some memory leaks in automated tests
   (fd.o #103600, Simon McVittie)
 
+• Expand ${bindir} correctly when pkg-config is asked for dbus_daemondir
+  (fd.o #104265, Benedikt Heine)
+
 Internal changes:
 
 • Harden the nonce-tcp: transport against resource leaks and
