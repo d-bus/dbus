@@ -155,7 +155,7 @@ test_weird_header_field (void        *user_data,
   DBusString modified_blob = _DBUS_STRING_INIT_INVALID;
   /* This is the serialization of a struct (uv), assumed to be at an
    * 8-byte boundary. */
-  const unsigned char weird_header[8] = {
+  unsigned char weird_header[8] = {
       NOT_A_HEADER_FIELD,   /*< type code */
       1,                    /*< length of signature */
       'u',                  /*< signature: uint32 */
@@ -252,7 +252,7 @@ test_weird_header_field (void        *user_data,
     {
       /* Do nothing: don't insert a weird header field at all */
     }
-  else if (g_str_equal (f->mode, "change"))
+  else if (g_str_equal (f->mode, "change") || g_str_equal (f->mode, "multi"))
     {
       /* Replace the interface (which is optional anyway) with the
        * weird header field */
@@ -285,6 +285,53 @@ test_weird_header_field (void        *user_data,
             }
 
           _dbus_type_reader_next (&array);
+        }
+
+      if (g_str_equal (f->mode, "multi"))
+        {
+          dbus_uint32_t header_fields_length;
+          unsigned int i;
+
+          memcpy (&header_fields_length, &blob[FIELDS_ARRAY_LENGTH_OFFSET], 4);
+
+          /* Same as prepend, twice */
+          for (i = 1; i <= 2; i++)
+            {
+              weird_header[0] = NOT_A_HEADER_FIELD - i;
+
+              if (!_dbus_string_insert_8_aligned (&modified_blob,
+                                                  FIRST_FIELD_OFFSET,
+                                                  weird_header))
+                {
+                  g_assert_false (have_memory);
+                  goto out;
+                }
+
+              header_fields_length += 8;
+            }
+
+          /* Same as append, twice (see below) */
+          header_fields_length = _DBUS_ALIGN_VALUE (header_fields_length, 8);
+          g_assert_cmpint (header_fields_length % 8, ==, 0);
+
+          for (i = 1; i <= 2; i++)
+            {
+              weird_header[0] = NOT_A_HEADER_FIELD + i;
+
+              if (!_dbus_string_insert_8_aligned (&modified_blob,
+                                                  (FIRST_FIELD_OFFSET +
+                                                   header_fields_length),
+                                                  weird_header))
+                {
+                  g_assert_false (have_memory);
+                  goto out;
+                }
+
+              header_fields_length += 8;
+            }
+
+          string_overwrite_n (&modified_blob, FIELDS_ARRAY_LENGTH_OFFSET,
+                              &header_fields_length, 4);
         }
     }
   else if (g_str_equal (f->mode, "prepend"))
@@ -372,6 +419,10 @@ test_weird_header_field (void        *user_data,
        * change */
       g_assert_cmpint (bytes_needed, ==, blob_len);
     }
+  else if (g_str_equal (f->mode, "multi"))
+    {
+      g_assert_cmpint (bytes_needed, ==, blob_len + 32);
+    }
   else
     {
       g_assert_cmpint (bytes_needed, ==, blob_len + 8);
@@ -431,7 +482,8 @@ test_weird_header_field (void        *user_data,
       goto out;
     }
 
-  if (f->mode != NULL && g_str_equal (f->mode, "change"))
+  if (f->mode != NULL &&
+      (g_str_equal (f->mode, "change") || g_str_equal (f->mode, "multi")))
     {
       /* We edited the interface field in-place to turn it into the
        * unknown field, so it doesn't have an interface any more. */
@@ -524,7 +576,11 @@ test_weird_header_field (void        *user_data,
                        ==, DBUS_TYPE_BYTE);
       _dbus_type_reader_read_basic (&sub, &field_code);
 
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD - 2);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD - 1);
       g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD + 1);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD + 2);
 
       _dbus_type_reader_next (&array);
     }
@@ -625,7 +681,11 @@ test_weird_header_field (void        *user_data,
                        ==, DBUS_TYPE_BYTE);
       _dbus_type_reader_read_basic (&sub, &field_code);
 
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD - 2);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD - 1);
       g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD + 1);
+      g_assert_cmpuint (field_code, !=, NOT_A_HEADER_FIELD + 2);
 
       _dbus_type_reader_next (&array);
     }
@@ -756,6 +816,8 @@ main (int argc,
                 "change");
   add_oom_test ("/message/weird-header-field/prepend", test_weird_header_field,
                 "prepend");
+  add_oom_test ("/message/weird-header-field/multi", test_weird_header_field,
+                "multi");
 
   ret = g_test_run ();
 
