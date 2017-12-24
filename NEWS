@@ -8,6 +8,12 @@ a 1.14.0 stable release at an unspecified point in the future.
 
 Enhancements:
 
+• D-Bus Specification v0.32
+  · Deprecate hyphen/minus in reversed domain names, recommending
+    underscores instead. Recommend prepending an underscore to domain
+    components that start with a digit, which would not be allowed.
+    (fd.o #103914, Simon McVittie)
+
 • Add experimental support for creating extra servers at runtime, to
   be used by app containers like Flatpak or Snap. This API is still
   subject to change and is not compiled in by default.
