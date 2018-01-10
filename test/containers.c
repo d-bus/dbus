@@ -509,14 +509,6 @@ test_metadata (Fixture *f,
                                         DBUS_INTERFACE_CONTAINERS1 ".Instance",
                                         "&o", &path_from_query));
   g_assert_cmpstr (path_from_query, ==, f->instance_path);
-  g_assert_true (g_variant_dict_lookup (&dict,
-                                        DBUS_INTERFACE_CONTAINERS1 ".Type",
-                                        "&s", &type));
-  g_assert_cmpstr (type, ==, "org.example.Springwatch");
-  g_assert_true (g_variant_dict_lookup (&dict,
-                                        DBUS_INTERFACE_CONTAINERS1 ".Name",
-                                        "&s", &name));
-  g_assert_cmpstr (name, ==, "");
   g_variant_dict_clear (&dict);
   g_clear_pointer (&asv, g_variant_unref);
   g_clear_pointer (&tuple, g_variant_unref);
