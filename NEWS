@@ -44,6 +44,10 @@ Fixes:
 • Expand ${bindir} correctly when pkg-config is asked for dbus_daemondir
   (fd.o #104265, Benedikt Heine)
 
+• On Linux systems with systemd, if ${localstatedir}/dbus doesn't exist,
+  create it before trying to create ${localstatedir}/dbus/machine-id
+  (fd.o #104577, Chris Lesiak)
+
 Internal changes:
 
 • Harden the nonce-tcp: transport against resource leaks and
