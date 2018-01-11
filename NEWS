@@ -15,6 +15,10 @@ Enhancements:
     (fd.o #103914, Simon McVittie)
   · Clarify how the SASL authentication handshake works
     (fd.o #104224, Simon McVittie)
+  · Recommend that the message bus should remove message header fields
+    that it does not understand. The new item "HeaderFiltering" in the
+    message bus' Features property indicates that it promises to do so.
+    (fd.o #100317, Simon McVittie)
 
 • Add experimental support for creating extra servers at runtime, to
   be used by app containers like Flatpak or Snap. This API is still
@@ -22,6 +26,12 @@ Enhancements:
   (fd.o #101354, Simon McVittie)
 
 • Improve automated test logging (fd.o #103601, Simon McVittie)
+
+• The dbus-daemon now filters the messages that it relays, removing
+  header fields that it does not understand. Clients must not rely on
+  this behaviour unless they have confirmed that they are connected to
+  a suitable message bus implementation, for example by querying its
+  Features property. (fd.o #100317, Simon McVittie)
 
 Fixes:
 
