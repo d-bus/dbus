@@ -13,6 +13,8 @@ Enhancements:
     underscores instead. Recommend prepending an underscore to domain
     components that start with a digit, which would not be allowed.
     (fd.o #103914, Simon McVittie)
+  · Clarify how the SASL authentication handshake works
+    (fd.o #104224, Simon McVittie)
 
 • Add experimental support for creating extra servers at runtime, to
   be used by app containers like Flatpak or Snap. This API is still
