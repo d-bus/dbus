@@ -550,6 +550,7 @@ sha1_handle_first_client_response (DBusAuth         *auth,
     }
       
   if (!_dbus_credentials_add_from_user (auth->desired_identity, data,
+                                        DBUS_CREDENTIALS_ADD_FLAGS_USER_DATABASE,
                                         &error))
     {
       if (dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))
@@ -1120,6 +1121,7 @@ handle_server_data_external_mech (DBusAuth         *auth,
 
       if (!_dbus_credentials_add_from_user (auth->desired_identity,
                                             &auth->identity,
+                                            DBUS_CREDENTIALS_ADD_FLAGS_NONE,
                                             &error))
         {
           if (dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))

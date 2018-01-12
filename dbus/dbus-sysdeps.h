@@ -240,8 +240,15 @@ dbus_bool_t _dbus_read_credentials_socket (DBusSocket        client_fd,
 dbus_bool_t _dbus_send_credentials_socket (DBusSocket       server_fd,
                                            DBusError       *error);
 
+typedef enum
+{
+  DBUS_CREDENTIALS_ADD_FLAGS_USER_DATABASE = (1 << 0),
+  DBUS_CREDENTIALS_ADD_FLAGS_NONE = 0
+} DBusCredentialsAddFlags;
+
 dbus_bool_t _dbus_credentials_add_from_user            (DBusCredentials         *credentials,
                                                         const DBusString        *username,
+                                                        DBusCredentialsAddFlags  flags,
                                                         DBusError               *error);
 
 dbus_bool_t _dbus_credentials_add_from_current_process (DBusCredentials  *credentials);

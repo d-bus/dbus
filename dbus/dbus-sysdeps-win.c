@@ -2066,6 +2066,7 @@ _dbus_concat_dir_and_file (DBusString       *dir,
 dbus_bool_t
 _dbus_credentials_add_from_user (DBusCredentials         *credentials,
                                  const DBusString        *username,
+                                 DBusCredentialsAddFlags  flags,
                                  DBusError               *error)
 {
   if (!_dbus_credentials_add_windows_sid (credentials,

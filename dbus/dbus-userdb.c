@@ -519,6 +519,7 @@ _dbus_homedir_from_uid (dbus_uid_t         uid,
 dbus_bool_t
 _dbus_credentials_add_from_user (DBusCredentials         *credentials,
                                  const DBusString        *username,
+                                 DBusCredentialsAddFlags  flags,
                                  DBusError               *error)
 {
   DBusUserDatabase *db;
@@ -534,6 +535,14 @@ _dbus_credentials_add_from_user (DBusCredentials         *credentials,
 
       _dbus_credentials_add_unix_uid (credentials, uid);
       return TRUE;
+    }
+
+  /* If we aren't allowed to look in NSS or /etc/passwd, fail now. */
+  if (!(flags & DBUS_CREDENTIALS_ADD_FLAGS_USER_DATABASE))
+    {
+      dbus_set_error (error, DBUS_ERROR_INVALID_ARGS,
+                      "Expected a numeric Unix uid");
+      return FALSE;
     }
 
   if (!_dbus_user_database_lock_system ())
