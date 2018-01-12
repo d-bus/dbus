@@ -522,6 +522,18 @@ _dbus_credentials_add_from_user (DBusCredentials  *credentials,
 {
   DBusUserDatabase *db;
   const DBusUserInfo *info;
+  unsigned long uid = DBUS_UID_UNSET;
+
+  /* Fast-path for the common case: if the "username" is all-numeric,
+   * then it's a Unix uid. This is true regardless of whether that uid
+   * exists in NSS or /etc/passwd or equivalent. */
+  if (_dbus_is_a_number (username, &uid))
+    {
+      _DBUS_STATIC_ASSERT (sizeof (uid) == sizeof (dbus_uid_t));
+
+      _dbus_credentials_add_unix_uid (credentials, uid);
+      return TRUE;
+    }
 
   /* FIXME: this can't distinguish ENOMEM from other errors */
   if (!_dbus_user_database_lock_system ())
