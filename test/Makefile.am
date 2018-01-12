@@ -477,6 +477,7 @@ static_data = \
 	data/auth/external-root.auth-script \
 	data/auth/external-silly.auth-script \
 	data/auth/external-successful.auth-script \
+	data/auth/external-username.auth-script \
 	data/auth/extra-bytes.auth-script \
 	data/auth/fail-after-n-attempts.auth-script \
 	data/auth/fallback.auth-script \
