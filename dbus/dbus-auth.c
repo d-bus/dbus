@@ -549,10 +549,18 @@ sha1_handle_first_client_response (DBusAuth         *auth,
         }
     }
       
-  if (!_dbus_credentials_add_from_user (auth->desired_identity, data))
+  if (!_dbus_credentials_add_from_user (auth->desired_identity, data,
+                                        &error))
     {
-      _dbus_verbose ("%s: Did not get a valid username from client\n",
-                     DBUS_AUTH_NAME (auth));
+      if (dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))
+        {
+          dbus_error_free (&error);
+          goto out;
+        }
+
+      _dbus_verbose ("%s: Did not get a valid username from client: %s\n",
+                     DBUS_AUTH_NAME (auth), error.message);
+      dbus_error_free (&error);
       return send_rejected (auth);
     }
       
@@ -1108,11 +1116,21 @@ handle_server_data_external_mech (DBusAuth         *auth,
     }
   else
     {
+      DBusError error = DBUS_ERROR_INIT;
+
       if (!_dbus_credentials_add_from_user (auth->desired_identity,
-                                            &auth->identity))
+                                            &auth->identity,
+                                            &error))
         {
-          _dbus_verbose ("%s: could not get credentials from uid string\n",
-                         DBUS_AUTH_NAME (auth));
+          if (dbus_error_has_name (&error, DBUS_ERROR_NO_MEMORY))
+            {
+              dbus_error_free (&error);
+              return FALSE;
+            }
+
+          _dbus_verbose ("%s: could not get credentials from uid string: %s\n",
+                         DBUS_AUTH_NAME (auth), error.message);
+          dbus_error_free (&error);
           return send_rejected (auth);
         }
     }

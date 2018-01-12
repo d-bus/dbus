@@ -2064,11 +2064,18 @@ _dbus_concat_dir_and_file (DBusString       *dir,
  * @returns #TRUE if the username existed and we got some credentials
  */
 dbus_bool_t
-_dbus_credentials_add_from_user (DBusCredentials  *credentials,
-                                     const DBusString *username)
+_dbus_credentials_add_from_user (DBusCredentials         *credentials,
+                                 const DBusString        *username,
+                                 DBusError               *error)
 {
-  return _dbus_credentials_add_windows_sid (credentials,
-                    _dbus_string_get_const_data(username));
+  if (!_dbus_credentials_add_windows_sid (credentials,
+                                          _dbus_string_get_const_data (username)))
+    {
+      _DBUS_SET_OOM (error);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 /**

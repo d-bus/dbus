@@ -517,8 +517,9 @@ _dbus_homedir_from_uid (dbus_uid_t         uid,
  * @returns #TRUE if the username existed and we got some credentials
  */
 dbus_bool_t
-_dbus_credentials_add_from_user (DBusCredentials  *credentials,
-                                 const DBusString *username)
+_dbus_credentials_add_from_user (DBusCredentials         *credentials,
+                                 const DBusString        *username,
+                                 DBusError               *error)
 {
   DBusUserDatabase *db;
   const DBusUserInfo *info;
@@ -535,19 +536,22 @@ _dbus_credentials_add_from_user (DBusCredentials  *credentials,
       return TRUE;
     }
 
-  /* FIXME: this can't distinguish ENOMEM from other errors */
   if (!_dbus_user_database_lock_system ())
-    return FALSE;
+    {
+      _DBUS_SET_OOM (error);
+      return FALSE;
+    }
 
   db = _dbus_user_database_get_system ();
   if (db == NULL)
     {
       _dbus_user_database_unlock_system ();
+      _DBUS_SET_OOM (error);
       return FALSE;
     }
 
   if (!_dbus_user_database_get_username (db, username,
-                                         &info, NULL))
+                                         &info, error))
     {
       _dbus_user_database_unlock_system ();
       return FALSE;
@@ -556,6 +560,7 @@ _dbus_credentials_add_from_user (DBusCredentials  *credentials,
   if (!_dbus_credentials_add_unix_uid(credentials, info->uid))
     {
       _dbus_user_database_unlock_system ();
+      _DBUS_SET_OOM (error);
       return FALSE;
     }
   

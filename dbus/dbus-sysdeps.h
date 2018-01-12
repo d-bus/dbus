@@ -240,8 +240,10 @@ dbus_bool_t _dbus_read_credentials_socket (DBusSocket        client_fd,
 dbus_bool_t _dbus_send_credentials_socket (DBusSocket       server_fd,
                                            DBusError       *error);
 
-dbus_bool_t _dbus_credentials_add_from_user            (DBusCredentials  *credentials,
-                                                        const DBusString *username);
+dbus_bool_t _dbus_credentials_add_from_user            (DBusCredentials         *credentials,
+                                                        const DBusString        *username,
+                                                        DBusError               *error);
+
 dbus_bool_t _dbus_credentials_add_from_current_process (DBusCredentials  *credentials);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_append_user_from_current_process     (DBusString        *str);
