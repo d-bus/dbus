@@ -35,6 +35,10 @@
 #include "dbus-internals.h"
 #include <dbus/dbus-test-tap.h>
 
+#ifdef DBUS_UNIX
+# include "dbus/dbus-userdb.h"
+#endif
+
 /**
  * @defgroup DBusAuthScript code for running unit test scripts for DBusAuth
  * @ingroup  DBusInternals
@@ -556,35 +560,33 @@ _dbus_auth_script_run (const DBusString *filename)
             else if (_dbus_string_find (&to_send, 0,
                                         "USERNAME_HEX", &where))
               {
-                DBusString username;
-                
-                if (!_dbus_string_init (&username))
-                  {
-                    _dbus_warn ("no memory for username");
-                    _dbus_string_free (&to_send);
-                    goto out;
-                  }
+#ifdef DBUS_UNIX
+                const DBusString *username;
 
-                if (!_dbus_append_user_from_current_process (&username))
+                if (!_dbus_username_from_current_process (&username))
                   {
                     _dbus_warn ("no memory for username");
-                    _dbus_string_free (&username);
                     _dbus_string_free (&to_send);
                     goto out;
                   }
 
                 _dbus_string_delete (&to_send, where, (int) strlen ("USERNAME_HEX"));
                 
-                if (!_dbus_string_hex_encode (&username, 0,
+                if (!_dbus_string_hex_encode (username, 0,
 					      &to_send, where))
                   {
                     _dbus_warn ("no memory to subst USERNAME_HEX");
-                    _dbus_string_free (&username);
                     _dbus_string_free (&to_send);
                     goto out;
                   }
-
-                _dbus_string_free (&username);
+#else
+                /* No authentication mechanism uses the login name on
+                 * Windows, so there's no point in it appearing in an
+                 * auth script that is not UNIX_ONLY. */
+                _dbus_warn ("USERNAME_HEX cannot be used on Windows");
+                _dbus_string_free (&to_send);
+                goto out;
+#endif
               }
           }
 
