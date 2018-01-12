@@ -472,6 +472,7 @@ static_data = \
 	data/auth/anonymous-server-successful.auth-script \
 	data/auth/cancel.auth-script \
 	data/auth/client-out-of-mechanisms.auth-script \
+	data/auth/external-auto.auth-script \
 	data/auth/external-failed.auth-script \
 	data/auth/external-root.auth-script \
 	data/auth/external-silly.auth-script \
