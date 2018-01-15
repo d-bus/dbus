@@ -848,6 +848,36 @@ populate_environment (BusActivation *activation)
   retval = _dbus_hash_table_from_array (activation->environment, environment, '=');
   dbus_free_string_array (environment);
 
+  /*
+   * These environment variables are set by systemd for the dbus-daemon
+   * itself, and are not applicable to our child processes.
+   *
+   * Of the other environment variables listed in systemd.exec(5):
+   *
+   * - XDG_RUNTIME_DIR, XDG_SESSION_ID, XDG_SEAT, XDG_VTNR: Properties of
+   *   the session and equally true for the activated service, should not
+   *   be reset
+   * - PATH, LANG, USER, LOGNAME, HOME, SHELL, MANAGERPID: Equally true for
+   *   the activated service, should not be reset
+   * - TERM, WATCHDOG_*: Should not be set for dbus-daemon, so not applicable
+   * - MAINPID, SERVICE_RESULT, EXIT_CODE, EXIT_STATUS: Not set for ExecStart,
+   *   so not applicable
+   * - INVOCATION_ID: TODO: Do we want to clear this or not? It isn't clear.
+   */
+
+  /* We give activated services their own Journal stream to avoid their
+   * logging being attributed to dbus-daemon */
+  _dbus_hash_table_remove_string (activation->environment, "JOURNAL_STREAM");
+
+  /* This is dbus-daemon's listening socket, not the activatable service's */
+  _dbus_hash_table_remove_string (activation->environment, "LISTEN_FDNAMES");
+  _dbus_hash_table_remove_string (activation->environment, "LISTEN_FDS");
+  _dbus_hash_table_remove_string (activation->environment, "LISTEN_PID");
+
+  /* This is dbus-daemon's status notification, not the activatable service's
+   * (and NotifyAccess wouldn't let it write here anyway) */
+  _dbus_hash_table_remove_string (activation->environment, "NOTIFY_SOCKET");
+
   return retval;
 }
 
