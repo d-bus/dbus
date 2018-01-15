@@ -1033,10 +1033,42 @@ bus_connection_get_unix_groups  (DBusConnection   *connection,
                                  int              *n_groups,
                                  DBusError        *error)
 {
+  /* Assigning dbus_gid_t to unsigned long is lossless (in fact
+   * they are the same type) */
+  _DBUS_STATIC_ASSERT (sizeof (unsigned long) == sizeof (dbus_gid_t));
+
+  const dbus_gid_t *groups_borrowed = NULL;
+  DBusCredentials *credentials;
   unsigned long uid;
+  size_t n = 0;
 
   *groups = NULL;
   *n_groups = 0;
+
+  credentials = _dbus_connection_get_credentials (connection);
+
+  if (credentials != NULL &&
+      _dbus_credentials_get_unix_gids (credentials, &groups_borrowed, &n))
+    {
+      size_t i;
+
+      /* We got the group IDs from SO_PEERGROUPS or equivalent - no
+       * need to ask NSS */
+
+      *n_groups = n;
+      *groups = dbus_new (unsigned long, n);
+
+      if (groups == NULL)
+        {
+          BUS_SET_OOM (error);
+          return FALSE;
+        }
+
+      for (i = 0; i < n; i++)
+        (*groups)[i] = groups_borrowed[i];
+
+      return TRUE;
+    }
 
   if (dbus_connection_get_unix_user (connection, &uid))
     {
