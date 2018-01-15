@@ -117,6 +117,7 @@ DBUS_UTIL_arch_sources = 			\
 	dbus-sysdeps-util-unix.c		\
 	dbus-userdb-util.c			\
 	dbus-spawn-unix.c			\
+	$(NULL)
 endif
 
 if HAVE_LINUX_EPOLL
