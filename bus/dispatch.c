@@ -290,7 +290,8 @@ bus_dispatch (DBusConnection *connection,
   /* Make sure the message does not have any header fields that we
    * don't understand (or validate), so that we can add header fields
    * in future and clients can assume that we have checked them. */
-  if (!_dbus_message_remove_unknown_fields (message))
+  if (!_dbus_message_remove_unknown_fields (message) ||
+      !dbus_message_set_container_instance (message, NULL))
     {
       BUS_SET_OOM (&error);
       goto out;

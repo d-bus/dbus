@@ -1294,6 +1294,11 @@ _dbus_message_test (const char *test_data_dir)
   _dbus_assert (strcmp (dbus_message_get_path (message),
                         "/foo") == 0);
 
+  if (!dbus_message_set_container_instance (message, "/org/freedesktop/DBus/Containers1/c42"))
+    _dbus_test_fatal ("out of memory");
+  _dbus_assert (strcmp (dbus_message_get_container_instance (message),
+                        "/org/freedesktop/DBus/Containers1/c42") == 0);
+
   if (!dbus_message_set_interface (message, "org.Foo"))
     _dbus_test_fatal ("out of memory");
   _dbus_assert (strcmp (dbus_message_get_interface (message),

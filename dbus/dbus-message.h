@@ -218,6 +218,12 @@ dbus_bool_t   dbus_message_get_path_decomposed (DBusMessage   *message,
                                                 char        ***path);
 
 DBUS_EXPORT
+const char   *dbus_message_get_container_instance (DBusMessage   *message);
+DBUS_EXPORT
+dbus_bool_t   dbus_message_set_container_instance (DBusMessage   *message,
+                                                   const char    *object_path);
+
+DBUS_EXPORT
 dbus_bool_t dbus_message_append_args          (DBusMessage     *message,
 					       int              first_arg_type,
 					       ...);

@@ -4069,6 +4069,57 @@ dbus_message_contains_unix_fds(DBusMessage *message)
 #endif
 }
 
+/**
+ * Sets the container instance this message was sent from.
+ *
+ * The path must contain only valid characters for an object path
+ * as defined in the D-Bus specification.
+ *
+ * @param message the message
+ * @param object_path the path or #NULL to unset
+ * @returns #FALSE if not enough memory
+ */
+dbus_bool_t
+dbus_message_set_container_instance (DBusMessage   *message,
+                                     const char    *object_path)
+{
+  _dbus_return_val_if_fail (message != NULL, FALSE);
+  _dbus_return_val_if_fail (!message->locked, FALSE);
+  _dbus_return_val_if_fail (object_path == NULL ||
+                            _dbus_check_is_valid_path (object_path),
+                            FALSE);
+
+  return set_or_delete_string_field (message,
+                                     DBUS_HEADER_FIELD_CONTAINER_INSTANCE,
+                                     DBUS_TYPE_OBJECT_PATH,
+                                     object_path);
+}
+
+/**
+ * Gets the container instance this message was sent from, or #NULL
+ * if none.
+ *
+ * The returned string becomes invalid if the message is
+ * modified, since it points into the wire-marshaled message data.
+ *
+ * @param message the message
+ * @returns the path (should not be freed) or #NULL
+ */
+const char *
+dbus_message_get_container_instance (DBusMessage *message)
+{
+  const char *v;
+
+  _dbus_return_val_if_fail (message != NULL, NULL);
+
+  v = NULL; /* in case field doesn't exist */
+  _dbus_header_get_field_basic (&message->header,
+                                DBUS_HEADER_FIELD_CONTAINER_INSTANCE,
+                                DBUS_TYPE_OBJECT_PATH,
+                                (void *) &v);
+  return v;
+}
+
 /** @} */
 
 /**
