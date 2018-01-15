@@ -2311,7 +2311,7 @@ bus_transaction_capture (BusTransaction *transaction,
     {
       DBusConnection *recipient = link->data;
 
-      if (!bus_transaction_send (transaction, recipient, message))
+      if (!bus_transaction_send (transaction, sender, recipient, message))
         goto out;
     }
 
@@ -2420,12 +2420,13 @@ bus_transaction_send_from_driver (BusTransaction *transaction,
       return TRUE;
     }
 
-  return bus_transaction_send (transaction, connection, message);
+  return bus_transaction_send (transaction, NULL, connection, message);
 }
 
 dbus_bool_t
 bus_transaction_send (BusTransaction *transaction,
-                      DBusConnection *connection,
+                      DBusConnection *sender,
+                      DBusConnection *destination,
                       DBusMessage    *message)
 {
   MessageToSend *to_send;
@@ -2442,15 +2443,15 @@ bus_transaction_send (BusTransaction *transaction,
                  dbus_message_get_member (message) : "(unset)",
                  dbus_message_get_error_name (message) ?
                  dbus_message_get_error_name (message) : "(unset)",
-                 dbus_connection_get_is_connected (connection) ?
+                 dbus_connection_get_is_connected (destination) ?
                  "" : " (disconnected)");
 
   _dbus_assert (dbus_message_get_sender (message) != NULL);
   
-  if (!dbus_connection_get_is_connected (connection))
-    return TRUE; /* silently ignore disconnected connections */
+  if (!dbus_connection_get_is_connected (destination))
+    return TRUE; /* silently ignore disconnected destinations */
   
-  d = BUS_CONNECTION_DATA (connection);
+  d = BUS_CONNECTION_DATA (destination);
   _dbus_assert (d != NULL);
   
   to_send = dbus_new (MessageToSend, 1);
@@ -2459,7 +2460,7 @@ bus_transaction_send (BusTransaction *transaction,
       return FALSE;
     }
 
-  to_send->preallocated = dbus_connection_preallocate_send (connection);
+  to_send->preallocated = dbus_connection_preallocate_send (destination);
   if (to_send->preallocated == NULL)
     {
       dbus_free (to_send);
@@ -2474,13 +2475,13 @@ bus_transaction_send (BusTransaction *transaction,
   
   if (!_dbus_list_prepend (&d->transaction_messages, to_send))
     {
-      message_to_send_free (connection, to_send);
+      message_to_send_free (destination, to_send);
       return FALSE;
     }
 
   _dbus_verbose ("prepended message\n");
   
-  /* See if we already had this connection in the list
+  /* See if we already had this destination in the list
    * for this transaction. If we have a pending message,
    * then we should already be in transaction->connections
    */
@@ -2500,10 +2501,10 @@ bus_transaction_send (BusTransaction *transaction,
 
   if (link == NULL)
     {
-      if (!_dbus_list_prepend (&transaction->connections, connection))
+      if (!_dbus_list_prepend (&transaction->connections, destination))
         {
           _dbus_list_remove (&d->transaction_messages, to_send);
-          message_to_send_free (connection, to_send);
+          message_to_send_free (destination, to_send);
           return FALSE;
         }
     }

@@ -108,9 +108,7 @@ send_one_message (DBusConnection *connection,
       return TRUE; /* don't send it but don't return an error either */
     }
 
-  if (!bus_transaction_send (transaction,
-                             connection,
-                             message))
+  if (!bus_transaction_send (transaction, sender, connection, message))
     {
       BUS_SET_OOM (error);
       return FALSE;
@@ -165,7 +163,8 @@ bus_dispatch_matches (BusTransaction *transaction,
       }
 
       /* Dispatch the message */
-      if (!bus_transaction_send (transaction, addressed_recipient, message))
+      if (!bus_transaction_send (transaction, sender, addressed_recipient,
+                                 message))
         {
           BUS_SET_OOM (error);
           return FALSE;
