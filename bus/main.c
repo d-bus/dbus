@@ -716,6 +716,7 @@ main (int argc, char **argv)
 #endif /* DBUS_UNIX */
 
   _dbus_verbose ("We are on D-Bus...\n");
+  _dbus_daemon_report_ready ();
   _dbus_loop_run (bus_context_get_loop (context));
 
   bus_context_shutdown (context);
