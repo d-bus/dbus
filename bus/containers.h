@@ -52,6 +52,10 @@ dbus_bool_t bus_containers_handle_get_connection_instance (DBusConnection *conne
                                                            BusTransaction *transaction,
                                                            DBusMessage    *message,
                                                            DBusError      *error);
+dbus_bool_t bus_containers_handle_request_header      (DBusConnection  *connection,
+                                                       BusTransaction  *transaction,
+                                                       DBusMessage     *message,
+                                                       DBusError       *error);
 dbus_bool_t bus_containers_supported_arguments_getter (BusContext      *context,
                                                        DBusMessageIter *var_iter);
 

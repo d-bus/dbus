@@ -28,6 +28,12 @@
 #include <dbus/dbus-list.h>
 #include "bus.h"
 
+typedef enum
+{
+  BUS_EXTRA_HEADERS_CONTAINER_INSTANCE = (1 << 0),
+  BUS_EXTRA_HEADERS_NONE = 0
+} BusExtraHeaders;
+
 typedef dbus_bool_t (* BusConnectionForeachFunction) (DBusConnection *connection, 
                                                       void           *data);
 
@@ -83,6 +89,9 @@ const char *bus_connection_get_name  (DBusConnection *connection);
 dbus_bool_t bus_connection_preallocate_oom_error (DBusConnection *connection);
 void        bus_connection_send_oom_error        (DBusConnection *connection,
                                                   DBusMessage    *in_reply_to);
+
+void        bus_connection_request_headers       (DBusConnection  *connection,
+                                                  BusExtraHeaders  headers);
 
 /* called by signals.c */
 dbus_bool_t bus_connection_add_match_rule      (DBusConnection *connection,

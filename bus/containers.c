@@ -1297,6 +1297,35 @@ failed:
   return FALSE;
 }
 
+dbus_bool_t
+bus_containers_handle_request_header (DBusConnection *caller,
+                                      BusTransaction *transaction,
+                                      DBusMessage    *message,
+                                      DBusError      *error)
+{
+  DBusMessage *reply = NULL;
+  dbus_bool_t ret = FALSE;
+
+  reply = dbus_message_new_method_return (message);
+
+  /* We prepare the transaction before carrying out its side-effects,
+   * because otherwise it isn't transactional */
+  if (reply == NULL ||
+      !bus_transaction_send_from_driver (transaction, caller, reply))
+    {
+      BUS_SET_OOM (error);
+      goto out;
+    }
+
+  bus_connection_request_headers (caller,
+                                  BUS_EXTRA_HEADERS_CONTAINER_INSTANCE);
+  ret = TRUE;
+
+out:
+  dbus_clear_message (&reply);
+  return ret;
+}
+
 void
 bus_containers_stop_listening (BusContainers *self)
 {

@@ -2598,6 +2598,8 @@ static const MessageHandler containers_message_handlers[] = {
     METHOD_FLAG_NONE },
   { "GetInstanceInfo", "o", "a{sv}ssa{sv}", bus_containers_handle_get_instance_info,
     METHOD_FLAG_NONE },
+  { "RequestHeader", "", "", bus_containers_handle_request_header,
+    METHOD_FLAG_NONE },
   { NULL, NULL, NULL, NULL }
 };
 static const PropertyHandler containers_property_handlers[] = {

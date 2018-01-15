@@ -108,6 +108,7 @@ typedef struct
   long connection_tv_sec;  /**< Time when we connected (seconds component) */
   long connection_tv_usec; /**< Time when we connected (microsec component) */
   int stamp;               /**< connections->stamp last time we were traversed */
+  BusExtraHeaders want_headers;
 
 #ifdef DBUS_ENABLE_STATS
   int peak_match_rules;
@@ -2453,7 +2454,27 @@ bus_transaction_send (BusTransaction *transaction,
   
   d = BUS_CONNECTION_DATA (destination);
   _dbus_assert (d != NULL);
-  
+
+  /* You might think that this is too late to be setting header fields,
+   * because the message is locked before sending - but remember that
+   * the message isn't actually queued to be sent (and hence locked)
+   * until we know we have enough memory for the entire transaction,
+   * and that doesn't happen until we know all the recipients.
+   * So this is about the last possible time we could edit the header. */
+  if ((d->want_headers & BUS_EXTRA_HEADERS_CONTAINER_INSTANCE) &&
+      dbus_message_get_container_instance (message) == NULL)
+    {
+      const char *path;
+
+      if (sender == NULL ||
+          !bus_containers_connection_is_contained (sender, &path,
+                                                   NULL, NULL))
+        path = "/";
+
+      if (!dbus_message_set_container_instance (message, path))
+        return FALSE;
+    }
+
   to_send = dbus_new (MessageToSend, 1);
   if (to_send == NULL)
     {
@@ -2912,4 +2933,16 @@ bus_connection_be_monitor (DBusConnection  *connection,
   bus_connection_drop_pending_replies (d->connections, connection);
 
   return TRUE;
+}
+
+void
+bus_connection_request_headers (DBusConnection  *connection,
+                                BusExtraHeaders  headers)
+{
+  BusConnectionData *d;
+
+  d = BUS_CONNECTION_DATA (connection);
+  _dbus_assert (d != NULL);
+
+  d->want_headers |= headers;
 }
