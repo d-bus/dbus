@@ -6,6 +6,17 @@ risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
 
+Behaviour changes:
+
+• DBusServer (and hence the dbus-daemon) no longer accepts usernames
+  (login names) for the recommended EXTERNAL authentication mechanism,
+  only numeric user IDs or the empty string. This is not believed to
+  affect real D-Bus clients in practice, because most D-Bus clients
+  send numeric user IDs: the only known client implementation that
+  sends usernames is dbus-java, and that only when run on a system
+  where the com.sun.security.auth.module.UnixSystem.getUid() method is
+  not available. (fd.o #104588, Simon McVittie)
+
 Enhancements:
 
 • D-Bus Specification v0.32
@@ -34,6 +45,11 @@ Enhancements:
   Features property. (fd.o #100317, Simon McVittie)
 
 Fixes:
+
+• Do not look up client-supplied strings in the system user database
+  (NSS or equivalent) when using the recommended EXTERNAL auth mechanism.
+  This could previously lead to a deadlock or timeout in the presence of
+  slow or network-dependent NSS modules. (fd.o #104588, Simon McVittie)
 
 • Report the correct error if OOM is reached while trying to listen
   on a TCP socket (fd.o #89104, Simon McVittie)
