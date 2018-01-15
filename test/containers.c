@@ -47,6 +47,7 @@
 #include "test-utils-glib.h"
 
 typedef struct {
+    TestMainContext *ctx;
     gboolean skip;
     gchar *bus_address;
     GPid daemon_pid;
@@ -64,6 +65,8 @@ typedef struct {
     GDBusProxy *observer_proxy;
     GHashTable *containers_removed;
     guint removed_sub;
+    DBusConnection *libdbus_observer;
+    DBusMessage *latest_shout;
 } Fixture;
 
 typedef struct
@@ -102,6 +105,33 @@ name_gone_set_boolean_cb (GDBusConnection *conn,
 #endif
 
 static void
+iterate_both_main_loops (TestMainContext *ctx)
+{
+  /* TODO: Gluing these two main loops together so they can block would
+   * be better than sleeping, but do we have enough API to do that without
+   * reinventing dbus-glib? */
+  g_usleep (G_USEC_PER_SEC / 100);
+  test_main_context_iterate (ctx, FALSE);
+  g_main_context_iteration (NULL, FALSE);
+}
+
+static DBusHandlerResult
+observe_shouting_cb (DBusConnection *observer,
+                     DBusMessage *message,
+                     void *user_data)
+{
+  Fixture *f = user_data;
+
+  if (dbus_message_is_signal (message, "com.example.Shouting", "Shouted"))
+    {
+      dbus_clear_message (&f->latest_shout);
+      f->latest_shout = dbus_message_ref (message);
+    }
+
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+static void
 instance_removed_cb (GDBusConnection *observer,
                      const gchar *sender,
                      const gchar *path,
@@ -131,6 +161,8 @@ setup (Fixture *f,
 
   if (config == NULL)
     config = &default_config;
+
+  f->ctx = test_main_context_get ();
 
   f->bus_address = test_get_dbus_daemon (config->config_file, TEST_USER_ME,
                                          NULL, &f->daemon_pid);
@@ -162,6 +194,16 @@ setup (Fixture *f,
                                                        G_DBUS_SIGNAL_FLAGS_NONE,
                                                        instance_removed_cb,
                                                        f, NULL);
+
+  /* We have to use libdbus for new header fields, because GDBus doesn't
+   * yet have API for that. */
+  f->libdbus_observer = test_connect_to_bus (f->ctx, f->bus_address);
+  dbus_bus_add_match (f->libdbus_observer,
+                      "interface='com.example.Shouting'", NULL);
+
+  if (!dbus_connection_add_filter (f->libdbus_observer, observe_shouting_cb, f,
+                                   NULL))
+    g_error ("OOM");
 }
 
 /*
@@ -296,6 +338,9 @@ test_basic (Fixture *f,
   guint32 uid;
   GStatBuf stat_buf;
   GVariant *tuple;
+  DBusMessage *libdbus_message = NULL;
+  DBusMessage *libdbus_reply = NULL;
+  DBusError libdbus_error = DBUS_ERROR_INIT;
 
   if (f->skip)
     return;
@@ -343,6 +388,68 @@ test_basic (Fixture *f,
   g_assert_nonnull (tuple);
   g_assert_cmpstr (g_variant_get_type_string (tuple), ==, "()");
   g_clear_pointer (&tuple, g_variant_unref);
+
+  g_test_message ("Receiving signals without requesting extra headers");
+  g_dbus_connection_emit_signal (f->confined_conn, NULL, "/",
+                                 "com.example.Shouting", "Shouted",
+                                 NULL, NULL);
+
+  while (f->latest_shout == NULL)
+    iterate_both_main_loops (f->ctx);
+
+  g_assert_cmpstr (dbus_message_get_container_instance (f->latest_shout), ==,
+                   NULL);
+  dbus_clear_message (&f->latest_shout);
+
+  g_dbus_connection_emit_signal (f->unconfined_conn, NULL, "/",
+                                 "com.example.Shouting", "Shouted",
+                                 NULL, NULL);
+
+  while (f->latest_shout == NULL)
+    iterate_both_main_loops (f->ctx);
+
+  g_assert_cmpstr (dbus_message_get_container_instance (f->latest_shout), ==,
+                   NULL);
+  dbus_clear_message (&f->latest_shout);
+
+  g_test_message ("Receiving signals after requesting extra headers");
+
+  libdbus_message = dbus_message_new_method_call (DBUS_SERVICE_DBUS,
+                                                  DBUS_PATH_DBUS,
+                                                  DBUS_INTERFACE_CONTAINERS1,
+                                                  "RequestHeader");
+  libdbus_reply = test_main_context_call_and_wait (f->ctx,
+                                                   f->libdbus_observer,
+                                                   libdbus_message,
+                                                   DBUS_TIMEOUT_USE_DEFAULT);
+
+  if (dbus_set_error_from_message (&libdbus_error, libdbus_reply))
+    g_error ("%s", libdbus_error.message);
+
+  dbus_clear_message (&libdbus_message);
+  dbus_clear_message (&libdbus_reply);
+
+  g_dbus_connection_emit_signal (f->confined_conn, NULL, "/",
+                                 "com.example.Shouting", "Shouted",
+                                 NULL, NULL);
+
+  while (f->latest_shout == NULL)
+    iterate_both_main_loops (f->ctx);
+
+  g_assert_cmpstr (dbus_message_get_container_instance (f->latest_shout), ==,
+                   f->instance_path);
+  dbus_clear_message (&f->latest_shout);
+
+  g_dbus_connection_emit_signal (f->unconfined_conn, NULL, "/",
+                                 "com.example.Shouting", "Shouted",
+                                 NULL, NULL);
+
+  while (f->latest_shout == NULL)
+    iterate_both_main_loops (f->ctx);
+
+  g_assert_cmpstr (dbus_message_get_container_instance (f->latest_shout), ==,
+                   "/");
+  dbus_clear_message (&f->latest_shout);
 
   g_test_message ("Checking that confined app is not considered privileged...");
   tuple = g_dbus_connection_call_sync (f->confined_conn, DBUS_SERVICE_DBUS,
@@ -1428,6 +1535,15 @@ teardown (Fixture *f,
   g_clear_pointer (&f->containers_removed, g_hash_table_unref);
   g_clear_object (&f->observer_conn);
 
+  if (f->libdbus_observer != NULL)
+    {
+      dbus_connection_remove_filter (f->libdbus_observer,
+                                     observe_shouting_cb, f);
+      dbus_connection_close (f->libdbus_observer);
+    }
+
+  dbus_clear_connection (&f->libdbus_observer);
+
   if (f->unconfined_conn != NULL)
     {
       GError *error = NULL;
@@ -1463,11 +1579,13 @@ teardown (Fixture *f,
       f->daemon_pid = 0;
     }
 
+  dbus_clear_message (&f->latest_shout);
   g_free (f->instance_path);
   g_free (f->socket_path);
   g_free (f->socket_dbus_address);
   g_free (f->bus_address);
   g_clear_error (&f->error);
+  test_main_context_unref (f->ctx);
 }
 
 /*
