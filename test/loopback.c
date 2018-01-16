@@ -31,6 +31,7 @@
 #include <glib/gstdio.h>
 
 #include <dbus/dbus.h>
+#include "dbus/dbus-connection-internal.h"
 
 #include <errno.h>
 #include <string.h>
@@ -163,6 +164,8 @@ test_connect (Fixture *f,
   const char *listening_address = addr;
   char *address;
   DBusAddressEntry **entries;
+  DBusCredentials *creds;
+  DBusString cred_string;
   int n_entries;
   dbus_bool_t ok;
 
@@ -257,6 +260,31 @@ test_connect (Fixture *f,
       test_progress ('.');
       test_main_context_iterate (f->ctx, TRUE);
     }
+
+  /* Wait for the server to have credentials, check that their string
+   * form is non-NULL and log them. We don't make any further assertions,
+   * because we don't really know what to expect. */
+
+  creds = _dbus_connection_get_credentials (f->server_conn);
+
+  while (creds == NULL)
+    {
+      test_progress ('.');
+      test_main_context_iterate (f->ctx, TRUE);
+      creds = _dbus_connection_get_credentials (f->server_conn);
+    }
+
+  g_assert_nonnull (creds);
+
+  if (!_dbus_string_init (&cred_string) ||
+      !_dbus_credentials_to_string_append (creds, &cred_string))
+    g_error ("OOM");
+
+  g_test_message ("Credentials: %s",
+                  _dbus_string_get_const_data (&cred_string));
+  g_assert_cmpstr (_dbus_string_get_const_data (&cred_string), !=, NULL);
+  _dbus_string_free (&cred_string);
+  _dbus_clear_credentials (&creds);
 
   dbus_free (address);
 }
