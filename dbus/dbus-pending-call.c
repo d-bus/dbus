@@ -194,18 +194,27 @@ _dbus_pending_call_set_reply_unlocked (DBusPendingCall *pending,
 }
 
 /**
- * Calls notifier function for the pending call
- * and sets the call to completed.
+ * Sets the pending call to completed
  *
  * @param pending the pending call
- * 
  */
 void
-_dbus_pending_call_complete (DBusPendingCall *pending)
+_dbus_pending_call_start_completion_unlocked (DBusPendingCall *pending)
 {
   _dbus_assert (!pending->completed);
   
   pending->completed = TRUE;
+}
+
+/**
+ * Call the notifier function for the pending call.
+ *
+ * @param pending the pending call
+ */
+void
+_dbus_pending_call_finish_completion (DBusPendingCall *pending)
+{
+  _dbus_assert (pending->completed);
 
   if (pending->function)
     {
