@@ -2325,10 +2325,11 @@ complete_pending_call_and_unlock (DBusConnection  *connection,
 {
   _dbus_pending_call_set_reply_unlocked (pending, message);
   _dbus_pending_call_ref_unlocked (pending); /* in case there's no app with a ref held */
+  _dbus_pending_call_start_completion_unlocked(pending);
   _dbus_connection_detach_pending_call_and_unlock (connection, pending);
- 
+
   /* Must be called unlocked since it invokes app callback */
-  _dbus_pending_call_complete (pending);
+  _dbus_pending_call_finish_completion (pending);
   dbus_pending_call_unref (pending);
 }
 

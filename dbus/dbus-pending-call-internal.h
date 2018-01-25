@@ -41,7 +41,10 @@ void             _dbus_pending_call_set_reply_serial_unlocked    (DBusPendingCal
 DBusConnection * _dbus_pending_call_get_connection_and_lock      (DBusPendingCall    *pending);
 DBusConnection * _dbus_pending_call_get_connection_unlocked      (DBusPendingCall    *pending);
 dbus_bool_t      _dbus_pending_call_get_completed_unlocked       (DBusPendingCall    *pending);
-void             _dbus_pending_call_complete                     (DBusPendingCall    *pending);
+
+void             _dbus_pending_call_start_completion_unlocked    (DBusPendingCall    *pending);
+void             _dbus_pending_call_finish_completion            (DBusPendingCall    *pending);
+
 void             _dbus_pending_call_set_reply_unlocked           (DBusPendingCall    *pending,
                                                                   DBusMessage        *message);
 void             _dbus_pending_call_queue_timeout_error_unlocked (DBusPendingCall    *pending,
