@@ -2527,7 +2527,7 @@ _dbus_connection_block_pending_call (DBusPendingCall *pending)
         {          
           /* block again, we don't have the reply buffered yet. */
           _dbus_connection_do_iteration_unlocked (connection,
-                                                  NULL,
+                                                  pending,
                                                   DBUS_ITERATION_DO_READING |
                                                   DBUS_ITERATION_BLOCK,
                                                   timeout_milliseconds - elapsed_milliseconds);
