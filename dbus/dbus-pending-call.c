@@ -75,8 +75,16 @@ struct DBusPendingCall
   
   dbus_uint32_t reply_serial;                     /**< Expected serial of reply */
 
-  unsigned int completed : 1;                     /**< TRUE if completed */
-  unsigned int timeout_added : 1;                 /**< Have added the timeout */
+  /**
+   * TRUE if some thread has taken responsibility for completing this
+   * pending call: either the pending call has completed, or it is about
+   * to be completed. Protected by the connection lock.
+   */
+  unsigned int completed : 1;
+  /**
+   * TRUE if we have added the timeout. Protected by the connection lock.
+   */
+  unsigned int timeout_added : 1;
 };
 
 static void
@@ -196,6 +204,11 @@ _dbus_pending_call_set_reply_unlocked (DBusPendingCall *pending,
 /**
  * Sets the pending call to completed
  *
+ * This method is called with the connection lock held, to protect
+ * pending->completed. It must be paired with a call to
+ * _dbus_pending_call_finish_completion() after the connection lock has
+ * been released.
+ *
  * @param pending the pending call
  */
 void
@@ -208,6 +221,10 @@ _dbus_pending_call_start_completion_unlocked (DBusPendingCall *pending)
 
 /**
  * Call the notifier function for the pending call.
+ *
+ * This method must be called after the connection lock has been
+ * released, and must be paired with a call to
+ * _dbus_pending_call_start_completion_unlocked().
  *
  * @param pending the pending call
  */
