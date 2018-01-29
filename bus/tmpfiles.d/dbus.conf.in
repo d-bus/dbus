@@ -1,6 +1,6 @@
 # Fields: type; path; mode; uid; gid; age; argument (symlink target)
 
-# Make ${localstatedir}/lib/dbus/
+# Make ${localstatedir}/lib/dbus (required for systemd < 237)
 # Adjust mode and ownership if it already exists.
 d @EXPANDED_LOCALSTATEDIR@/lib/dbus 0755 - - -
 
