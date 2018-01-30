@@ -7,7 +7,7 @@
   <articleinfo>
     <title>D-Bus Specification</title>
     <releaseinfo>Version 0.32</releaseinfo>
-    <date>(not yet released)</date>
+    <date>2018-01-30</date>
     <authorgroup>
       <author>
         <firstname>Havoc</firstname>
@@ -70,6 +70,7 @@
       </author>
     </authorgroup>
    <revhistory>
+     <!--
      <revision>
        <revnumber>latest</revnumber>
        <date>(not yet released)</date>
@@ -77,6 +78,41 @@
        <revremark>
          See <ulink url='http://cgit.freedesktop.org/dbus/dbus/log/doc/dbus-specification.xml'>commit log</ulink>
        </revremark>
+     </revision>
+     -->
+     <revision>
+       <revnumber>0.32</revnumber>
+       <date>2018-01-30</date>
+       <authorinitials>smcv</authorinitials>
+       <revdescription>
+         <itemizedlist>
+           <listitem><simpara>Deprecate hyphen/minus in bus names, with
+             underscore as the recommended replacement</simpara></listitem>
+           <listitem><simpara>Document the convention for escaping
+             leading digits in interface and bus names
+             (org._7_zip)</simpara></listitem>
+           <listitem><simpara>Recommend using SASL EXTERNAL where
+             possible, or DBUS_COOKIE_SHA1 otherwise</simpara></listitem>
+           <listitem><simpara>Message buses should not accept SASL
+             ANONYMOUS</simpara></listitem>
+           <listitem><simpara>Document the meaning of non-empty SASL
+             authorization identity strings</simpara></listitem>
+           <listitem><simpara>Document the optional argument to SASL
+             ERROR</simpara></listitem>
+           <listitem><simpara>Document who sends each SASL command, and
+             the possible replies</simpara></listitem>
+           <listitem><simpara>Document the authentication states used to
+             negotiate Unix fd-passing</simpara></listitem>
+           <listitem><simpara>Servers that relay messages should remove
+             header fields they do not understand</simpara></listitem>
+           <listitem><simpara>Clarify who controls each header
+             field</simpara></listitem>
+           <listitem><simpara>Document the HeaderFiltering message bus
+             feature flag</simpara></listitem>
+           <listitem><simpara>Non-message-bus servers may use the SENDER
+             and DESTINATION fields</simpara></listitem>
+         </itemizedlist>
+       </revdescription>
      </revision>
      <revision>
        <revnumber>0.31</revnumber>
