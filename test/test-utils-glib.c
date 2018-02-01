@@ -346,7 +346,7 @@ test_try_connect_to_bus (TestMainContext *ctx,
 
   g_assert (dbus_bus_get_unique_name (conn) != NULL);
 
-  if (!test_connection_try_setup (ctx, conn))
+  if (ctx != NULL && !test_connection_try_setup (ctx, conn))
     {
       _DBUS_SET_OOM (&error);
       goto fail;
