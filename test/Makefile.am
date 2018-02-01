@@ -221,6 +221,7 @@ endif DBUS_UNIX
 
 installable_manual_tests += \
 	manual-authz \
+	manual-test-thread-blocking \
 	$(NULL)
 endif DBUS_WITH_GLIB
 
@@ -362,6 +363,12 @@ test_monitor_LDADD = \
 
 test_syntax_SOURCES = syntax.c
 test_syntax_LDADD = \
+    libdbus-testutils.la \
+    $(GLIB_LIBS) \
+    $(NULL)
+
+manual_test_thread_blocking_SOURCES = thread-blocking.c
+manual_test_thread_blocking_LDADD = \
     libdbus-testutils.la \
     $(GLIB_LIBS) \
     $(NULL)

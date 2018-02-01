@@ -112,6 +112,7 @@ if(DBUS_WITH_GLIB)
     add_test_executable(test-syslog ${CMAKE_SOURCE_DIR}/../test/internals/syslog.c ${TEST_LIBRARIES})
     add_test_executable(test-uid-permissions ${CMAKE_SOURCE_DIR}/../test/uid-permissions.c ${TEST_LIBRARIES})
     add_helper_executable(manual-authz ${CMAKE_SOURCE_DIR}/../test/manual-authz.c ${TEST_LIBRARIES})
+    add_helper_executable(manual-test-thread-blocking ${CMAKE_SOURCE_DIR}/../test/thread-blocking.c ${TEST_LIBRARIES})
 endif()
 
 ### keep these in creation order, i.e. uppermost dirs first 
