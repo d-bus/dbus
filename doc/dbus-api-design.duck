@@ -60,12 +60,12 @@ $link[>>http://dbus.freedesktop.org/doc/dbus-specification.html#introspection-fo
 specification), and is supported by tools such as $cmd(gdbus-codegen).
 
 Interface files for public API should be installed to
-$code($var($$(datadir$))/dbus-1/interfaces) so that other services can load
+$code($var($$(datadir))/dbus-1/interfaces) so that other services can load
 them. Private APIs should not be installed. There should be one file installed
 per D-Bus interface, named after the interface, containing a single top-level
 $code(<node>) element with a single $code(<interface>) beneath it. For example,
 interface $code(com.example.MyService1.Manager) would be described by file
-$file($var($$(datadir$))/dbus-1/interfaces/com.example.MyService1.Manager.xml):
+$file($var($$(datadir))/dbus-1/interfaces/com.example.MyService1.Manager.xml):
 
 [listing]
   [title]
@@ -189,16 +189,16 @@ convenience APIs and designing APIs which operate on large data sets in a single
 call, rather than requiring as many calls as elements in the data set.
 
 Consider an address book API, $code(com.example.MyService1.AddressBook). It
-might have an $code(AddContact(ss$) → (u$)) method to add a contact (taking name
+might have an $code(AddContact(ss) → (u)) method to add a contact (taking name
 and e-mail address parameters and returning a unique contact ID), and a
-$code(RemoveContact(u$)) method to remove one by ID. In the normal case of
+$code(RemoveContact(u)) method to remove one by ID. In the normal case of
 operating on single contacts in the address book, these calls are optimal.
 However, if the user wants to import a list of contacts, or delete multiple
 contacts simultaneously, one call has to be made per contact — this could take
 a long time for large contact lists.
 
 Instead of the $code(AddContact) and $code(RemoveContact) methods, the interface
-could have an $code(UpdateContacts(a(ss$)au$) → (au$)) method, which takes an array
+could have an $code(UpdateContacts(a(ss)au) → (au)) method, which takes an array
 of structs containing the new contacts’ details, and an array of IDs of the
 contacts to delete, and returns an array of IDs for the new contacts. This
 reduces the number of round trips needed to one.
@@ -479,18 +479,18 @@ $code(Get$var(PropertyName)) and $code(Set$var(PropertyName)) methods.
   For example, consider an object implementing an interface
   $code(com.example.MyService1.SomeInterface) with methods:
   [list]
-  * $code(GetName($) → (s$))
-  * $code(SetName(s$) → ($))
-  * $code(GetStatus($) → (u$))
-  * $code(RunOperation(ss$) → (u$))
+  * $code(GetName() → (s))
+  * $code(SetName(s) → ())
+  * $code(GetStatus() → (u))
+  * $code(RunOperation(ss) → (u))
   and signals:
   [list]
-  * $code(NameChanged(u$))
-  * $code(StatusChanged(u$))
+  * $code(NameChanged(u))
+  * $code(StatusChanged(u))
 
   The interface could be cut down to a single method:
   [list]
-  * $code(RunOperation(ss$) → (u$))
+  * $code(RunOperation(ss) → (u))
   The object could then implement the $code(org.freedesktop.DBus.Properties)
   interface and define properties:
   [list]
@@ -522,11 +522,11 @@ not expose the entire file system hierarchy using $code(ObjectManager).
   For example, consider an object implementing an interface
   $code(com.example.MyService1.AddressBookManager) with methods:
   [list]
-  * $code(GetAddressBooks($) → (ao$))
+  * $code(GetAddressBooks() → (ao))
   and signals:
   [list]
-  * $code(AddressBookAdded(o$))
-  * $code(AddressBookRemoved(o$))
+  * $code(AddressBookAdded(o))
+  * $code(AddressBookRemoved(o))
 
   If the manager object is at path
   $code(/com/example/MyService1/AddressBookManager), each address book is a
@@ -802,8 +802,8 @@ specification)).
 Service files must be named after the service’s well-known name, for example
 file $file(com.example.MyService1.service) for well-known name
 $code(com.example.MyService1). Files must be installed in
-$file($var($$(datadir$))/dbus-1/services) for the session bus and
-$file($var($$(datadir$))/dbus-1/system-services) for the system bus. Note, however,
+$file($var($$(datadir))/dbus-1/services) for the session bus and
+$file($var($$(datadir))/dbus-1/system-services) for the system bus. Note, however,
 that services on the system bus almost always need a
 $link[>#security-policies](security policy) as well.
 
@@ -826,10 +826,10 @@ however there are some steps which you can take when designing an API to ease
 security policy implementation.
 
 D-Bus security policies are written as XML files in
-$file($var($$(datadir$)/dbus-1/system.d)),
-$file($var($$(datadir$)/dbus-1/session.d)),
-$file($var($$(sysconfdir$)/dbus-1/system.d)) and
-$file($var($$(sysconfdir$)/dbus-1/session.d)) and use an allow/deny model, where
+$file($var($$(datadir)/dbus-1/system.d)),
+$file($var($$(datadir)/dbus-1/session.d)),
+$file($var($$(sysconfdir)/dbus-1/system.d)) and
+$file($var($$(sysconfdir)/dbus-1/session.d)) and use an allow/deny model, where
 each message (method call, signal emission, etc.) can be allowed or denied
 according to the sum of all policy rules which match it. Each $code(<allow>) or
 $code(<deny>) rule in the policy should have the $code(own),
@@ -840,7 +840,7 @@ security policy, and consider splitting up methods or providing more restricted
 versions which accept constrained parameters, so that they can be exposed with
 less restrictive security policies if needed by less trusted clients. Since
 dbus-daemon 1.10, security policies should be installed to
-$file($var($$(datadir$))) rather than $(file($var($$(sysconfdir$))); the latter
+$file($var($$(datadir))) rather than $(file($var($$(sysconfdir))); the latter
 is intended for system administators.
 
 Secondly, the default D-Bus security policy for the system bus is restrictive
