@@ -704,8 +704,6 @@ process_config_postinit (BusContext      *context,
   DBusHashTable *service_context_table;
   DBusList *watched_dirs = NULL;
 
-  raise_file_descriptor_limit (context);
-
   service_context_table = bus_config_parser_steal_service_context_table (parser);
   if (!bus_registry_set_service_context_table (context->registry,
 					       service_context_table))
@@ -930,6 +928,11 @@ bus_context_new (const DBusString *config_file,
   if (print_pid_pipe && _dbus_pipe_is_valid (print_pid_pipe) &&
       !_dbus_pipe_is_stdout_or_stderr (print_pid_pipe))
     _dbus_pipe_close (print_pid_pipe, NULL);
+
+  /* Raise the file descriptor limits before dropping the privileges
+   * required to do so.
+   */
+  raise_file_descriptor_limit (context);
 
   /* Here we change our credentials if required,
    * as soon as we've set up our sockets and pidfile.
