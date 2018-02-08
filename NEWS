@@ -3,6 +3,13 @@ dbus 1.12.4 (UNRELEASED)
 
 Fixes:
 
+• When iterating the DBusConnection while blocking on a pending call,
+  don't wait for I/O if that pending call already has a result; and make
+  sure that whether it has a result is propagated in a thread-safe way.
+  This prevents certain multi-threaded calling patterns from blocking
+  until their timeout even when they should have succeeded sooner.
+  (fd.o #102839; Manish Narang, Michael Searle)
+
 • Report the correct error if OOM is reached while trying to listen
   on a TCP socket (fd.o #89104, Simon McVittie)
 
