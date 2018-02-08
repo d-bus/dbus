@@ -25,6 +25,8 @@ Fixes:
   exist, create it before trying to create ${localstatedir}/dbus/machine-id
   (fd.o #104577, Chris Lesiak)
 
+• Fix escaping in dbus-api-design document (fd.o #104925, Philip Withnall)
+
 dbus 1.12.2 (2017-11-13)
 ========================
 
