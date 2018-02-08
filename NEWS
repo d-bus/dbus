@@ -46,6 +46,13 @@ Enhancements:
 
 Fixes:
 
+• When iterating the DBusConnection while blocking on a pending call,
+  don't wait for I/O if that pending call already has a result; and make
+  sure that whether it has a result is propagated in a thread-safe way.
+  This prevents certain multi-threaded calling patterns from blocking
+  until their timeout even when they should have succeeded sooner.
+  (fd.o #102839; Manish Narang, Michael Searle)
+
 • Do not look up client-supplied strings in the system user database
   (NSS or equivalent) when using the recommended EXTERNAL auth mechanism.
   This could previously lead to a deadlock or timeout in the presence of
