@@ -1,10 +1,16 @@
-dbus 1.13.0 (UNRELEASED)
+dbus 1.13.0 (2018-02-08)
 ========================
+
+The “Citispeed Eco 75” release.
 
 This is a new development branch for the adventurous, and comes with a
 risk of regressions. OS distributions should stay with the 1.12.x branch,
 unless they can commit to following the 1.13.x branch until it reaches
 a 1.14.0 stable release at an unspecified point in the future.
+
+In particular, the new Containers API is subject to change and shouldn't
+be enabled in distributions yet, even those aimed at early adopters
+(hello, Arch Linux).
 
 Behaviour changes:
 
