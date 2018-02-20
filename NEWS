@@ -1,7 +1,11 @@
 dbus 1.12.6 (UNRELEASED)
 ========================
 
-...
+Fixes:
+
+• Increase system dbus-daemon's RLIMIT_NOFILE rlimit before it drops
+  privileges, because it won't have permission afterwards.
+  (fd.o #105165, David King)
 
 dbus 1.12.4 (2018-02-08)
 ========================
