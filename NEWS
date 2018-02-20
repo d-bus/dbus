@@ -1,7 +1,12 @@
 dbus 1.13.2 (UNRELEASED)
 ========================
 
-...
+Enhancements:
+
+• When a container manager creates an extra server at runtime, services
+  can now request that messages from connections to that server are
+  tagged with the container instance ID, providing a fast-path for
+  identifying such connections. (fd.o #101899, Simon McVittie)
 
 dbus 1.13.0 (2018-02-08)
 ========================
