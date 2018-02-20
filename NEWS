@@ -8,6 +8,12 @@ Enhancements:
   tagged with the container instance ID, providing a fast-path for
   identifying such connections. (fd.o #101899, Simon McVittie)
 
+Fixes:
+
+• Increase system dbus-daemon's RLIMIT_NOFILE rlimit before it drops
+  privileges, because it won't have permission afterwards.
+  (fd.o #105165, David King)
+
 dbus 1.13.0 (2018-02-08)
 ========================
 
