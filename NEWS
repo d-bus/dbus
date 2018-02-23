@@ -4,7 +4,9 @@ dbus 1.12.6 (UNRELEASED)
 Fixes:
 
 • Increase system dbus-daemon's RLIMIT_NOFILE rlimit before it drops
-  privileges, because it won't have permission afterwards.
+  privileges, because it won't have permission afterwards. This fixes a
+  regression in dbus 1.10.18 and 1.11.0 which made the standard system bus
+  more susceptible to deliberate or accidental denial of service.
   (fd.o #105165, David King)
 
 dbus 1.12.4 (2018-02-08)
