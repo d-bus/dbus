@@ -1,7 +1,13 @@
 D-Bus 1.10.26 (UNRELEASED)
 ==
 
-...
+Fixes:
+
+• Increase system dbus-daemon's RLIMIT_NOFILE rlimit before it drops
+  privileges, because it won't have permission afterwards. This fixes a
+  regression in dbus 1.10.18 and 1.11.0 which made the standard system bus
+  more susceptible to deliberate or accidental denial of service.
+  (fd.o #105165, David King)
 
 D-Bus 1.10.24 (2017-09-25)
 ==
