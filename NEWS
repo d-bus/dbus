@@ -1,5 +1,7 @@
-dbus 1.12.6 (UNRELEASED)
+dbus 1.12.6 (2018-03-01)
 ========================
+
+The “just the one swan, actually” release.
 
 Fixes:
 
