@@ -104,6 +104,7 @@ name_gone_set_boolean_cb (GDBusConnection *conn,
 }
 #endif
 
+#ifdef HAVE_CONTAINERS_TEST
 static void
 iterate_both_main_loops (TestMainContext *ctx)
 {
@@ -114,6 +115,7 @@ iterate_both_main_loops (TestMainContext *ctx)
   test_main_context_iterate (ctx, FALSE);
   g_main_context_iteration (NULL, FALSE);
 }
+#endif
 
 static DBusHandlerResult
 observe_shouting_cb (DBusConnection *observer,
