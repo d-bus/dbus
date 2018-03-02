@@ -1,7 +1,19 @@
 dbus 1.13.4 (UNRELEASED)
 ========================
 
-...
+Enhancements:
+
+• On Linux 4.13 or later, <policy group="…"> now uses the SO_PEERGROUPS
+  credentials-passing socket option to get the effective group IDs
+  of the initiator of the connection. On platforms where that socket
+  option is not available, dbus-daemon continues to look up the
+  connection's user ID in the system user and group databases and
+  assume that it has the groups that would have been granted by
+  initgroups(). (fd.o #103737, #97821; Simon McVittie)
+
+• If the dbus-daemon is compiled for Linux with systemd support, it
+  now informs systemd that it is ready for use via the sd_notify()
+  mechanism. (fd.o #104641; Michal Sekletar, Simon McVittie)
 
 dbus 1.13.2 (2018-03-01)
 ========================
