@@ -232,24 +232,6 @@ bus_selinux_pre_init (void)
 #endif
 }
 
-/*
- * Private Flask definitions; the order of these constants must
- * exactly match that of the structure array below!
- */
-/* security dbus class constants */
-#define SECCLASS_DBUS       1
-
-/* dbus's per access vector constants */
-#define DBUS__ACQUIRE_SVC   1
-#define DBUS__SEND_MSG      2
-
-#ifdef HAVE_SELINUX
-static struct security_class_mapping dbus_map[] = {
-  { "dbus", { "acquire_svc", "send_msg", NULL } },
-  { NULL }
-};
-#endif /* HAVE_SELINUX */
-
 /**
  * Establish dynamic object class and permission mapping and
  * initialize the user space access vector cache (AVC) for D-Bus and set up
@@ -270,13 +252,6 @@ bus_selinux_full_init (BusContext *context, DBusError *error)
     }
 
   _dbus_verbose ("SELinux is enabled in this kernel.\n");
-
-  if (selinux_set_mapping (dbus_map) < 0)
-    {
-      _dbus_warn ("Failed to set up security class mapping (selinux_set_mapping():%s).",
-                   strerror (errno));
-      return FALSE; 
-    }
 
   avc_entry_ref_init (&aeref);
   if (avc_open (NULL, 0) < 0)
@@ -392,19 +367,53 @@ error:
 static dbus_bool_t
 bus_selinux_check (BusSELinuxID        *sender_sid,
                    BusSELinuxID        *override_sid,
-                   security_class_t     target_class,
-                   access_vector_t      requested,
-		   DBusString          *auxdata)
+                   const char          *target_class,
+                   const char          *requested,
+                   DBusString          *auxdata)
 {
+  int saved_errno;
+  security_class_t security_class;
+  access_vector_t requested_access;
+
   if (!selinux_enabled)
     return TRUE;
+
+  security_class = string_to_security_class (target_class);
+  if (security_class == 0)
+    {
+      saved_errno = errno;
+      log_callback (SELINUX_ERROR, "Unknown class %s", target_class);
+      if (security_deny_unknown () == 0)
+        {
+          return TRUE;
+	}
+
+      _dbus_verbose ("Unknown class %s\n", target_class);
+      errno = saved_errno;
+      return FALSE;
+    }
+
+  requested_access = string_to_av_perm (security_class, requested);
+  if (requested_access == 0)
+    {
+      saved_errno = errno;
+      log_callback (SELINUX_ERROR, "Unknown permission %s for class %s", requested, target_class);
+      if (security_deny_unknown () == 0)
+        {
+          return TRUE;
+	}
+
+      _dbus_verbose ("Unknown permission %s for class %s\n", requested, target_class);
+      errno = saved_errno;
+      return FALSE;
+    }
 
   /* Make the security check.  AVC checks enforcing mode here as well. */
   if (avc_has_perm (SELINUX_SID_FROM_BUS (sender_sid),
                     override_sid ?
                     SELINUX_SID_FROM_BUS (override_sid) :
                     bus_sid,
-                    target_class, requested, &aeref, auxdata) < 0)
+                    security_class, requested_access, &aeref, auxdata) < 0)
     {
     switch (errno)
       {
@@ -471,8 +480,8 @@ bus_selinux_allows_acquire_service (DBusConnection     *connection,
   
   ret = bus_selinux_check (connection_sid,
 			   service_sid,
-			   SECCLASS_DBUS,
-			   DBUS__ACQUIRE_SVC,
+			   "dbus",
+			   "acquire_svc",
 			   &auxdata);
 
   _dbus_string_free (&auxdata);
@@ -600,8 +609,8 @@ bus_selinux_allows_send (DBusConnection     *sender,
 
   ret = bus_selinux_check (sender_sid, 
 			   recipient_sid,
-			   SECCLASS_DBUS, 
-			   DBUS__SEND_MSG,
+			   "dbus",
+			   "send_msg",
 			   &auxdata);
 
   _dbus_string_free (&auxdata);
