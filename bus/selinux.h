@@ -28,7 +28,7 @@
 #include "services.h"
 
 dbus_bool_t bus_selinux_pre_init (void);
-dbus_bool_t bus_selinux_full_init(void);
+dbus_bool_t bus_selinux_full_init(BusContext *context, DBusError *error);
 void        bus_selinux_shutdown (void);
 
 dbus_bool_t bus_selinux_enabled  (void);
