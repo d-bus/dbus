@@ -99,6 +99,13 @@ DBusSocket     _dbus_watch_get_socket         (DBusWatch               *watch);
 DBUS_PRIVATE_EXPORT
 DBusPollable   _dbus_watch_get_pollable       (DBusWatch               *watch);
 
+static inline void
+_dbus_clear_watch (DBusWatch **pointer_to_watch)
+{
+  _dbus_clear_pointer_impl (DBusWatch, pointer_to_watch,
+                            _dbus_watch_unref);
+}
+
 /** @} */
 
 DBUS_END_DECLS

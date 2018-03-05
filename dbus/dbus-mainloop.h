@@ -60,6 +60,13 @@ dbus_bool_t _dbus_loop_dispatch       (DBusLoop            *loop);
 int  _dbus_get_oom_wait    (void);
 void _dbus_wait_for_memory (void);
 
+static inline void
+_dbus_clear_loop (DBusLoop **pointer_to_loop)
+{
+  _dbus_clear_pointer_impl (DBusLoop, pointer_to_loop,
+                            _dbus_loop_unref);
+}
+
 #endif /* !DOXYGEN_SHOULD_SKIP_THIS */
 
 #endif /* DBUS_MAINLOOP_H */
