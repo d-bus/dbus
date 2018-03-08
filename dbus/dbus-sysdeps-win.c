@@ -1527,7 +1527,7 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
   else
     {
       dbus_set_error (error,
-                      DBUS_ERROR_INVALID_ARGS,
+                      DBUS_ERROR_BAD_ADDRESS,
                       "Unknown address family %s", family);
       return _dbus_socket_get_invalid ();
     }
