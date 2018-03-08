@@ -1500,10 +1500,13 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
                                      const char     *noncefile,
                                      DBusError      *error)
 {
+  int saved_errno = 0;
+  DBusList *connect_errors = NULL;
   DBusSocket fd = DBUS_SOCKET_INIT;
   int res;
   struct addrinfo hints;
   struct addrinfo *ai, *tmp;
+  DBusError *connect_error;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
@@ -1541,8 +1544,8 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
       dbus_set_error (error,
                       _dbus_error_from_errno (res),
                       "Failed to lookup host/port: \"%s:%s\": %s (%d)",
-                      host, port, _dbus_strerror(res), res);
-      return _dbus_socket_get_invalid ();
+                      host, port, _dbus_strerror (res), res);
+      goto out;
     }
 
   tmp = ai;
@@ -1550,21 +1553,45 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
     {
       if ((fd.sock = socket (tmp->ai_family, SOCK_STREAM, 0)) == INVALID_SOCKET)
         {
-          DBUS_SOCKET_SET_ERRNO ();
+          saved_errno = _dbus_get_low_level_socket_errno ();
           dbus_set_error (error,
-                          _dbus_error_from_errno (errno),
+                          _dbus_error_from_errno (saved_errno),
                           "Failed to open socket: %s",
-                          _dbus_strerror_from_errno ());
+                          _dbus_strerror (saved_errno));
           freeaddrinfo(ai);
-          return _dbus_socket_get_invalid ();
+          _dbus_socket_invalidate (&fd);
+          goto out;
         }
       _DBUS_ASSERT_ERROR_IS_CLEAR(error);
 
       if (connect (fd.sock, (struct sockaddr*) tmp->ai_addr, tmp->ai_addrlen) == SOCKET_ERROR)
         {
-          DBUS_SOCKET_SET_ERRNO ();
+          saved_errno = _dbus_get_low_level_socket_errno ();
           closesocket(fd.sock);
-          fd.sock = INVALID_SOCKET;
+          _dbus_socket_invalidate (&fd);
+
+          connect_error = dbus_new0 (DBusError, 1);
+
+          if (connect_error == NULL)
+            {
+              _DBUS_SET_OOM (error);
+              goto out;
+            }
+
+          dbus_error_init (connect_error);
+          _dbus_set_error_with_inet_sockaddr (connect_error,
+                                              tmp->ai_addr, tmp->ai_addrlen,
+                                              "Failed to connect to socket",
+                                              saved_errno);
+
+          if (!_dbus_list_append (&connect_errors, connect_error))
+            {
+              dbus_error_free (connect_error);
+              dbus_free (connect_error);
+              _DBUS_SET_OOM (error);
+              goto out;
+            }
+
           tmp = tmp->ai_next;
           continue;
         }
@@ -1575,11 +1602,9 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
 
   if (!_dbus_socket_is_valid (fd))
     {
-      dbus_set_error (error,
-                      _dbus_error_from_errno (errno),
-                      "Failed to connect to socket \"%s:%s\" %s",
-                      host, port, _dbus_strerror_from_errno ());
-      return _dbus_socket_get_invalid ();
+      _dbus_combine_tcp_errors (&connect_errors, "Failed to connect",
+                                host, port, error);
+      goto out;
     }
 
   if (noncefile != NULL)
@@ -1601,7 +1626,8 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
       if (!ret)
         {
           closesocket (fd.sock);
-          return _dbus_socket_get_invalid ();
+          _dbus_socket_invalidate (&fd);
+          goto out;
         }
     }
 
@@ -1611,7 +1637,15 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
   if (!_dbus_set_socket_nonblocking (fd, error))
     {
       closesocket (fd.sock);
-      return _dbus_socket_get_invalid ();
+      _dbus_socket_invalidate (&fd);
+      goto out;
+    }
+
+out:
+  while ((connect_error = _dbus_list_pop_first (&connect_errors)))
+    {
+      dbus_error_free (connect_error);
+      dbus_free (connect_error);
     }
 
   return fd;
