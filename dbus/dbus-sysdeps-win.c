@@ -1640,8 +1640,11 @@ _dbus_listen_tcp_socket (const char     *host,
                          DBusSocket    **fds_p,
                          DBusError      *error)
 {
-  DBusSocket *listen_fd = NULL;
+  int saved_errno;
   int nlisten_fd = 0, res, i, port_num = -1;
+  DBusList *bind_errors = NULL;
+  DBusError *bind_error = NULL;
+  DBusSocket *listen_fd = NULL;
   struct addrinfo hints;
   struct addrinfo *ai, *tmp;
 
@@ -1689,6 +1692,7 @@ _dbus_listen_tcp_socket (const char     *host,
 #endif
 
  redo_lookup_with_port:
+  ai = NULL;
   if ((res = getaddrinfo(host, port, &hints, &ai)) != 0 || !ai)
     {
       dbus_set_error (error,
@@ -1704,41 +1708,71 @@ _dbus_listen_tcp_socket (const char     *host,
       DBusSocket fd = DBUS_SOCKET_INIT, *newlisten_fd;
       if ((fd.sock = socket (tmp->ai_family, SOCK_STREAM, 0)) == INVALID_SOCKET)
         {
-          DBUS_SOCKET_SET_ERRNO ();
+          saved_errno = _dbus_get_low_level_socket_errno ();
           dbus_set_error (error,
-                          _dbus_error_from_errno (errno),
+                          _dbus_error_from_errno (saved_errno),
                          "Failed to open socket: %s",
-                         _dbus_strerror_from_errno ());
+                         _dbus_strerror (saved_errno));
           goto failed;
         }
       _DBUS_ASSERT_ERROR_IS_CLEAR(error);
 
       if (bind (fd.sock, (struct sockaddr*) tmp->ai_addr, tmp->ai_addrlen) == SOCKET_ERROR)
         {
-          DBUS_SOCKET_SET_ERRNO ();
+          saved_errno = _dbus_get_low_level_socket_errno ();
           closesocket (fd.sock);
-          if (errno == WSAEADDRINUSE)
-          {
-              /* Calling this function with port=0 tries to
-               * bind the same port twice, so we should
-               * ignore the second bind.
-               */
-              tmp = tmp->ai_next;
-              continue;
-          }
-          dbus_set_error (error, _dbus_error_from_errno (errno),
-                          "Failed to bind socket \"%s:%s\": %s",
-                          host ? host : "*", port, _dbus_strerror_from_errno ());
-          goto failed;
-    }
+
+          /*
+           * We don't treat this as a fatal error, because there might be
+           * other addresses that we can listen on. In particular:
+           *
+           * - If saved_errno is WSAEADDRINUSE after we
+           *   "goto redo_lookup_with_port" after binding a port on one of the
+           *   possible addresses, we will try to bind that same port on
+           *   every address, including the same address again for a second
+           *   time, which will fail with WSAEADDRINUSE .
+           *
+           * - If saved_errno is WSAEADDRINUSE, it might be because binding to
+           *   an IPv6 address implicitly binds to a corresponding IPv4
+           *   address or vice versa.
+           *
+           * - If saved_errno is WSAEADDRNOTAVAIL when we asked for family
+           *   AF_UNSPEC, it might be because IPv6 is disabled for this
+           *   particular interface.
+           */
+          bind_error = dbus_new0 (DBusError, 1);
+
+          if (bind_error == NULL)
+            {
+              _DBUS_SET_OOM (error);
+              goto failed;
+            }
+
+          dbus_error_init (bind_error);
+          _dbus_set_error_with_inet_sockaddr (bind_error, tmp->ai_addr, tmp->ai_addrlen,
+                                              "Failed to bind socket",
+                                              saved_errno);
+
+          if (!_dbus_list_append (&bind_errors, bind_error))
+            {
+              dbus_error_free (bind_error);
+              dbus_free (bind_error);
+              _DBUS_SET_OOM (error);
+              goto failed;
+            }
+
+          /* Try the next address, maybe it will work better */
+          tmp = tmp->ai_next;
+          continue;
+        }
 
       if (listen (fd.sock, 30 /* backlog */) == SOCKET_ERROR)
         {
-          DBUS_SOCKET_SET_ERRNO ();
-          dbus_set_error (error, _dbus_error_from_errno (errno),
-                          "Failed to listen on socket \"%s:%s\": %s",
-                          host ? host : "*", port, _dbus_strerror_from_errno ());
+          saved_errno = _dbus_get_low_level_socket_errno ();
           closesocket (fd.sock);
+          _dbus_set_error_with_inet_sockaddr (error, tmp->ai_addr, tmp->ai_addrlen,
+                                              "Failed to listen on socket",
+                                              saved_errno);
           goto failed;
         }
 
@@ -1766,15 +1800,15 @@ _dbus_listen_tcp_socket (const char     *host,
               socklen_t addrlen = sizeof(addr);
               char portbuf[NI_MAXSERV];
 
-              if (getsockname(fd.sock, &addr.Address, &addrlen) == SOCKET_ERROR ||
+              if (getsockname (fd.sock, &addr.Address, &addrlen) == SOCKET_ERROR ||
                 (res = getnameinfo (&addr.Address, addrlen, NULL, 0,
                                     portbuf, sizeof(portbuf),
                                     NI_NUMERICSERV)) != 0)
                 {
-                  DBUS_SOCKET_SET_ERRNO ();
-                  dbus_set_error (error, _dbus_error_from_errno (errno),
+                  saved_errno = _dbus_get_low_level_socket_errno ();
+                  dbus_set_error (error, _dbus_error_from_errno (saved_errno),
                                   "Failed to resolve port \"%s:%s\": %s",
-                                  host ? host : "*", port, _dbus_strerror_from_errno());
+                                  host ? host : "*", port, _dbus_strerror (saved_errno));
                   goto failed;
                 }
               if (!_dbus_string_append(retport, portbuf))
@@ -1805,11 +1839,8 @@ _dbus_listen_tcp_socket (const char     *host,
 
   if (!nlisten_fd)
     {
-      _dbus_win_set_errno (WSAEADDRINUSE);
-      dbus_set_error (error, _dbus_error_from_errno (errno),
-                      "Failed to bind socket \"%s:%s\": %s",
-                      host ? host : "*", port, _dbus_strerror_from_errno ());
-      return -1;
+      _dbus_combine_tcp_errors (&bind_errors, "Failed to bind", host, port, error);
+      goto failed;
     }
 
   sscanf(_dbus_string_get_const_data(retport), "%d", &port_num);
@@ -1825,6 +1856,13 @@ _dbus_listen_tcp_socket (const char     *host,
 
   *fds_p = listen_fd;
 
+  /* This list might be non-empty even on success, because we might be
+   * ignoring WSAEADDRINUSE or WSAEADDRNOTAVAIL */
+  while ((bind_error = _dbus_list_pop_first (&bind_errors)))
+    {
+      dbus_error_free (bind_error);
+      dbus_free (bind_error);
+    }
   return nlisten_fd;
 
  failed:
@@ -1832,6 +1870,13 @@ _dbus_listen_tcp_socket (const char     *host,
     freeaddrinfo(ai);
   for (i = 0 ; i < nlisten_fd ; i++)
     closesocket (listen_fd[i].sock);
+
+  while ((bind_error = _dbus_list_pop_first (&bind_errors)))
+    {
+      dbus_error_free (bind_error);
+      dbus_free (bind_error);
+    }
+
   dbus_free(listen_fd);
   return -1;
 }
