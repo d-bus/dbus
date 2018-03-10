@@ -1611,17 +1611,8 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
     {
       DBusString noncefileStr;
       dbus_bool_t ret;
-      if (!_dbus_string_init (&noncefileStr) ||
-          !_dbus_string_append(&noncefileStr, noncefile))
-        {
-          closesocket (fd.sock);
-          dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
-          return _dbus_socket_get_invalid ();
-        }
-
+      _dbus_string_init_const (&noncefileStr, noncefile);
       ret = _dbus_send_nonce (fd, &noncefileStr, error);
-
-      _dbus_string_free (&noncefileStr);
 
       if (!ret)
         {
