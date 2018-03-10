@@ -1739,7 +1739,9 @@ _dbus_listen_tcp_socket (const char     *host,
   tmp = ai;
   while (tmp)
     {
+      const int reuseaddr = 1, tcp_nodelay_on = 1;
       DBusSocket fd = DBUS_SOCKET_INIT, *newlisten_fd;
+
       if ((fd.sock = socket (tmp->ai_family, SOCK_STREAM, 0)) == INVALID_SOCKET)
         {
           saved_errno = _dbus_get_low_level_socket_errno ();
@@ -1750,6 +1752,22 @@ _dbus_listen_tcp_socket (const char     *host,
           goto failed;
         }
       _DBUS_ASSERT_ERROR_IS_CLEAR(error);
+
+      if (setsockopt (fd.sock, SOL_SOCKET, SO_REUSEADDR, (const char *)&reuseaddr, sizeof(reuseaddr)) == SOCKET_ERROR)
+        {
+          saved_errno = _dbus_get_low_level_socket_errno ();
+          _dbus_warn ("Failed to set socket option \"%s:%s\": %s",
+                      host ? host : "*", port, _dbus_strerror (saved_errno));
+        }
+
+      /* Nagle's algorithm imposes a huge delay on the initial messages
+         going over TCP. */
+      if (setsockopt (fd.sock, IPPROTO_TCP, TCP_NODELAY, (const char *)&tcp_nodelay_on, sizeof (tcp_nodelay_on)) == SOCKET_ERROR)
+        {
+          saved_errno = _dbus_get_low_level_socket_errno ();
+          _dbus_warn ("Failed to set TCP_NODELAY socket option \"%s:%s\": %s",
+                      host ? host : "*", port, _dbus_strerror (saved_errno));
+        }
 
       if (bind (fd.sock, (struct sockaddr*) tmp->ai_addr, tmp->ai_addrlen) == SOCKET_ERROR)
         {
