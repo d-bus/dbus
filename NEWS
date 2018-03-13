@@ -1,6 +1,12 @@
 dbus 1.13.4 (UNRELEASED)
 ========================
 
+Dependencies:
+
+• All Windows builds now require Windows Vista or later.
+  (Note that we do not recommend or support use of dbus on operating
+  systems outside their vendor's security support lifetime, such as Vista.)
+
 Enhancements:
 
 • On Linux 4.13 or later, <policy group="…"> now uses the SO_PEERGROUPS
@@ -14,6 +20,23 @@ Enhancements:
 • If the dbus-daemon is compiled for Linux with systemd support, it
   now informs systemd that it is ready for use via the sd_notify()
   mechanism. (fd.o #104641; Michal Sekletar, Simon McVittie)
+
+• Failing to bind a TCP socket to an address produces better error
+  messages. (fd.o #61922; Simon McVittie, Ralf Habacker)
+
+• Windows builds now set the SO_REUSEADDR and TCP_NODELAY options on
+  TCP sockets (as Unix builds already did), which should improve
+  robustness and performance (fd.o #61922, Ralf Habacker)
+
+• Windows executables built with cmake have version information.
+  When building for Windows with Autotools, only libdbus-1-3.dll
+  has version information, matching previous behaviour with cmake.
+  (fd.o #103387, Ralf Habacker)
+
+Fixes:
+
+• Listening on TCP sockets copes better with IPv6 being disabled
+  (fd.o #61922; Ralf Habacker, Simon McVittie)
 
 dbus 1.13.2 (2018-03-01)
 ========================
