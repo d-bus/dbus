@@ -38,6 +38,15 @@ Fixes:
 • Listening on TCP sockets copes better with IPv6 being disabled
   (fd.o #61922; Ralf Habacker, Simon McVittie)
 
+Internal changes:
+
+• The _DBUS_GNUC_WARN_UNUSED_RESULT macro has been replaced with
+  _DBUS_WARN_UNUSED_RESULT, which is effective with gcc, clang and MSVC
+  (with cl.exe /analyze). Note that for MSVC compatibility, it must
+  appear before the return type in function declarations, whereas the
+  older macro could also have appeared after the arguments.
+  (fd.o #105460; Daniel Wendt, Ralf Habacker)
+
 dbus 1.13.2 (2018-03-01)
 ========================
 
