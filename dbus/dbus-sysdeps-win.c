@@ -1652,16 +1652,17 @@ out:
  * @param port the port to listen on, if zero a free port will be used 
  * @param family the address family to listen on, NULL for all
  * @param retport string to return the actual port listened on
+ * @param retfamily string to return the actual family listened on
  * @param fds_p location to store returned file descriptors
  * @param error return location for errors
  * @returns the number of listening file descriptors or -1 on error
  */
-
 int
 _dbus_listen_tcp_socket (const char     *host,
                          const char     *port,
                          const char     *family,
                          DBusString     *retport,
+                         const char    **retfamily,
                          DBusSocket    **fds_p,
                          DBusError      *error)
 {
@@ -1672,6 +1673,8 @@ _dbus_listen_tcp_socket (const char     *host,
   DBusSocket *listen_fd = NULL;
   struct addrinfo hints;
   struct addrinfo *ai, *tmp;
+  dbus_bool_t have_ipv4 = FALSE;
+  dbus_bool_t have_ipv6 = FALSE;
 
   // On Vista, sockaddr_gen must be a sockaddr_in6, and not a sockaddr_in6_old
   //That's required for family == IPv6(which is the default on Vista if family is not given)
@@ -1831,6 +1834,11 @@ _dbus_listen_tcp_socket (const char     *host,
       listen_fd[nlisten_fd] = fd;
       nlisten_fd++;
 
+      if (tmp->ai_addr->sa_family == AF_INET)
+        have_ipv4 = TRUE;
+      else if (tmp->ai_addr->sa_family == AF_INET6)
+        have_ipv6 = TRUE;
+
       if (!_dbus_string_get_length(retport))
         {
           /* If the user didn't specify a port, or used 0, then
@@ -1885,6 +1893,11 @@ _dbus_listen_tcp_socket (const char     *host,
       _dbus_combine_tcp_errors (&bind_errors, "Failed to bind", host, port, error);
       goto failed;
     }
+
+  if (have_ipv4 && !have_ipv6)
+    *retfamily = "ipv4";
+  else if (!have_ipv4 && have_ipv6)
+    *retfamily = "ipv6";
 
   sscanf(_dbus_string_get_const_data(retport), "%d", &port_num);
 

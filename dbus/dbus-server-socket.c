@@ -429,7 +429,8 @@ _dbus_server_new_for_tcp_socket (const char     *host,
   DBusString host_str;    /* Initialized as const later, not freed */
   DBusString port_str = _DBUS_STRING_INIT_INVALID;
   DBusNonceFile *noncefile = NULL;
-  
+  const char *family_used = NULL;
+
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
 
   if (!_dbus_string_init (&address))
@@ -457,6 +458,7 @@ _dbus_server_new_for_tcp_socket (const char     *host,
 
   nlisten_fds =_dbus_listen_tcp_socket (bind, port, family,
                                         &port_str,
+                                        &family_used,
                                         &listen_fds, error);
   if (nlisten_fds <= 0)
     {
@@ -473,9 +475,9 @@ _dbus_server_new_for_tcp_socket (const char     *host,
       dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
       goto failed;
     }
-  if (family &&
+  if (family_used &&
       (!_dbus_string_append (&address, ",family=") ||
-       !_dbus_string_append (&address, family)))
+       !_dbus_string_append (&address, family_used)))
     {
       dbus_set_error (error, DBUS_ERROR_NO_MEMORY, NULL);
       goto failed;

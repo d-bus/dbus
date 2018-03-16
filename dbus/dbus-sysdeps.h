@@ -237,6 +237,7 @@ int _dbus_listen_tcp_socket   (const char     *host,
                                const char     *port,
                                const char     *family,
                                DBusString     *retport,
+                               const char    **retfamily,
                                DBusSocket    **fds_p,
                                DBusError      *error);
 DBusSocket _dbus_accept       (DBusSocket      listen_fd);
