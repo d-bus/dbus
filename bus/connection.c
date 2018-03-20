@@ -1064,7 +1064,7 @@ bus_connection_get_unix_groups  (DBusConnection   *connection,
       *n_groups = n;
       *groups = dbus_new (unsigned long, n);
 
-      if (groups == NULL)
+      if (*groups == NULL)
         {
           BUS_SET_OOM (error);
           return FALSE;
