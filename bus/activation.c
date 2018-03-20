@@ -862,7 +862,6 @@ populate_environment (BusActivation *activation)
    * - TERM, WATCHDOG_*: Should not be set for dbus-daemon, so not applicable
    * - MAINPID, SERVICE_RESULT, EXIT_CODE, EXIT_STATUS: Not set for ExecStart,
    *   so not applicable
-   * - INVOCATION_ID: TODO: Do we want to clear this or not? It isn't clear.
    */
 
   /* We give activated services their own Journal stream to avoid their
@@ -877,6 +876,13 @@ populate_environment (BusActivation *activation)
   /* This is dbus-daemon's status notification, not the activatable service's
    * (and NotifyAccess wouldn't let it write here anyway) */
   _dbus_hash_table_remove_string (activation->environment, "NOTIFY_SOCKET");
+
+  /* This identifies the dbus-daemon invocation. Whether it should be
+   * inherited by "smaller" services isn't entirely clear-cut, but not
+   * inheriting it makes traditional D-Bus activation under systemd a
+   * little more consistent with systemd activation.
+   * https://lists.freedesktop.org/archives/systemd-devel/2018-March/040467.html */
+  _dbus_hash_table_remove_string (activation->environment, "INVOCATION_ID");
 
   return retval;
 }
