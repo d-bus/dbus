@@ -925,7 +925,7 @@ _dbus_combine_tcp_errors (DBusList **sources,
   else
     {
       DBusList *iter;
-      const char *name;
+      const char *name = NULL;
 
       /* If there was more than one error, concatenate all the
        * errors' diagnostic messages, and use their common error
