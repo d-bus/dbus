@@ -1026,7 +1026,7 @@ socket_handle_watch (DBusTransport *transport,
                        flags);
       else
         _dbus_verbose ("asked to handle watch %p on fd %" DBUS_SOCKET_FORMAT " that we don't recognize\n",
-                       watch, dbus_watch_get_socket (watch));
+                       watch, _dbus_socket_printable (_dbus_watch_get_socket (watch)));
     }
 #endif /* DBUS_ENABLE_VERBOSE_MODE */
 
