@@ -82,19 +82,33 @@ case "$ci_distro" in
         # travis-ci has a sources list for Chrome which doesn't support i386
         : | $sudo tee /etc/apt/sources.list.d/google-chrome.list
 
-        if [ "$ci_host" = mingw ]; then
-            $sudo dpkg --add-architecture i386
-        fi
+        case "$ci_host" in
+            (i686-w64-mingw32)
+                $sudo dpkg --add-architecture i386
+                ;;
+            (x86_64-w64-mingw32)
+                # nothing required, travis-ci is an amd64 system
+                ;;
+        esac
 
         $sudo apt-get -qq -y update
 
-        if [ "$ci_host" = mingw ]; then
-            $sudo apt-get -qq -y install \
-                binutils-mingw-w64-i686 \
-                g++-mingw-w64-i686 \
-                wine:i386 \
-                ${NULL}
-        fi
+        case "$ci_host" in
+            (i686-w64-mingw32)
+                $sudo apt-get -qq -y install \
+                    binutils-mingw-w64-i686 \
+                    g++-mingw-w64-i686 \
+                    wine:i386 \
+                    ${NULL}
+                ;;
+            (x86_64-w64-mingw32)
+                $sudo apt-get -qq -y install \
+                    binutils-mingw-w64-x86-64\
+                    g++-mingw-w64-x86-64 \
+                    wine:amd64 \
+                    ${NULL}
+                ;;
+        esac
 
         $sudo apt-get -qq -y install \
             autoconf-archive \
