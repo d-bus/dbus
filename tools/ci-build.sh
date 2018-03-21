@@ -94,9 +94,13 @@ cd ci-build-${ci_variant}-${ci_host}
 make="make -j${ci_parallel} V=1 VERBOSE=1"
 
 case "$ci_host" in
-    (mingw)
-        mirror=http://repo.msys2.org/mingw/i686
-        mingw="$(pwd)/mingw32"
+    (*-w64-mingw32)
+        mirror=http://repo.msys2.org/mingw/${ci_host%%-*}
+        if [ "${ci_host%%-*}" = i686 ]; then
+            mingw="$(pwd)/mingw32"
+        else
+            mingw="$(pwd)/mingw64"
+        fi
         install -d "${mingw}"
         export PKG_CONFIG_LIBDIR="${mingw}/lib/pkgconfig"
         export PKG_CONFIG_PATH=
@@ -111,8 +115,8 @@ case "$ci_host" in
             libffi-3.2.1-3 \
             zlib-1.2.8-9 \
             ; do
-            wget ${mirror}/mingw-w64-i686-${pkg}-any.pkg.tar.xz
-            tar -xvf mingw-w64-i686-${pkg}-any.pkg.tar.xz
+            wget ${mirror}/mingw-w64-${ci_host%%-*}-${pkg}-any.pkg.tar.xz
+            tar -xvf mingw-w64-${ci_host%%-*}-${pkg}-any.pkg.tar.xz
         done
         export TMPDIR=/tmp
         ;;
@@ -126,9 +130,13 @@ case "$ci_buildsys" in
                 set _ "$@"
                 set "$@" --enable-developer --enable-tests
                 # Enable optional features that are off by default
-                if [ "$ci_host" != mingw ]; then
-                    set "$@" --enable-user-session
-                fi
+                case "$ci_host" in
+                    *-w64-mingw32)
+                        ;;
+                    *)
+                        set "$@" --enable-user-session
+                        ;;
+                esac
                 shift
                 # The test coverage for OOM-safety is too
                 # verbose to be useful on travis-ci.
@@ -196,10 +204,10 @@ case "$ci_buildsys" in
         esac
 
         case "$ci_host" in
-            (mingw)
+            (*-w64-mingw32)
                 set _ "$@"
                 set "$@" --build="$(build-aux/config.guess)"
-                set "$@" --host=i686-w64-mingw32
+                set "$@" --host="${ci_host}"
                 set "$@" CFLAGS=-static-libgcc
                 set "$@" CXXFLAGS=-static-libgcc
                 # don't run tests yet, Wine needs Xvfb and
@@ -252,9 +260,9 @@ case "$ci_buildsys" in
 
     (cmake)
         case "$ci_host" in
-            (mingw)
+            (*-w64-mingw32)
                 set _ "$@"
-                set "$@" -D CMAKE_TOOLCHAIN_FILE="${srcdir}/cmake/i686-w64-mingw32.cmake"
+                set "$@" -D CMAKE_TOOLCHAIN_FILE="${srcdir}/cmake/${ci_host}.cmake"
                 set "$@" -D CMAKE_PREFIX_PATH="${mingw}"
                 set "$@" -D CMAKE_INCLUDE_PATH="${mingw}/include"
                 set "$@" -D CMAKE_LIBRARY_PATH="${mingw}/lib"
