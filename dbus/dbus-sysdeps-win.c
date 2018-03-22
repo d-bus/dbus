@@ -2556,7 +2556,7 @@ static void dump_backtrace_for_thread (HANDLE hThread)
             DPRINTF ("%3d %s", i++, pSymbol->Name);
         }
       else
-        DPRINTF ("%3d 0x%lx", i++, sf.AddrPC.Offset);
+        DPRINTF ("%3d 0x%Ix", i++, sf.AddrPC.Offset);
 
       line.SizeOfStruct = sizeof(IMAGEHLP_LINE);
       if (SymGetLineFromAddr (GetCurrentProcess (), sf.AddrPC.Offset, &dwDisplacement, &line))
