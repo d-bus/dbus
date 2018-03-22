@@ -1,6 +1,8 @@
 dbus 1.13.4 (UNRELEASED)
 ========================
 
+The “parsimonious topping” release.
+
 Dependencies:
 
 • All Windows builds now require Windows Vista or later.
