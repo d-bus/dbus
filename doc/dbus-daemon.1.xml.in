@@ -491,6 +491,10 @@ exist, then all known mechanisms are allowed.  If there are multiple
 &lt;auth&gt; elements, all the listed mechanisms are allowed.  The order in
 which mechanisms are listed is not meaningful.</para>
 
+<para>On non-Windows operating systems, allowing only the
+  <literal>EXTERNAL</literal> authentication
+  mechanism is strongly recommended. This is the default for the
+  well-known system bus and for the well-known session bus.</para>
 
 <para>Example: &lt;auth&gt;EXTERNAL&lt;/auth&gt;</para>
 
