@@ -3543,6 +3543,10 @@
       </para>
       <para>
         Unix domain sockets are not available on Windows.
+        On all other platforms, they are the recommended transport for
+        D-Bus, either used alone or in conjunction with
+        <link linkend="transports-systemd">systemd</link> or
+        <link linkend="transports-launchd">launchd</link> addresses.
       </para>
       <para>
         Unix addresses that specify <literal>path</literal> or
@@ -3691,7 +3695,8 @@
       </para>
       <para>
         The systemd transport accepts only one or more Unix domain or
-        TCP streams sockets passed in via socket activation.
+        TCP streams sockets passed in via socket activation. Using
+        Unix domain sockets is strongly recommended.
       </para>
       <para>
         The systemd transport is not available on non-Linux operating systems.
