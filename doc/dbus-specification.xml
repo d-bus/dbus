@@ -3731,6 +3731,16 @@
         mechanism does not work for this transport.
       </para>
       <para>
+        Developers are sometimes tempted to use remote TCP as a debugging
+        tool. However, if this functionality is left enabled in finished
+        products, the result will be dangerously insecure. Instead of
+        using remote TCP, developers should <ulink
+          url="https://lists.freedesktop.org/archives/dbus/2018-April/017447.html"
+          >relay connections via Secure Shell or a similar protocol</ulink>.
+        <!-- TODO: Ideally someone would write a more formal guide to
+             remote D-Bus debugging, and we could link to that instead -->
+      </para>
+      <para>
         All <literal>tcp</literal> addresses are listenable.
         <literal>tcp</literal> addresses in which both
         <literal>host</literal> and <literal>port</literal> are
