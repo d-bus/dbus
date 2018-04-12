@@ -148,8 +148,10 @@ bus.</para>
   <varlistentry>
   <term><option>--address[=ADDRESS]</option></term>
   <listitem>
-<para>Set the address to listen on. This option overrides the address
-configured in the configuration file.</para>
+    <para>Set the address to listen on. This option overrides the address
+      configured in the configuration file via the
+      <literal>&lt;listen&gt;</literal> directive.
+      See the documentation of that directive for more details.</para>
   </listitem>
   </varlistentry>
   <varlistentry>
@@ -395,6 +397,24 @@ effect unless the ANONYMOUS mechanism has also been enabled using the
 address is in the standard D-Bus format that contains
 a transport name plus possible parameters/options.</para>
 
+<para>On platforms other than Windows, <literal>unix</literal>-based
+  transports (<literal>unix</literal>, <literal>systemd</literal>,
+  <literal>launchd</literal>) are the default for both the well-known
+  system bus and the well-known session bus, and are strongly
+  recommended.</para>
+
+<para>
+  On Windows, <literal>unix</literal>-based transports are not available,
+  so TCP-based transports must be used.
+  Similar to remote X11, the <literal>tcp</literal> and
+  <literal>nonce-tcp</literal> transports have no integrity or
+  confidentiality protection, so they should normally only be
+  used across the local loopback interface, for example using an
+  address like <literal>tcp:host=127.0.0.1</literal> or
+  <literal>nonce-tcp:host=localhost</literal>. In particular,
+  configuring the well-known system bus or the well-known session
+  bus to listen on a non-loopback TCP address is insecure.
+</para>
 
 <para>Example: &lt;listen&gt;unix:path=/tmp/foo&lt;/listen&gt;</para>
 
