@@ -3809,6 +3809,32 @@
         the higher-level authentication mechanisms described in the
         Authentication section.
       </para>
+      <para>
+        The nonce-tcp transport is conceptually similar to a combination
+        of the <link linkend="auth-mechanisms-sha">DBUS_COOKIE_SHA1</link>
+        authentication mechanism and the
+        <link linkend="transports-tcp-sockets">tcp</link> transport,
+        and appears to have originally been implemented as a result of
+        a misunderstanding of the SASL authentication mechanisms.
+      </para>
+      <para>
+        Like the ordinary tcp transport, the nonce-tcp transport has no
+        integrity or confidentiality protection, so it should normally
+        only be used across the local loopback interface, for example
+        using an address like <literal>tcp:host=127.0.0.1</literal> or
+        <literal>tcp:host=localhost</literal>. Other uses are insecure.
+        See <xref linkend="transports-tcp-sockets"/> for more
+        information on situations where these transports have been used,
+        and alternatives to these transports.
+      </para>
+      <para>
+        Implementations of D-Bus on Windows operating systems normally
+        use a nonce-tcp transport via the local loopback interface.
+        This is because the
+        <link linkend="transports-unix-domain-sockets">unix</link>
+        transport, which would otherwise be recommended, is not
+        available on these operating systems.
+      </para>
 
       <para>
         On start, the server generates a random 16 byte nonce and writes it
