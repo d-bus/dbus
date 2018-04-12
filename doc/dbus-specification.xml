@@ -3717,8 +3717,13 @@
         located on the same or different hosts.
       </para>
       <para>
-        Using tcp transport without any additional secure authentification mechanismus
-        over a network is unsecure.
+        Similar to remote X11, the TCP transport has no integrity or
+        confidentiality protection, so it should normally only be
+        used across the local loopback interface, for example using an
+        address like <literal>tcp:host=127.0.0.1</literal> or
+        <literal>tcp:host=localhost</literal>. In particular,
+        configuring the well-known system bus or the well-known session
+        bus to listen on a non-loopback TCP address is insecure.
       </para>
       <para>
         On Windows and most Unix platforms, the TCP stack is unable to transfer
