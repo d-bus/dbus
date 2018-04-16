@@ -819,3 +819,19 @@ test_check_tcp_works (void)
   return TRUE;
 #endif
 }
+
+/*
+ * Store the result of an async operation. @user_data is a pointer to a
+ * variable that can store @result, initialized to %NULL.
+ */
+void
+test_store_result_cb (GObject *source_object G_GNUC_UNUSED,
+                      GAsyncResult *result,
+                      gpointer user_data)
+{
+  GAsyncResult **result_p = user_data;
+
+  g_assert_nonnull (result_p);
+  g_assert_null (*result_p);
+  *result_p = g_object_ref (result);
+}
