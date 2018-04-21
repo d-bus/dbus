@@ -104,7 +104,7 @@ dbus.devhelp: $(srcdir)/doxygen_to_devhelp.xsl doxygen.stamp
 endif
 
 if DBUS_DUCKTYPE_DOCS_ENABLED
-html_DATA += $(YELP_HTML) $(YELP_STATIC_HTML)
+html_DATA += $(YELP_HTML)
 
 %.page: %.duck
 	$(DUCKTYPE) -o $@ $<
@@ -118,6 +118,13 @@ endif
 install-data-local:: doxygen.stamp
 	$(MKDIR_P) $(DESTDIR)$(apidir)
 	$(INSTALL_DATA) api/html/* $(DESTDIR)$(apidir)
+if DBUS_DUCKTYPE_DOCS_ENABLED
+	$(AM_V_at)for x in $(YELP_STATIC_HTML); do \
+		if test -e "$$x"; then \
+			$(INSTALL_DATA) "$$x" $(DESTDIR)$(htmldir); \
+		fi; \
+	done
+endif
 
 uninstall-local::
 	rm -f $(DESTDIR)$(apidir)/*.html
@@ -141,7 +148,7 @@ BONUS_FILES = \
 	$(top_srcdir)/COPYING \
 	$(top_srcdir)/ChangeLog
 
-dbus-docs: $(STATIC_DOCS) $(MAN_XML_FILES) $(dist_doc_DATA) $(dist_html_DATA) $(MAN_HTML_FILES) $(BONUS_FILES) doxygen.stamp $(XMLTO_HTML) $(YELP_HTML) $(YELP_STATIC_HTML)
+dbus-docs: $(STATIC_DOCS) $(MAN_XML_FILES) $(dist_doc_DATA) $(dist_html_DATA) $(MAN_HTML_FILES) $(BONUS_FILES) doxygen.stamp $(XMLTO_HTML) $(YELP_HTML)
 	$(AM_V_at)rm -rf $@ $@.tmp
 	$(AM_V_GEN)$(MKDIR_P) $@.tmp/api
 	$(AM_V_at)cd $(srcdir) && cp $(STATIC_DOCS) @abs_builddir@/$@.tmp
@@ -149,7 +156,11 @@ dbus-docs: $(STATIC_DOCS) $(MAN_XML_FILES) $(dist_doc_DATA) $(dist_html_DATA) $(
 	$(AM_V_at)cd $(srcdir) && cp $(STATIC_HTML) @abs_builddir@/$@.tmp
 	$(AM_V_at)cp $(XMLTO_HTML) @abs_builddir@/$@.tmp
 	$(AM_V_at)cp $(YELP_HTML) @abs_builddir@/$@.tmp
-	$(AM_V_at)cp $(YELP_STATIC_HTML) @abs_builddir@/$@.tmp
+	$(AM_V_at)for x in $(YELP_STATIC_HTML); do \
+		if test -e "$$x"; then \
+			cp "$$x" @abs_builddir@/$@.tmp; \
+		fi; \
+	done
 	$(AM_V_at)cp $(MAN_HTML_FILES) @abs_builddir@/$@.tmp
 	$(AM_V_at)cp $(MAN_XML_FILES) @abs_builddir@/$@.tmp
 	$(AM_V_at)cp $(BONUS_FILES) @abs_builddir@/$@.tmp
