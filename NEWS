@@ -35,10 +35,16 @@ Enhancements:
   has version information, matching previous behaviour with cmake.
   (fd.o #103387, Ralf Habacker)
 
+• The Devhelp documentation index is now in version 2 format
+  (fd.o #106186, Simon McVittie)
+
 Fixes:
 
 • Listening on TCP sockets copes better with IPv6 being disabled
   (fd.o #61922; Ralf Habacker, Simon McVittie)
+
+• Fix installation of Ducktype documentation with newer yelp-build
+  versions (fd.o #106171, Simon McVittie)
 
 Internal changes:
 
