@@ -57,6 +57,7 @@ STATIC_HTML = \
 YELP_STATIC_HTML = \
 	yelp.js \
 	C.css \
+	highlight.pack.js \
 	jquery.js \
 	jquery.syntax.js \
 	jquery.syntax.brush.html.js \

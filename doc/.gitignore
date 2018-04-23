@@ -19,6 +19,7 @@ dbus-docs.tar.gz
 doxygen.stamp
 dbus-api-design.page
 dbus-api-design.html
+/highlight.pack.js
 jquery.js
 jquery.syntax.brush.html.js
 jquery.syntax.core.js
