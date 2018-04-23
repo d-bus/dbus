@@ -10,6 +10,7 @@ Makefile.in
 *.o
 api
 dbus.devhelp
+/dbus.devhelp2
 dbus-specification.html
 dbus-test-plan.html
 dbus-tutorial.html

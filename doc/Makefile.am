@@ -98,9 +98,9 @@ doxygen.stamp: $(wildcard $(top_srcdir)/dbus/*.[ch])
 	@touch $@
 
 if DBUS_HAVE_XSLTPROC
-html_DATA += dbus.devhelp
+html_DATA += dbus.devhelp2
 
-dbus.devhelp: $(srcdir)/doxygen_to_devhelp.xsl doxygen.stamp
+dbus.devhelp2: $(srcdir)/doxygen_to_devhelp.xsl doxygen.stamp
 	$(XSLTPROC) -o $@ $< api/xml/index.xml
 endif
 
