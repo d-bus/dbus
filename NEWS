@@ -11,6 +11,12 @@ Dependencies:
 
 Enhancements:
 
+• D-Bus Specification v0.32
+  · Be clearer about the security properties of TCP transports, which
+    have no integrity or confidentiality protection and so should not
+    normally be used, except via the loopback interface on Windows
+    (fd.o #106004, Simon McVittie)
+
 • On Linux 4.13 or later, <policy group="…"> now uses the SO_PEERGROUPS
   credentials-passing socket option to get the effective group IDs
   of the initiator of the connection. On platforms where that socket
@@ -37,6 +43,11 @@ Enhancements:
 
 • The Devhelp documentation index is now in version 2 format
   (fd.o #106186, Simon McVittie)
+
+• Give the dbus-daemon man page some scarier warnings about
+  <allow_anonymous/>, which is insecure and should not be used,
+  particularly for the standard system and session buses
+  (fd.o #106004, Simon McVittie)
 
 Fixes:
 
