@@ -10,7 +10,8 @@
 <xsl:template match="/">
   <book title="D-Bus: A system for interprocess communication"
         name="dbus"
-        link="dbus-tutorial.html">
+        link="{$prefix}/api/index.html"
+        >
   <chapters>
      <sub name="Tutorial" link="{$prefix}dbus-tutorial.html"/>
      <sub name="FAQ" link="{$prefix}dbus-faq.html"/>
