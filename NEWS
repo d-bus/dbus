@@ -1,3 +1,16 @@
+dbus 1.12.8 (UNRELEASED)
+========================
+
+Enhancements:
+
+• The Devhelp documentation index is now in version 2 format
+  (fd.o #106186, Simon McVittie)
+
+Fixes:
+
+• Fix installation of Ducktype documentation with newer yelp-build
+  versions (fd.o #106171, Simon McVittie)
+
 dbus 1.12.6 (2018-03-01)
 ========================
 
