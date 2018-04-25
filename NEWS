@@ -45,8 +45,8 @@ Enhancements:
   (fd.o #106186, Simon McVittie)
 
 • Give the dbus-daemon man page some scarier warnings about
-  <allow_anonymous/>, which is insecure and should not be used,
-  particularly for the standard system and session buses
+  <allow_anonymous/> and non-local TCP, which are insecure and should
+  not be used, particularly for the standard system and session buses
   (fd.o #106004, Simon McVittie)
 
 Fixes:
