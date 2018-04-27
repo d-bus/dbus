@@ -1,4 +1,4 @@
-dbus 1.13.4 (UNRELEASED)
+dbus 1.13.4 (2018-04-30)
 ========================
 
 The “parsimonious topping” release.
@@ -11,7 +11,7 @@ Dependencies:
 
 Enhancements:
 
-• D-Bus Specification v0.32
+• D-Bus Specification v0.33
   · Be clearer about the security properties of TCP transports, which
     have no integrity or confidentiality protection and so should not
     normally be used, except via the loopback interface on Windows
@@ -28,6 +28,9 @@ Enhancements:
 • If the dbus-daemon is compiled for Linux with systemd support, it
   now informs systemd that it is ready for use via the sd_notify()
   mechanism. (fd.o #104641; Michal Sekletar, Simon McVittie)
+
+• Several environment variables set by systemd are no longer passed
+  on to activated services (fd.o #104641, Simon McVittie)
 
 • Failing to bind a TCP socket to an address produces better error
   messages. (fd.o #61922; Simon McVittie, Ralf Habacker)
