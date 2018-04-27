@@ -131,6 +131,8 @@ uninstall-local::
 	rm -f $(DESTDIR)$(apidir)/*.png
 	rm -f $(DESTDIR)$(apidir)/*.css
 	rm -f $(DESTDIR)$(apidir)/*.js
+	rm -f $(DESTDIR)$(htmldir)/*.css
+	rm -f $(DESTDIR)$(htmldir)/*.js
 	rm -f $(DESTDIR)$(htmldir)/*.html
 	rm -f $(DESTDIR)$(docdir)/*.txt
 	rm -f $(DESTDIR)$(htmldir)/*.png
