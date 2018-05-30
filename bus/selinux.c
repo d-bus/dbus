@@ -135,14 +135,10 @@ out:
  * this could have changed.  Send a SIGHUP to reload all configs.
  */
 static int
-policy_reload_callback (u_int32_t event, security_id_t ssid, 
-                        security_id_t tsid, security_class_t tclass, 
-                        access_vector_t perms, access_vector_t *out_retained)
+policy_reload_callback (int seqno)
 {
-  if (event == AVC_CALLBACK_RESET)
-    return raise (SIGHUP);
-  
-  return 0;
+  _dbus_verbose ("SELinux policy reload callback called, sending SIGHUP\n");
+  return raise (SIGHUP);
 }
 
 /**
@@ -327,15 +323,7 @@ bus_selinux_full_init (BusContext *context, DBusError *error)
       goto error;
     }
 
-  if (avc_add_callback (policy_reload_callback, AVC_CALLBACK_RESET,
-                       NULL, NULL, 0, 0) < 0)
-    {
-      dbus_set_error (error, DBUS_ERROR_FAILED,
-                      "Failed to add policy reload callback: %s",
-                      _dbus_strerror (errno));
-      goto error;
-    }
-
+  selinux_set_callback (SELINUX_CB_POLICYLOAD, (union selinux_callback) policy_reload_callback);
   selinux_set_callback (SELINUX_CB_AUDIT, (union selinux_callback) log_audit_callback);
   selinux_set_callback (SELINUX_CB_LOG, (union selinux_callback) log_callback);
 
