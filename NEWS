@@ -1,7 +1,14 @@
 dbus 1.13.6 (UNRELEASED)
 ========================
 
-...
+Fixes:
+
+• Don't use misleading errno-derived error names if getaddrinfo() or
+  getnameinfo() fails with a code other than EAI_SYSTEM
+  (fd.o #106395, Simon McVittie)
+
+• Skip tests that require working TCP if we are in a container environment
+  where 127.0.0.1 cannot be resolved (fd.o #106812, Simon McVittie)
 
 dbus 1.13.4 (2018-04-30)
 ========================
