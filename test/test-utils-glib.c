@@ -34,8 +34,10 @@
 # include <io.h>
 # include <windows.h>
 #else
+# include <netdb.h>
 # include <signal.h>
 # include <unistd.h>
+# include <sys/socket.h>
 # include <sys/types.h>
 # include <pwd.h>
 #endif
@@ -644,4 +646,59 @@ test_mkdir (const gchar *path,
       g_error ("Unable to create directory \"%s\": %s", path,
                g_strerror (saved_errno));
     }
+}
+
+gboolean
+test_check_tcp_works (void)
+{
+#ifdef DBUS_UNIX
+  /* In pathological container environments, we might not have a
+   * working 127.0.0.1 */
+  int res;
+  struct addrinfo *addrs = NULL;
+  struct addrinfo hints;
+  int saved_errno;
+
+  _DBUS_ZERO (hints);
+#ifdef AI_ADDRCONFIG
+  hints.ai_flags |= AI_ADDRCONFIG;
+#endif
+  hints.ai_flags = AI_ADDRCONFIG;
+  hints.ai_family = AF_INET;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_protocol = IPPROTO_TCP;
+
+  res = getaddrinfo ("127.0.0.1", "0", &hints, &addrs);
+  saved_errno = errno;
+
+  if (res != 0)
+    {
+      const gchar *system_message;
+      gchar *skip_message;
+
+#ifdef EAI_SYSTEM
+      if (res == EAI_SYSTEM)
+        system_message = g_strerror (saved_errno);
+      else
+#endif
+        system_message = gai_strerror (res);
+
+      skip_message = g_strdup_printf ("Name resolution does not work here: "
+                                      "getaddrinfo(\"127.0.0.1\", \"0\", "
+                                      "{flags=ADDRCONFIG, family=INET,"
+                                      "socktype=STREAM, protocol=TCP}): "
+                                      "%s",
+                                      system_message);
+      g_test_skip (skip_message);
+      free (skip_message);
+    }
+
+  if (addrs != NULL)
+    freeaddrinfo (addrs);
+
+  return (res == 0);
+#else
+  /* Assume that on Windows, TCP always works */
+  return TRUE;
+#endif
 }
