@@ -358,8 +358,13 @@ validate_body_helper (DBusTypeReader       *reader,
           
           if (current_type == DBUS_TYPE_BOOLEAN)
             {
-              dbus_uint32_t v = _dbus_unpack_uint32 (byte_order,
-                                                     p);
+              dbus_uint32_t v;
+
+              if (p + 4 > end)
+                return DBUS_INVALID_NOT_ENOUGH_DATA;
+
+              v = _dbus_unpack_uint32 (byte_order, p);
+
               if (!(v == 0 || v == 1))
                 return DBUS_INVALID_BOOLEAN_NOT_ZERO_OR_ONE;
             }
