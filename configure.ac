@@ -330,10 +330,14 @@ dnl - we are not going to stop using deprecated functions on a stable
 dnl   branch
 dnl - missing field initializers being 0 is a C feature, not a bug
 dnl - unused-parameter is to make writing callbacks less annoying
+dnl - cast-function-type is for the
+dnl   foreach(list, (DBusForeachFunction) free, NULL) idiom which would
+dnl   be too intrusive to replace in a stable branch
 DISABLE_WARNINGS="$DISABLE_WARNINGS
                   -Wno-deprecated-declarations
                   -Wno-missing-field-initializers
-                  -Wno-unused-parameter"
+                  -Wno-unused-parameter
+                  -Wno-cast-function-type"
 
 if test x$enable_asserts = xno; then
     AC_DEFINE(DBUS_DISABLE_ASSERT,1,[Disable assertion checking])
