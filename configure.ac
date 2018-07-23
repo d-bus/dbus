@@ -1396,10 +1396,12 @@ TP_COMPILER_WARNINGS([WARNING_CFLAGS],
   dnl   gcc can't cope with inconsistent tab/space indentation
   dnl
   dnl To be fixed one day:
+  dnl - cast-function-type is fd.o #107349
   dnl - pointer-sign is a workaround for fd.o #15522
   dnl - type-limits is probably a bug too, but having the rest of -Wextra
   dnl   is better than nothing
   [$DISABLE_UNUSED_WARNINGS \
+   cast-function-type \
    deprecated-declarations \
    missing-field-initializers \
    misleading-indentation \
