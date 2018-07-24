@@ -249,6 +249,7 @@ _dbus_server_listen_platform_specific (DBusAddressEntry *entry,
         goto systemd_err;
 
       dbus_free (fds);
+      _dbus_string_free (&address);
 
       return DBUS_SERVER_LISTEN_OK;
 
