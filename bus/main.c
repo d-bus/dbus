@@ -693,6 +693,7 @@ main (int argc, char **argv)
                              _dbus_string_get_length(&address) > 0 ? &address : NULL,
                              &error);
   _dbus_string_free (&config_file);
+  _dbus_string_free (&address);
   if (context == NULL)
     {
       _dbus_warn ("Failed to start message bus: %s",
