@@ -1,3 +1,14 @@
+dbus 1.10.28 (UNRELEASED)
+==
+
+Fixes:
+
+• Fix build with gcc 8 -Werror=cast-function-type
+  (fd.o #107349, Simon McVittie)
+
+• Fix warning from gcc 8 about suspicious use of strncpy() when
+  populating struct sockaddr_un (fd.o #107350, Simon McVittie)
+
 D-Bus 1.10.26 (2018-03-01)
 ==
 
