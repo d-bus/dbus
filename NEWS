@@ -1,5 +1,7 @@
-dbus 1.12.10 (UNRELEASED)
+dbus 1.12.10 (2018-08-02)
 =========================
+
+The “beam deflection” release.
 
 Fixes:
 
