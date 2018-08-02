@@ -1,5 +1,7 @@
-dbus 1.13.6 (UNRELEASED)
+dbus 1.13.6 (2018-08-02)
 ========================
+
+The “vine cutting” release.
 
 Fixes:
 
