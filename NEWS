@@ -3,6 +3,12 @@ dbus 1.12.10 (UNRELEASED)
 
 Fixes:
 
+• Prevent reading up to 3 bytes beyond the end of a truncated message.
+  This could in principle be an information leak or denial of service
+  on the system bus, but is not believed to be exploitable to crash
+  the system bus or leak interesting information in practice.
+  (fd.o #107332, Simon McVittie)
+
 • Fix build with gcc 8 -Werror=cast-function-type
   (fd.o #107349, Simon McVittie)
 
