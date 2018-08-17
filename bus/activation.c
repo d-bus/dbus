@@ -1267,6 +1267,7 @@ bus_activation_send_pending_auto_activation_messages (BusActivation  *activation
                                                  entry->activation_message);
                 }
 
+              dbus_error_free (&error);
               link = next;
               continue;
             }
