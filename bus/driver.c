@@ -2258,6 +2258,7 @@ bus_driver_handle_become_monitor (DBusConnection *connection,
   /* Special case: a zero-length array becomes [""] */
   if (n_match_rules == 0)
     {
+      dbus_free (match_rules);
       match_rules = dbus_malloc (2 * sizeof (char *));
 
       if (match_rules == NULL)
