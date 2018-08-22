@@ -18,7 +18,7 @@ AC_CANONICAL_HOST
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.13 tar-ustar -Wno-portability subdir-objects foreign])
+AM_INIT_AUTOMAKE([1.13 tar-ustar no-dist-gzip dist-xz -Wno-portability subdir-objects foreign])
 
 GETTEXT_PACKAGE=dbus-1
 AC_SUBST(GETTEXT_PACKAGE)

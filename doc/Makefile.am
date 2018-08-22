@@ -171,7 +171,7 @@ dbus-docs: $(STATIC_DOCS) $(dist_dtd_DATA) $(MAN_XML_FILES) $(dist_doc_DATA) $(d
 	$(AM_V_at)cp -r api/html @abs_builddir@/$@.tmp/api
 	$(AM_V_at)mv $@.tmp $@
 
-dbus-docs.tar.gz: dbus-docs
+dbus-docs.tar.xz: dbus-docs
 	$(AM_V_GEN)tar czf $@ $<
 
 DOC_SERVER = dbus.freedesktop.org
@@ -180,8 +180,8 @@ DOC_WWW_DIR = /srv/dbus.freedesktop.org/www
 SPECIFICATION_SERVER = specifications.freedesktop.org
 SPECIFICATION_PATH = /srv/specifications.freedesktop.org/www/dbus/1.0
 
-maintainer-upload-docs: dbus-docs.tar.gz dbus-docs
-	scp dbus-docs.tar.gz $(DOC_SERVER):$(DOC_WWW_DIR)/
+maintainer-upload-docs: dbus-docs.tar.xz dbus-docs
+	scp dbus-docs.tar.xz $(DOC_SERVER):$(DOC_WWW_DIR)/
 	rsync -rpvzP --chmod=Dg+s,ug+rwX,o=rX \
 		dbus-docs/ $(DOC_SERVER):$(DOC_WWW_DIR)/doc/
 	cd $(srcdir) && scp -p $(dist_dtd_DATA) $(SPECIFICATION_SERVER):$(SPECIFICATION_PATH)/
