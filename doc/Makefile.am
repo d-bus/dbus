@@ -145,7 +145,7 @@ endif
 if DBUS_CAN_UPLOAD_DOCS
 BONUS_FILES = \
 	$(top_srcdir)/README \
-	$(top_srcdir)/HACKING \
+	$(top_srcdir)/CONTRIBUTING \
 	$(top_srcdir)/AUTHORS \
 	$(top_srcdir)/NEWS \
 	$(top_srcdir)/COPYING \

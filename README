@@ -18,7 +18,8 @@ The "and coordination" part is important; D-Bus provides a bus daemon that does 
 See http://www.freedesktop.org/software/dbus/ for lots of documentation, 
 mailing lists, etc.
 
-See also the file HACKING for notes of interest to developers working on D-Bus.
+See also the file CONTRIBUTING for notes of interest to developers
+working on D-Bus.
 
 If you're considering D-Bus for use in a project, you should be aware
 that D-Bus was designed for a couple of specific use cases, a "system
