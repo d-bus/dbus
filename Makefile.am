@@ -12,9 +12,7 @@ EXTRA_DIST =			\
 	CONTRIBUTING		\
 	dbus-1.pc.in		\
 	cleanup-man-pages.sh    \
-        ChangeLog.pre-1-0       \
         NEWS.pre-1-0            \
-	ChangeLog.pre-1-2       \
         NEWS.pre-1-2		\
 	README.cmake		\
 	README.valgrind		\
