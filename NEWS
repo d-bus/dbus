@@ -1,7 +1,9 @@
 dbus 1.12.12 (UNRELEASED)
 =========================
 
-...
+Fixes:
+
+• Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
 
 dbus 1.12.10 (2018-08-02)
 =========================
