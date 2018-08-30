@@ -12,6 +12,9 @@ Enhancements:
 • Improve test coverage and clean up dead code
   (fd.o #107739, Simon McVittie)
 
+• Allow --enable-relocation in combination with absolute paths for
+  --exec-prefix, --libdir (fd.o #107662, Simon McVittie)
+
 Fixes:
 
 • Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
