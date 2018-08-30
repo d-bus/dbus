@@ -9,6 +9,9 @@ Enhancements:
 
 • Reference the freedesktop.org Code of Conduct (Simon McVittie)
 
+• Improve test coverage and clean up dead code
+  (fd.o #107739, Simon McVittie)
+
 Fixes:
 
 • Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
