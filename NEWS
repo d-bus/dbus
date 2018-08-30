@@ -1,6 +1,10 @@
 dbus 1.12.12 (UNRELEASED)
 =========================
 
+Enhancements:
+
+• Reference the freedesktop.org Code of Conduct (Simon McVittie)
+
 Fixes:
 
 • Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
