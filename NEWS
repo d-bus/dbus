@@ -1,7 +1,21 @@
 dbus 1.13.8 (UNRELEASED)
 ========================
 
-...
+Enhancements:
+
+• Tarball releases no longer contain pre-2007 changelogs and are now
+  compressed with xz, so they should be somewhat smaller
+  (fd.o #107630; Francesco Turco, Simon McVittie)
+
+• Reference the freedesktop.org Code of Conduct (Simon McVittie)
+
+Fixes:
+
+• Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
+  which does not meet the criteria for that attribute in gcc 4.7+,
+  potentially leading to miscompilation (fd.o #107741, Simon McVittie)
+
+• Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
 
 dbus 1.13.6 (2018-08-02)
 ========================
