@@ -2109,8 +2109,7 @@ int16_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (dbus_int16_t*) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   _dbus_assert (v == int16_from_seed (seed));
 
@@ -2236,8 +2235,7 @@ int32_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (dbus_int32_t*) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   _dbus_assert (v == int32_from_seed (seed));
 
@@ -2351,8 +2349,7 @@ int64_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (dbus_int64_t*) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   _dbus_assert (v == int64_from_seed (seed));
 
@@ -2621,8 +2618,7 @@ double_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (double*) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   expected = double_from_seed (seed);
 
@@ -2715,8 +2711,7 @@ object_path_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (const char **) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   object_path_from_seed (buf, seed);
 
@@ -2786,8 +2781,7 @@ signature_read_value (TestTypeNode   *node,
 
   check_expected_type (reader, node->klass->typecode);
 
-  _dbus_type_reader_read_basic (reader,
-                                (const char **) &v);
+  _dbus_type_reader_read_basic (reader, &v);
 
   signature_from_seed (buf, seed);
 
@@ -3412,8 +3406,7 @@ dict_read_or_set_value (TestTypeNode   *node,
               
               check_expected_type (&entry_sub, DBUS_TYPE_INT32);
 
-              _dbus_type_reader_read_basic (&entry_sub,
-                                            (dbus_int32_t*) &v);
+              _dbus_type_reader_read_basic (&entry_sub, &v);
 
               _dbus_assert (v == int32_from_seed (seed + i));
 
