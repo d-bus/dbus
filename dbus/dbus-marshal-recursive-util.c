@@ -2145,6 +2145,8 @@ int16_write_multi (TestTypeNode   *node,
   dbus_int16_t *v_ARRAY_INT16 = values;
   int i;
 
+  _dbus_assert (count <= MAX_MULTI_COUNT);
+
   for (i = 0; i < count; ++i)
     values[i] = int16_from_seed (seed + i);
 
@@ -2270,6 +2272,8 @@ int32_write_multi (TestTypeNode   *node,
   dbus_int32_t *v_ARRAY_INT32 = values;
   int i;
 
+  _dbus_assert (count <= MAX_MULTI_COUNT);
+
   for (i = 0; i < count; ++i)
     values[i] = int32_from_seed (seed + i);
 
@@ -2380,7 +2384,10 @@ string_from_seed (char *buf,
   int i;
   unsigned char v;
 
-  _dbus_assert (len < MAX_SAMPLE_STRING_LEN);
+  /* Callers use a buffer of length MAX_SAMPLE_STRING_LEN + 1, which is
+   * enough for MAX_SAMPLE_STRING_LEN bytes of actual string payload,
+   * plus the NUL terminator */
+  _dbus_assert (len + 2 <= MAX_SAMPLE_STRING_LEN);
 
   /* vary the length slightly, though we also have multiple string
    * value types for this, varying it here tests the set_value code
