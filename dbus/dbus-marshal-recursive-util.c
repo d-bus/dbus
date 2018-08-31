@@ -362,24 +362,24 @@ struct TestTypeNodeClass
   dbus_bool_t (* write_value)     (TestTypeNode   *node,
                                    DataBlock      *block,
                                    DBusTypeWriter *writer,
-                                   int             seed);
+                                   unsigned int    seed);
   dbus_bool_t (* read_value)      (TestTypeNode   *node,
                                    DBusTypeReader *reader,
-                                   int             seed);
+                                   unsigned int    seed);
   dbus_bool_t (* set_value)       (TestTypeNode   *node,
                                    DBusTypeReader *reader,
                                    DBusTypeReader *realign_root,
-                                   int             seed);
+                                   unsigned int    seed);
   dbus_bool_t (* build_signature) (TestTypeNode   *node,
                                    DBusString     *str);
   dbus_bool_t (* write_multi)     (TestTypeNode   *node,
                                    DataBlock      *block,
                                    DBusTypeWriter *writer,
-                                   int             seed,
+                                   unsigned int    seed,
                                    int             count);
   dbus_bool_t (* read_multi)      (TestTypeNode   *node,
                                    DBusTypeReader *reader,
-                                   int             seed,
+                                   unsigned int    seed,
                                    int             count);
 };
 
@@ -393,173 +393,173 @@ struct TestTypeNodeContainerClass
  * and by merging read_value and set_value into one function
  * taking a flag argument.
  */
-static dbus_bool_t int16_write_value       (TestTypeNode   *node,
+static dbus_bool_t uint16_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
-static dbus_bool_t int16_read_value        (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint16_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
-static dbus_bool_t int16_set_value         (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint16_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
-static dbus_bool_t int16_write_multi       (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint16_write_multi      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed,
+                                            unsigned int    seed,
                                             int             count);
-static dbus_bool_t int16_read_multi        (TestTypeNode   *node,
+static dbus_bool_t uint16_read_multi       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed,
+                                            unsigned int    seed,
                                             int             count);
-static dbus_bool_t int32_write_value       (TestTypeNode   *node,
+static dbus_bool_t uint32_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
-static dbus_bool_t int32_read_value        (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint32_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
-static dbus_bool_t int32_set_value         (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint32_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
-static dbus_bool_t int32_write_multi       (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint32_write_multi      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed,
+                                            unsigned int    seed,
                                             int             count);
-static dbus_bool_t int32_read_multi        (TestTypeNode   *node,
+static dbus_bool_t uint32_read_multi       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed,
+                                            unsigned int    seed,
                                             int             count);
-static dbus_bool_t int64_write_value       (TestTypeNode   *node,
+static dbus_bool_t uint64_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
-static dbus_bool_t int64_read_value        (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint64_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
-static dbus_bool_t int64_set_value         (TestTypeNode   *node,
+                                            unsigned int    seed);
+static dbus_bool_t uint64_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t string_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t string_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t string_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t bool_write_value        (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t bool_read_value         (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t bool_set_value          (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t byte_write_value        (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t byte_read_value         (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t byte_set_value          (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t double_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t double_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t double_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t object_path_write_value (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t object_path_read_value  (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t object_path_set_value   (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t signature_write_value   (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t signature_read_value    (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t signature_set_value     (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t struct_write_value      (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t struct_read_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t struct_set_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t struct_build_signature  (TestTypeNode   *node,
                                             DBusString     *str);
 static dbus_bool_t dict_write_value        (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t dict_read_value         (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t dict_set_value          (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t dict_build_signature    (TestTypeNode   *node,
                                             DBusString     *str);
 static dbus_bool_t array_write_value       (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t array_read_value        (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t array_set_value         (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t array_build_signature   (TestTypeNode   *node,
                                             DBusString     *str);
 static dbus_bool_t variant_write_value     (TestTypeNode   *node,
                                             DataBlock      *block,
                                             DBusTypeWriter *writer,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t variant_read_value      (TestTypeNode   *node,
                                             DBusTypeReader *reader,
-                                            int             seed);
+                                            unsigned int    seed);
 static dbus_bool_t variant_set_value       (TestTypeNode   *node,
                                             DBusTypeReader *reader,
                                             DBusTypeReader *realign_root,
-                                            int             seed);
+                                            unsigned int    seed);
 static void        container_destroy       (TestTypeNode   *node);
 
 
@@ -570,12 +570,12 @@ static const TestTypeNodeClass int16_class = {
   0,
   NULL,
   NULL,
-  int16_write_value,
-  int16_read_value,
-  int16_set_value,
+  uint16_write_value, /* recycle from uint16 */
+  uint16_read_value,
+  uint16_set_value,
   NULL,
-  int16_write_multi,
-  int16_read_multi
+  uint16_write_multi,
+  uint16_read_multi
 };
 
 static const TestTypeNodeClass uint16_class = {
@@ -584,12 +584,12 @@ static const TestTypeNodeClass uint16_class = {
   0,
   NULL,
   NULL,
-  int16_write_value, /* recycle from int16 */
-  int16_read_value,  /* recycle from int16 */
-  int16_set_value,   /* recycle from int16 */
+  uint16_write_value,
+  uint16_read_value,
+  uint16_set_value,
   NULL,
-  int16_write_multi, /* recycle from int16 */
-  int16_read_multi   /* recycle from int16 */
+  uint16_write_multi,
+  uint16_read_multi
 };
 
 static const TestTypeNodeClass int32_class = {
@@ -598,12 +598,12 @@ static const TestTypeNodeClass int32_class = {
   0,
   NULL,
   NULL,
-  int32_write_value,
-  int32_read_value,
-  int32_set_value,
+  uint32_write_value, /* recycle from int32 */
+  uint32_read_value,
+  uint32_set_value,
   NULL,
-  int32_write_multi,
-  int32_read_multi
+  uint32_write_multi,
+  uint32_read_multi
 };
 
 static const TestTypeNodeClass uint32_class = {
@@ -612,12 +612,12 @@ static const TestTypeNodeClass uint32_class = {
   0,
   NULL,
   NULL,
-  int32_write_value, /* recycle from int32 */
-  int32_read_value,  /* recycle from int32 */
-  int32_set_value,   /* recycle from int32 */
+  uint32_write_value,
+  uint32_read_value,
+  uint32_set_value,
   NULL,
-  int32_write_multi, /* recycle from int32 */
-  int32_read_multi   /* recycle from int32 */
+  uint32_write_multi,
+  uint32_read_multi
 };
 
 static const TestTypeNodeClass int64_class = {
@@ -626,9 +626,9 @@ static const TestTypeNodeClass int64_class = {
   0,
   NULL,
   NULL,
-  int64_write_value,
-  int64_read_value,
-  int64_set_value,
+  uint64_write_value, /* recycle from uint64 */
+  uint64_read_value,
+  uint64_set_value,
   NULL,
   NULL, /* FIXME */
   NULL  /* FIXME */
@@ -640,9 +640,9 @@ static const TestTypeNodeClass uint64_class = {
   0,
   NULL,
   NULL,
-  int64_write_value, /* recycle from int64 */
-  int64_read_value,  /* recycle from int64 */
-  int64_set_value,   /* recycle from int64 */
+  uint64_write_value,
+  uint64_read_value,
+  uint64_set_value,
   NULL,
   NULL, /* FIXME */
   NULL  /* FIXME */
@@ -960,7 +960,7 @@ static dbus_bool_t
 node_write_value (TestTypeNode   *node,
                   DataBlock      *block,
                   DBusTypeWriter *writer,
-                  int             seed)
+                  unsigned int    seed)
 {
   dbus_bool_t retval;
 
@@ -977,7 +977,7 @@ node_write_value (TestTypeNode   *node,
 static dbus_bool_t
 node_read_value (TestTypeNode   *node,
                  DBusTypeReader *reader,
-                 int             seed)
+                 unsigned int    seed)
 {
   /* DBusTypeReader restored; */
 
@@ -995,7 +995,7 @@ static dbus_bool_t
 node_set_value (TestTypeNode   *node,
                 DBusTypeReader *reader,
                 DBusTypeReader *realign_root,
-                int             seed)
+                unsigned int    seed)
 {
   if (!(* node->klass->set_value) (node, reader, realign_root, seed))
     return FALSE;
@@ -1031,7 +1031,7 @@ static dbus_bool_t
 node_write_multi (TestTypeNode   *node,
                   DataBlock      *block,
                   DBusTypeWriter *writer,
-                  int             seed,
+                  unsigned int    seed,
                   int             n_copies)
 {
   dbus_bool_t retval;
@@ -1050,7 +1050,7 @@ node_write_multi (TestTypeNode   *node,
 static dbus_bool_t
 node_read_multi (TestTypeNode   *node,
                  DBusTypeReader *reader,
-                 int             seed,
+                 unsigned int    seed,
                  int             n_copies)
 {
   _dbus_assert (node->klass->read_multi != NULL);
@@ -2060,22 +2060,22 @@ _dbus_marshal_recursive_test (void)
 
 #define SAMPLE_INT16           1234
 #define SAMPLE_INT16_ALTERNATE 6785
-static dbus_int16_t
-int16_from_seed (int seed)
+static dbus_uint16_t
+uint16_from_seed (unsigned int seed)
 {
   /* Generate an integer value that's predictable from seed.  We could
    * just use seed itself, but that would only ever touch one byte of
    * the int so would miss some kinds of bug.
    */
-  static const dbus_int16_t v_of_seed[5] = {
+  static const dbus_uint16_t v_of_seed[5] = {
     SAMPLE_INT16,
     SAMPLE_INT16_ALTERNATE,
-    -1,
+    _DBUS_UINT16_MAX,
     _DBUS_INT16_MAX,
     1
   };
 
-  dbus_int16_t v = v_of_seed[seed % _DBUS_N_ELEMENTS(v_of_seed)];
+  dbus_uint16_t v = v_of_seed[seed % _DBUS_N_ELEMENTS(v_of_seed)];
 
   if (seed > 1)
     v *= seed; /* wraps around eventually, which is fine */
@@ -2084,15 +2084,15 @@ int16_from_seed (int seed)
 }
 
 static dbus_bool_t
-int16_write_value (TestTypeNode   *node,
-                   DataBlock      *block,
-                   DBusTypeWriter *writer,
-                   int             seed)
+uint16_write_value (TestTypeNode   *node,
+                    DataBlock      *block,
+                    DBusTypeWriter *writer,
+                    unsigned int    seed)
 {
-  /* also used for uint16 */
-  dbus_int16_t v;
+  /* also used for int16 */
+  dbus_uint16_t v;
 
-  v = int16_from_seed (seed);
+  v = uint16_from_seed (seed);
 
   return _dbus_type_writer_write_basic (writer,
                                         node->klass->typecode,
@@ -2100,32 +2100,32 @@ int16_write_value (TestTypeNode   *node,
 }
 
 static dbus_bool_t
-int16_read_value (TestTypeNode   *node,
-                  DBusTypeReader *reader,
-                  int             seed)
+uint16_read_value (TestTypeNode   *node,
+                   DBusTypeReader *reader,
+                   unsigned int    seed)
 {
-  /* also used for uint16 */
-  dbus_int16_t v;
+  /* also used for int16 */
+  dbus_uint16_t v;
 
   check_expected_type (reader, node->klass->typecode);
 
   _dbus_type_reader_read_basic (reader, &v);
 
-  _dbus_assert (v == int16_from_seed (seed));
+  _dbus_assert (v == uint16_from_seed (seed));
 
   return TRUE;
 }
 
 static dbus_bool_t
-int16_set_value (TestTypeNode   *node,
-                 DBusTypeReader *reader,
-                 DBusTypeReader *realign_root,
-                 int             seed)
+uint16_set_value (TestTypeNode   *node,
+                  DBusTypeReader *reader,
+                  DBusTypeReader *realign_root,
+                  unsigned int    seed)
 {
-  /* also used for uint16 */
-  dbus_int16_t v;
+  /* also used for int16 */
+  dbus_uint16_t v;
 
-  v = int16_from_seed (seed);
+  v = uint16_from_seed (seed);
 
   return _dbus_type_reader_set_basic (reader,
                                       &v,
@@ -2133,35 +2133,35 @@ int16_set_value (TestTypeNode   *node,
 }
 
 static dbus_bool_t
-int16_write_multi (TestTypeNode   *node,
-                   DataBlock      *block,
-                   DBusTypeWriter *writer,
-                   int             seed,
-                   int             count)
+uint16_write_multi (TestTypeNode   *node,
+                    DataBlock      *block,
+                    DBusTypeWriter *writer,
+                    unsigned int    seed,
+                    int             count)
 {
-  /* also used for uint16 */
-  dbus_int16_t values[MAX_MULTI_COUNT];
-  dbus_int16_t *v_ARRAY_INT16 = values;
+  /* also used for int16 */
+  dbus_uint16_t values[MAX_MULTI_COUNT];
+  dbus_uint16_t *v_ARRAY_UINT16 = values;
   int i;
 
   _dbus_assert (count <= MAX_MULTI_COUNT);
 
   for (i = 0; i < count; ++i)
-    values[i] = int16_from_seed (seed + i);
+    values[i] = uint16_from_seed (seed + i);
 
   return _dbus_type_writer_write_fixed_multi (writer,
                                               node->klass->typecode,
-                                              &v_ARRAY_INT16, count);
+                                              &v_ARRAY_UINT16, count);
 }
 
 static dbus_bool_t
-int16_read_multi (TestTypeNode   *node,
-                  DBusTypeReader *reader,
-                  int             seed,
-                  int             count)
+uint16_read_multi (TestTypeNode   *node,
+                   DBusTypeReader *reader,
+                   unsigned int    seed,
+                   int             count)
 {
-  /* also used for uint16 */
-  dbus_int16_t *values;
+  /* also used for int16 */
+  dbus_uint16_t *values;
   int n_elements;
   int i;
 
@@ -2176,9 +2176,9 @@ int16_read_multi (TestTypeNode   *node,
   _dbus_assert (n_elements == count);
 
   for (i = 0; i < count; i++)
-    _dbus_assert (((dbus_int16_t)_dbus_unpack_uint16 (reader->byte_order,
-                                                      (const unsigned char*)values + (i * 2))) ==
-                  int16_from_seed (seed + i));
+    _dbus_assert ((_dbus_unpack_uint16 (reader->byte_order,
+                                        (const unsigned char*)values + (i * 2))) ==
+                  uint16_from_seed (seed + i));
 
   return TRUE;
 }
@@ -2186,22 +2186,22 @@ int16_read_multi (TestTypeNode   *node,
 
 #define SAMPLE_INT32           12345678
 #define SAMPLE_INT32_ALTERNATE 53781429
-static dbus_int32_t
-int32_from_seed (int seed)
+static dbus_uint32_t
+uint32_from_seed (unsigned int seed)
 {
   /* Generate an integer value that's predictable from seed.  We could
    * just use seed itself, but that would only ever touch one byte of
    * the int so would miss some kinds of bug.
    */
-  static const dbus_int32_t v_of_seed[5] = {
+  static const dbus_uint32_t v_of_seed[5] = {
     SAMPLE_INT32,
     SAMPLE_INT32_ALTERNATE,
-    -1,
-    _DBUS_INT_MAX,
+    _DBUS_UINT32_MAX,
+    _DBUS_INT32_MAX,
     1
   };
 
-  dbus_int32_t v = v_of_seed[seed % _DBUS_N_ELEMENTS(v_of_seed)];
+  dbus_uint32_t v = v_of_seed[seed % _DBUS_N_ELEMENTS(v_of_seed)];
 
   if (seed > 1)
     v *= seed; /* wraps around eventually, which is fine */
@@ -2210,15 +2210,15 @@ int32_from_seed (int seed)
 }
 
 static dbus_bool_t
-int32_write_value (TestTypeNode   *node,
-                   DataBlock      *block,
-                   DBusTypeWriter *writer,
-                   int             seed)
+uint32_write_value (TestTypeNode   *node,
+                    DataBlock      *block,
+                    DBusTypeWriter *writer,
+                    unsigned int    seed)
 {
-  /* also used for uint32 */
-  dbus_int32_t v;
+  /* also used for int32 */
+  dbus_uint32_t v;
 
-  v = int32_from_seed (seed);
+  v = uint32_from_seed (seed);
 
   return _dbus_type_writer_write_basic (writer,
                                         node->klass->typecode,
@@ -2226,32 +2226,32 @@ int32_write_value (TestTypeNode   *node,
 }
 
 static dbus_bool_t
-int32_read_value (TestTypeNode   *node,
-                  DBusTypeReader *reader,
-                  int             seed)
+uint32_read_value (TestTypeNode   *node,
+                   DBusTypeReader *reader,
+                   unsigned int    seed)
 {
-  /* also used for uint32 */
-  dbus_int32_t v;
+  /* also used for int32 */
+  dbus_uint32_t v;
 
   check_expected_type (reader, node->klass->typecode);
 
   _dbus_type_reader_read_basic (reader, &v);
 
-  _dbus_assert (v == int32_from_seed (seed));
+  _dbus_assert (v == uint32_from_seed (seed));
 
   return TRUE;
 }
 
 static dbus_bool_t
-int32_set_value (TestTypeNode   *node,
-                 DBusTypeReader *reader,
-                 DBusTypeReader *realign_root,
-                 int             seed)
+uint32_set_value (TestTypeNode   *node,
+                  DBusTypeReader *reader,
+                  DBusTypeReader *realign_root,
+                  unsigned int    seed)
 {
-  /* also used for uint32 */
-  dbus_int32_t v;
+  /* also used for int32 */
+  dbus_uint32_t v;
 
-  v = int32_from_seed (seed);
+  v = uint32_from_seed (seed);
 
   return _dbus_type_reader_set_basic (reader,
                                       &v,
@@ -2259,35 +2259,35 @@ int32_set_value (TestTypeNode   *node,
 }
 
 static dbus_bool_t
-int32_write_multi (TestTypeNode   *node,
-                   DataBlock      *block,
-                   DBusTypeWriter *writer,
-                   int             seed,
-                   int             count)
+uint32_write_multi (TestTypeNode   *node,
+                    DataBlock      *block,
+                    DBusTypeWriter *writer,
+                    unsigned int    seed,
+                    int             count)
 {
-  /* also used for uint32 */
-  dbus_int32_t values[MAX_MULTI_COUNT];
-  dbus_int32_t *v_ARRAY_INT32 = values;
+  /* also used for int32 */
+  dbus_uint32_t values[MAX_MULTI_COUNT];
+  dbus_uint32_t *v_ARRAY_UINT32 = values;
   int i;
 
   _dbus_assert (count <= MAX_MULTI_COUNT);
 
   for (i = 0; i < count; ++i)
-    values[i] = int32_from_seed (seed + i);
+    values[i] = uint32_from_seed (seed + i);
 
   return _dbus_type_writer_write_fixed_multi (writer,
                                               node->klass->typecode,
-                                              &v_ARRAY_INT32, count);
+                                              &v_ARRAY_UINT32, count);
 }
 
 static dbus_bool_t
-int32_read_multi (TestTypeNode   *node,
-                  DBusTypeReader *reader,
-                  int             seed,
-                  int             count)
+uint32_read_multi (TestTypeNode   *node,
+                   DBusTypeReader *reader,
+                   unsigned int    seed,
+                   int             count)
 {
-  /* also used for uint32 */
-  dbus_int32_t *values;
+  /* also used for int32 */
+  dbus_uint32_t *values;
   int n_elements;
   int i;
 
@@ -2302,37 +2302,41 @@ int32_read_multi (TestTypeNode   *node,
   _dbus_assert (n_elements == count);
 
   for (i = 0; i < count; i++)
-    _dbus_assert (((int)_dbus_unpack_uint32 (reader->byte_order,
-                                             (const unsigned char*)values + (i * 4))) ==
-                  int32_from_seed (seed + i));
+    _dbus_assert ((_dbus_unpack_uint32 (reader->byte_order,
+                                        (const unsigned char*)values + (i * 4))) ==
+                  uint32_from_seed (seed + i));
 
   return TRUE;
 }
 
-static dbus_int64_t
-int64_from_seed (int seed)
+static dbus_uint64_t
+uint64_from_seed (unsigned int seed)
 {
-  dbus_int32_t v32;
-  dbus_int64_t v;
+  dbus_uint32_t v32;
+  dbus_uint64_t v;
 
-  v32 = int32_from_seed (seed);
+  v32 = uint32_from_seed (seed);
 
-  v = - (dbus_int32_t) ~ v32;
-  v |= (((dbus_int64_t)v32) << 32);
+  /* In the original implementation, everything was signed, and v was
+   * set to - ((dbus_int32_t) ~ v32), but in two's complement that's just
+   * v32 + 1 with wraparound. */
+  v = (v32 + 1) & 0xFFFFFFFF;
+
+  v |= (((dbus_uint64_t) v32) << 32);
 
   return v;
 }
 
 static dbus_bool_t
-int64_write_value (TestTypeNode   *node,
-                   DataBlock      *block,
-                   DBusTypeWriter *writer,
-                   int             seed)
+uint64_write_value (TestTypeNode   *node,
+                    DataBlock      *block,
+                    DBusTypeWriter *writer,
+                    unsigned int    seed)
 {
-  /* also used for uint64 */
-  dbus_int64_t v;
+  /* also used for int64 */
+  dbus_uint64_t v;
 
-  v = int64_from_seed (seed);
+  v = uint64_from_seed (seed);
 
   return _dbus_type_writer_write_basic (writer,
                                         node->klass->typecode,
@@ -2340,32 +2344,32 @@ int64_write_value (TestTypeNode   *node,
 }
 
 static dbus_bool_t
-int64_read_value (TestTypeNode   *node,
-                  DBusTypeReader *reader,
-                  int             seed)
+uint64_read_value (TestTypeNode   *node,
+                   DBusTypeReader *reader,
+                   unsigned int    seed)
 {
-  /* also used for uint64 */
-  dbus_int64_t v;
+  /* also used for int64 */
+  dbus_uint64_t v;
 
   check_expected_type (reader, node->klass->typecode);
 
   _dbus_type_reader_read_basic (reader, &v);
 
-  _dbus_assert (v == int64_from_seed (seed));
+  _dbus_assert (v == uint64_from_seed (seed));
 
   return TRUE;
 }
 
 static dbus_bool_t
-int64_set_value (TestTypeNode   *node,
-                 DBusTypeReader *reader,
-                 DBusTypeReader *realign_root,
-                 int             seed)
+uint64_set_value (TestTypeNode   *node,
+                  DBusTypeReader *reader,
+                  DBusTypeReader *realign_root,
+                  unsigned int    seed)
 {
-  /* also used for uint64 */
-  dbus_int64_t v;
+  /* also used for int64 */
+  dbus_uint64_t v;
 
-  v = int64_from_seed (seed);
+  v = uint64_from_seed (seed);
 
   return _dbus_type_reader_set_basic (reader,
                                       &v,
@@ -2374,9 +2378,9 @@ int64_set_value (TestTypeNode   *node,
 
 #define MAX_SAMPLE_STRING_LEN 10
 static void
-string_from_seed (char *buf,
-                  int   len,
-                  int   seed)
+string_from_seed (char         *buf,
+                  int           len,
+                  unsigned int  seed)
 {
   int i;
   unsigned char v;
@@ -2425,7 +2429,7 @@ static dbus_bool_t
 string_write_value (TestTypeNode   *node,
                     DataBlock      *block,
                     DBusTypeWriter *writer,
-                    int             seed)
+                    unsigned int    seed)
 {
   char buf[MAX_SAMPLE_STRING_LEN + 1]="";
   const char *v_string = buf;
@@ -2442,7 +2446,7 @@ string_write_value (TestTypeNode   *node,
 static dbus_bool_t
 string_read_value (TestTypeNode   *node,
                    DBusTypeReader *reader,
-                   int             seed)
+                   unsigned int    seed)
 {
   const char *v;
   char buf[MAX_SAMPLE_STRING_LEN + 1];
@@ -2466,7 +2470,7 @@ static dbus_bool_t
 string_set_value (TestTypeNode   *node,
                   DBusTypeReader *reader,
                   DBusTypeReader *realign_root,
-                  int             seed)
+                  unsigned int    seed)
 {
   char buf[MAX_SAMPLE_STRING_LEN + 1];
   const char *v_string = buf;
@@ -2494,7 +2498,7 @@ static dbus_bool_t
 bool_write_value (TestTypeNode   *node,
                   DataBlock      *block,
                   DBusTypeWriter *writer,
-                  int             seed)
+                  unsigned int    seed)
 {
   dbus_bool_t v;
 
@@ -2508,7 +2512,7 @@ bool_write_value (TestTypeNode   *node,
 static dbus_bool_t
 bool_read_value (TestTypeNode   *node,
                  DBusTypeReader *reader,
-                 int             seed)
+                 unsigned int    seed)
 {
   dbus_bool_t v;
 
@@ -2526,7 +2530,7 @@ static dbus_bool_t
 bool_set_value (TestTypeNode   *node,
                 DBusTypeReader *reader,
                 DBusTypeReader *realign_root,
-                int             seed)
+                unsigned int    seed)
 {
   dbus_bool_t v;
 
@@ -2537,13 +2541,13 @@ bool_set_value (TestTypeNode   *node,
                                       realign_root);
 }
 
-#define BYTE_FROM_SEED(seed) ((unsigned char) int32_from_seed (seed))
+#define BYTE_FROM_SEED(seed) ((unsigned char) uint32_from_seed (seed))
 
 static dbus_bool_t
 byte_write_value (TestTypeNode   *node,
                   DataBlock      *block,
                   DBusTypeWriter *writer,
-                  int             seed)
+                  unsigned int    seed)
 {
   unsigned char v;
 
@@ -2557,7 +2561,7 @@ byte_write_value (TestTypeNode   *node,
 static dbus_bool_t
 byte_read_value (TestTypeNode   *node,
                  DBusTypeReader *reader,
-                 int             seed)
+                 unsigned int    seed)
 {
   unsigned char v;
 
@@ -2576,7 +2580,7 @@ static dbus_bool_t
 byte_set_value (TestTypeNode   *node,
                 DBusTypeReader *reader,
                 DBusTypeReader *realign_root,
-                int             seed)
+                unsigned int    seed)
 {
   unsigned char v;
 
@@ -2588,16 +2592,16 @@ byte_set_value (TestTypeNode   *node,
 }
 
 static double
-double_from_seed (int seed)
+double_from_seed (unsigned int seed)
 {
-  return SAMPLE_INT32 * (double) seed + 0.3;
+  return SAMPLE_INT32 * ((double) (int) seed) + 0.3;
 }
 
 static dbus_bool_t
 double_write_value (TestTypeNode   *node,
                     DataBlock      *block,
                     DBusTypeWriter *writer,
-                    int             seed)
+                    unsigned int    seed)
 {
   double v;
 
@@ -2611,7 +2615,7 @@ double_write_value (TestTypeNode   *node,
 static dbus_bool_t
 double_read_value (TestTypeNode   *node,
                    DBusTypeReader *reader,
-                   int             seed)
+                   unsigned int    seed)
 {
   double v;
   double expected;
@@ -2635,7 +2639,7 @@ static dbus_bool_t
 double_set_value (TestTypeNode   *node,
                 DBusTypeReader *reader,
                 DBusTypeReader *realign_root,
-                int             seed)
+                unsigned int    seed)
 {
   double v;
 
@@ -2648,8 +2652,8 @@ double_set_value (TestTypeNode   *node,
 
 #define MAX_SAMPLE_OBJECT_PATH_LEN 10
 static void
-object_path_from_seed (char *buf,
-                       int   seed)
+object_path_from_seed (char          *buf,
+                       unsigned int   seed)
 {
   int i;
   unsigned char v;
@@ -2689,7 +2693,7 @@ static dbus_bool_t
 object_path_write_value (TestTypeNode   *node,
                          DataBlock      *block,
                          DBusTypeWriter *writer,
-                         int             seed)
+                         unsigned int    seed)
 {
   char buf[MAX_SAMPLE_OBJECT_PATH_LEN + 1];
   const char *v_string = buf;
@@ -2704,7 +2708,7 @@ object_path_write_value (TestTypeNode   *node,
 static dbus_bool_t
 object_path_read_value (TestTypeNode   *node,
                         DBusTypeReader *reader,
-                        int             seed)
+                        unsigned int    seed)
 {
   const char *v;
   char buf[MAX_SAMPLE_OBJECT_PATH_LEN + 1];
@@ -2725,7 +2729,7 @@ static dbus_bool_t
 object_path_set_value (TestTypeNode   *node,
                        DBusTypeReader *reader,
                        DBusTypeReader *realign_root,
-                       int             seed)
+                       unsigned int    seed)
 {
   char buf[MAX_SAMPLE_OBJECT_PATH_LEN + 1];
   const char *v_string = buf;
@@ -2739,8 +2743,8 @@ object_path_set_value (TestTypeNode   *node,
 
 #define MAX_SAMPLE_SIGNATURE_LEN 10
 static void
-signature_from_seed (char *buf,
-                     int   seed)
+signature_from_seed (char         *buf,
+                     unsigned int  seed)
 {
   /* try to avoid ascending, descending, or alternating length to help find bugs */
   const char *sample_signatures[] = {
@@ -2759,7 +2763,7 @@ static dbus_bool_t
 signature_write_value (TestTypeNode   *node,
                        DataBlock      *block,
                        DBusTypeWriter *writer,
-                       int             seed)
+                       unsigned int    seed)
 {
   char buf[MAX_SAMPLE_SIGNATURE_LEN + 1];
   const char *v_string = buf;
@@ -2774,7 +2778,7 @@ signature_write_value (TestTypeNode   *node,
 static dbus_bool_t
 signature_read_value (TestTypeNode   *node,
                       DBusTypeReader *reader,
-                      int             seed)
+                      unsigned int    seed)
 {
   const char *v;
   char buf[MAX_SAMPLE_SIGNATURE_LEN + 1];
@@ -2796,7 +2800,7 @@ static dbus_bool_t
 signature_set_value (TestTypeNode   *node,
                      DBusTypeReader *reader,
                      DBusTypeReader *realign_root,
-                     int             seed)
+                     unsigned int    seed)
 {
   char buf[MAX_SAMPLE_SIGNATURE_LEN + 1];
   const char *v_string = buf;
@@ -2812,7 +2816,7 @@ static dbus_bool_t
 struct_write_value (TestTypeNode   *node,
                     DataBlock      *block,
                     DBusTypeWriter *writer,
-                    int             seed)
+                    unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DataBlockState saved;
@@ -2867,7 +2871,7 @@ static dbus_bool_t
 struct_read_or_set_value (TestTypeNode   *node,
                           DBusTypeReader *reader,
                           DBusTypeReader *realign_root,
-                          int             seed)
+                          unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DBusTypeReader sub;
@@ -2919,7 +2923,7 @@ struct_read_or_set_value (TestTypeNode   *node,
 static dbus_bool_t
 struct_read_value (TestTypeNode   *node,
                    DBusTypeReader *reader,
-                   int             seed)
+                   unsigned int    seed)
 {
   return struct_read_or_set_value (node, reader, NULL, seed);
 }
@@ -2928,7 +2932,7 @@ static dbus_bool_t
 struct_set_value (TestTypeNode   *node,
                   DBusTypeReader *reader,
                   DBusTypeReader *realign_root,
-                  int             seed)
+                  unsigned int    seed)
 {
   return struct_read_or_set_value (node, reader, realign_root, seed);
 }
@@ -2983,7 +2987,7 @@ static dbus_bool_t
 array_write_value (TestTypeNode   *node,
                    DataBlock      *block,
                    DBusTypeWriter *writer,
-                   int             seed)
+                   unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DataBlockState saved;
@@ -3062,7 +3066,7 @@ static dbus_bool_t
 array_read_or_set_value (TestTypeNode   *node,
                          DBusTypeReader *reader,
                          DBusTypeReader *realign_root,
-                         int             seed)
+                         unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DBusTypeReader sub;
@@ -3133,7 +3137,7 @@ array_read_or_set_value (TestTypeNode   *node,
 static dbus_bool_t
 array_read_value (TestTypeNode   *node,
                   DBusTypeReader *reader,
-                  int             seed)
+                  unsigned int    seed)
 {
   return array_read_or_set_value (node, reader, NULL, seed);
 }
@@ -3142,7 +3146,7 @@ static dbus_bool_t
 array_set_value (TestTypeNode   *node,
                  DBusTypeReader *reader,
                  DBusTypeReader *realign_root,
-                 int             seed)
+                 unsigned int    seed)
 {
   return array_read_or_set_value (node, reader, realign_root, seed);
 }
@@ -3177,7 +3181,7 @@ static dbus_bool_t
 variant_write_value (TestTypeNode   *node,
                      DataBlock      *block,
                      DBusTypeWriter *writer,
-                     int             seed)
+                     unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DataBlockState saved;
@@ -3223,7 +3227,7 @@ static dbus_bool_t
 variant_read_or_set_value (TestTypeNode   *node,
                            DBusTypeReader *reader,
                            DBusTypeReader *realign_root,
-                           int             seed)
+                           unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DBusTypeReader sub;
@@ -3257,7 +3261,7 @@ variant_read_or_set_value (TestTypeNode   *node,
 static dbus_bool_t
 variant_read_value (TestTypeNode   *node,
                     DBusTypeReader *reader,
-                    int             seed)
+                    unsigned int    seed)
 {
   return variant_read_or_set_value (node, reader, NULL, seed);
 }
@@ -3266,7 +3270,7 @@ static dbus_bool_t
 variant_set_value (TestTypeNode   *node,
                    DBusTypeReader *reader,
                    DBusTypeReader *realign_root,
-                   int             seed)
+                   unsigned int    seed)
 {
   return variant_read_or_set_value (node, reader, realign_root, seed);
 }
@@ -3275,7 +3279,7 @@ static dbus_bool_t
 dict_write_value (TestTypeNode   *node,
                   DataBlock      *block,
                   DBusTypeWriter *writer,
-                  int             seed)
+                  unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DataBlockState saved;
@@ -3337,7 +3341,7 @@ dict_write_value (TestTypeNode   *node,
                                       &entry_sub))
         goto oom;
 
-      key = int32_from_seed (seed + i);
+      key = (dbus_int32_t) uint32_from_seed (seed + i);
 
       if (!_dbus_type_writer_write_basic (&entry_sub,
                                           DBUS_TYPE_INT32,
@@ -3371,7 +3375,7 @@ static dbus_bool_t
 dict_read_or_set_value (TestTypeNode   *node,
                         DBusTypeReader *reader,
                         DBusTypeReader *realign_root,
-                        int             seed)
+                        unsigned int    seed)
 {
   TestTypeNodeContainer *container = (TestTypeNodeContainer*) node;
   DBusTypeReader sub;
@@ -3408,7 +3412,7 @@ dict_read_or_set_value (TestTypeNode   *node,
 
               _dbus_type_reader_read_basic (&entry_sub, &v);
 
-              _dbus_assert (v == int32_from_seed (seed + i));
+              _dbus_assert (v == (dbus_int32_t) uint32_from_seed (seed + i));
 
               NEXT_EXPECTING_TRUE (&entry_sub);
               
@@ -3421,7 +3425,7 @@ dict_read_or_set_value (TestTypeNode   *node,
             {
               dbus_int32_t v;
               
-              v = int32_from_seed (seed + i);
+              v = (dbus_int32_t) uint32_from_seed (seed + i);
               
               if (!_dbus_type_reader_set_basic (&entry_sub,
                                                 &v,
@@ -3451,7 +3455,7 @@ dict_read_or_set_value (TestTypeNode   *node,
 static dbus_bool_t
 dict_read_value (TestTypeNode   *node,
                  DBusTypeReader *reader,
-                 int             seed)
+                 unsigned int    seed)
 {
   return dict_read_or_set_value (node, reader, NULL, seed);
 }
@@ -3460,7 +3464,7 @@ static dbus_bool_t
 dict_set_value (TestTypeNode   *node,
                 DBusTypeReader *reader,
                 DBusTypeReader *realign_root,
-                int             seed)
+                unsigned int    seed)
 {
   return dict_read_or_set_value (node, reader, realign_root, seed);
 }
