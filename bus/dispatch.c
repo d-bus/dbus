@@ -5098,11 +5098,10 @@ bus_dispatch_sha1_test (const char *test_data_dir_cstr)
   return TRUE;
 }
 
-#ifdef HAVE_UNIX_FD_PASSING
-
 dbus_bool_t
 bus_unix_fds_passing_test (const char *test_data_dir_cstr)
 {
+#ifdef HAVE_UNIX_FD_PASSING
   DBusString test_data_dir;
   BusContext *context;
   DBusConnection *foo, *bar;
@@ -5248,8 +5247,10 @@ bus_unix_fds_passing_test (const char *test_data_dir_cstr)
 
   bus_context_unref (context);
 
+#else
+  _dbus_test_skip ("fd-passing not supported on this platform");
+#endif
   return TRUE;
 }
-#endif
 
 #endif /* DBUS_ENABLE_EMBEDDED_TESTS */

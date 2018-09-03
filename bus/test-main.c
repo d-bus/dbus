@@ -120,12 +120,7 @@ main (int argc, char **argv)
   test_one ("dispatch", bus_dispatch_test, dir);
   test_one ("activation-service-reload",
             bus_activation_service_reload_test, dir);
-
-#ifdef HAVE_UNIX_FD_PASSING
   test_one ("unix-fds-passing", bus_unix_fds_passing_test, dir);
-#else
-  _dbus_test_skip ("fd-passing not supported on this platform");
-#endif
 
   return _dbus_test_done_testing ();
 }

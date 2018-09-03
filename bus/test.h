@@ -50,10 +50,7 @@ void        bus_test_run_clients_loop (dbus_bool_t                   block);
 void        bus_test_run_everything   (BusContext                   *context);
 BusContext* bus_context_new_test      (const DBusString             *test_data_dir,
                                        const char                   *filename);
-
-#ifdef HAVE_UNIX_FD_PASSING
 dbus_bool_t bus_unix_fds_passing_test (const char                   *test_data_dir_cstr);
-#endif
 
 #endif
 
