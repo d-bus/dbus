@@ -266,11 +266,14 @@ DBUS_UTIL_SOURCES=				\
 	dbus-spawn.h				\
 	dbus-string-util.c			\
 	dbus-sysdeps-util.c			\
-	dbus-test.c				\
 	dbus-test.h
 
 if DBUS_ENABLE_EMBEDDED_TESTS
-DBUS_UTIL_SOURCES += dbus-spawn-test.c
+DBUS_UTIL_SOURCES += \
+	dbus-spawn-test.c \
+	dbus-test-wrappers.c \
+	dbus-test-wrappers.h \
+	$(NULL)
 endif
 
 libdbus_1_la_SOURCES=				\

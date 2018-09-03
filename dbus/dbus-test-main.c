@@ -21,48 +21,53 @@
  *
  */
 
-
 #include <config.h>
-#include "dbus-types.h"
+
+#include "dbus-internals.h"
 #include "dbus-test.h"
-#include "dbus-test-tap.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#if HAVE_LOCALE_H
-#include <locale.h>
+#include "dbus-test-wrappers.h"
+
+static DBusTestCase tests[] =
+{
+  { "string", _dbus_string_test },
+  { "sysdeps", _dbus_sysdeps_test },
+  { "data-slot", _dbus_data_slot_test },
+  { "misc", _dbus_misc_test },
+  { "address", _dbus_address_test },
+  { "server", _dbus_server_test },
+  { "object-tree", _dbus_object_tree_test },
+  { "signature", _dbus_signature_test },
+  { "marshalling", _dbus_marshal_test },
+  { "marshal-recursive" , _dbus_marshal_recursive_test },
+  { "byteswap", _dbus_marshal_byteswap_test },
+  { "memory", _dbus_memory_test },
+  { "mem-pool", _dbus_mem_pool_test },
+  { "list", _dbus_list_test },
+  { "marshal-validate", _dbus_marshal_validate_test },
+  { "message", _dbus_message_test },
+  { "hash", _dbus_hash_test },
+  { "credentials", _dbus_credentials_test },
+  { "keyring", _dbus_keyring_test },
+  { "sha", _dbus_sha_test },
+  { "auth", _dbus_auth_test },
+
+#if defined(DBUS_UNIX)
+  { "userdb", _dbus_userdb_test },
+  { "transport-unix", _dbus_transport_unix_test },
 #endif
 
-#ifdef DBUS_UNIX
-# include <dbus/dbus-sysdeps-unix.h>
+#if !defined(DBUS_WINCE)
+  { "spawn", _dbus_spawn_test },
 #endif
+
+  { NULL }
+};
 
 int
 main (int    argc,
       char **argv)
 {
-  const char *test_data_dir;
-  const char *specific_test;
-
-#ifdef DBUS_UNIX
-  /* close any inherited fds so dbus-spawn's check for close-on-exec works */
-  _dbus_close_all ();
-#endif
-
-#if HAVE_SETLOCALE
-  setlocale(LC_ALL, "");
-#endif
-  
-  if (argc > 1 && strcmp (argv[1], "--tap") != 0)
-    test_data_dir = argv[1];
-  else
-    test_data_dir = NULL;
-
-  if (argc > 2)
-    specific_test = argv[2];
-  else
-    specific_test = _dbus_getenv ("DBUS_TEST_ONLY");
-
-  _dbus_run_tests (test_data_dir, specific_test);
-  return _dbus_test_done_testing ();
+  return _dbus_test_main (argc, argv, _DBUS_N_ELEMENTS (tests), tests,
+                          DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
+                          NULL, NULL);
 }

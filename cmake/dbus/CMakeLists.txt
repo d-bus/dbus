@@ -171,8 +171,8 @@ set (DBUS_UTIL_SOURCES
 if (DBUS_ENABLE_EMBEDDED_TESTS)
 	set (DBUS_UTIL_SOURCES 
 		${DBUS_UTIL_SOURCES}
-		${DBUS_DIR}/dbus-test.c
 		${DBUS_DIR}/dbus-spawn-test.c
+		${DBUS_DIR}/dbus-test-wrappers.c
 	)
 endif (DBUS_ENABLE_EMBEDDED_TESTS)
 
@@ -185,6 +185,7 @@ set (DBUS_UTIL_HEADERS
 	${DBUS_DIR}/dbus-socket-set.h
 	${DBUS_DIR}/dbus-spawn.h
 	${DBUS_DIR}/dbus-test.h
+	${DBUS_DIR}/dbus-test-wrappers.h
 )
 
 ### platform specific settings

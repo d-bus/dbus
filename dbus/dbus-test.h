@@ -96,9 +96,6 @@ dbus_bool_t _dbus_object_tree_test       (const char *test_data_dir);
 
 dbus_bool_t _dbus_credentials_test       (const char *test_data_dir);
 
-void        _dbus_run_tests              (const char *test_data_dir,
-                                          const char *specific_test);
-
 dbus_bool_t _dbus_test_generate_bodies   (int         sequence,
                                           int         byte_order,
                                           DBusString *signature,
