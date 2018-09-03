@@ -97,6 +97,14 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     add_test_executable(test-bus "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
     set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
+    set(SOURCES ${TEST_DIR}/bus/dispatch.c)
+    add_test_executable(test-bus-dispatch "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus-dispatch PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/bus/dispatch-sha1.c)
+    add_test_executable(test-bus-dispatch-sha1 "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus-dispatch-sha1 PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
     if(NOT WIN32)
         add_test_executable(test-bus-system ${TEST_DIR}/bus/system.c launch-helper-internal)
         add_test_executable(test-bus-launch-helper-oom ${TEST_DIR}/bus/launch-helper-oom.c launch-helper-internal)

@@ -79,7 +79,11 @@ if !DBUS_WINCE
 uninstallable_test_programs += test-spawn-oom
 endif
 
-uninstallable_test_programs += test-bus
+uninstallable_test_programs += \
+	test-bus \
+	test-bus-dispatch \
+	test-bus-dispatch-sha1 \
+	$(NULL)
 
 if DBUS_UNIX
 uninstallable_test_programs += test-bus-launch-helper-oom
@@ -167,6 +171,12 @@ test_bus_system_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
 
 test_bus_SOURCES = bus/main.c
 test_bus_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+
+test_bus_dispatch_SOURCES = bus/dispatch.c
+test_bus_dispatch_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+
+test_bus_dispatch_sha1_SOURCES = bus/dispatch-sha1.c
+test_bus_dispatch_sha1_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
 
 EXTRA_DIST += dbus-test-runner
 

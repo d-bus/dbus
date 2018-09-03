@@ -1,6 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* test-main.c  main() for make check
- *
+/*
  * Copyright 2003-2009 Red Hat, Inc.
  * Copyright 2011-2018 Collabora Ltd.
  *
@@ -47,20 +46,12 @@ test_post_hook (void)
     bus_selinux_shutdown ();
 }
 
-static DBusTestCase tests[] =
-{
-  { "expire-list", bus_expire_list_test },
-  { "config-parser", bus_config_parser_test },
-  { "signals", bus_signals_test },
-  { "activation-service-reload", bus_activation_service_reload_test },
-  { "unix-fds-passing", bus_unix_fds_passing_test },
-  { NULL }
-};
+static DBusTestCase test = { "dispatch-sha1", bus_dispatch_sha1_test };
 
 int
 main (int argc, char **argv)
 {
-  return _dbus_test_main (argc, argv, _DBUS_N_ELEMENTS (tests), tests,
+  return _dbus_test_main (argc, argv, 1, &test,
                           (DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS |
                            DBUS_TEST_FLAGS_CHECK_FD_LEAKS |
                            DBUS_TEST_FLAGS_REQUIRE_DATA),
