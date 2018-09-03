@@ -24,6 +24,8 @@
 #ifndef DBUS_MARSHAL_VALIDATE_H
 #define DBUS_MARSHAL_VALIDATE_H
 
+#include <dbus/dbus-string.h>
+
 /**
  * @addtogroup DBusMarshal
  *
