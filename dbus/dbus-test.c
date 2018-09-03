@@ -38,6 +38,8 @@ run_data_test (const char             *test_name,
                TestDataFunc            test,
                const char             *test_data_dir)
 {
+  long before, after;
+
   if (specific_test != NULL && strcmp (specific_test, test_name) != 0)
     {
       _dbus_test_skip ("%s - Only intending to run %s", test_name, specific_test);
@@ -46,10 +48,17 @@ run_data_test (const char             *test_name,
 
   _dbus_test_diag ("%s: running %s tests", "test-dbus", test_name);
 
+  _dbus_get_monotonic_time (&before, NULL);
+
   if (test (test_data_dir))
     _dbus_test_ok ("%s", test_name);
   else
     _dbus_test_not_ok ("%s", test_name);
+
+  _dbus_get_monotonic_time (&after, NULL);
+
+  _dbus_test_diag ("%s: %s test took %ld seconds",
+                   "test-dbus", test_name, after - before);
 
   _dbus_test_check_memleaks (test_name);
 }

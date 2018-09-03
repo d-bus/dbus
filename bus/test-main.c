@@ -65,6 +65,8 @@ test_one (const char *name,
           dbus_bool_t (*func) (const char *),
           const char *test_data_dir)
 {
+  long before, after;
+
   if (only != NULL && strcmp (only, name) != 0)
     {
       _dbus_test_skip ("%s - Only intending to run %s", name, only);
@@ -72,6 +74,7 @@ test_one (const char *name,
     }
 
   _dbus_test_diag ("Running test: %s", name);
+  _dbus_get_monotonic_time (&before, NULL);
 
   test_pre_hook ();
 
@@ -79,6 +82,10 @@ test_one (const char *name,
     _dbus_test_ok ("%s", name);
   else
     _dbus_test_not_ok ("%s", name);
+
+  _dbus_get_monotonic_time (&after, NULL);
+
+  _dbus_test_diag ("%s test took %ld seconds", name, after - before);
 
   test_post_hook (name);
 }
