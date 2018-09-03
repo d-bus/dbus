@@ -2041,7 +2041,7 @@ out:
 }
 
 dbus_bool_t
-_dbus_marshal_recursive_test (void)
+_dbus_marshal_recursive_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   make_and_run_test_nodes ();
 

@@ -687,36 +687,41 @@ check_file_valid (DBusString *full_path,
 }
 
 dbus_bool_t
-bus_config_parser_trivial_test (const DBusString *test_data_dir)
+bus_config_parser_trivial_test (const char *test_data_dir_cstr)
 {
+  DBusString test_data_dir;
   DBusString full_path;
   dbus_bool_t retval;
 
   retval = FALSE;
 
-  if (test_data_dir == NULL ||
-      _dbus_string_get_length (test_data_dir) == 0)
+  if (test_data_dir_cstr == NULL || test_data_dir_cstr[0] == '\0')
     {
       _dbus_test_diag ("No test data");
       return TRUE;
     }
-  
+
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
+
   /* We already test default_session_servicedirs and default_system_servicedirs
    * in bus_config_parser_test() */
-  if (!process_test_valid_subdir (test_data_dir, "valid-config-files", VALID))
+  if (!process_test_valid_subdir (&test_data_dir, "valid-config-files",
+                                  VALID))
     goto finish;
 
 #ifndef DBUS_WIN
   /* We already test default_session_servicedirs and default_system_servicedirs
    * in bus_config_parser_test() */
-  if (!process_test_valid_subdir (test_data_dir, "valid-config-files-system", VALID))
+  if (!process_test_valid_subdir (&test_data_dir,
+                                  "valid-config-files-system", VALID))
     goto finish;
 #endif
 
   /* we don't process all the invalid files, as the trivial parser can't hope
    * to validate them all for all different syntaxes. We just check one broken
    * file to see if junk is received */
-  if (!make_full_path (test_data_dir, "invalid-config-files", "not-well-formed.conf", &full_path))
+  if (!make_full_path (&test_data_dir, "invalid-config-files",
+                       "not-well-formed.conf", &full_path))
     goto finish;
   if (!check_file_valid (&full_path, INVALID))
     goto finish;
@@ -724,7 +729,8 @@ bus_config_parser_trivial_test (const DBusString *test_data_dir)
 
 #ifndef DBUS_WIN
   /* just test if the check_file_valid works okay and we got sane values */
-  if (!make_full_path (test_data_dir, "valid-config-files-system", "system.conf", &full_path))
+  if (!make_full_path (&test_data_dir, "valid-config-files-system",
+                       "system.conf", &full_path))
     goto finish;
   if (!check_file_valid (&full_path, VALID))
     goto finish;

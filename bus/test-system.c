@@ -50,7 +50,6 @@ int
 main (int argc, char **argv)
 {
   const char *dir;
-  DBusString test_data_dir;
 
   progname = argv[0];
 
@@ -62,11 +61,9 @@ main (int argc, char **argv)
   if (dir == NULL)
     _dbus_test_fatal ("Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable");
 
-  _dbus_string_init_const (&test_data_dir, dir);
-
   test_pre_hook ();
   _dbus_test_diag ("%s: Running config file parser (trivial) test", argv[0]);
-  if (!bus_config_parser_trivial_test (&test_data_dir))
+  if (!bus_config_parser_trivial_test (dir))
     _dbus_test_fatal ("OOM creating parser");
 
   /* All failure modes for this test are currently fatal */

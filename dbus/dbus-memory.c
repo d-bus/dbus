@@ -930,7 +930,7 @@ dbus_shutdown (void)
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_memory_test (void)
+_dbus_memory_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   dbus_bool_t old_guards;
   void *p;

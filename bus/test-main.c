@@ -42,7 +42,6 @@
 
 static const char *only;
 static DBusInitialFDs *initial_fds = NULL;
-static DBusString test_data_dir;
 
 static void
 test_pre_hook (void)
@@ -63,7 +62,8 @@ test_post_hook (const char *name)
 
 static void
 test_one (const char *name,
-          dbus_bool_t (*func) (const DBusString *))
+          dbus_bool_t (*func) (const char *),
+          const char *test_data_dir)
 {
   if (only != NULL && strcmp (only, name) != 0)
     {
@@ -75,7 +75,7 @@ test_one (const char *name,
 
   test_pre_hook ();
 
-  if (func (&test_data_dir))
+  if (func (test_data_dir))
     _dbus_test_ok ("%s", name);
   else
     _dbus_test_not_ok ("%s", name);
@@ -101,22 +101,21 @@ main (int argc, char **argv)
   if (dir == NULL)
     _dbus_test_fatal ("Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable");
 
-  _dbus_string_init_const (&test_data_dir, dir);
-
 #ifdef DBUS_UNIX
   /* close any inherited fds so dbus-spawn's check for close-on-exec works */
   _dbus_close_all ();
 #endif
 
-  test_one ("expire-list", bus_expire_list_test);
-  test_one ("config-parser", bus_config_parser_test);
-  test_one ("signals", bus_signals_test);
-  test_one ("dispatch-sha1", bus_dispatch_sha1_test);
-  test_one ("dispatch", bus_dispatch_test);
-  test_one ("activation-service-reload", bus_activation_service_reload_test);
+  test_one ("expire-list", bus_expire_list_test, dir);
+  test_one ("config-parser", bus_config_parser_test, dir);
+  test_one ("signals", bus_signals_test, dir);
+  test_one ("dispatch-sha1", bus_dispatch_sha1_test, dir);
+  test_one ("dispatch", bus_dispatch_test, dir);
+  test_one ("activation-service-reload",
+            bus_activation_service_reload_test, dir);
 
 #ifdef HAVE_UNIX_FD_PASSING
-  test_one ("unix-fds-passing", bus_unix_fds_passing_test);
+  test_one ("unix-fds-passing", bus_unix_fds_passing_test, dir);
 #else
   _dbus_test_skip ("fd-passing not supported on this platform");
 #endif

@@ -698,7 +698,7 @@ static const char* invalid_escaped_values[] = {
 };
 
 dbus_bool_t
-_dbus_address_test (void)
+_dbus_address_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusAddressEntry **entries;
   int len;

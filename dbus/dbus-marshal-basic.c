@@ -1663,7 +1663,7 @@ swap_test_array (void *array,
   } while (0)
 
 dbus_bool_t
-_dbus_marshal_test (void)
+_dbus_marshal_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   int alignment;
   DBusString str;

@@ -1187,7 +1187,7 @@ verify_test_message_memleak (DBusMessage *message)
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_message_test (const char *test_data_dir)
+_dbus_message_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusMessage *message, *message_without_unix_fds;
   DBusMessageLoader *loader;

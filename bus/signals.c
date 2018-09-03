@@ -2963,7 +2963,7 @@ test_matching_path_namespace (void)
 }
 
 dbus_bool_t
-bus_signals_test (const DBusString *test_data_dir)
+bus_signals_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   BusMatchmaker *matchmaker;
 

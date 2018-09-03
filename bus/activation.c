@@ -2733,11 +2733,14 @@ do_service_reload_test (const DBusString *test_data_dir,
 }
 
 dbus_bool_t
-bus_activation_service_reload_test (const DBusString *test_data_dir)
+bus_activation_service_reload_test (const char *test_data_dir_cstr)
 {
+  DBusString test_data_dir;
   DBusString directory;
   const char *tmp;
   dbus_bool_t ret = FALSE;
+
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
 
   if (!_dbus_string_init (&directory))
     return FALSE;
@@ -2758,7 +2761,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
   if (!init_service_reload_test (&directory))
     _dbus_test_fatal ("could not initiate service reload test");
 
-  if (!do_service_reload_test (test_data_dir, &directory, FALSE))
+  if (!do_service_reload_test (&test_data_dir, &directory, FALSE))
     {
       /* Do nothing? */
     }
@@ -2770,7 +2773,7 @@ bus_activation_service_reload_test (const DBusString *test_data_dir)
   if (!init_service_reload_test (&directory))
     _dbus_test_fatal ("could not initiate service reload test");
 
-  if (!do_service_reload_test (test_data_dir, &directory, TRUE))
+  if (!do_service_reload_test (&test_data_dir, &directory, TRUE))
     {
       /* Do nothing? */
     }

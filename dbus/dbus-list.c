@@ -972,7 +972,7 @@ lists_equal (DBusList **list1,
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_list_test (void)
+_dbus_list_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusList *list1;
   DBusList *list2;

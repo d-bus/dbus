@@ -1199,7 +1199,7 @@ dbus_server_get_data (DBusServer   *server,
 #include <string.h>
 
 dbus_bool_t
-_dbus_server_test (void)
+_dbus_server_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   const char *valid_addresses[] = {
     "tcp:port=1234",

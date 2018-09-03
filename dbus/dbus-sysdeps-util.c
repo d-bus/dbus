@@ -132,7 +132,7 @@ check_path_absolute (const char *path,
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_sysdeps_test (void)
+_dbus_sysdeps_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
 #ifdef DBUS_WIN
   check_dirname ("foo\\bar", "foo");

@@ -317,7 +317,7 @@ time_add_milliseconds (long *tv_sec,
 }
 
 dbus_bool_t
-bus_expire_list_test (const DBusString *test_data_dir)
+bus_expire_list_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusLoop *loop;
   BusExpireList *list;

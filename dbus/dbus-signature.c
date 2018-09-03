@@ -421,7 +421,7 @@ dbus_type_is_valid (int typecode)
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_signature_test (void)
+_dbus_signature_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusSignatureIter iter;
   DBusSignatureIter subiter;
