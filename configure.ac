@@ -423,6 +423,26 @@ unsetenv
 usleep
 ])
 
+# This construct is only suitable for headers that are self-contained
+# and do not require extra headers to be included first. More complex
+# headers need their own checks. Please keep sorted in LC_ALL=C order
+AC_CHECK_HEADERS_ONCE([
+alloca.h
+byteswap.h
+crt_externs.h
+dirent.h
+errno.h
+locale.h
+signal.h
+stdint.h
+sys/prctl.h
+sys/resource.h
+sys/syslimits.h
+sys/time.h
+unistd.h
+ws2tcpip.h
+])
+
 #### Integer sizes
 
 AC_CHECK_SIZEOF(char)
@@ -661,9 +681,6 @@ if test "x$ac_cv_header_syslog_h" = "xyes"; then
   AC_CHECK_DECLS([LOG_PERROR], [], [], [[#include <syslog.h>]])
 fi
 
-# For test-segfault.c
-AC_CHECK_HEADERS_ONCE([sys/prctl.h])
-
 AC_MSG_CHECKING(for dirfd)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <sys/types.h>
@@ -699,31 +716,10 @@ closedir(dirp);
 	fi
 fi
 
-AC_CHECK_HEADERS(sys/resource.h)
-AC_CHECK_HEADERS([sys/time.h])
-
-AC_CHECK_HEADERS(dirent.h)
-
 AC_CHECK_HEADERS([execinfo.h],
 	[AC_SEARCH_LIBS([backtrace], [execinfo],
 		[AC_DEFINE([HAVE_BACKTRACE], [1],
 			[Define to 1 if you have backtrace().])])])
-
-AC_CHECK_HEADERS(errno.h)
-
-AC_CHECK_HEADERS(signal.h)
-
-AC_CHECK_HEADERS(locale.h)
-
-AC_CHECK_HEADERS(byteswap.h)
-
-AC_CHECK_HEADERS(unistd.h)
-
-AC_CHECK_HEADERS([stdint.h])
-
-AC_CHECK_HEADERS(ws2tcpip.h)
-
-AC_CHECK_HEADERS(alloca.h)
 
 # Add -D_POSIX_PTHREAD_SEMANTICS if on Solaris
 #
@@ -800,9 +796,6 @@ fi
 dnl check for writev header and writev function so we're
 dnl good to go if HAVE_WRITEV gets defined.
 AC_CHECK_HEADERS(sys/uio.h, [AC_CHECK_FUNCS(writev)])
-
-dnl needed on darwin for NAME_MAX
-AC_CHECK_HEADERS(sys/syslimits.h)
 
 dnl Make it easy to check if we have MSG_NOSIGNAL without actually having to include sys/socket.h
 AC_CHECK_DECLS([MSG_NOSIGNAL], [], [], [[ #include <sys/types.h>
@@ -1721,7 +1714,6 @@ AC_DEFINE_UNQUOTED([DBUS_SESSION_BUS_CONNECT_ADDRESS],
   [Fallback address for session bus clients])
 
 # darwin needs this to initialize the environment
-AC_CHECK_HEADERS(crt_externs.h)
 AC_CHECK_FUNC(_NSGetEnviron, [AC_DEFINE(HAVE_NSGETENVIRON, 1, [Define if your system needs _NSGetEnviron to set up the environment])])
 AH_VERBATIM(_DARWIN_ENVIRON,
 [
