@@ -389,6 +389,40 @@ AS_IF([test x$enable_code_coverage = xyes],[
       [Defined if gcov is enabled to force a rebuild due to config.h changing])
   ])
 
+#### Simple checks for things with no special dependencies
+
+# This construct is only suitable for functions that are in the system's
+# standard C library and do not have unusual dependencies. Other
+# functions need their own checks. Please keep sorted in LC_ALL=C order
+AC_CHECK_FUNCS_ONCE([
+accept4
+clearenv
+fpathconf
+getgrouplist
+getpeereid
+getpeerucred
+getresuid
+getrlimit
+inotify_init1
+issetugid
+localeconv
+nanosleep
+pipe2
+poll
+prctl
+prlimit
+raise
+setenv
+setlocale
+setresuid
+setrlimit
+socketpair
+strtoll
+strtoull
+unsetenv
+usleep
+])
+
 #### Integer sizes
 
 AC_CHECK_SIZEOF(char)
@@ -622,8 +656,6 @@ AC_DEFINE_UNQUOTED([DBUS_USE_SYNC], [$have_sync], [Use the gcc __sync extension]
 AC_SEARCH_LIBS(socket,[socket network])
 AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
 
-AC_CHECK_FUNCS([nanosleep usleep setenv clearenv unsetenv socketpair getgrouplist fpathconf setrlimit poll setlocale localeconv strtoll strtoull issetugid getresuid setresuid getrlimit prlimit])
-
 AC_CHECK_HEADERS([syslog.h])
 if test "x$ac_cv_header_syslog_h" = "xyes"; then
   AC_CHECK_DECLS([LOG_PERROR], [], [], [[#include <syslog.h>]])
@@ -631,7 +663,6 @@ fi
 
 # For test-segfault.c
 AC_CHECK_HEADERS_ONCE([sys/prctl.h])
-AC_CHECK_FUNCS_ONCE([prctl raise])
 
 AC_MSG_CHECKING(for dirfd)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
@@ -800,10 +831,6 @@ AC_CHECK_MEMBER([struct unpcbid.unp_pid],
                 [],
                 [[#include <sys/un.h>]])
 
-AC_CHECK_FUNCS(getpeerucred getpeereid)
-
-AC_CHECK_FUNCS(pipe2 accept4)
-
 PKG_CHECK_MODULES([EXPAT], [expat])
 
 save_cflags="$CFLAGS"
@@ -949,7 +976,6 @@ fi
 dnl check if inotify backend is enabled
 if test x$have_inotify = xyes; then
    AC_DEFINE(DBUS_BUS_ENABLE_INOTIFY,1,[Use inotify])
-   AC_CHECK_FUNCS(inotify_init1)
 fi
 
 AM_CONDITIONAL(DBUS_BUS_ENABLE_INOTIFY, test x$have_inotify = xyes)
