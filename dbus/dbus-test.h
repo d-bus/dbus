@@ -44,9 +44,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_marshal_test           (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_misc_test              (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_mem_pool_test          (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT

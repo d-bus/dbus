@@ -33,6 +33,68 @@
 
 #include "misc-internals.h"
 
+static dbus_bool_t
+_dbus_misc_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
+{
+  int major, minor, micro;
+  DBusString str;
+
+  /* make sure we don't crash on NULL */
+  dbus_get_version (NULL, NULL, NULL);
+
+  /* Now verify that all the compile-time version stuff
+   * is right and matches the runtime. These tests
+   * are mostly intended to catch various kinds of
+   * typo (mixing up major and minor, that sort of thing).
+   */
+  dbus_get_version (&major, &minor, &micro);
+
+  _dbus_assert (major == DBUS_MAJOR_VERSION);
+  _dbus_assert (minor == DBUS_MINOR_VERSION);
+  _dbus_assert (micro == DBUS_MICRO_VERSION);
+
+#define MAKE_VERSION(x, y, z) (((x) << 16) | ((y) << 8) | (z))
+
+  /* check that MAKE_VERSION works and produces the intended ordering */
+  _dbus_assert (MAKE_VERSION (1, 0, 0) > MAKE_VERSION (0, 0, 0));
+  _dbus_assert (MAKE_VERSION (1, 1, 0) > MAKE_VERSION (1, 0, 0));
+  _dbus_assert (MAKE_VERSION (1, 1, 1) > MAKE_VERSION (1, 1, 0));
+
+  _dbus_assert (MAKE_VERSION (2, 0, 0) > MAKE_VERSION (1, 1, 1));
+  _dbus_assert (MAKE_VERSION (2, 1, 0) > MAKE_VERSION (1, 1, 1));
+  _dbus_assert (MAKE_VERSION (2, 1, 1) > MAKE_VERSION (1, 1, 1));
+
+  /* check DBUS_VERSION */
+  _dbus_assert (MAKE_VERSION (major, minor, micro) == DBUS_VERSION);
+
+  /* check that ordering works with DBUS_VERSION */
+  _dbus_assert (MAKE_VERSION (major - 1, minor, micro) < DBUS_VERSION);
+  _dbus_assert (MAKE_VERSION (major, minor - 1, micro) < DBUS_VERSION);
+  _dbus_assert (MAKE_VERSION (major, minor, micro - 1) < DBUS_VERSION);
+
+  _dbus_assert (MAKE_VERSION (major + 1, minor, micro) > DBUS_VERSION);
+  _dbus_assert (MAKE_VERSION (major, minor + 1, micro) > DBUS_VERSION);
+  _dbus_assert (MAKE_VERSION (major, minor, micro + 1) > DBUS_VERSION);
+
+  /* Check DBUS_VERSION_STRING */
+
+  if (!_dbus_string_init (&str))
+    _dbus_test_fatal ("no memory");
+
+  if (!(_dbus_string_append_int (&str, major) &&
+        _dbus_string_append_byte (&str, '.') &&
+        _dbus_string_append_int (&str, minor) &&
+        _dbus_string_append_byte (&str, '.') &&
+        _dbus_string_append_int (&str, micro)))
+    _dbus_test_fatal ("no memory");
+
+  _dbus_assert (_dbus_string_equal_c_str (&str, DBUS_VERSION_STRING));
+
+  _dbus_string_free (&str);
+
+  return TRUE;
+}
+
 /**
  * @ingroup DBusSignatureInternals
  * Unit test for DBusSignature.
