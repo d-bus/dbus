@@ -40,6 +40,8 @@ typedef struct
   unsigned int in_array : 1; /**< true if we are a subiterator pointing to an array's element type */
 } DBusSignatureRealIter;
 
+_DBUS_STATIC_ASSERT (sizeof (DBusSignatureIter) >= sizeof (DBusSignatureRealIter));
+
 /** macro that checks whether a typecode is a container type */
 #define TYPE_IS_CONTAINER(typecode)             \
     ((typecode) == DBUS_TYPE_STRUCT ||          \
@@ -429,8 +431,6 @@ _dbus_signature_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
   DBusSignatureIter subsubsubiter;
   const char *sig;
   dbus_bool_t boolres;
-
-  _DBUS_STATIC_ASSERT (sizeof (DBusSignatureIter) >= sizeof (DBusSignatureRealIter));
 
   sig = "";
   _dbus_assert (dbus_signature_validate (sig, NULL));
