@@ -30,5 +30,6 @@ dbus_bool_t _dbus_auth_test              (const char *test_data_dir);
 dbus_bool_t _dbus_credentials_test       (const char *test_data_dir);
 dbus_bool_t _dbus_marshal_byteswap_test  (const char *test_data_dir);
 dbus_bool_t _dbus_marshal_validate_test  (const char *test_data_dir);
+dbus_bool_t _dbus_string_test            (const char *test_data_dir);
 
 #endif

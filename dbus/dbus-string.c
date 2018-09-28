@@ -1,8 +1,15 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* dbus-string.c String utility class (internal to D-Bus implementation)
  *
- * Copyright (C) 2002, 2003, 2004, 2005 Red Hat, Inc.
- * Copyright (C) 2006 Ralf Habacker <ralf.habacker@freenet.de>
+ * Copyright 2002-2007 Red Hat, Inc.
+ * Copyright 2003 CodeFactory AB
+ * Copyright 2003 Mark McLoughlin
+ * Copyright 2004 Michael Meeks
+ * Copyright 2006-2014 Ralf Habacker <ralf.habacker@freenet.de>
+ * Copyright 2006-2018 Collabora Ltd.
+ * Copyright 2007 Allison Lortie
+ * Copyright 2011 Roberto Guido
+ * Copyright 2013 Chengwei Yang / Intel
  *
  * Licensed under the Academic Free License version 2.1
  *
