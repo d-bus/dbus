@@ -22,16 +22,22 @@
  */
 
 #include <config.h>
+
+#include "misc-internals.h"
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#include "dbus-internals.h"
-#include "dbus-marshal-validate.h"
-#include "dbus-marshal-recursive.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-marshal-validate.h"
+#include "dbus/dbus-marshal-recursive.h"
 #include <dbus/dbus-test-tap.h>
 
-#include "dbus-test.h"
+#include "dbus/dbus-test.h"
+
+#include "dbus-marshal-recursive-util.h"
+
 #include <stdio.h>
 
 typedef struct

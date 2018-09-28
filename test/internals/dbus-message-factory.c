@@ -32,6 +32,8 @@
 #include "dbus/dbus-test.h"
 #include "dbus/dbus-test-tap.h"
 
+#include "dbus-marshal-recursive-util.h"
+
 #include <stdio.h>
 
 typedef enum

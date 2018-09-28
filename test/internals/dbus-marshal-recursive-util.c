@@ -23,12 +23,14 @@
 
 #include <config.h>
 
+#include "dbus-marshal-recursive-util.h"
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
-#include "dbus-marshal-recursive.h"
-#include "dbus-marshal-basic.h"
-#include "dbus-signature.h"
-#include "dbus-internals.h"
+#include "dbus/dbus-marshal-recursive.h"
+#include "dbus/dbus-marshal-basic.h"
+#include "dbus/dbus-signature.h"
+#include "dbus/dbus-internals.h"
 #include <dbus/dbus-test-tap.h>
 #include <string.h>
 
@@ -124,8 +126,8 @@ _dbus_type_reader_equal_values (const DBusTypeReader *lhs,
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#include "dbus-test.h"
-#include "dbus-list.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-list.h"
 #include <stdio.h>
 #include <stdlib.h>
 

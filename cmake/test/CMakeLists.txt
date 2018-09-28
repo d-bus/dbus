@@ -96,10 +96,15 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     add_test_executable(test-hash ${TEST_DIR}/internals/hash.c dbus-testutils)
     set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    add_test_executable(test-marshal-recursive ${TEST_DIR}/internals/marshal-recursive.c dbus-testutils)
+    set(SOURCES ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/marshal-recursive.c)
+    add_test_executable(test-marshal-recursive "${SOURCES}" dbus-testutils)
     set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES ${TEST_DIR}/internals/dbus-message-factory.c
+    set(SOURCES ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/dbus-message-factory.c
                 ${TEST_DIR}/internals/dbus-message-factory.h
                 ${TEST_DIR}/internals/dbus-message-util.c
                 ${TEST_DIR}/internals/dbus-message-util.h
@@ -111,6 +116,10 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
                 ${TEST_DIR}/internals/dbus-auth-script.h
                 ${TEST_DIR}/internals/dbus-auth-util.c
                 ${TEST_DIR}/internals/dbus-credentials-util.c
+                ${TEST_DIR}/internals/dbus-marshal-byteswap-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/dbus-marshal-validate-util.c
                 ${TEST_DIR}/internals/misc-internals.c
                 ${TEST_DIR}/internals/misc-internals.h)
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)

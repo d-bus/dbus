@@ -43,10 +43,6 @@ dbus_bool_t _dbus_list_test              (const char *test_data_dir);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_marshal_test           (const char *test_data_dir);
 
-dbus_bool_t _dbus_marshal_recursive_test (const char *test_data_dir);
-dbus_bool_t _dbus_marshal_byteswap_test  (const char *test_data_dir);
-dbus_bool_t _dbus_marshal_validate_test  (const char *test_data_dir);
-
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_misc_test              (const char *test_data_dir);
 
@@ -86,10 +82,5 @@ dbus_bool_t _dbus_memory_test            (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_object_tree_test       (const char *test_data_dir);
-
-dbus_bool_t _dbus_test_generate_bodies   (int         sequence,
-                                          int         byte_order,
-                                          DBusString *signature,
-                                          DBusString *body);
 
 #endif /* DBUS_TEST_H */

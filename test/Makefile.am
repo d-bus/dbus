@@ -203,10 +203,16 @@ test_bus_dispatch_sha1_LDADD = \
 test_hash_SOURCES = internals/hash.c
 test_hash_LDADD = libdbus-testutils.la
 
-test_marshal_recursive_SOURCES = internals/marshal-recursive.c
+test_marshal_recursive_SOURCES = \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
+	internals/marshal-recursive.c \
+	$(NULL)
 test_marshal_recursive_LDADD = libdbus-testutils.la
 
 test_message_internals_SOURCES = \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
 	internals/dbus-message-factory.c \
 	internals/dbus-message-factory.h \
 	internals/dbus-message-util.c \
@@ -220,6 +226,10 @@ test_misc_internals_SOURCES = \
 	internals/dbus-auth-script.h \
 	internals/dbus-auth-util.c \
 	internals/dbus-credentials-util.c \
+	internals/dbus-marshal-byteswap-util.c \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
+	internals/dbus-marshal-validate-util.c \
 	internals/misc-internals.c \
 	internals/misc-internals.h \
 	$(NULL)

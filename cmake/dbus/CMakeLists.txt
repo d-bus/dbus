@@ -153,9 +153,6 @@ set (DBUS_SHARED_HEADERS
 set (DBUS_UTIL_SOURCES
 	${DBUS_DIR}/dbus-asv-util.c
 	${DBUS_DIR}/dbus-mainloop.c
-	${DBUS_DIR}/dbus-marshal-byteswap-util.c
-	${DBUS_DIR}/dbus-marshal-recursive-util.c
-	${DBUS_DIR}/dbus-marshal-validate-util.c
 	${DBUS_DIR}/dbus-message-util.c
 	${DBUS_DIR}/dbus-shell.c
 	${DBUS_DIR}/dbus-pollable-set.c

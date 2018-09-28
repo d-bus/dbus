@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/*
- * Copyright 2002-2009 Red Hat, Inc.
- * Copyright 2011-2018 Collabora Ltd.
+/* dbus-marshal-recursive-util.c  Would be in dbus-marshal-recursive.c, but only used in bus/tests
+ *
+ * Copyright (C) 2004, 2005 Red Hat, Inc.
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -21,21 +21,16 @@
  *
  */
 
-#include <config.h>
+#ifndef TEST_INTERNALS_DBUS_MARSHAL_RECURSIVE_UTIL_H
+#define TEST_INTERNALS_DBUS_MARSHAL_RECURSIVE_UTIL_H
 
-#include "dbus/dbus-internals.h"
-#include "dbus/dbus-test.h"
-#include "test/test-utils.h"
+#include <dbus/dbus-string.h>
+#include <dbus/dbus-types.h>
 
-#include "dbus-marshal-recursive-util.h"
+dbus_bool_t _dbus_marshal_recursive_test (const char *test_data_dir);
+dbus_bool_t _dbus_test_generate_bodies   (int         sequence,
+                                          int         byte_order,
+                                          DBusString *signature,
+                                          DBusString *body);
 
-static DBusTestCase test = { "marshal-recursive", _dbus_marshal_recursive_test };
-
-int
-main (int    argc,
-      char **argv)
-{
-  return _dbus_test_main (argc, argv, 1, &test,
-                          DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
-                          NULL, NULL);
-}
+#endif

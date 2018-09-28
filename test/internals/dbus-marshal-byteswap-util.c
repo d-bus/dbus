@@ -23,11 +23,15 @@
 
 #include <config.h>
 
+#include "misc-internals.h"
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
-#include "dbus-marshal-byteswap.h"
-#include "dbus-test.h"
+#include "dbus/dbus-marshal-byteswap.h"
+#include "dbus/dbus-test.h"
 #include <dbus/dbus-test-tap.h>
 #include <stdio.h>
+
+#include "dbus-marshal-recursive-util.h"
 
 static void
 do_byteswap_test (int byte_order)
