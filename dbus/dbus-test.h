@@ -65,7 +65,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_server_test            (const char *test_data_dir);
 
 dbus_bool_t _dbus_message_test           (const char *test_data_dir);
-dbus_bool_t _dbus_auth_test              (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_sha_test               (const char *test_data_dir);
@@ -89,8 +88,6 @@ dbus_bool_t _dbus_memory_test            (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_object_tree_test       (const char *test_data_dir);
-
-dbus_bool_t _dbus_credentials_test       (const char *test_data_dir);
 
 dbus_bool_t _dbus_test_generate_bodies   (int         sequence,
                                           int         byte_order,

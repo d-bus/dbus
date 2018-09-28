@@ -24,16 +24,18 @@
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
+#include "misc-internals.h"
+
 #include "dbus-auth-script.h"
 
 #include <stdio.h>
 
-#include "dbus-auth.h"
-#include "dbus-string.h"
-#include "dbus-hash.h"
-#include "dbus-credentials.h"
-#include "dbus-internals.h"
-#include <dbus/dbus-test-tap.h>
+#include "dbus/dbus-auth.h"
+#include "dbus/dbus-credentials.h"
+#include "dbus/dbus-hash.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-string.h"
+#include "dbus/dbus-test-tap.h"
 
 #ifdef DBUS_UNIX
 # include "dbus/dbus-userdb.h"

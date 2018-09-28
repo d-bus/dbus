@@ -245,10 +245,6 @@ DBUS_SHARED_SOURCES=				\
 DBUS_UTIL_SOURCES=				\
 	dbus-asv-util.c				\
 	dbus-asv-util.h				\
-	dbus-auth-script.c			\
-	dbus-auth-script.h			\
-	dbus-auth-util.c			\
-	dbus-credentials-util.c			\
 	dbus-mainloop.c				\
 	dbus-mainloop.h				\
 	dbus-marshal-byteswap-util.c		\

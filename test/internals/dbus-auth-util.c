@@ -22,10 +22,13 @@
  */
 
 #include <config.h>
-#include "dbus-internals.h"
-#include "dbus-test.h"
-#include "dbus-auth.h"
-#include <dbus/dbus-test-tap.h>
+
+#include "misc-internals.h"
+
+#include "dbus/dbus-auth.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-test-tap.h"
+#include "dbus/dbus-test.h"
 
 /**
  * @addtogroup DBusAuth

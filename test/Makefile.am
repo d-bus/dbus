@@ -209,7 +209,14 @@ test_marshal_recursive_LDADD = libdbus-testutils.la
 test_message_internals_SOURCES = internals/message-internals.c
 test_message_internals_LDADD = libdbus-testutils.la
 
-test_misc_internals_SOURCES = internals/misc-internals.c
+test_misc_internals_SOURCES = \
+	internals/dbus-auth-script.c \
+	internals/dbus-auth-script.h \
+	internals/dbus-auth-util.c \
+	internals/dbus-credentials-util.c \
+	internals/misc-internals.c \
+	internals/misc-internals.h \
+	$(NULL)
 test_misc_internals_LDADD = libdbus-testutils.la
 
 EXTRA_DIST += dbus-test-runner

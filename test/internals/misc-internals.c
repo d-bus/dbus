@@ -27,6 +27,8 @@
 #include "dbus/dbus-test.h"
 #include "test/test-utils.h"
 
+#include "misc-internals.h"
+
 static DBusTestCase tests[] =
 {
   { "string", _dbus_string_test },
