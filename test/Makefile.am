@@ -231,6 +231,7 @@ test_misc_internals_SOURCES = \
 	internals/dbus-marshal-recursive-util.h \
 	internals/dbus-marshal-validate-util.c \
 	internals/dbus-string-util.c \
+	internals/dbus-sysdeps-util.c \
 	internals/misc-internals.c \
 	internals/misc-internals.h \
 	$(NULL)

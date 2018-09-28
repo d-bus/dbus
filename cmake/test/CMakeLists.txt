@@ -121,6 +121,7 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
                 ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
                 ${TEST_DIR}/internals/dbus-marshal-validate-util.c
                 ${TEST_DIR}/internals/dbus-string-util.c
+                ${TEST_DIR}/internals/dbus-sysdeps-util.c
                 ${TEST_DIR}/internals/misc-internals.c
                 ${TEST_DIR}/internals/misc-internals.h)
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
