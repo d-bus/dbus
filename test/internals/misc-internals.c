@@ -26,6 +26,7 @@
 #include <config.h>
 
 #include <dbus/dbus.h>
+#include "dbus/dbus-connection-internal.h"
 #include "dbus/dbus-internals.h"
 #include "dbus/dbus-test.h"
 #include "dbus/dbus-test-tap.h"
@@ -317,6 +318,33 @@ _dbus_signature_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
   return FALSE;
 #endif
 }
+
+#ifdef DBUS_UNIX
+static dbus_bool_t
+_dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
+{
+  DBusConnection *c;
+  DBusError error;
+  dbus_bool_t ret;
+  const char *address;
+
+  dbus_error_init (&error);
+
+  c = dbus_connection_open ("unixexec:argv0=false,argv1=foobar,path=/bin/false", &error);
+  _dbus_assert (c != NULL);
+  _dbus_assert (!dbus_error_is_set (&error));
+
+  address = _dbus_connection_get_address (c);
+  _dbus_assert (address != NULL);
+
+  /* Let's see if the address got parsed, reordered and formatted correctly */
+  ret = strcmp (address, "unixexec:path=/bin/false,argv0=false,argv1=foobar") == 0;
+
+  dbus_connection_unref (c);
+
+  return ret;
+}
+#endif
 
 static DBusTestCase tests[] =
 {

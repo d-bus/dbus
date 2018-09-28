@@ -407,32 +407,3 @@ _dbus_transport_open_platform_specific (DBusAddressEntry  *entry,
 }
 
 /** @} */
-
-#ifdef DBUS_ENABLE_EMBEDDED_TESTS
-
-dbus_bool_t
-_dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
-{
-  DBusConnection *c;
-  DBusError error;
-  dbus_bool_t ret;
-  const char *address;
-
-  dbus_error_init (&error);
-
-  c = dbus_connection_open ("unixexec:argv0=false,argv1=foobar,path=/bin/false", &error);
-  _dbus_assert (c != NULL);
-  _dbus_assert (!dbus_error_is_set (&error));
-
-  address = _dbus_connection_get_address (c);
-  _dbus_assert (address != NULL);
-
-  /* Let's see if the address got parsed, reordered and formatted correctly */
-  ret = strcmp (address, "unixexec:path=/bin/false,argv0=false,argv1=foobar") == 0;
-
-  dbus_connection_unref (c);
-
-  return ret;
-}
-
-#endif
