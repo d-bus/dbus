@@ -1,6 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /*
- * Copyright 2002-2009 Red Hat, Inc.
+ * Copyright 2002-2011 Red Hat, Inc.
+ * Copyright 2006 Julio M. Merino Vidal
+ * Copyright 2006 Ralf Habacker
  * Copyright 2011-2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
@@ -23,11 +25,184 @@
 
 #include <config.h>
 
+#include <dbus/dbus.h>
 #include "dbus/dbus-internals.h"
 #include "dbus/dbus-test.h"
+#include "dbus/dbus-test-tap.h"
 #include "test/test-utils.h"
 
 #include "misc-internals.h"
+
+/**
+ * @ingroup DBusSignatureInternals
+ * Unit test for DBusSignature.
+ *
+ * @returns #TRUE on success.
+ */
+static dbus_bool_t
+_dbus_signature_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
+{
+  DBusSignatureIter iter;
+  DBusSignatureIter subiter;
+  DBusSignatureIter subsubiter;
+  DBusSignatureIter subsubsubiter;
+  const char *sig;
+  dbus_bool_t boolres;
+
+  sig = "";
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  _dbus_assert (!dbus_signature_validate_single (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_INVALID);
+
+  sig = DBUS_TYPE_STRING_AS_STRING;
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  _dbus_assert (dbus_signature_validate_single (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_STRING);
+
+  sig = DBUS_TYPE_STRING_AS_STRING DBUS_TYPE_BYTE_AS_STRING;
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_STRING);
+  boolres = dbus_signature_iter_next (&iter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_BYTE);
+
+  sig = DBUS_TYPE_UINT16_AS_STRING
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_STRING_AS_STRING
+    DBUS_TYPE_UINT32_AS_STRING
+    DBUS_TYPE_VARIANT_AS_STRING
+    DBUS_TYPE_DOUBLE_AS_STRING
+    DBUS_STRUCT_END_CHAR_AS_STRING;
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_UINT16);
+  boolres = dbus_signature_iter_next (&iter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_STRUCT);
+  dbus_signature_iter_recurse (&iter, &subiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_STRING);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_UINT32);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_VARIANT);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_DOUBLE);
+
+  sig = DBUS_TYPE_UINT16_AS_STRING
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_UINT32_AS_STRING
+    DBUS_TYPE_BYTE_AS_STRING
+    DBUS_TYPE_ARRAY_AS_STRING
+    DBUS_TYPE_ARRAY_AS_STRING
+    DBUS_TYPE_DOUBLE_AS_STRING
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_BYTE_AS_STRING
+    DBUS_STRUCT_END_CHAR_AS_STRING
+    DBUS_STRUCT_END_CHAR_AS_STRING;
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_UINT16);
+  boolres = dbus_signature_iter_next (&iter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_STRUCT);
+  dbus_signature_iter_recurse (&iter, &subiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_UINT32);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_BYTE);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_ARRAY);
+  _dbus_assert (dbus_signature_iter_get_element_type (&subiter) == DBUS_TYPE_ARRAY);
+
+  dbus_signature_iter_recurse (&subiter, &subsubiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subsubiter) == DBUS_TYPE_ARRAY);
+  _dbus_assert (dbus_signature_iter_get_element_type (&subsubiter) == DBUS_TYPE_DOUBLE);
+
+  dbus_signature_iter_recurse (&subsubiter, &subsubsubiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subsubsubiter) == DBUS_TYPE_DOUBLE);
+  boolres = dbus_signature_iter_next (&subiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subiter) == DBUS_TYPE_STRUCT);
+  dbus_signature_iter_recurse (&subiter, &subsubiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subsubiter) == DBUS_TYPE_BYTE);
+
+  sig = DBUS_TYPE_ARRAY_AS_STRING
+    DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_INT16_AS_STRING
+    DBUS_TYPE_STRING_AS_STRING
+    DBUS_DICT_ENTRY_END_CHAR_AS_STRING
+    DBUS_TYPE_VARIANT_AS_STRING;
+  _dbus_assert (dbus_signature_validate (sig, NULL));
+  _dbus_assert (!dbus_signature_validate_single (sig, NULL));
+  dbus_signature_iter_init (&iter, sig);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_ARRAY);
+  _dbus_assert (dbus_signature_iter_get_element_type (&iter) == DBUS_TYPE_DICT_ENTRY);
+
+  dbus_signature_iter_recurse (&iter, &subiter);
+  dbus_signature_iter_recurse (&subiter, &subsubiter);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subsubiter) == DBUS_TYPE_INT16);
+  boolres = dbus_signature_iter_next (&subsubiter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&subsubiter) == DBUS_TYPE_STRING);
+  boolres = dbus_signature_iter_next (&subsubiter);
+  _dbus_assert (!boolres);
+
+  boolres = dbus_signature_iter_next (&iter);
+  _dbus_assert (boolres);
+  _dbus_assert (dbus_signature_iter_get_current_type (&iter) == DBUS_TYPE_VARIANT);
+  boolres = dbus_signature_iter_next (&iter);
+  _dbus_assert (!boolres);
+
+  sig = DBUS_TYPE_DICT_ENTRY_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_TYPE_ARRAY_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_TYPE_UINT32_AS_STRING
+    DBUS_TYPE_ARRAY_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_TYPE_ARRAY_AS_STRING
+    DBUS_TYPE_DICT_ENTRY_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_DICT_ENTRY_END_CHAR_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_INT32_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_INT32_AS_STRING
+    DBUS_TYPE_STRING_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_STRUCT_END_CHAR_AS_STRING
+    DBUS_STRUCT_BEGIN_CHAR_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+
+  sig = DBUS_STRUCT_BEGIN_CHAR_AS_STRING
+    DBUS_TYPE_BOOLEAN_AS_STRING;
+  _dbus_assert (!dbus_signature_validate (sig, NULL));
+  return TRUE;
+#if 0
+ oom:
+  _dbus_test_fatal ("out of memory");
+  return FALSE;
+#endif
+}
 
 static DBusTestCase tests[] =
 {
