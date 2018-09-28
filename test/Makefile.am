@@ -206,7 +206,13 @@ test_hash_LDADD = libdbus-testutils.la
 test_marshal_recursive_SOURCES = internals/marshal-recursive.c
 test_marshal_recursive_LDADD = libdbus-testutils.la
 
-test_message_internals_SOURCES = internals/message-internals.c
+test_message_internals_SOURCES = \
+	internals/dbus-message-factory.c \
+	internals/dbus-message-factory.h \
+	internals/dbus-message-util.c \
+	internals/dbus-message-util.h \
+	internals/message-internals.c \
+	$(NULL)
 test_message_internals_LDADD = libdbus-testutils.la
 
 test_misc_internals_SOURCES = \

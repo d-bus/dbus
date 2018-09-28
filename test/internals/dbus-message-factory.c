@@ -26,10 +26,12 @@
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 #include "dbus-message-factory.h"
-#include "dbus-message-private.h"
-#include "dbus-signature.h"
-#include "dbus-test.h"
-#include <dbus/dbus-test-tap.h>
+
+#include "dbus/dbus-message-private.h"
+#include "dbus/dbus-signature.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-test-tap.h"
+
 #include <stdio.h>
 
 typedef enum

@@ -156,7 +156,6 @@ set (DBUS_UTIL_SOURCES
 	${DBUS_DIR}/dbus-marshal-byteswap-util.c
 	${DBUS_DIR}/dbus-marshal-recursive-util.c
 	${DBUS_DIR}/dbus-marshal-validate-util.c
-	${DBUS_DIR}/dbus-message-factory.c
 	${DBUS_DIR}/dbus-message-util.c
 	${DBUS_DIR}/dbus-shell.c
 	${DBUS_DIR}/dbus-pollable-set.c
@@ -168,7 +167,6 @@ set (DBUS_UTIL_SOURCES
 set (DBUS_UTIL_HEADERS
 	${DBUS_DIR}/dbus-asv-util.h
 	${DBUS_DIR}/dbus-mainloop.h
-	${DBUS_DIR}/dbus-message-factory.h
 	${DBUS_DIR}/dbus-shell.h
 	${DBUS_DIR}/dbus-pollable-set.h
 	${DBUS_DIR}/dbus-spawn.h

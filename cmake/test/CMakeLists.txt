@@ -99,7 +99,12 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     add_test_executable(test-marshal-recursive ${TEST_DIR}/internals/marshal-recursive.c dbus-testutils)
     set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    add_test_executable(test-message-internals ${TEST_DIR}/internals/message-internals.c dbus-testutils)
+    set(SOURCES ${TEST_DIR}/internals/dbus-message-factory.c
+                ${TEST_DIR}/internals/dbus-message-factory.h
+                ${TEST_DIR}/internals/dbus-message-util.c
+                ${TEST_DIR}/internals/dbus-message-util.h
+                ${TEST_DIR}/internals/message-internals.c)
+    add_test_executable(test-message-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
     set(SOURCES ${TEST_DIR}/internals/dbus-auth-script.c

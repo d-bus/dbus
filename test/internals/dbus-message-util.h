@@ -1,7 +1,15 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /*
  * Copyright 2002-2009 Red Hat, Inc.
- * Copyright 2011-2018 Collabora Ltd.
+ * Copyright 2002-2003 CodeFactory AB
+ * Copyright 2007-2018 Collabora Ltd.
+ * Copyright 2009 Scott James Remnant / Canonical Ltd.
+ * Copyright 2009 William Lachance
+ * Copyright 2010 Christian Dywan / Lanedo
+ * Copyright 2013 Chengwei Yang / Intel
+ * Copyright 2013 Vasiliy Balyasnyy / Samsung
+ * Copyright 2014 Ralf Habacker
+ * Copyright 2017 Endless Mobile, Inc.
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -21,21 +29,11 @@
  *
  */
 
-#include <config.h>
+#ifndef TEST_INTERNALS_DBUS_MESSAGE_UTIL_H
+#define TEST_INTERNALS_DBUS_MESSAGE_UTIL_H
 
-#include "dbus/dbus-internals.h"
-#include "dbus/dbus-test.h"
-#include "test/test-utils.h"
+#include <dbus/dbus-types.h>
 
-#include "dbus-message-util.h"
+dbus_bool_t _dbus_message_test (const char *test_data_dir);
 
-static DBusTestCase test = { "message", _dbus_message_test };
-
-int
-main (int    argc,
-      char **argv)
-{
-  return _dbus_test_main (argc, argv, 1, &test,
-                          DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
-                          NULL, NULL);
-}
+#endif

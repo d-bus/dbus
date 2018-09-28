@@ -64,8 +64,6 @@ dbus_bool_t _dbus_address_test           (const char *test_data_dir);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_server_test            (const char *test_data_dir);
 
-dbus_bool_t _dbus_message_test           (const char *test_data_dir);
-
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_sha_test               (const char *test_data_dir);
 

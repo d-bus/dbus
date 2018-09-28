@@ -250,8 +250,6 @@ DBUS_UTIL_SOURCES=				\
 	dbus-marshal-byteswap-util.c		\
 	dbus-marshal-recursive-util.c		\
 	dbus-marshal-validate-util.c		\
-	dbus-message-factory.c			\
-	dbus-message-factory.h			\
 	dbus-message-util.c			\
 	dbus-shell.c				\
 	dbus-shell.h				\
