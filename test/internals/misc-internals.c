@@ -95,6 +95,58 @@ _dbus_misc_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
   return TRUE;
 }
 
+static dbus_bool_t
+_dbus_server_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
+{
+  const char *valid_addresses[] = {
+    "tcp:port=1234",
+    "tcp:host=localhost,port=1234",
+    "tcp:host=localhost,port=1234;tcp:port=5678",
+#ifdef DBUS_UNIX
+    "unix:path=./boogie",
+    "tcp:port=1234;unix:path=./boogie",
+#endif
+  };
+
+  DBusServer *server;
+  int i;
+
+  for (i = 0; i < _DBUS_N_ELEMENTS (valid_addresses); i++)
+    {
+      DBusError error = DBUS_ERROR_INIT;
+      char *address;
+      char *id;
+
+      server = dbus_server_listen (valid_addresses[i], &error);
+      if (server == NULL)
+        {
+          _dbus_warn ("server listen error: %s: %s", error.name, error.message);
+          dbus_error_free (&error);
+          _dbus_assert_not_reached ("Failed to listen for valid address.");
+        }
+
+      id = dbus_server_get_id (server);
+      _dbus_assert (id != NULL);
+      address = dbus_server_get_address (server);
+      _dbus_assert (address != NULL);
+
+      if (strstr (address, id) == NULL)
+        {
+          _dbus_warn ("server id '%s' is not in the server address '%s'",
+                      id, address);
+          _dbus_assert_not_reached ("bad server id or address");
+        }
+
+      dbus_free (id);
+      dbus_free (address);
+
+      dbus_server_disconnect (server);
+      dbus_server_unref (server);
+    }
+
+  return TRUE;
+}
+
 /**
  * @ingroup DBusSignatureInternals
  * Unit test for DBusSignature.
