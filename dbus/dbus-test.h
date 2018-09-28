@@ -80,7 +80,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_data_slot_test         (const char *test_data_dir);
 
 dbus_bool_t _dbus_sysdeps_test           (const char *test_data_dir);
-dbus_bool_t _dbus_spawn_test             (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_userdb_test            (const char *test_data_dir);

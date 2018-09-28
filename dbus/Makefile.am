@@ -270,7 +270,6 @@ DBUS_UTIL_SOURCES=				\
 
 if DBUS_ENABLE_EMBEDDED_TESTS
 DBUS_UTIL_SOURCES += \
-	dbus-spawn-test.c \
 	dbus-test-wrappers.c \
 	dbus-test-wrappers.h \
 	$(NULL)

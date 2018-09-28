@@ -77,6 +77,9 @@ add_test_executable(test-printf ${TEST_DIR}/internals/printf.c dbus-testutils)
 add_helper_executable(test-privserver ${TEST_DIR}/test-privserver.c dbus-testutils)
 add_helper_executable(test-shell-service ${test-shell-service_SOURCES} dbus-testutils)
 add_helper_executable(test-spawn ${test-spawn_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
+if(NOT WINCE)
+    add_test_executable(test-spawn-oom ${TEST_DIR}/internals/spawn-oom.c ${DBUS_INTERNAL_LIBRARIES})
+endif()
 add_helper_executable(test-exit ${test-exit_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 # the second argument of add_helper_executable() is a whitespace-separated
 # list of source files and the third and subsequent arguments are libraries

@@ -56,10 +56,6 @@ static DBusTestCase tests[] =
   { "transport-unix", _dbus_transport_unix_test },
 #endif
 
-#if !defined(DBUS_WINCE)
-  { "spawn", _dbus_spawn_test },
-#endif
-
   { NULL }
 };
 

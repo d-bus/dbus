@@ -24,10 +24,11 @@
  */
 #include <config.h>
 
-
-#include "dbus-spawn.h"
-#include "dbus-sysdeps.h"
-#include "dbus-test.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-spawn.h"
+#include "dbus/dbus-sysdeps.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-test-wrappers.h"
 
 static char *
 get_test_exec (const char *exe,
@@ -265,7 +266,7 @@ check_spawn_and_kill (void        *data,
   return TRUE;
 }
 
-dbus_bool_t
+static dbus_bool_t
 _dbus_spawn_test (const char *test_data_dir)
 {
   if (!_dbus_test_oom_handling ("spawn_nonexistent",
@@ -289,4 +290,15 @@ _dbus_spawn_test (const char *test_data_dir)
     return FALSE;
 
   return TRUE;
+}
+
+static DBusTestCase test = { "spawn", _dbus_spawn_test };
+
+int
+main (int    argc,
+      char **argv)
+{
+  return _dbus_test_main (argc, argv, 1, &test,
+                          DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
+                          NULL, NULL);
 }

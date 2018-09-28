@@ -58,8 +58,12 @@ EXTRA_DIST += glib-tap-test.sh
 EXTRA_DIST += tap-test.sh.in
 
 TESTS =
+noinst_PROGRAMS =
 
 if DBUS_ENABLE_EMBEDDED_TESTS
+
+uninstallable_test_programs =
+
 ## break-loader removed for now
 ## these binaries are used in tests but are not themselves tests
 TEST_BINARIES = \
@@ -70,6 +74,10 @@ TEST_BINARIES = \
 	test-segfault \
 	test-shell-service \
 	$(NULL)
+
+if !DBUS_WINCE
+uninstallable_test_programs += test-spawn-oom
+endif
 
 ## These are conceptually part of directories that come earlier in SUBDIRS
 ## order, but we don't want to run them til we arrive in this directory,
@@ -85,13 +93,16 @@ endif
 
 TESTS += ../dbus/test-dbus$(EXEEXT)
 
+noinst_PROGRAMS += $(uninstallable_test_programs)
+TESTS += $(uninstallable_test_programs)
+
 else !DBUS_ENABLE_EMBEDDED_TESTS
 
 TEST_BINARIES=
 
 endif !DBUS_ENABLE_EMBEDDED_TESTS
 
-noinst_PROGRAMS= $(TEST_BINARIES)
+noinst_PROGRAMS += $(TEST_BINARIES)
 
 # This helper is meant to crash, so if we're compiling the rest with
 # AddressSanitizer, we need to stop it from catching the SIGSEGV and
@@ -108,6 +119,8 @@ test_shell_SOURCES = shell-test.c
 test_shell_LDADD = libdbus-testutils.la
 test_spawn_SOURCES = spawn-test.c
 test_spawn_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+test_spawn_oom_SOURCES = internals/spawn-oom.c
+test_spawn_oom_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 test_assertions_SOURCES = internals/assertions.c
 test_assertions_LDADD = libdbus-testutils.la $(GLIB_LIBS)
