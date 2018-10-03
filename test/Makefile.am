@@ -89,6 +89,8 @@ uninstallable_test_programs += \
 if DBUS_UNIX
 uninstallable_test_programs += test-bus-launch-helper-oom
 uninstallable_test_programs += test-bus-system
+# this is used by the tests but is not, itself, a test
+TEST_BINARIES += dbus-daemon-launch-helper-for-tests
 endif
 
 noinst_PROGRAMS += $(uninstallable_test_programs)
@@ -164,6 +166,9 @@ manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 test_bus_launch_helper_oom_SOURCES = bus/launch-helper-oom.c
 test_bus_launch_helper_oom_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+
+dbus_daemon_launch_helper_for_tests_SOURCES = bus/launch-helper-for-tests.c
+dbus_daemon_launch_helper_for_tests_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
 
 test_bus_system_SOURCES = bus/system.c
 test_bus_system_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
@@ -661,7 +666,7 @@ uninstalled-config-local:
 			-e 's,[@]DBUS_TEST_EXEC[@],@abs_builddir@,' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \
 			-e 's,[@]EXEEXT[@],$(EXEEXT),' \
-			-e 's,[@]TEST_LAUNCH_HELPER_BINARY[@],@abs_top_builddir@/bus/dbus-daemon-launch-helper-test$(EXEEXT),' \
+			-e 's,[@]TEST_LAUNCH_HELPER_BINARY[@],@abs_top_builddir@/test/dbus-daemon-launch-helper-for-tests$(EXEEXT),' \
 			-e 's,[@]TEST_LISTEN[@],$(TEST_LISTEN),' \
 			< $(srcdir)/"$$F" > "$${F%.in}"; \
 	done

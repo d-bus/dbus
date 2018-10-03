@@ -1565,7 +1565,7 @@ AC_DEFINE_UNQUOTED([DBUS_EXEEXT], ["$EXEEXT"],
                    [Extension for executables, typically empty or .exe])
 
 ## Export the non-setuid external helper
-TEST_LAUNCH_HELPER_BINARY="$DBUS_PWD/bus/dbus-daemon-launch-helper-test$EXEEXT"
+TEST_LAUNCH_HELPER_BINARY="$DBUS_TEST_EXEC/dbus-daemon-launch-helper-for-tests$EXEEXT"
 AC_SUBST(TEST_LAUNCH_HELPER_BINARY)
 AC_DEFINE_UNQUOTED(DBUS_TEST_LAUNCH_HELPER_BINARY, "$TEST_LAUNCH_HELPER_BINARY",
                    [Full path to the launch helper test program in the builddir])

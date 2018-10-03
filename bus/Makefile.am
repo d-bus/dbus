@@ -155,8 +155,8 @@ liblaunch_helper_internal_la_SOURCES =		\
 
 ## This is the installed launch helper with the setuid checks
 ## All files that have special cases #ifdef ACTIVATION_LAUNCHER_TEST must
-## be here and in dbus_daemon_launch_helper_test_SOURCES, not in
-## liblaunch-helper-internal.la.
+## be listed here and included in test/bus/launch-helper-for-tests.c,
+## not in liblaunch-helper-internal.la.
 dbus_daemon_launch_helper_SOURCES = \
 	activation-helper.c \
 	activation-helper-bin.c \
@@ -168,43 +168,12 @@ liblaunch_helper_internal_la_LIBADD = \
 	$(top_builddir)/dbus/libdbus-internal.la \
 	$(DBUS_LAUNCHER_LIBS)
 
-## we build another binary so we can do the launch testing without root privs.
-## DO NOT INSTALL THIS FILE
-## All files that have special cases #ifdef ACTIVATION_LAUNCHER_TEST must
-## be here and in dbus_daemon_launch_helper_SOURCES, not in
-## liblaunch-helper-internal.la.
-dbus_daemon_launch_helper_test_SOURCES=		\
-	activation-helper.c \
-	activation-helper-bin.c \
-	$(NULL)
-dbus_daemon_launch_helper_test_LDADD = liblaunch-helper-internal.la
-
-dbus_daemon_launch_helper_test_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-DACTIVATION_LAUNCHER_TEST
-
 noinst_PROGRAMS =
 dbus_daemon_exec_PROGRAMS = dbus-daemon
 if DBUS_UNIX
 noinst_LTLIBRARIES += liblaunch-helper-internal.la
 libexec_PROGRAMS = dbus-daemon-launch-helper
 endif DBUS_UNIX
-
-## Note that TESTS has special meaning (stuff to use in make check).
-## We don't actually want to run any of these tests until test/ has been
-## compiled, so we don't put them in TESTS here; we run them in test/
-## instead.
-
-if DBUS_ENABLE_EMBEDDED_TESTS
-## we use noinst_PROGRAMS not check_PROGRAMS so that we build
-## even when not doing "make check"
-
-if DBUS_UNIX
-# this is used by the tests but is not,itself, a test
-noinst_PROGRAMS += dbus-daemon-launch-helper-test
-endif DBUS_UNIX
-
-endif DBUS_ENABLE_EMBEDDED_TESTS
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(dbusdatadir)/session.d

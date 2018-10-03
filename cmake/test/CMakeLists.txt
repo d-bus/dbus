@@ -111,6 +111,7 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     if(NOT WIN32)
         add_test_executable(test-bus-system ${TEST_DIR}/bus/system.c launch-helper-internal)
         add_test_executable(test-bus-launch-helper-oom ${TEST_DIR}/bus/launch-helper-oom.c launch-helper-internal)
+        add_helper_executable(dbus-daemon-launch-helper-for-tests ${TEST_DIR}/bus/launch-helper-for-tests.c launch-helper-internal)
     endif()
 endif()
 
