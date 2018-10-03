@@ -93,6 +93,9 @@ if(WIN32)
 endif()
 
 if(DBUS_ENABLE_EMBEDDED_TESTS)
+    add_test_executable(test-misc-internals ${TEST_DIR}/internals/misc-internals.c ${DBUS_INTERNAL_LIBRARIES})
+    set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
     set(SOURCES ${TEST_DIR}/bus/main.c)
     add_test_executable(test-bus "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
     set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})

@@ -83,14 +83,13 @@ uninstallable_test_programs += \
 	test-bus \
 	test-bus-dispatch \
 	test-bus-dispatch-sha1 \
+	test-misc-internals \
 	$(NULL)
 
 if DBUS_UNIX
 uninstallable_test_programs += test-bus-launch-helper-oom
 uninstallable_test_programs += test-bus-system
 endif
-
-TESTS += ../dbus/test-dbus$(EXEEXT)
 
 noinst_PROGRAMS += $(uninstallable_test_programs)
 TESTS += $(uninstallable_test_programs)
@@ -177,6 +176,9 @@ test_bus_dispatch_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
 
 test_bus_dispatch_sha1_SOURCES = bus/dispatch-sha1.c
 test_bus_dispatch_sha1_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+
+test_misc_internals_SOURCES = internals/misc-internals.c
+test_misc_internals_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 EXTRA_DIST += dbus-test-runner
 

@@ -324,16 +324,6 @@ endif
 
 noinst_PROGRAMS =
 
-if DBUS_ENABLE_EMBEDDED_TESTS
-# We can't actually run this til we've reached test/
-noinst_PROGRAMS += test-dbus
-endif
-
-test_dbus_SOURCES=				\
-	dbus-test-main.c
-
-test_dbus_LDADD = libdbus-internal.la
-
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
 @CODE_COVERAGE_RULES@
 

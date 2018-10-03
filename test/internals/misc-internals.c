@@ -1,7 +1,7 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* dbus-test.c  Program to run all tests
- *
- * Copyright (C) 2002  Red Hat Inc.
+/*
+ * Copyright 2002-2009 Red Hat, Inc.
+ * Copyright 2011-2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -23,9 +23,9 @@
 
 #include <config.h>
 
-#include "dbus-internals.h"
-#include "dbus-test.h"
-#include "dbus-test-wrappers.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-test-wrappers.h"
 
 static DBusTestCase tests[] =
 {

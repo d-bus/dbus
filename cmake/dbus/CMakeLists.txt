@@ -341,11 +341,6 @@ else(WIN32)
     endif()
 endif(WIN32)
 
-if (DBUS_ENABLE_EMBEDDED_TESTS)
-	add_test_executable(test-dbus ${CMAKE_SOURCE_DIR}/../dbus/dbus-test-main.c ${DBUS_INTERNAL_LIBRARIES})
-	set_target_properties(test-dbus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
-ENDIF (DBUS_ENABLE_EMBEDDED_TESTS)
-
 if (UNIX)
 # set version info
 ENDIF (UNIX)
