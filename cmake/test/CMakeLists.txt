@@ -92,6 +92,17 @@ if(WIN32)
     add_helper_executable(manual-paths ${manual-paths_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 endif()
 
+if(DBUS_ENABLE_EMBEDDED_TESTS)
+    set(SOURCES ${TEST_DIR}/bus/main.c)
+    add_test_executable(test-bus "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    if(NOT WIN32)
+        add_test_executable(test-bus-system ${TEST_DIR}/bus/system.c launch-helper-internal)
+        add_test_executable(test-bus-launch-helper-oom ${TEST_DIR}/bus/launch-helper-oom.c launch-helper-internal)
+    endif()
+endif()
+
 if(DBUS_WITH_GLIB)
     message(STATUS "with glib test apps")
 

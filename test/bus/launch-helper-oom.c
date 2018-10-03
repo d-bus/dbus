@@ -23,18 +23,27 @@
  */
 
 #include <config.h>
-#include "test.h"
-#include "activation-helper.h"
+
+#include "bus/test.h"
 
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-test-tap.h>
 #include <dbus/dbus-test-wrappers.h>
 
+#include "bus/activation-helper.h"
+
 #if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
 #error This file is only relevant for the embedded tests on Unix
 #endif
 
-#ifdef ACTIVATION_LAUNCHER_DO_OOM
+/* Embed a version of the real activation helper that has been altered
+ * to be testable. We monkey-patch it like this because we don't want to
+ * compile test-only code into the real setuid executable, and Automake
+ * versions older than 1.16 can't cope with expanding directory variables
+ * in SOURCES when using subdir-objects. */
+#define ACTIVATION_LAUNCHER_TEST
+#define ACTIVATION_LAUNCHER_DO_OOM
+#include "bus/activation-helper.c"
 
 /* returns true if good things happen, or if we get OOM */
 static dbus_bool_t
@@ -68,8 +77,6 @@ bus_activation_helper_oom_test (void        *data,
     }
   return retval;
 }
-
-#endif
 
 static dbus_bool_t
 bus_activation_helper_test (const char *test_data_dir)

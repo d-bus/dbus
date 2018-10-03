@@ -183,19 +183,6 @@ dbus_daemon_launch_helper_test_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	-DACTIVATION_LAUNCHER_TEST
 
-## we build yet another binary so we can do the OOM tests
-## DO NOT INSTALL THIS FILE
-test_bus_launch_helper_SOURCES = \
-	activation-helper.c \
-	test-launch-helper.c \
-	$(NULL)
-test_bus_launch_helper_LDADD = liblaunch-helper-internal.la
-
-test_bus_launch_helper_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-DACTIVATION_LAUNCHER_TEST	\
-	-DACTIVATION_LAUNCHER_DO_OOM
-
 noinst_PROGRAMS =
 dbus_daemon_exec_PROGRAMS = dbus-daemon
 if DBUS_UNIX
@@ -212,23 +199,12 @@ if DBUS_ENABLE_EMBEDDED_TESTS
 ## we use noinst_PROGRAMS not check_PROGRAMS so that we build
 ## even when not doing "make check"
 
-# run as a test by test/Makefile.am
-noinst_PROGRAMS += test-bus
-
 if DBUS_UNIX
-# run as a test by test/Makefile.am
-noinst_PROGRAMS += test-bus-launch-helper test-bus-system
 # this is used by the tests but is not,itself, a test
 noinst_PROGRAMS += dbus-daemon-launch-helper-test
 endif DBUS_UNIX
 
 endif DBUS_ENABLE_EMBEDDED_TESTS
-
-test_bus_system_SOURCES = test-system.c
-test_bus_system_LDADD = liblaunch-helper-internal.la
-
-test_bus_SOURCES = test-main.c
-test_bus_LDADD = libdbus-daemon-internal.la
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(dbusdatadir)/session.d

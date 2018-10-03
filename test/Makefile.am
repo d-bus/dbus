@@ -79,16 +79,11 @@ if !DBUS_WINCE
 uninstallable_test_programs += test-spawn-oom
 endif
 
-## These are conceptually part of directories that come earlier in SUBDIRS
-## order, but we don't want to run them til we arrive in this directory,
-## since they depend on stuff from this directory. We wrap some of them in a
-## simple shell script to get TAP output.
-
-TESTS += ../bus/test-bus$(EXEEXT)
+uninstallable_test_programs += test-bus
 
 if DBUS_UNIX
-TESTS += ../bus/test-bus-launch-helper$(EXEEXT)
-TESTS += ../bus/test-bus-system$(EXEEXT)
+uninstallable_test_programs += test-bus-launch-helper-oom
+uninstallable_test_programs += test-bus-system
 endif
 
 TESTS += ../dbus/test-dbus$(EXEEXT)
@@ -163,6 +158,15 @@ manual_paths_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 manual_tcp_SOURCES = manual-tcp.c
 manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+
+test_bus_launch_helper_oom_SOURCES = bus/launch-helper-oom.c
+test_bus_launch_helper_oom_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+
+test_bus_system_SOURCES = bus/system.c
+test_bus_system_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+
+test_bus_SOURCES = bus/main.c
+test_bus_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
 
 EXTRA_DIST += dbus-test-runner
 

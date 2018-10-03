@@ -156,19 +156,10 @@ if(NOT WIN32)
 endif(NOT WIN32)
 
 if (DBUS_ENABLE_EMBEDDED_TESTS)
-	set(SOURCES ${BUS_DIR}/test-main.c)
-	add_test_executable(test-bus "${SOURCES}" dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
-	set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 	if (NOT WIN32)
-		add_test_executable(test-bus-system ${BUS_DIR}/test-system.c launch-helper-internal)
-
 		add_executable(dbus-daemon-launch-helper-test ${BUS_DIR}/activation-helper.c ${BUS_DIR}/activation-helper-bin.c)
 		set_target_properties(dbus-daemon-launch-helper-test PROPERTIES COMPILE_FLAGS "-DACTIVATION_LAUNCHER_TEST")
 		target_link_libraries(dbus-daemon-launch-helper-test launch-helper-internal)
-
-		set (SOURCES ${BUS_DIR}/activation-helper.c ${BUS_DIR}/test-launch-helper.c)
-		add_test_executable(test-bus-launch-helper "${SOURCES}" launch-helper-internal)
-		set_target_properties(test-bus-launch-helper PROPERTIES COMPILE_FLAGS "-DACTIVATION_LAUNCHER_TEST -DACTIVATION_LAUNCHER_DO_OOM")
 	endif()
 endif (DBUS_ENABLE_EMBEDDED_TESTS)
 
