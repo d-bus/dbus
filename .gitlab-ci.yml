@@ -27,6 +27,16 @@ stages:
 
 before_script:
   - ./tools/ci-install.sh
+  - mkdir -p .ccache
+  - export CCACHE_BASEDIR="$(pwd)"
+  - export CCACHE_DIR="$CCACHE_BASEDIR/.ccache"
+  # Debian's ccache package creates symlinks here for all supported
+  # compilers
+  - export PATH="/usr/lib/ccache:$PATH"
+
+cache:
+  paths:
+    - .ccache/
 
 variables:
   ci_in_docker: "yes"
