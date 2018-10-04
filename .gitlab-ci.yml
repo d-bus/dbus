@@ -35,6 +35,7 @@ before_script:
   - export PATH="/usr/lib/ccache:$PATH"
 
 cache:
+  key: dbus-1.12-${CI_JOB_NAME}
   paths:
     - .ccache/
 
