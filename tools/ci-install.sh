@@ -126,6 +126,7 @@ case "$ci_distro" in
             autoconf-archive \
             automake \
             autotools-dev \
+            ccache \
             cmake \
             debhelper \
             dh-autoreconf \
