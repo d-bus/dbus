@@ -82,23 +82,7 @@ build:cmake:
     ci_buildsys: "cmake"
   script: *script
 
-build:i686-w64-mingw32:
-  stage: build
-  image: "debian:stretch-slim"
-  variables:
-    ci_host: "i686-w64-mingw32"
-  script: *script
-
-build:i686-w64-mingw32-cmake-debug:
-  stage: build
-  image: "debian:stretch-slim"
-  variables:
-    ci_buildsys: "cmake"
-    ci_host: "i686-w64-mingw32"
-    ci_variant: "debug"
-  script: *script
-
-build:x86_64-w64-mingw32-debug:
+build:i686-w64-mingw32-debug:
   stage: build
   image: "debian:stretch-slim"
   variables:
@@ -106,12 +90,28 @@ build:x86_64-w64-mingw32-debug:
     ci_variant: "debug"
   script: *script
 
-build:x86_64-w64-mingw32-cmake:
+build:i686-w64-mingw32-cmake:
   stage: build
   image: "debian:stretch-slim"
   variables:
     ci_buildsys: "cmake"
     ci_host: "i686-w64-mingw32"
+  script: *script
+
+build:x86_64-w64-mingw32:
+  stage: build
+  image: "debian:stretch-slim"
+  variables:
+    ci_host: "i686-w64-mingw32"
+  script: *script
+
+build:x86_64-w64-mingw32-cmake-debug:
+  stage: build
+  image: "debian:stretch-slim"
+  variables:
+    ci_buildsys: "cmake"
+    ci_host: "i686-w64-mingw32"
+    ci_variant: "debug"
   script: *script
 
 build:jessie:
