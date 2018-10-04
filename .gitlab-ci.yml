@@ -63,6 +63,7 @@ build:debug:
 
 build:reduced:
   stage: build
+  when: manual
   image: "debian:stretch-slim"
   variables:
     ci_variant: "reduced"
@@ -70,6 +71,7 @@ build:reduced:
 
 build:legacy:
   stage: build
+  when: manual
   image: "debian:stretch-slim"
   variables:
     ci_variant: "legacy"
@@ -92,6 +94,7 @@ build:i686-w64-mingw32-debug:
 
 build:i686-w64-mingw32-cmake:
   stage: build
+  when: manual
   image: "debian:stretch-slim"
   variables:
     ci_buildsys: "cmake"
@@ -107,6 +110,7 @@ build:x86_64-w64-mingw32:
 
 build:x86_64-w64-mingw32-cmake-debug:
   stage: build
+  when: manual
   image: "debian:stretch-slim"
   variables:
     ci_buildsys: "cmake"
@@ -115,6 +119,7 @@ build:x86_64-w64-mingw32-cmake-debug:
   script: *script
 
 build:jessie:
+  when: manual
   stage: build
   image: "debian:jessie-slim"
   variables:
@@ -122,6 +127,7 @@ build:jessie:
   script: *script
 
 build:xenial:
+  when: manual
   stage: build
   image: "ubuntu:xenial"
   variables:
@@ -130,6 +136,7 @@ build:xenial:
   script: *script
 
 build:trusty:
+  when: manual
   stage: build
   image: "ubuntu:trusty"
   variables:
