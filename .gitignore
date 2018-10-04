@@ -3,6 +3,7 @@
 *.rej
 *.o
 *~
+/.ccache/
 /build-aux/
 compile
 config.cache
