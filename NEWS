@@ -23,6 +23,13 @@ Fixes:
 
 • Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
 
+Tests and CI:
+
+• Add Travis-CI builds for 64-bit Windows using mingw-w64
+  (fd.o #105662, Ralf Habacker)
+
+• Add Gitlab-CI integration (fd.o #108177, Simon McVittie)
+
 dbus 1.13.6 (2018-08-02)
 ========================
 
