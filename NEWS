@@ -19,6 +19,13 @@ Fixes:
 • Fix warning from gcc 8 about suspicious use of strncpy() when
   populating struct sockaddr_un (fd.o #107350, Simon McVittie)
 
+Tests and CI:
+
+• Add Travis-CI builds for 64-bit Windows using mingw-w64
+  (fd.o #105662, Ralf Habacker)
+
+• Add Gitlab-CI integration (fd.o #108177, Simon McVittie)
+
 D-Bus 1.10.26 (2018-03-01)
 ==
 
