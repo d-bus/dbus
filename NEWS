@@ -120,6 +120,9 @@ Fixes:
 • Fix installation of Ducktype documentation with newer yelp-build
   versions (fd.o #106171, Simon McVittie)
 
+• Fix printf formats for pointer-sized integers on 64-bit Windows
+  (fd.o #105662, Ralf Habacker)
+
 Internal changes:
 
 • The _DBUS_GNUC_WARN_UNUSED_RESULT macro has been replaced with
