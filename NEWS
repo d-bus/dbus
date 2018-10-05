@@ -13,6 +13,16 @@ Fixes:
 
 • Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
 
+• Fix printf formats for pointer-sized integers on 64-bit Windows
+  (fd.o #105662, Ralf Habacker)
+
+Tests and CI:
+
+• Add Travis-CI builds for 64-bit Windows using mingw-w64
+  (fd.o #105662, Ralf Habacker)
+
+• Add Gitlab-CI integration (fd.o #108177, Simon McVittie)
+
 dbus 1.12.10 (2018-08-02)
 =========================
 
