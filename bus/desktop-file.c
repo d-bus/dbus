@@ -382,8 +382,7 @@ is_valid_section_name (const char *name)
 
   while (*name)
     {
-      if (!((*name >= 'A' && *name <= 'Z') || (*name >= 'a' || *name <= 'z') ||
-	    *name == '\n' || *name == '\t'))
+      if (*name <= 0x1f || *name >= 0x7f || *name  == '[' || *name == ']')
 	return FALSE;
       
       name++;
