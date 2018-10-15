@@ -487,7 +487,7 @@ if (MINGW)
 endif(MINGW)
 
 # compiler definitions
-add_definitions(-DHAVE_CONFIG_H=1)
+add_definitions(-DHAVE_CONFIG_H)
 add_definitions(${DBUS_BUS_CFLAGS})
 
 
@@ -517,8 +517,6 @@ if (WIN32)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbus-env.bat.cmake ${CMAKE_BINARY_DIR}/bin/dbus-env.bat )
     install(FILES ${CMAKE_BINARY_DIR}/bin/dbus-env.bat DESTINATION bin)
 endif()
-
-add_definitions(-DHAVE_CONFIG_H=1)
 
 #
 # create cmake find_package related files
