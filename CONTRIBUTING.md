@@ -1,15 +1,15 @@
+# Contributing to dbus
+
 The guidelines in this file are the ideals; it's better to send a
 not-fully-following-guidelines patch than no patch at all, though.  We
 can always polish it up.
 
-Mailing list
-===
+## Mailing list
 
 The D-Bus mailing list is dbus@lists.freedesktop.org; discussion
 of patches, etc. should go there.
 
-Security
-===
+## Security
 
 If you find a security vulnerability that is not known to the public,
 please report it privately to dbus-security@lists.freedesktop.org
@@ -45,8 +45,7 @@ Most of D-Bus is security sensitive.  Guidelines related to that:
 
 http://vsftpd.beasts.org/ has other good security suggestions.
 
-Coding Style
-===
+## Coding Style
 
  - The C library uses GNU coding conventions, with GLib-like
    extensions (e.g. lining up function arguments). The
@@ -64,8 +63,7 @@ Coding Style
    data). Avoiding heuristics is also important for security reasons;
    if it looks funny, ignore it (or exit, or disconnect).
 
-Development
-===
+## Development
 
 D-Bus uses Git as its version control system. The main repository is
 hosted on freedesktop.org. To clone D-Bus, execute one of the
@@ -147,8 +145,7 @@ When making a change to D-Bus, do the following:
   your own code), or if it has been too long since the last merge.
 
 
-Making a release
-===
+## Making a release
 
 To make a release of D-Bus, do the following:
 
@@ -213,8 +210,7 @@ To make a release of D-Bus, do the following:
  - post to dbus@lists.freedesktop.org announcing the release.
 
 
-Making a ".0" stable release
-===
+## Making a ".0" stable release
 
 We create a branch for each stable release. The branch name should be
 dbus-X.Y which is a branch that has releases versioned X.Y.Z;
@@ -228,73 +224,83 @@ Be extra-careful not to merge master (or any branch based on master) into a
 stable branch.
 
 To branch:
-  git branch dbus-X.Y
+
+    git branch dbus-X.Y
+
 and upload the branch tag to the server:
-  git push origin dbus-X.Y
+
+    git push origin dbus-X.Y
 
 To develop in this branch:
-  git checkout dbus-X.Y
 
-Environment variables
-===
+    git checkout dbus-X.Y
+
+## Environment variables
 
 These are the environment variables that are used by the D-Bus client library
 
-DBUS_VERBOSE=1
-Turns on printing verbose messages. This only works if D-Bus has been
-compiled with --enable-verbose-mode
+* `DBUS_VERBOSE=1`
 
-DBUS_MALLOC_FAIL_NTH=n
-Can be set to a number, causing every nth call to dbus_alloc or
-dbus_realloc to fail. This only works if D-Bus has been compiled with
---enable-tests.
+  Turns on printing verbose messages. This only works if D-Bus has been
+  compiled with --enable-verbose-mode
 
-DBUS_MALLOC_FAIL_GREATER_THAN=n
-Can be set to a number, causing every call to dbus_alloc or
-dbus_realloc to fail if the number of bytes to be allocated is greater
-than the specified number. This only works if D-Bus has been compiled with
---enable-tests.
+* `DBUS_MALLOC_FAIL_NTH=n`
 
-DBUS_TEST_MALLOC_FAILURES=n
-Many of the D-Bus tests will run over and over, once for each malloc
-involved in the test. Each run will fail a different malloc, plus some
-number of mallocs following that malloc (because a fair number of bugs
-only happen if two or more mallocs fail in a row, e.g. error recovery
-that itself involves malloc).  This env variable sets the number of
-mallocs to fail.
-Here's why you care: If set to 0, then the malloc checking is skipped,
-which makes the test suite a heck of a lot faster. Just run with this
-env variable unset before you commit.
+  Can be set to a number, causing every nth call to dbus_alloc or
+  dbus_realloc to fail. This only works if D-Bus has been compiled with
+  --enable-tests.
 
-Tests
-===
+* `DBUS_MALLOC_FAIL_GREATER_THAN=n`
+
+  Can be set to a number, causing every call to dbus_alloc or
+  dbus_realloc to fail if the number of bytes to be allocated is greater
+  than the specified number. This only works if D-Bus has been compiled with
+  --enable-tests.
+
+* `DBUS_TEST_MALLOC_FAILURES=n`
+
+  Many of the D-Bus tests will run over and over, once for each malloc
+  involved in the test. Each run will fail a different malloc, plus some
+  number of mallocs following that malloc (because a fair number of bugs
+  only happen if two or more mallocs fail in a row, e.g. error recovery
+  that itself involves malloc).  This env variable sets the number of
+  mallocs to fail.
+
+  Here's why you care: If set to 0, then the malloc checking is skipped,
+  which makes the test suite a heck of a lot faster. Just run with this
+  env variable unset before you commit.
+
+## Tests
 
 These are the test programs that are built if dbus is compiled using
 --enable-tests.
 
-dbus/test-dbus
-This is the main unit test program that tests all aspects of the D-Bus
-client library.
+* `dbus/test-dbus`
 
-dbus/bus-test
-This it the unit test program for the message bus.
+  This is the main unit test program that tests all aspects of the D-Bus
+  client library.
 
-test/break-loader
-A test that tries to break the message loader by passing it randomly
-created invalid messages.
+* `dbus/bus-test`
 
-test/name-test/*
-This is a suite of programs which are run with a temporary session bus.
-If your test involves multiple processes communicating, your best bet
-is to add a test in here.
+  This it the unit test program for the message bus.
+
+* `test/break-loader`
+
+  A test that tries to break the message loader by passing it randomly
+  created invalid messages.
+
+* `test/name-test/*`
+
+  This is a suite of programs which are run with a temporary session bus.
+  If your test involves multiple processes communicating, your best bet
+  is to add a test in here.
 
 "make check" runs all the deterministic test programs (i.e. not break-loader).
 
 "make lcov-check" is available if you configure with --enable-compiler-coverage
 and gives a complete report on test suite coverage.
 
-Patches
-===
+## Patches
 
 Please file them at http://bugzilla.freedesktop.org under component
 dbus, and also post to the mailing list for discussion.  The commit
@@ -355,8 +361,7 @@ Will Thompson <will.thompson@collabora.co.uk>
 Simon McVittie <simon.mcvittie@collabora.co.uk>
 David Zeuthen <davidz@redhat.com>
 
-Code of Conduct
-===
+## Code of Conduct
 
 As a freedesktop.org project, dbus follows the Contributor Covenant,
 found at: https://www.freedesktop.org/wiki/CodeOfConduct
