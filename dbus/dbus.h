@@ -91,7 +91,7 @@
  * This manual also contains docs for @ref DBusInternals "D-Bus internals",
  * so you can use it to get oriented to the D-Bus source code if you're
  * interested in patching the code. You should also read the
- * file CONTRIBUTING which comes with the source code if you plan to
+ * file CONTRIBUTING.md which comes with the source code if you plan to
  * contribute to D-Bus.
  *
  * As you read the code, you can identify internal D-Bus functions

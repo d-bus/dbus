@@ -9,7 +9,7 @@ cmakeconfig_DATA = cmake/DBus1Config.cmake       \
 
 EXTRA_DIST =			\
 	autogen.sh		\
-	CONTRIBUTING		\
+	CONTRIBUTING.md		\
 	dbus-1.pc.in		\
 	cleanup-man-pages.sh    \
         ChangeLog.pre-1-0       \
