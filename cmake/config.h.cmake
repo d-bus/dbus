@@ -46,6 +46,9 @@
 #ifndef DBUS_DISABLE_CHECKS
 #  define DBUS_ENABLE_CHECKS 1
 #endif
+#cmakedefine DBUS_ENABLE_EMBEDDED_TESTS 1
+#cmakedefine DBUS_ENABLE_MODULAR_TESTS 1
+
 /* xmldocs */
 /* doxygen */
 #cmakedefine DBUS_GCOV_ENABLED 1

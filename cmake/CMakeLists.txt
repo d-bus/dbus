@@ -305,7 +305,6 @@ option (DBUS_BUILD_TESTS "enable unit test code" ON)
 if(DBUS_BUILD_TESTS)
     set (DBUS_ENABLE_EMBEDDED_TESTS ON)
     set (DBUS_ENABLE_MODULAR_TESTS ON)
-    add_definitions(-DDBUS_ENABLE_EMBEDDED_TESTS -DDBUS_ENABLE_MODULAR_TESTS)
 endif(DBUS_BUILD_TESTS)
 
 option (DBUS_USE_OUTPUT_DEBUG_STRING "enable win32 debug port for message output" OFF)
