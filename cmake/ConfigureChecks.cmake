@@ -78,7 +78,7 @@ check_type_size("long"      SIZEOF_LONG)
 check_type_size("long long" SIZEOF_LONG_LONG)
 check_type_size("__int64"   SIZEOF___INT64)
 set(CMAKE_EXTRA_INCLUDE_FILES "sys/socket.h")
-check_type_size("socklen_t" SOCKLEN_T)          #  dbus-sysdeps-unix.c
+check_type_size("socklen_t" SOCKLEN_T) # define HAVE_SOCKLEN_T and SOCKLEN_T for size
 set(CMAKE_EXTRA_INCLUDE_FILES)
 
 # DBUS_INT64_TYPE
