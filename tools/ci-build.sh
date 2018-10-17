@@ -85,6 +85,7 @@ maybe_fail_tests () {
     fi
 }
 
+# generate config.h.in and configure
 NOCONFIGURE=1 ./autogen.sh
 
 srcdir="$(pwd)"
