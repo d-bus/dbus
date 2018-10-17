@@ -289,13 +289,16 @@ main (int argc, char *argv[])
         }
       else if ((strstr (arg, "--bus=") == arg) || (strstr (arg, "--peer=") == arg) || (strstr (arg, "--address=") == arg))
         {
-          if (arg[2] == 'b') /* bus */
-            {
-              is_bus = TRUE;
-            }
-          else if (arg[2] == 'p') /* peer */
+          /* Check for peer first, to avoid the GCC -Wduplicated-branches
+           * warning.
+           */
+          if (arg[2] == 'p') /* peer */
             {
               is_bus = FALSE;
+            }
+          else if (arg[2] == 'b') /* bus */
+            {
+              is_bus = TRUE;
             }
           else /* address; keeping backwards compatibility */
             {
