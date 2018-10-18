@@ -86,13 +86,19 @@ static const Test valid_content[] =
   { "odd whitespace",
     "\n\n    \n[D-BUS Service]\n    \n",
     -1 },
-  /* Note that backslash is not included here. dbus-daemon currently
-   * interprets group names in the same way as string values, with
-   * backslash escapes interpreted; this does not appear to match
-   * the Desktop Entry Specification or the implementation in GKeyFile. */
   { "Misc printable ASCII in section heading",
-    "[abcxyzABCXYZ012789`!\"$%^&*()-_=+{}:;'@#~<,>./?|]",
+    "[abcxyzABCXYZ012789`!\"$%^&*()-_=+{}:;'@#~<,>./?|\\]",
     -1 },
+  { "Backslash in section heading",
+    /* Section name consists of a single backslash followed by literal n
+     * (it is not a newline) */
+    "[\\n]\n"
+    "foo=bar",
+    -1,
+    "\\n",
+    "foo",
+    "bar",
+    "bar" },
   { "empty", "", -1 }
 };
 

@@ -302,7 +302,7 @@ new_section (BusDesktopFile *desktop_file,
 
 static BusDesktopFileSection* 
 open_section (BusDesktopFileParser *parser,
-              char                 *name)
+              const char           *name)
 {  
   BusDesktopFileSection *section;
 
@@ -376,8 +376,15 @@ parse_comment_or_blank (BusDesktopFileParser *parser)
 }
 
 static dbus_bool_t
-is_valid_section_name (const char *name)
+is_valid_section_name (const DBusString *section_name)
 {
+  int i;
+  int len;
+  const unsigned char *data;
+
+  len = _dbus_string_get_length (section_name);
+  data = _dbus_string_get_const_udata_len (section_name, 0, len);
+
   /* 5. Group names may contain all ASCII characters except for control characters and '[' and ']'.
    *
    * We don't use isprint() here because it's locale-dependent. ASCII
@@ -385,12 +392,12 @@ is_valid_section_name (const char *name)
    * values >= 0x80 aren't ASCII. 0x20 is a space, which we must allow,
    * not least because DBUS_SERVICE_SECTION contains one. */
 
-  while (*name)
+  for (i = 0; i < len; i++)
     {
-      if (*name <= 0x1f || *name >= 0x7f || *name  == '[' || *name == ']')
+      unsigned char c = data[i];
+
+      if (c <= 0x1f || c >= 0x7f || c  == '[' || c == ']')
 	return FALSE;
-      
-      name++;
     }
 
   return TRUE;
@@ -400,7 +407,7 @@ static dbus_bool_t
 parse_section_start (BusDesktopFileParser *parser, DBusError *error)
 {
   int line_end, eol_len;
-  char *section_name;
+  DBusString section_name;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
     
@@ -415,27 +422,34 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
       return FALSE;
     }
 
-  section_name = unescape_string (parser,
-                                  &parser->data, parser->pos + 1, line_end - 1,
-                                  error);
-
-  if (section_name == NULL)
+  if (!_dbus_string_init (&section_name))
     {
       parser_free (parser);
+      BUS_SET_OOM (error);
       return FALSE;
     }
 
-  if (!is_valid_section_name (section_name))
+  if (!_dbus_string_copy_len (&parser->data, parser->pos + 1,
+                              line_end - parser->pos - 2,
+                              &section_name, 0))
+    {
+      parser_free (parser);
+      _dbus_string_free (&section_name);
+      BUS_SET_OOM (error);
+      return FALSE;
+    }
+
+  if (!is_valid_section_name (&section_name))
     {
       report_error (parser, "Invalid characters in section name", BUS_DESKTOP_PARSE_ERROR_INVALID_CHARS, error);
       parser_free (parser);
-      dbus_free (section_name);
+      _dbus_string_free (&section_name);
       return FALSE;
     }
 
-  if (open_section (parser, section_name) == NULL)
+  if (open_section (parser, _dbus_string_get_const_data (&section_name)) == NULL)
     {
-      dbus_free (section_name);
+      _dbus_string_free (&section_name);
       parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
@@ -448,7 +462,7 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
   
   parser->line_num += 1;
 
-  dbus_free (section_name);
+  _dbus_string_free (&section_name);
   
   return TRUE;
 }
