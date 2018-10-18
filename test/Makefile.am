@@ -161,6 +161,7 @@ installable_tests += \
 	test-corrupt \
 	test-dbus-daemon \
 	test-dbus-daemon-eavesdrop \
+	test-desktop-file \
 	test-fdpass \
 	test-header-fields \
 	test-message \
@@ -324,6 +325,15 @@ test_dbus_daemon_LDADD = \
 test_dbus_daemon_eavesdrop_SOURCES = dbus-daemon-eavesdrop.c
 test_dbus_daemon_eavesdrop_LDADD = \
     libdbus-testutils.la \
+    $(GLIB_LIBS) \
+    $(NULL)
+
+test_desktop_file_SOURCES = \
+    internals/desktop-file.c \
+    $(NULL)
+test_desktop_file_LDADD = \
+    libdbus-testutils.la \
+    $(top_builddir)/dbus/libdbus-internal.la \
     $(GLIB_LIBS) \
     $(NULL)
 
