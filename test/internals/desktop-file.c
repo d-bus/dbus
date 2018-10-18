@@ -86,6 +86,13 @@ static const Test valid_content[] =
   { "odd whitespace",
     "\n\n    \n[D-BUS Service]\n    \n",
     -1 },
+  /* Note that backslash is not included here. dbus-daemon currently
+   * interprets group names in the same way as string values, with
+   * backslash escapes interpreted; this does not appear to match
+   * the Desktop Entry Specification or the implementation in GKeyFile. */
+  { "Misc printable ASCII in section heading",
+    "[abcxyzABCXYZ012789`!\"$%^&*()-_=+{}:;'@#~<,>./?|]",
+    -1 },
   { "empty", "", -1 }
 };
 
@@ -96,6 +103,30 @@ static const Test invalid_content[] =
     -1 },
   { "newline in section heading",
     "[D-BUS Service\n]",
+    -1 },
+  { "tab in section heading",
+    "[D-BUS\tService]",
+    -1 },
+  { "junk after section heading",
+    "[Foo] banana",
+    -1 },
+  { "opening square bracket in section heading",
+    "[Foo[]",
+    -1 },
+  { "closing square bracket in section heading",
+    "[Foo]]",
+    -1 },
+  { "control character in section heading",
+    "[Foo\001]",
+    -1 },
+  { "backspace in section heading",
+    "[Foo\177]",
+    -1 },
+  { "NUL in section heading",
+    "[Foo\000]",
+    -1 },
+  { "non-ASCII in section heading",
+    "[Foo\xc2\xa3]",
     -1 },
   { "bare string not in section",
     "aaaa",
