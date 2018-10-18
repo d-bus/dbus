@@ -378,7 +378,12 @@ parse_comment_or_blank (BusDesktopFileParser *parser)
 static dbus_bool_t
 is_valid_section_name (const char *name)
 {
-  /* 5. Group names may contain all ASCII characters except for control characters and '[' and ']'. */
+  /* 5. Group names may contain all ASCII characters except for control characters and '[' and ']'.
+   *
+   * We don't use isprint() here because it's locale-dependent. ASCII
+   * characters <= 0x1f and 0x7f are control characters, and bytes with
+   * values >= 0x80 aren't ASCII. 0x20 is a space, which we must allow,
+   * not least because DBUS_SERVICE_SECTION contains one. */
 
   while (*name)
     {
