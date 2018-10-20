@@ -217,6 +217,9 @@
 #cmakedefine HAVE_SETRLIMIT 1
 #cmakedefine HAVE_UNIX_FD_PASSING 1
 
+/* Define to use epoll(4) on Linux */
+#cmakedefine DBUS_HAVE_LINUX_EPOLL 1
+
 // structs
 /* Define to 1 if you have struct cmsgred */
 #cmakedefine    HAVE_CMSGCRED 1

@@ -233,6 +233,13 @@ else (WIN32)
 	)
 endif (WIN32)
 
+if(DBUS_HAVE_LINUX_EPOLL)
+        set(DBUS_UTIL_SOURCES
+                ${DBUS_UTIL_SOURCES}
+                ${DBUS_DIR}/dbus-socket-set-epoll.c
+        )
+endif()
+
 set(libdbus_SOURCES
 	${DBUS_LIB_SOURCES}
 	${DBUS_SHARED_SOURCES}

@@ -3,6 +3,7 @@ include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CheckStructMember)
 include(CheckTypeSize)
+include(CheckCSourceCompiles)
 
 check_include_file(alloca.h     HAVE_ALLOCA_H)
 check_include_file(byteswap.h     HAVE_BYTESWAP_H)
@@ -68,6 +69,15 @@ check_symbol_exists(prlimit      "sys/resource.h;sys/time.h" HAVE_PRLIMIT)
 check_symbol_exists(setrlimit    "sys/resource.h;sys/time.h" HAVE_SETRLIMIT)
 
 check_struct_member(cmsgcred cmcred_pid "sys/types.h;sys/socket.h" HAVE_CMSGCRED)   #  dbus-sysdeps.c
+
+CHECK_C_SOURCE_COMPILES("
+#ifndef __linux__
+#error This is not Linux
+#endif
+#include <sys/epoll.h>
+int main() {
+epoll_create1 (EPOLL_CLOEXEC);
+}" DBUS_HAVE_LINUX_EPOLL)
 
 # missing:
 # DBUS_HAVE_GCC33_GCOV
