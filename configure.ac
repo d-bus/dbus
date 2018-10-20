@@ -1011,7 +1011,7 @@ fi
 if test x$have_linux_epoll = xyes; then
   AC_DEFINE([DBUS_HAVE_LINUX_EPOLL], 1, [Define to use epoll(4) on Linux])
 fi
-AM_CONDITIONAL([HAVE_LINUX_EPOLL], [test x$have_linux_epoll = xyes])
+AM_CONDITIONAL([DBUS_HAVE_LINUX_EPOLL], [test x$have_linux_epoll = xyes])
 
 # kqueue checks
 if test x$enable_kqueue = xno ; then
