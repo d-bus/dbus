@@ -66,18 +66,14 @@
 # define DBUS_ENABLE_X11_AUTOLAUNCH 1
 #endif
 
+/* A 'va_copy' style function */
+#cmakedefine DBUS_VA_COPY @DBUS_VA_COPY@
+
+/* for msvc */
 #define _DBUS_VA_COPY_ASSIGN(a1,a2) { a1 = a2; }
 
-#cmakedefine DBUS_VA_COPY_FUNC
-#if (defined DBUS_VA_COPY_FUNC)
-# define DBUS_VA_COPY @DBUS_VA_COPY_FUNC@
-#endif
-
-#ifdef DBUS_VA_COPY_FUNC
-#undef DBUS_VA_COPY_FUNC
-#endif
-
-#cmakedefine DBUS_VA_COPY_AS_ARRAY @DBUS_VA_COPY_AS_ARRAY@
+/* 'va_lists' cannot be copies as values */
+#cmakedefine DBUS_VA_COPY_AS_ARRAY 1
 
 #cmakedefine DBUS_WITH_GLIB 1
 #cmakedefine GLIB_VERSION_MIN_REQUIRED @GLIB_VERSION_MIN_REQUIRED@
