@@ -208,6 +208,9 @@
 /* Have dirfd function */
 #cmakedefine HAVE_DIRFD 1
 
+/* Have the ddfd member of DIR */
+#cmakedefine HAVE_DDFD 1
+
 #cmakedefine HAVE_INOTIFY_INIT1 1
 #cmakedefine HAVE_GETRLIMIT 1
 #cmakedefine HAVE_PRCTL 1

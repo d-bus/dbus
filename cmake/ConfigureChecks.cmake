@@ -160,6 +160,21 @@ int main(
 )
 " HAVE_DIRFD)
 
+if(NOT HAVE_DIRFD)
+    CHECK_C_SOURCE_COMPILES("
+    #include <sys/types.h>
+    #include <dirent.h>
+    int main()
+    {
+        DIR *dirp;
+        int fd;
+        dirp = opendir(\".\");
+        fd = dirp->dd_fd;
+        closedir(dirp);
+    }
+    " HAVE_DDFD)
+endif()
+
 # missing:
 # DBUS_HAVE_GCC33_GCOV
 
