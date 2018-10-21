@@ -216,6 +216,9 @@
 /* Define to use epoll(4) on Linux */
 #cmakedefine DBUS_HAVE_LINUX_EPOLL 1
 
+/* Use the gcc __sync extension */
+#cmakedefine DBUS_USE_SYNC 1
+
 // structs
 /* Define to 1 if you have struct cmsgred */
 #cmakedefine    HAVE_CMSGCRED 1

@@ -142,6 +142,14 @@ if (NOT VA_COPY_AS_ARRAY)
     set(DBUS_VA_COPY_AS_ARRAY 1 CACHE STRING "'va_lists' cannot be copies as values")
 endif()
 
+CHECK_C_SOURCE_COMPILES("
+int main() {
+    int a = 4;
+    int b = __sync_sub_and_fetch(&a, 4);
+    exit(b);
+}
+" DBUS_USE_SYNC)
+
 # missing:
 # DBUS_HAVE_GCC33_GCOV
 
