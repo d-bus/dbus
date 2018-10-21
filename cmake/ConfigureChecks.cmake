@@ -197,9 +197,6 @@ int main()
 }
 " HAVE_ISO_VARARGS)
 
-# missing:
-# DBUS_HAVE_GCC33_GCOV
-
 check_type_size("short"     SIZEOF_SHORT)
 check_type_size("int"       SIZEOF_INT)
 check_type_size("long"      SIZEOF_LONG)
