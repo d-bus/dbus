@@ -12,7 +12,12 @@
  * Variables defined by AC_DEFINE in ../configure.ac
  * should be placed in this file
 */
+
+/* Have GNU-style varargs macros */
 #cmakedefine HAVE_GNUC_VARARGS 1
+
+/* Have ISO C99 varargs macros */
+#cmakedefine HAVE_ISO_VARARGS 1
 
 #cmakedefine DBUS_CONSOLE_AUTH_DIR "@DBUS_CONSOLE_AUTH_DIR@"
 #cmakedefine DBUS_DATADIR  "@DBUS_DATADIR@"
