@@ -59,7 +59,6 @@ check_symbol_exists(strtoull     "stdlib.h"         HAVE_STRTOULL)           #  
 set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 check_symbol_exists(pipe2        "fcntl.h;unistd.h"         HAVE_PIPE2)
 check_symbol_exists(accept4      "sys/socket.h"             HAVE_ACCEPT4)
-check_symbol_exists(dirfd        "dirent.h"                 HAVE_DIRFD)
 check_symbol_exists(inotify_init1 "sys/inotify.h"           HAVE_INOTIFY_INIT1)
 check_symbol_exists(SCM_RIGHTS    "sys/types.h;sys/socket.h;sys/un.h" HAVE_UNIX_FD_PASSING)
 check_symbol_exists(prctl        "sys/prctl.h"              HAVE_PRCTL)
@@ -149,6 +148,17 @@ int main() {
     exit(b);
 }
 " DBUS_USE_SYNC)
+
+CHECK_C_SOURCE_COMPILES("
+#include <sys/types.h>
+#include <dirent.h>
+int main(
+    DIR *dirp;
+    dirp = opendir(\".\");
+    dirfd(dirp);
+    closedir(dirp);
+)
+" HAVE_DIRFD)
 
 # missing:
 # DBUS_HAVE_GCC33_GCOV

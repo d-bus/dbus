@@ -204,7 +204,10 @@
 #cmakedefine   HAVE_PIPE2 1
 
 #cmakedefine HAVE_ACCEPT4 1
+
+/* Have dirfd function */
 #cmakedefine HAVE_DIRFD 1
+
 #cmakedefine HAVE_INOTIFY_INIT1 1
 #cmakedefine HAVE_GETRLIMIT 1
 #cmakedefine HAVE_PRCTL 1
