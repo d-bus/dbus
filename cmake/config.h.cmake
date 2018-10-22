@@ -167,7 +167,7 @@
 #cmakedefine   HAVE_NANOSLEEP 1
 
 /* Define to 1 if you have getpwnam_r */
-#cmakedefine   HAVE_POSIX_GETPWNAM_R 1
+#cmakedefine   HAVE_GETPWNAM_R 1
 
 /* Define to 1 if you have socketpair */
 #cmakedefine   HAVE_SOCKETPAIR 1

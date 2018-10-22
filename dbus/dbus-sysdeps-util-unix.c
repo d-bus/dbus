@@ -808,7 +808,7 @@ fill_group_info (DBusGroupInfo    *info,
    * to add more configure checks.
    */
   
-#if defined (HAVE_POSIX_GETPWNAM_R) || defined (HAVE_NONPOSIX_GETPWNAM_R)
+#ifdef HAVE_GETPWNAM_R
   {
     struct group *g;
     int result;
@@ -838,17 +838,12 @@ fill_group_info (DBusGroupInfo    *info,
           }
 
         g = NULL;
-#ifdef HAVE_POSIX_GETPWNAM_R
         if (group_c_str)
           result = getgrnam_r (group_c_str, &g_str, buf, buflen,
                                &g);
         else
           result = getgrgid_r (gid, &g_str, buf, buflen,
                                &g);
-#else
-        g = getgrnam_r (group_c_str, &g_str, buf, buflen);
-        result = 0;
-#endif /* !HAVE_POSIX_GETPWNAM_R */
         /* Try a bigger buffer if ERANGE was returned:
            https://bugs.freedesktop.org/show_bug.cgi?id=16727
         */
@@ -882,6 +877,8 @@ fill_group_info (DBusGroupInfo    *info,
   {
     /* I guess we're screwed on thread safety here */
     struct group *g;
+
+#warning getpwnam_r() not available, please report this to the dbus maintainers with details of your OS
 
     g = getgrnam (group_c_str);
 
