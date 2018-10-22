@@ -85,7 +85,9 @@ maybe_fail_tests () {
     fi
 }
 
-# generate config.h.in and configure
+# Generate config.h.in and configure. We do this for both Autotools and
+# CMake builds, so that the CMake build can compare config.h.in with its
+# own checks.
 NOCONFIGURE=1 ./autogen.sh
 
 srcdir="$(pwd)"
