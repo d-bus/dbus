@@ -25,7 +25,10 @@ Enhancements:
   --exec-prefix, --libdir (fd.o #107662, Simon McVittie)
 
 • Improve CMake build system parity with Autotools
-  (dbus#57, dbus#117, dbus#193, dbus#227; Ralf Habacker, Simon McVittie)
+  · In particular, detect inotify, prctl() and getpwnam_r() correctly
+    on Linux
+  (dbus#57, dbus#117, dbus#193, dbus#227, dbus!18;
+  Ralf Habacker, Simon McVittie)
 
 Fixes:
 
