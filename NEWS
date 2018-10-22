@@ -1,7 +1,16 @@
 dbus 1.13.8 (UNRELEASED)
 ========================
 
+dbus version control is now hosted on freedesktop.org's Gitlab
+installation, and bug reports and feature requests have switched from
+Bugzilla bugs (indicated by "fd.o #nnn") to Gitlab issues ("dbus#nnn")
+and merge requests ("dbus!nnn"). See README and CONTRIBUTING.md for
+more details.
+
 Enhancements:
+
+• Rewrite CONTRIBUTING.md to reflect the current setup
+  (dbus!8, Simon McVittie)
 
 • Tarball releases no longer contain pre-2007 changelogs and are now
   compressed with xz, so they should be somewhat smaller
@@ -15,13 +24,26 @@ Enhancements:
 • Allow --enable-relocation in combination with absolute paths for
   --exec-prefix, --libdir (fd.o #107662, Simon McVittie)
 
+• Improve CMake build system parity with Autotools
+  (dbus#57, dbus#117, dbus#193, dbus#227; Ralf Habacker, Simon McVittie)
+
 Fixes:
 
 • Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
   which does not meet the criteria for that attribute in gcc 4.7+,
   potentially leading to miscompilation (fd.o #107741, Simon McVittie)
 
+• Parse section/group names in .service files according to the syntax
+  from the Desktop Entry Specification:
+  · reject control characters and non-ASCII in section/group names
+  · backslash escapes are not interpreted in section/group names
+  (dbus#208; David King, Simon McVittie)
+
 • Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
+
+• Fix build warnings with recent gcc (dbus#208, dbus#225; David King)
+
+• Fix build warnings without libX11 (dbus#228, Simon McVittie)
 
 Tests and CI:
 
