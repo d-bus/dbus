@@ -39,7 +39,7 @@ autopackage(
     dbus
     ${DBUS_VERSION_STRING}
     "http://dbus.freedesktop.org"
-    "https://bugs.freedesktop.org/enter_bug.cgi?product=dbus"
+    "https://gitlab.freedesktop.org/dbus/dbus/issues"
 )
 
 include(Macros)

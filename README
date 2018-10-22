@@ -35,9 +35,9 @@ Security
 
 If you find a security vulnerability that is not known to the public,
 please report it privately to dbus-security@lists.freedesktop.org
-or by reporting a freedesktop.org bug that is marked as
-restricted to the "D-BUS security group" (you might need to "Show
-Advanced Fields" to have that option).
+or by reporting a Gitlab issue at
+https://gitlab.freedesktop.org/dbus/dbus/issues/new and marking it
+as "confidential".
 
 On Unix systems, the system bus (dbus-daemon --system) is designed
 to be a security boundary between users with different privileges.
