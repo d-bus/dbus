@@ -48,6 +48,32 @@
 #include <string.h>
 #include <stdarg.h>
 
+#if !defined(BROKEN_POLL) && (defined(__APPLE__) || defined(__INTERIX))
+  /* Following libcurl's example, we blacklist poll() on Darwin
+   * (macOS, iOS, etc.) and Interix due to a history of implementation
+   * issues.
+   * https://github.com/curl/curl/blob/master/m4/curl-functions.m4
+   *
+   * On unspecified older macOS versions, poll() failed if given a
+   * device node to poll.
+   *
+   * On macOS < 10.9, poll() with nfds=0 failed instead of waiting for
+   * the timeout and then succeeding.
+   *
+   * On macOS >= 10.12, poll() with nfds=0 succeeded immediately
+   * instead of waiting for the timeout, resulting in busy-looping.
+   *
+   * On Interix, poll() apparently only works for files in /proc.
+   *
+   * The "legacy" build flavour in our CI machinery defines BROKEN_POLL
+   * on whatever platform is in use (normally Linux) to force use of the
+   * same select()-based poll() emulation that we use for macOS, Interix,
+   * and any platform that lacks a real poll(), so that we can test it
+   * more regularly.
+   */
+# define BROKEN_POLL
+#endif
+
 /* AIX sys/poll.h does #define events reqevents, and other
  * wonderousness, so must include sys/poll before declaring
  * DBusPollFD
