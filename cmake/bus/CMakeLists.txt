@@ -148,7 +148,7 @@ set(LAUNCH_HELPER_SOURCES
 if(NOT WIN32)
 	add_executable(dbus-daemon-launch-helper ${LAUNCH_HELPER_SOURCES} ${BUS_DIR}/activation-helper-bin.c )
 	target_link_libraries(dbus-daemon-launch-helper ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES} )
-	install_targets(/lib dbus-daemon-launch-helper)
+	install(TARGETS dbus-daemon-launch-helper ${INSTALL_TARGETS_DEFAULT_ARGS} RUNTIME DESTINATION lib)
 endif(NOT WIN32)
 
 if (DBUS_ENABLE_EMBEDDED_TESTS)
