@@ -1,79 +1,79 @@
-include_directories(${CMAKE_SOURCE_DIR}/../test)
+set(TEST_DIR ../../test)
+
+include_directories(${TEST_DIR})
 
 add_definitions(${DBUS_INTERNAL_CLIENT_DEFINITIONS})
-
-include_directories(${CMAKE_SOURCE_DIR}/../test)
 
 set(DBUS_SESSION_BUS_LISTEN_ADDRESS ${TEST_LISTEN})
 
 add_library(dbus-testutils STATIC
-    ${CMAKE_SOURCE_DIR}/../test/test-utils.h
-    ${CMAKE_SOURCE_DIR}/../test/test-utils.c
+    ${TEST_DIR}/test-utils.h
+    ${TEST_DIR}/test-utils.c
 )
 target_link_libraries(dbus-testutils ${DBUS_INTERNAL_LIBRARIES})
 
 add_subdirectory( name-test )
 
 set (manual-dir-iter_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/manual-dir-iter.c
+    ${TEST_DIR}/manual-dir-iter.c
 )
 
 set (test-service_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-service.c
+    ${TEST_DIR}/test-service.c
 )
 
 set (test-names_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-names.c
+    ${TEST_DIR}/test-names.c
 )
 
 set (break_loader_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/break-loader.c
+    ${TEST_DIR}/break-loader.c
 )
 
 set (test-shell-service_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-shell-service.c
+    ${TEST_DIR}/test-shell-service.c
 )
 
 set (test-shell_SOURCES
-        ${CMAKE_SOURCE_DIR}/../test/shell-test.c
+        ${TEST_DIR}/shell-test.c
 )
 
 set (test-spawn_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/spawn-test.c
+    ${TEST_DIR}/spawn-test.c
 )
 
 set (test-exit_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-exit.c
+    ${TEST_DIR}/test-exit.c
 )
 
 set (test-segfault_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-segfault.c
+    ${TEST_DIR}/test-segfault.c
 )
 
 set (test-sleep-forever_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/test-sleep-forever.c
+    ${TEST_DIR}/test-sleep-forever.c
 )
 
 set (manual-tcp_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/manual-tcp.c
+    ${TEST_DIR}/manual-tcp.c
 )
 
 set (manual-paths_SOURCES
-    ${CMAKE_SOURCE_DIR}/../test/manual-paths.c
+    ${TEST_DIR}/manual-paths.c
 )
 
 add_helper_executable(manual-dir-iter ${manual-dir-iter_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(test-service ${test-service_SOURCES} dbus-testutils)
 add_helper_executable(test-names ${test-names_SOURCES} dbus-testutils)
 add_test_executable(test-shell ${test-shell_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
-add_test_executable(test-printf ${CMAKE_SOURCE_DIR}/../test/internals/printf.c dbus-testutils)
+add_test_executable(test-printf ${TEST_DIR}/internals/printf.c dbus-testutils)
 add_helper_executable(test-shell-service ${test-shell-service_SOURCES} dbus-testutils)
 add_helper_executable(test-spawn ${test-spawn_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(test-exit ${test-exit_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(test-segfault ${test-segfault_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(test-sleep-forever ${test-sleep-forever_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(manual-tcp ${manual-tcp_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
-add_helper_executable(manual-backtrace ${CMAKE_SOURCE_DIR}/../test/manual-backtrace.c dbus-1)
+add_helper_executable(manual-backtrace ${TEST_DIR}/manual-backtrace.c dbus-1)
 if(WIN32)
     add_helper_executable(manual-paths ${manual-paths_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 endif()
@@ -82,8 +82,8 @@ if(DBUS_WITH_GLIB)
     message(STATUS "with glib test apps")
 
     add_library(dbus-testutils-glib STATIC
-        ${CMAKE_SOURCE_DIR}/../test/test-utils-glib.h
-        ${CMAKE_SOURCE_DIR}/../test/test-utils-glib.c
+        ${TEST_DIR}/test-utils-glib.h
+        ${TEST_DIR}/test-utils-glib.c
     )
     target_link_libraries(dbus-testutils-glib dbus-testutils ${DBUS_INTERNAL_LIBRARIES})
 
@@ -96,22 +96,22 @@ if(DBUS_WITH_GLIB)
 
     set(TEST_LIBRARIES ${DBUS_INTERNAL_LIBRARIES} dbus-testutils dbus-testutils-glib ${GLIB2_LIBRARIES})
 
-    add_test_executable(test-corrupt ${CMAKE_SOURCE_DIR}/../test/corrupt.c ${TEST_LIBRARIES})
-    add_test_executable(test-dbus-daemon ${CMAKE_SOURCE_DIR}/../test/dbus-daemon.c ${TEST_LIBRARIES})
-    add_test_executable(test-dbus-daemon-eavesdrop ${CMAKE_SOURCE_DIR}/../test/dbus-daemon-eavesdrop.c ${TEST_LIBRARIES})
-    add_test_executable(test-desktop-file ${CMAKE_SOURCE_DIR}/../test/internals/desktop-file.c ${TEST_LIBRARIES})
-    add_test_executable(test-fdpass ${CMAKE_SOURCE_DIR}/../test/fdpass.c ${TEST_LIBRARIES})
-    add_test_executable(test-loopback ${CMAKE_SOURCE_DIR}/../test/loopback.c ${TEST_LIBRARIES})
-    add_test_executable(test-marshal ${CMAKE_SOURCE_DIR}/../test/marshal.c ${TEST_LIBRARIES})
-    add_test_executable(test-monitor ${CMAKE_SOURCE_DIR}/../test/monitor.c ${TEST_LIBRARIES})
-    add_test_executable(test-refs ${CMAKE_SOURCE_DIR}/../test/internals/refs.c ${TEST_LIBRARIES})
-    add_test_executable(test-relay ${CMAKE_SOURCE_DIR}/../test/relay.c ${TEST_LIBRARIES})
-    add_test_executable(test-server-oom ${CMAKE_SOURCE_DIR}/../test/internals/server-oom.c ${TEST_LIBRARIES})
-    add_test_executable(test-syntax ${CMAKE_SOURCE_DIR}/../test/syntax.c ${TEST_LIBRARIES})
-    add_test_executable(test-syslog ${CMAKE_SOURCE_DIR}/../test/internals/syslog.c ${TEST_LIBRARIES})
-    add_test_executable(test-uid-permissions ${CMAKE_SOURCE_DIR}/../test/uid-permissions.c ${TEST_LIBRARIES})
-    add_helper_executable(manual-authz ${CMAKE_SOURCE_DIR}/../test/manual-authz.c ${TEST_LIBRARIES})
-    add_helper_executable(manual-test-thread-blocking ${CMAKE_SOURCE_DIR}/../test/thread-blocking.c ${TEST_LIBRARIES})
+    add_test_executable(test-corrupt ${TEST_DIR}/corrupt.c ${TEST_LIBRARIES})
+    add_test_executable(test-dbus-daemon ${TEST_DIR}/dbus-daemon.c ${TEST_LIBRARIES})
+    add_test_executable(test-dbus-daemon-eavesdrop ${TEST_DIR}/dbus-daemon-eavesdrop.c ${TEST_LIBRARIES})
+    add_test_executable(test-desktop-file ${TEST_DIR}/internals/desktop-file.c ${TEST_LIBRARIES})
+    add_test_executable(test-fdpass ${TEST_DIR}/fdpass.c ${TEST_LIBRARIES})
+    add_test_executable(test-loopback ${TEST_DIR}/loopback.c ${TEST_LIBRARIES})
+    add_test_executable(test-marshal ${TEST_DIR}/marshal.c ${TEST_LIBRARIES})
+    add_test_executable(test-monitor ${TEST_DIR}/monitor.c ${TEST_LIBRARIES})
+    add_test_executable(test-refs ${TEST_DIR}/internals/refs.c ${TEST_LIBRARIES})
+    add_test_executable(test-relay ${TEST_DIR}/relay.c ${TEST_LIBRARIES})
+    add_test_executable(test-server-oom ${TEST_DIR}/internals/server-oom.c ${TEST_LIBRARIES})
+    add_test_executable(test-syntax ${TEST_DIR}/syntax.c ${TEST_LIBRARIES})
+    add_test_executable(test-syslog ${TEST_DIR}/internals/syslog.c ${TEST_LIBRARIES})
+    add_test_executable(test-uid-permissions ${TEST_DIR}/uid-permissions.c ${TEST_LIBRARIES})
+    add_helper_executable(manual-authz ${TEST_DIR}/manual-authz.c ${TEST_LIBRARIES})
+    add_helper_executable(manual-test-thread-blocking ${TEST_DIR}/thread-blocking.c ${TEST_LIBRARIES})
 endif()
 
 ### keep these in creation order, i.e. uppermost dirs first 
