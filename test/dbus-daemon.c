@@ -1045,9 +1045,13 @@ test_pending_fd_timeout (Fixture *f,
       test_progress ('.');
       test_main_context_iterate (f->ctx, TRUE);
 
-      /* It should take no longer than 500ms to get disconnected. We'll
-       * be generous and allow 1000ms. */
-      g_assert_cmpint (g_get_monotonic_time (), <=, start + G_USEC_PER_SEC);
+      /* It should take 0.5s to get disconnected, as configured in
+       * valid-config-files/pending-fd-timeout.conf; but this test
+       * might get starved by other processes running in parallel
+       * (particularly on shared CI systems), so we have to be a lot
+       * more generous. Allow up to 10 seconds. */
+      g_assert_cmpint (g_get_monotonic_time (), <=,
+                       start + (10 * G_USEC_PER_SEC));
     }
 
   g_object_unref (socket);
