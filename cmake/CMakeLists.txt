@@ -298,8 +298,6 @@ set(DBUS_INCLUDES)
 ENABLE_TESTING()
 
 ########### command line options ###############
-# TODO: take check from configure.in
-
 option (DBUS_BUILD_TESTS "enable unit test code" ON)
  
 if(DBUS_BUILD_TESTS)

@@ -3,6 +3,7 @@ include(CheckIncludeFiles)
 include(CheckSymbolExists)
 include(CheckStructMember)
 include(CheckTypeSize)
+include(CheckCSourceCompiles)
 
 check_include_file(alloca.h     HAVE_ALLOCA_H)
 check_include_file(byteswap.h     HAVE_BYTESWAP_H)
@@ -58,7 +59,6 @@ check_symbol_exists(strtoull     "stdlib.h"         HAVE_STRTOULL)           #  
 set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
 check_symbol_exists(pipe2        "fcntl.h;unistd.h"         HAVE_PIPE2)
 check_symbol_exists(accept4      "sys/socket.h"             HAVE_ACCEPT4)
-check_symbol_exists(dirfd        "dirent.h"                 HAVE_DIRFD)
 check_symbol_exists(inotify_init1 "sys/inotify.h"           HAVE_INOTIFY_INIT1)
 check_symbol_exists(SCM_RIGHTS    "sys/types.h;sys/socket.h;sys/un.h" HAVE_UNIX_FD_PASSING)
 check_symbol_exists(prctl        "sys/prctl.h"              HAVE_PRCTL)
@@ -69,8 +69,133 @@ check_symbol_exists(setrlimit    "sys/resource.h;sys/time.h" HAVE_SETRLIMIT)
 
 check_struct_member(cmsgcred cmcred_pid "sys/types.h;sys/socket.h" HAVE_CMSGCRED)   #  dbus-sysdeps.c
 
-# missing:
-# DBUS_HAVE_GCC33_GCOV
+CHECK_C_SOURCE_COMPILES("
+#ifndef __linux__
+#error This is not Linux
+#endif
+#include <sys/epoll.h>
+int main() {
+epoll_create1 (EPOLL_CLOEXEC);
+}" DBUS_HAVE_LINUX_EPOLL)
+
+CHECK_C_SOURCE_COMPILES("
+#include <stdarg.h>
+#include <stdlib.h>
+static void f (int i, ...) {
+    va_list args1, args2;
+    va_start (args1, i);
+    va_copy (args2, args1);
+    if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+      exit (1);
+    va_end (args1); va_end (args2);
+}
+int main() {
+    f (0, 42);
+    return 0;
+}
+"  HAVE_VA_COPY)
+
+CHECK_C_SOURCE_COMPILES("
+#include <stdarg.h>
+#include <stdlib.h>
+static void f (int i, ...) {
+    va_list args1, args2;
+    va_start (args1, i);
+    __va_copy (args2, args1);
+    if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+      exit (1);
+    va_end (args1); va_end (args2);
+}
+int main() {
+    f (0, 42);
+    return 0;
+}
+"  HAVE___VA_COPY)
+
+if(HAVE_VA_COPY)
+    set(DBUS_VA_COPY va_copy CACHE STRING "va_copy function")
+elseif(HAVE___VA_COPY)
+    set(DBUS_VA_COPY __va_copy CACHE STRING "va_copy function")
+else()
+    # this is used for msvc < 2013
+    set(DBUS_VA_COPY _DBUS_VA_COPY_ASSIGN)
+endif()
+
+CHECK_C_SOURCE_COMPILES("
+#include <stdarg.h>
+#include <stdlib.h>
+static void f (int i, ...) {
+    va_list args1, args2;
+    va_start (args1, i);
+    args2 = args1;
+    if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+    exit (1);
+    va_end (args1); va_end (args2);
+}
+int main() {
+    f (0, 42);
+    return 0;
+}
+" VA_COPY_AS_ARRAY)
+if (NOT VA_COPY_AS_ARRAY)
+    set(DBUS_VA_COPY_AS_ARRAY 1 CACHE STRING "'va_lists' cannot be copies as values")
+endif()
+
+CHECK_C_SOURCE_COMPILES("
+int main() {
+    int a = 4;
+    int b = __sync_sub_and_fetch(&a, 4);
+    exit(b);
+}
+" DBUS_USE_SYNC)
+
+CHECK_C_SOURCE_COMPILES("
+#include <sys/types.h>
+#include <dirent.h>
+int main(
+    DIR *dirp;
+    dirp = opendir(\".\");
+    dirfd(dirp);
+    closedir(dirp);
+)
+" HAVE_DIRFD)
+
+if(NOT HAVE_DIRFD)
+    CHECK_C_SOURCE_COMPILES("
+    #include <sys/types.h>
+    #include <dirent.h>
+    int main()
+    {
+        DIR *dirp;
+        int fd;
+        dirp = opendir(\".\");
+        fd = dirp->dd_fd;
+        closedir(dirp);
+    }
+    " HAVE_DDFD)
+endif()
+
+CHECK_C_SOURCE_COMPILES("
+int a(int p1, int p2, int p3)
+{
+}
+int main()
+{
+    #define call_a(params...) a(1,params)
+    call_a(2,3);
+}
+" HAVE_GNUC_VARARGS)
+
+CHECK_C_SOURCE_COMPILES("
+int a(int p1, int p2, int p3)
+{
+}
+int main()
+{
+    #define call_a(...) a(1,__VA_ARGS__)
+    call_a(2,3);
+}
+" HAVE_ISO_VARARGS)
 
 check_type_size("short"     SIZEOF_SHORT)
 check_type_size("int"       SIZEOF_INT)
@@ -120,54 +245,3 @@ endif(SIZEOF_INT EQUAL 2)
 
 find_program(DOXYGEN doxygen)
 find_program(XMLTO xmlto)
-
-if(MSVC)
-   SET(DBUS_VA_COPY_FUNC "_DBUS_VA_COPY_ASSIGN")
-else(MSVC)
-write_file("${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/cmake_try_compile.c" "#include <stdarg.h>
-	#include <stdlib.h>
-        static void f (int i, ...) {
-	va_list args1, args2;
-	va_start (args1, i);
-	va_copy (args2, args1);
-	if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
-	  exit (1);
-	va_end (args1); va_end (args2);
-	}
-	int main() {
-	  f (0, 42);
-	  return 0;
-	}
-")
-try_compile(DBUS_HAVE_VA_COPY
-            ${CMAKE_BINARY_DIR}
-            ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/cmake_try_compile.c)
-
-if(DBUS_HAVE_VA_COPY)
-  SET(DBUS_VA_COPY_FUNC va_copy CACHE STRING "va_copy function")
-else(DBUS_HAVE_VA_COPY)
-  write_file("${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/cmake_try_compile.c" "#include <stdarg.h>
-          #include <stdlib.h>
-	  static void f (int i, ...) {
-	  va_list args1, args2;
-	  va_start (args1, i);
-	  __va_copy (args2, args1);
-	  if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
-	    exit (1);
-	  va_end (args1); va_end (args2);
-	  }
-	  int main() {
-	    f (0, 42);
-	    return 0;
-	  }
-  ")
-  try_compile(DBUS_HAVE___VA_COPY
-              ${CMAKE_BINARY_DIR}
-              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/cmake_try_compile.c)
-  if(DBUS_HAVE___VA_COPY)
-    SET(DBUS_VA_COPY_FUNC __va_copy CACHE STRING "va_copy function")
-  else(DBUS_HAVE___VA_COPY)
-    SET(DBUS_VA_COPY_AS_ARRAY "1" CACHE STRING "'va_lists' cannot be copies as values")
-  endif(DBUS_HAVE___VA_COPY)
-endif(DBUS_HAVE_VA_COPY)
-endif(MSVC) # _not_ MSVC

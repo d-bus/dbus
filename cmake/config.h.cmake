@@ -12,7 +12,12 @@
  * Variables defined by AC_DEFINE in ../configure.ac
  * should be placed in this file
 */
+
+/* Have GNU-style varargs macros */
 #cmakedefine HAVE_GNUC_VARARGS 1
+
+/* Have ISO C99 varargs macros */
+#cmakedefine HAVE_ISO_VARARGS 1
 
 #cmakedefine DBUS_CONSOLE_AUTH_DIR "@DBUS_CONSOLE_AUTH_DIR@"
 #cmakedefine DBUS_DATADIR  "@DBUS_DATADIR@"
@@ -66,18 +71,14 @@
 # define DBUS_ENABLE_X11_AUTOLAUNCH 1
 #endif
 
+/* A 'va_copy' style function */
+#cmakedefine DBUS_VA_COPY @DBUS_VA_COPY@
+
+/* for msvc */
 #define _DBUS_VA_COPY_ASSIGN(a1,a2) { a1 = a2; }
 
-#cmakedefine DBUS_VA_COPY_FUNC
-#if (defined DBUS_VA_COPY_FUNC)
-# define DBUS_VA_COPY @DBUS_VA_COPY_FUNC@
-#endif
-
-#ifdef DBUS_VA_COPY_FUNC
-#undef DBUS_VA_COPY_FUNC
-#endif
-
-#cmakedefine DBUS_VA_COPY_AS_ARRAY @DBUS_VA_COPY_AS_ARRAY@
+/* 'va_lists' cannot be copies as values */
+#cmakedefine DBUS_VA_COPY_AS_ARRAY 1
 
 #cmakedefine DBUS_WITH_GLIB 1
 #cmakedefine GLIB_VERSION_MIN_REQUIRED @GLIB_VERSION_MIN_REQUIRED@
@@ -208,7 +209,13 @@
 #cmakedefine   HAVE_PIPE2 1
 
 #cmakedefine HAVE_ACCEPT4 1
+
+/* Have dirfd function */
 #cmakedefine HAVE_DIRFD 1
+
+/* Have the ddfd member of DIR */
+#cmakedefine HAVE_DDFD 1
+
 #cmakedefine HAVE_INOTIFY_INIT1 1
 #cmakedefine HAVE_GETRLIMIT 1
 #cmakedefine HAVE_PRCTL 1
@@ -216,6 +223,12 @@
 #cmakedefine HAVE_RAISE 1
 #cmakedefine HAVE_SETRLIMIT 1
 #cmakedefine HAVE_UNIX_FD_PASSING 1
+
+/* Define to use epoll(4) on Linux */
+#cmakedefine DBUS_HAVE_LINUX_EPOLL 1
+
+/* Use the gcc __sync extension */
+#cmakedefine DBUS_USE_SYNC 1
 
 // structs
 /* Define to 1 if you have struct cmsgred */

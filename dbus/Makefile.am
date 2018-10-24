@@ -120,7 +120,7 @@ DBUS_UTIL_arch_sources = 			\
 	$(NULL)
 endif
 
-if HAVE_LINUX_EPOLL
+if DBUS_HAVE_LINUX_EPOLL
 DBUS_UTIL_arch_sources += dbus-socket-set-epoll.c
 endif
 
