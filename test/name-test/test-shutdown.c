@@ -21,15 +21,19 @@ open_destroy_shared_session_bus_connection (void)
   DBusConnection *connection;
   char *session_addr_no_guid;
   char *comma;
-  
+
   dbus_error_init (&error);
 
   session_addr_no_guid = strdup (getenv ("DBUS_SESSION_BUS_ADDRESS"));
   comma = strchr (session_addr_no_guid, ',');
-  if (comma == NULL)
-    die ("Couldn't find GUID in session bus address");
+
+#ifdef DBUS_WIN
+  _dbus_assert (comma == NULL);
+#else
+  _dbus_assert (comma != NULL);
   *comma = '\0';
-    
+#endif
+
   connection = dbus_connection_open (session_addr_no_guid, &error);
   free (session_addr_no_guid);
   if (connection == NULL)
