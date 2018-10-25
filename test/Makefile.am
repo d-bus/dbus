@@ -66,7 +66,6 @@ TEST_BINARIES = \
 	test-segfault \
 	test-service \
 	test-shell-service \
-	test-sleep-forever \
 	$(NULL)
 
 ## These are conceptually part of directories that come earlier in SUBDIRS
@@ -137,6 +136,7 @@ nobase_testexec_PROGRAMS =
 nobase_testmeta_DATA =
 
 installable_helpers = \
+	test-sleep-forever \
 	$(NULL)
 installable_tests = \
 	test-shell \
