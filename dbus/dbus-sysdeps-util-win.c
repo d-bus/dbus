@@ -1399,7 +1399,8 @@ _dbus_command_for_pid (unsigned long  pid,
                        int            max_len,
                        DBusError     *error)
 {
-  // FIXME
+  dbus_set_error (error, DBUS_ERROR_NOT_SUPPORTED,
+                  "_dbus_command_for_pid() not implemented on Windows");
   return FALSE;
 }
 
