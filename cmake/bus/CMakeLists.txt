@@ -1,7 +1,7 @@
 add_definitions(-DDBUS_COMPILATION)
 
 SET(EFENCE "")
-SET(BUS_DIR ${CMAKE_SOURCE_DIR}/../bus)
+SET(BUS_DIR ../../bus)
 
 # config files for installation 
 CONFIGURE_FILE( "${BUS_DIR}/session.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/session.conf" IMMEDIATE @ONLY)

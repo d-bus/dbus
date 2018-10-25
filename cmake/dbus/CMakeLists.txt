@@ -1,4 +1,4 @@
-SET(DBUS_DIR ${CMAKE_SOURCE_DIR}/../dbus)
+SET(DBUS_DIR ../../dbus)
 
 configure_file(${DBUS_DIR}/dbus-arch-deps.h.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h )
 
