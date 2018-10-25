@@ -148,6 +148,7 @@ set(LAUNCH_HELPER_SOURCES
 if(NOT WIN32)
 	add_executable(dbus-daemon-launch-helper ${LAUNCH_HELPER_SOURCES} ${BUS_DIR}/activation-helper-bin.c )
 	target_link_libraries(dbus-daemon-launch-helper ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES} )
+	install(TARGETS dbus-daemon-launch-helper ${INSTALL_TARGETS_DEFAULT_ARGS} RUNTIME DESTINATION ${CMAKE_INSTALL_LIBEXECDIR})
 endif(NOT WIN32)
 
 if (DBUS_ENABLE_EMBEDDED_TESTS)
@@ -171,7 +172,6 @@ if (DBUS_ENABLE_EMBEDDED_TESTS)
 		set (SOURCES ${LAUNCH_HELPER_SOURCES} ${BUS_DIR}/test-launch-helper.c)
 		add_test_executable(test-bus-launch-helper "${SOURCES}"  ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 		set_target_properties(test-bus-launch-helper PROPERTIES COMPILE_FLAGS "-DACTIVATION_LAUNCHER_TEST -DACTIVATION_LAUNCHER_DO_OOM")
-		install_targets(/lib dbus-daemon-launch-helper)
 	endif()
 endif (DBUS_ENABLE_EMBEDDED_TESTS)
 
