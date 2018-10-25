@@ -60,6 +60,7 @@ test_command_for_pid (Fixture *f,
   GError *error = NULL;
   GPid process = NO_PROCESS;
   unsigned long pid;
+  DBusError d_error = DBUS_ERROR_INIT;
   DBusString string;
 
   argv[0] = test_get_helper_executable ("test-sleep-forever" DBUS_EXEEXT);
@@ -81,7 +82,7 @@ test_command_for_pid (Fixture *f,
   if (!_dbus_string_init (&string))
     g_error ("out of memory");
 
-  if (_dbus_command_for_pid (pid, &string, strlen (argv[0]) + 1024, NULL))
+  if (_dbus_command_for_pid (pid, &string, strlen (argv[0]) + 1024, &d_error))
     {
       gchar *expected;
 
@@ -98,7 +99,11 @@ test_command_for_pid (Fixture *f,
     }
   else
     {
-      g_test_message ("Unable to get command for process ID");
+      g_test_message ("Unable to get command for process ID: %s: %s",
+                      d_error.name, d_error.message);
+      g_assert_nonnull (d_error.name);
+      g_assert_nonnull (d_error.message);
+      dbus_error_free (&d_error);
     }
 
   if (!_dbus_string_set_length (&string, 0))
