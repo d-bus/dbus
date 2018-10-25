@@ -1092,7 +1092,22 @@ string_squash_nonprintable (DBusString *str)
   
   buf = _dbus_string_get_udata (str);
   len = _dbus_string_get_length (str);
-  
+
+  /* /proc/$pid/cmdline is a sequence of \0-terminated words, but we
+   * want a sequence of space-separated words, with no extra trailing
+   * space:
+   *     "/bin/sleep" "\0" "60" "\0"
+   *  -> "/bin/sleep" "\0" "60"
+   *  -> "/bin/sleep" " " "60"
+   *
+   * so chop off the trailing NUL before cleaning up unprintable
+   * characters. */
+  if (len > 0 && buf[len - 1] == '\0')
+    {
+      _dbus_string_shorten (str, 1);
+      len--;
+    }
+
   for (i = 0; i < len; i++)
     {
       unsigned char c = (unsigned char) buf[i];
