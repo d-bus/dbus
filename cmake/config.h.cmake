@@ -13,6 +13,16 @@
  * should be placed in this file
 */
 
+/* Opt-in to modern APIs and thread-safety for Solaris. In the Autotools
+ * build system we do the equivalent of this by appending to CFLAGS
+ * in configure.ac */
+#ifdef __sun
+# define __EXTENSIONS__
+# define _POSIX_PTHREAD_SEMANTICS
+# define _REENTRANT
+# define _XOPEN_SOURCE 500
+#endif
+
 #cmakedefine DBUS_CONSOLE_AUTH_DIR "@DBUS_CONSOLE_AUTH_DIR@"
 #cmakedefine DBUS_DATADIR  "@DBUS_DATADIR@"
 #cmakedefine DBUS_BINDIR   "@DBUS_BINDIR@"
