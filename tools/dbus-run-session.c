@@ -4,6 +4,7 @@
  * Copyright © 2003-2006 Red Hat, Inc.
  * Copyright © 2006 Thiago Macieira <thiago@kde.org>
  * Copyright © 2011-2012 Nokia Corporation
+ * Copyright © 2018 Ralf Habacker
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -33,9 +34,13 @@
 #include <unistd.h>
 
 #include <sys/types.h>
+#ifdef DBUS_UNIX
 #include <sys/wait.h>
 #include <signal.h>
-
+#else
+#include <dbus/dbus-internals.h>
+#include <dbus/dbus-sysdeps-win.h>
+#endif
 #include "dbus/dbus.h"
 #include "dbus/dbus-internals.h"
 
@@ -93,6 +98,7 @@ version (void)
           "Copyright (C) 2003-2006 Red Hat, Inc.\n"
           "Copyright (C) 2006 Thiago Macieira\n"
           "Copyright © 2011-2012 Nokia Corporation\n"
+          "Copyright © 2018 Ralf Habacker\n"
           "\n"
           "This is free software; see the source for copying conditions.\n"
           "There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
@@ -100,6 +106,7 @@ version (void)
   exit (0);
 }
 
+#ifndef DBUS_WIN
 static void oom (void) _DBUS_GNUC_NORETURN;
 
 static void
@@ -210,143 +217,16 @@ exec_app (int prog_arg, char **argv)
   exit (1);
 }
 
-int
-main (int argc, char **argv)
+static int
+run_session (const char *dbus_daemon,
+             const char *config_file,
+             char       *bus_address,
+             char      **argv,
+             int         prog_arg)
 {
-  int prog_arg = 0;
-  int bus_address_pipe[2] = { 0, 0 };
-  const char *config_file = NULL;
-  const char *dbus_daemon = NULL;
-  char bus_address[MAX_ADDR_LEN] = { 0 };
-  const char *prev_arg = NULL;
-  int i = 1;
-  int requires_arg = 0;
   pid_t bus_pid;
   pid_t app_pid;
-
-  while (i < argc)
-    {
-      const char *arg = argv[i];
-
-      if (requires_arg)
-        {
-          const char **arg_dest;
-
-          assert (prev_arg != NULL);
-
-          if (strcmp (prev_arg, "--config-file") == 0)
-            {
-              arg_dest = &config_file;
-            }
-          else if (strcmp (prev_arg, "--dbus-daemon") == 0)
-            {
-              arg_dest = &dbus_daemon;
-            }
-          else
-            {
-              /* shouldn't happen */
-              fprintf (stderr, "%s: internal error: %s not fully implemented\n",
-                       me, prev_arg);
-              return 127;
-            }
-
-          if (*arg_dest != NULL)
-            {
-              fprintf (stderr, "%s: %s given twice\n", me, prev_arg);
-              return 127;
-            }
-
-          *arg_dest = arg;
-          requires_arg = 0;
-          prev_arg = arg;
-          ++i;
-          continue;
-        }
-
-      if (strcmp (arg, "--help") == 0 ||
-          strcmp (arg, "-h") == 0 ||
-          strcmp (arg, "-?") == 0)
-        {
-          usage (0);
-        }
-      else if (strcmp (arg, "--version") == 0)
-        {
-          version ();
-        }
-      else if (strstr (arg, "--config-file=") == arg)
-        {
-          const char *file;
-
-          if (config_file != NULL)
-            {
-              fprintf (stderr, "%s: --config-file given twice\n", me);
-              return 127;
-            }
-
-          file = strchr (arg, '=');
-          ++file;
-
-          config_file = file;
-        }
-      else if (strstr (arg, "--dbus-daemon=") == arg)
-        {
-          const char *file;
-
-          if (dbus_daemon != NULL)
-            {
-              fprintf (stderr, "%s: --dbus-daemon given twice\n", me);
-              return 127;
-            }
-
-          file = strchr (arg, '=');
-          ++file;
-
-          dbus_daemon = file;
-        }
-      else if (strcmp (arg, "--config-file") == 0 ||
-               strcmp (arg, "--dbus-daemon") == 0)
-        {
-          requires_arg = 1;
-        }
-      else if (arg[0] == '-')
-        {
-          if (strcmp (arg, "--") != 0)
-            {
-              fprintf (stderr, "%s: option '%s' is unknown\n", me, arg);
-              return 127;
-            }
-          else
-            {
-              prog_arg = i + 1;
-              break;
-            }
-        }
-      else
-        {
-          prog_arg = i;
-          break;
-        }
-
-      prev_arg = arg;
-      ++i;
-    }
-
-  /* "dbus-run-session" and "dbus-run-session ... --" are not allowed:
-   * there must be something to run */
-  if (prog_arg < 1 || prog_arg >= argc)
-    {
-      fprintf (stderr, "%s: a non-option argument is required\n", me);
-      return 127;
-    }
-
-  if (requires_arg)
-    {
-      fprintf (stderr, "%s: option '%s' requires an argument\n", me, prev_arg);
-      return 127;
-    }
-
-  if (dbus_daemon == NULL)
-    dbus_daemon = "dbus-daemon";
+  int bus_address_pipe[2] = { 0, 0 };
 
   if (pipe (bus_address_pipe) < 0)
     {
@@ -481,4 +361,276 @@ main (int argc, char **argv)
     }
 
   return 0;
+}
+#else
+static int
+run_session (const char *dbus_daemon,
+             const char *config_file,
+             char       *bus_address,
+             char      **argv,
+             int         prog_arg)
+{
+  char *dbus_daemon_argv[3];
+  int ret = 127;
+  HANDLE server_handle = NULL;
+  HANDLE app_handle = NULL;
+  DWORD exit_code;
+  DBusString argv_strings[4];
+  DBusString address;
+  char **env = NULL;
+  DBusHashTable *env_table = NULL;
+  long sec,usec;
+  dbus_bool_t result = TRUE;
+  char *key = NULL;
+  char *value = NULL;
+
+  if (!_dbus_string_init (&argv_strings[0]))
+    result = FALSE;
+  if (!_dbus_string_init (&argv_strings[1]))
+    result = FALSE;
+  if (!_dbus_string_init (&argv_strings[2]))
+    result = FALSE;
+  if (!_dbus_string_init (&address))
+    result = FALSE;
+  if (!result)
+    goto out;
+
+  /* run dbus daemon */
+  _dbus_get_real_time (&sec, &usec);
+  /* On Windows it's difficult to make use of --print-address to
+   * convert a listenable address into a connectable address, so instead
+   * we tell the temporary dbus-daemon to use the Windows autolaunch
+   * mechanism, with a unique scope that is shared by this dbus-daemon,
+   * the app process that defines its lifetime, and any other child
+   * processes they might have. */
+  _dbus_string_append_printf (&address, "autolaunch:scope=dbus-tmp-session-%ld%ld-" DBUS_PID_FORMAT, sec, usec, _dbus_getpid ());
+  _dbus_string_append_printf (&argv_strings[0], "%s", dbus_daemon);
+  if (config_file != NULL)
+    _dbus_string_append_printf (&argv_strings[1], "--config-file=%s", config_file);
+  else
+    _dbus_string_append_printf (&argv_strings[1], "--session");
+  _dbus_string_append_printf (&argv_strings[2], "--address=%s", _dbus_string_get_const_data (&address));
+  dbus_daemon_argv[0] = _dbus_string_get_data (&argv_strings[0]);
+  dbus_daemon_argv[1] = _dbus_string_get_data (&argv_strings[1]);
+  dbus_daemon_argv[2] = _dbus_string_get_data (&argv_strings[2]);
+  dbus_daemon_argv[3] = NULL;
+
+  server_handle = _dbus_spawn_program (dbus_daemon, dbus_daemon_argv, NULL);
+  if (!server_handle)
+    {
+      _dbus_win_stderr_win_error (me, "Could not start dbus daemon", GetLastError ());
+      goto out;
+    }
+
+  /* run app */
+  env = _dbus_get_environment ();
+  env_table = _dbus_hash_table_new (DBUS_HASH_STRING,
+                                    dbus_free,
+                                    dbus_free);
+  if (!_dbus_hash_table_from_array (env_table, env, '='))
+    {
+      goto out;
+    }
+
+  /* replace DBUS_SESSION_BUS_ADDRESS in environment */
+  if (!_dbus_string_steal_data (&address, &value))
+    goto out;
+
+  key = _dbus_strdup ("DBUS_SESSION_BUS_ADDRESS");
+
+  if (key == NULL)
+    goto out;
+
+  if (_dbus_hash_table_insert_string (env_table, key, value))
+    {
+      /* env_table took ownership, do not free separately */
+      key = NULL;
+      value = NULL;
+    }
+  else
+    {
+      /* we still own key and value, the cleanup code will free them */
+      goto out;
+    }
+
+  _dbus_hash_table_remove_string (env_table, "DBUS_STARTER_ADDRESS");
+  _dbus_hash_table_remove_string (env_table, "DBUS_STARTER_BUS_TYPE");
+  _dbus_hash_table_remove_string (env_table, "DBUS_SESSION_BUS_PID");
+  _dbus_hash_table_remove_string (env_table, "DBUS_SESSION_BUS_WINDOWID");
+
+  dbus_free_string_array (env);
+  env = _dbus_hash_table_to_array (env_table, '=');
+  if (!env)
+    goto out;
+
+  app_handle = _dbus_spawn_program (argv[prog_arg], argv + prog_arg, env);
+  if (!app_handle)
+    {
+      _dbus_win_stderr_win_error (me, "unable to start child process", GetLastError ());
+      goto out;
+    }
+
+  WaitForSingleObject (app_handle, INFINITE);
+  if (!GetExitCodeProcess (app_handle, &exit_code))
+    {
+      _dbus_win_stderr_win_error (me, "could not fetch exit code", GetLastError ());
+      goto out;
+    }
+  ret = exit_code;
+
+out:
+  TerminateProcess (server_handle, 0);
+  if (server_handle != NULL)
+    CloseHandle (server_handle);
+  if (app_handle != NULL)
+    CloseHandle (app_handle);
+  _dbus_string_free (&argv_strings[0]);
+  _dbus_string_free (&argv_strings[1]);
+  _dbus_string_free (&argv_strings[2]);
+  _dbus_string_free (&address);
+  dbus_free_string_array (env);
+  if (env_table != NULL)
+    _dbus_hash_table_unref (env_table);
+  dbus_free (key);
+  dbus_free (value);
+  return ret;
+}
+#endif
+
+int
+main (int argc, char **argv)
+{
+  int prog_arg = 0;
+  const char *config_file = NULL;
+  const char *dbus_daemon = NULL;
+  char bus_address[MAX_ADDR_LEN] = { 0 };
+  const char *prev_arg = NULL;
+  int i = 1;
+  int requires_arg = 0;
+
+  while (i < argc)
+    {
+      const char *arg = argv[i];
+
+      if (requires_arg)
+        {
+          const char **arg_dest;
+
+          assert (prev_arg != NULL);
+
+          if (strcmp (prev_arg, "--config-file") == 0)
+            {
+              arg_dest = &config_file;
+            }
+          else if (strcmp (prev_arg, "--dbus-daemon") == 0)
+            {
+              arg_dest = &dbus_daemon;
+            }
+          else
+            {
+              /* shouldn't happen */
+              fprintf (stderr, "%s: internal error: %s not fully implemented\n",
+                       me, prev_arg);
+              return 127;
+            }
+
+          if (*arg_dest != NULL)
+            {
+              fprintf (stderr, "%s: %s given twice\n", me, prev_arg);
+              return 127;
+            }
+
+          *arg_dest = arg;
+          requires_arg = 0;
+          prev_arg = arg;
+          ++i;
+          continue;
+        }
+
+      if (strcmp (arg, "--help") == 0 ||
+          strcmp (arg, "-h") == 0 ||
+          strcmp (arg, "-?") == 0)
+        {
+          usage (0);
+        }
+      else if (strcmp (arg, "--version") == 0)
+        {
+          version ();
+        }
+      else if (strstr (arg, "--config-file=") == arg)
+        {
+          const char *file;
+
+          if (config_file != NULL)
+            {
+              fprintf (stderr, "%s: --config-file given twice\n", me);
+              return 127;
+            }
+
+          file = strchr (arg, '=');
+          ++file;
+
+          config_file = file;
+        }
+      else if (strstr (arg, "--dbus-daemon=") == arg)
+        {
+          const char *file;
+
+          if (dbus_daemon != NULL)
+            {
+              fprintf (stderr, "%s: --dbus-daemon given twice\n", me);
+              return 127;
+            }
+
+          file = strchr (arg, '=');
+          ++file;
+
+          dbus_daemon = file;
+        }
+      else if (strcmp (arg, "--config-file") == 0 ||
+               strcmp (arg, "--dbus-daemon") == 0)
+        {
+          requires_arg = 1;
+        }
+      else if (arg[0] == '-')
+        {
+          if (strcmp (arg, "--") != 0)
+            {
+              fprintf (stderr, "%s: option '%s' is unknown\n", me, arg);
+              return 127;
+            }
+          else
+            {
+              prog_arg = i + 1;
+              break;
+            }
+        }
+      else
+        {
+          prog_arg = i;
+          break;
+        }
+
+      prev_arg = arg;
+      ++i;
+    }
+
+  /* "dbus-run-session" and "dbus-run-session ... --" are not allowed:
+   * there must be something to run */
+  if (prog_arg < 1 || prog_arg >= argc)
+    {
+      fprintf (stderr, "%s: a non-option argument is required\n", me);
+      return 127;
+    }
+
+  if (requires_arg)
+    {
+      fprintf (stderr, "%s: option '%s' requires an argument\n", me, prev_arg);
+      return 127;
+    }
+
+  if (dbus_daemon == NULL)
+    dbus_daemon = "dbus-daemon";
+
+  return run_session (dbus_daemon, config_file, bus_address, argv, prog_arg);
 }

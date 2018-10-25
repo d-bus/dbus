@@ -130,11 +130,9 @@ add_executable(dbus-monitor ${dbus_monitor_SOURCES})
 target_link_libraries(dbus-monitor ${DBUS_LIBRARIES})
 install(TARGETS dbus-monitor ${INSTALL_TARGETS_DEFAULT_ARGS})
 
-if(NOT WIN32)
-    add_executable(dbus-run-session ${dbus_run_session_SOURCES})
-    target_link_libraries(dbus-run-session ${DBUS_LIBRARIES})
-    install(TARGETS dbus-run-session ${INSTALL_TARGETS_DEFAULT_ARGS})
-endif()
+add_executable(dbus-run-session ${dbus_run_session_SOURCES})
+target_link_libraries(dbus-run-session ${DBUS_INTERNAL_LIBRARIES})
+install(TARGETS dbus-run-session ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 # create the /var/lib/dbus directory for dbus-uuidgen
 install(DIRECTORY DESTINATION var/lib/dbus)
