@@ -890,3 +890,23 @@ test_incomplete (const gchar *message)
       g_test_skip (message);
     }
 }
+
+/*
+ * Return location of @exe test helper executable, or NULL if unknown.
+ *
+ * @exe must already include %DBUS_EXEEXT if appropriate.
+ *
+ * Returns: (transfer full) (nullable): an absolute path or NULL.
+ */
+gchar *
+test_get_helper_executable (const gchar *exe)
+{
+  const char *dbus_test_exec;
+
+  dbus_test_exec = _dbus_getenv ("DBUS_TEST_EXEC");
+
+  if (dbus_test_exec == NULL)
+    return NULL;
+
+  return g_build_filename (dbus_test_exec, exe, NULL);
+}
