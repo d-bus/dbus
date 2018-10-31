@@ -84,18 +84,9 @@ test_command_for_pid (Fixture *f,
   if (_dbus_command_for_pid (pid, &string, strlen (argv[0]) + 1024, NULL))
     {
       gchar *expected;
-      int len;
 
       g_test_message ("Process %lu: \"%s\"", pid,
                       _dbus_string_get_const_data (&string));
-
-      len = _dbus_string_get_length (&string);
-      /* TODO: _dbus_command_for_pid() currently appends an unwanted
-       * space. See dbus#222 */
-      _dbus_string_chop_white (&string);
-
-      if (_dbus_string_get_length (&string) < len)
-        test_incomplete ("Ignoring unwanted whitespace");
 
       expected = g_strdup_printf ("%s %s", argv[0], argv[1]);
 
