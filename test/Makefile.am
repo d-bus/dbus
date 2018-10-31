@@ -424,10 +424,18 @@ if DBUS_ENABLE_INSTALLED_TESTS
   nobase_testmeta_DATA += $(installable_test_meta)
   nobase_testmeta_DATA += $(installable_test_meta_with_config)
 else !DBUS_ENABLE_INSTALLED_TESTS
-  noinst_PROGRAMS += $(installable_tests) $(installable_manual_tests)
+  noinst_PROGRAMS += $(installable_helpers)
+  noinst_PROGRAMS += $(installable_manual_tests)
+  noinst_PROGRAMS += $(installable_tests)
 endif !DBUS_ENABLE_INSTALLED_TESTS
 
-endif DBUS_ENABLE_MODULAR_TESTS
+else !DBUS_ENABLE_MODULAR_TESTS
+
+if DBUS_ENABLE_EMBEDDED_TESTS
+  noinst_PROGRAMS += $(installable_helpers)
+endif DBUS_ENABLE_EMBEDDED_TESTS
+
+endif !DBUS_ENABLE_MODULAR_TESTS
 
 # If we're installing the tests into a DESTDIR we can't run them
 # again using the installed copy, because we don't know how to
