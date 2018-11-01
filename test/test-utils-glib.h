@@ -127,4 +127,8 @@ void test_store_result_cb (GObject *source_object,
                            GAsyncResult *result,
                            gpointer user_data);
 
+void test_incomplete (const gchar *message);
+
+gchar *test_get_helper_executable (const gchar *exe);
+
 #endif

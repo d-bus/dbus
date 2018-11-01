@@ -66,7 +66,6 @@ TEST_BINARIES = \
 	test-segfault \
 	test-service \
 	test-shell-service \
-	test-sleep-forever \
 	$(NULL)
 
 ## These are conceptually part of directories that come earlier in SUBDIRS
@@ -109,6 +108,9 @@ test_refs_LDADD = libdbus-testutils.la $(GLIB_LIBS)
 test_server_oom_SOURCES = internals/server-oom.c
 test_server_oom_LDADD = libdbus-testutils.la $(GLIB_LIBS)
 
+test_sysdeps_SOURCES = internals/sysdeps.c
+test_sysdeps_LDADD =  libdbus-testutils.la $(GLIB_LIBS)
+
 test_syslog_SOURCES = internals/syslog.c
 test_syslog_LDADD = libdbus-testutils.la $(GLIB_LIBS)
 
@@ -137,6 +139,7 @@ nobase_testexec_PROGRAMS =
 nobase_testmeta_DATA =
 
 installable_helpers = \
+	test-sleep-forever \
 	$(NULL)
 installable_tests = \
 	test-shell \
@@ -172,6 +175,7 @@ installable_tests += \
 	test-relay \
 	test-server-oom \
 	test-syntax \
+	test-sysdeps \
 	test-syslog \
 	test-uid-permissions \
 	test-variant \
@@ -424,10 +428,18 @@ if DBUS_ENABLE_INSTALLED_TESTS
   nobase_testmeta_DATA += $(installable_test_meta)
   nobase_testmeta_DATA += $(installable_test_meta_with_config)
 else !DBUS_ENABLE_INSTALLED_TESTS
-  noinst_PROGRAMS += $(installable_tests) $(installable_manual_tests)
+  noinst_PROGRAMS += $(installable_helpers)
+  noinst_PROGRAMS += $(installable_manual_tests)
+  noinst_PROGRAMS += $(installable_tests)
 endif !DBUS_ENABLE_INSTALLED_TESTS
 
-endif DBUS_ENABLE_MODULAR_TESTS
+else !DBUS_ENABLE_MODULAR_TESTS
+
+if DBUS_ENABLE_EMBEDDED_TESTS
+  noinst_PROGRAMS += $(installable_helpers)
+endif DBUS_ENABLE_EMBEDDED_TESTS
+
+endif !DBUS_ENABLE_MODULAR_TESTS
 
 # If we're installing the tests into a DESTDIR we can't run them
 # again using the installed copy, because we don't know how to

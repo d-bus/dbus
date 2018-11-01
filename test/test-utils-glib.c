@@ -863,3 +863,50 @@ test_store_result_cb (GObject *source_object G_GNUC_UNUSED,
   g_assert_null (*result_p);
   *result_p = g_object_ref (result);
 }
+
+/*
+ * Report that a test should have failed, but we are tolerating the
+ * failure because it represents a known bug or missing feature.
+ *
+ * This is the same as g_test_incomplete(), but with a workaround for
+ * GLib bug 1474 so that we don't fail tests on older GLib.
+ */
+void
+test_incomplete (const gchar *message)
+{
+  if (glib_check_version (2, 57, 3))
+    {
+      /* In GLib >= 2.57.3, g_test_incomplete() behaves as intended:
+       * the test result is reported as an expected failure and the
+       * overall test exits 0 */
+      g_test_incomplete (message);
+    }
+  else
+    {
+      /* In GLib < 2.57.3, g_test_incomplete() reported the wrong TAP
+       * result (an unexpected success) and the overall test exited 1,
+       * which would break "make check". g_test_skip() is the next
+       * best thing available. */
+      g_test_skip (message);
+    }
+}
+
+/*
+ * Return location of @exe test helper executable, or NULL if unknown.
+ *
+ * @exe must already include %DBUS_EXEEXT if appropriate.
+ *
+ * Returns: (transfer full) (nullable): an absolute path or NULL.
+ */
+gchar *
+test_get_helper_executable (const gchar *exe)
+{
+  const char *dbus_test_exec;
+
+  dbus_test_exec = _dbus_getenv ("DBUS_TEST_EXEC");
+
+  if (dbus_test_exec == NULL)
+    return NULL;
+
+  return g_build_filename (dbus_test_exec, exe, NULL);
+}
