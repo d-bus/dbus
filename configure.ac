@@ -1584,7 +1584,7 @@ AS_IF([test "x$enable_relocation" = xauto],
 
 
 AS_IF([test "x$enable_relocation" = xyes],
-  [AC_SUBST([pkgconfig_prefix], ['${pcfiledir}/../../'])],
+  [AC_SUBST([pkgconfig_prefix], ['${pcfiledir}/../..'])],
   [AC_SUBST([pkgconfig_prefix], ['${original_prefix}'])])
 
 #### Directory to source sysconfdir configuration from
