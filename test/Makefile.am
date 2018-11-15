@@ -83,6 +83,9 @@ uninstallable_test_programs += \
 	test-bus \
 	test-bus-dispatch \
 	test-bus-dispatch-sha1 \
+	test-hash \
+	test-marshal-recursive \
+	test-message-internals \
 	test-misc-internals \
 	$(NULL)
 
@@ -196,6 +199,15 @@ test_bus_dispatch_sha1_LDADD = \
 	$(top_builddir)/bus/libdbus-daemon-internal.la \
 	libdbus-testutils.la \
 	$(NULL)
+
+test_hash_SOURCES = internals/hash.c
+test_hash_LDADD = libdbus-testutils.la
+
+test_marshal_recursive_SOURCES = internals/marshal-recursive.c
+test_marshal_recursive_LDADD = libdbus-testutils.la
+
+test_message_internals_SOURCES = internals/message-internals.c
+test_message_internals_LDADD = libdbus-testutils.la
 
 test_misc_internals_SOURCES = internals/misc-internals.c
 test_misc_internals_LDADD = libdbus-testutils.la

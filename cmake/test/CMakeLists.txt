@@ -93,6 +93,15 @@ if(WIN32)
 endif()
 
 if(DBUS_ENABLE_EMBEDDED_TESTS)
+    add_test_executable(test-hash ${TEST_DIR}/internals/hash.c dbus-testutils)
+    set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    add_test_executable(test-marshal-recursive ${TEST_DIR}/internals/marshal-recursive.c dbus-testutils)
+    set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    add_test_executable(test-message-internals ${TEST_DIR}/internals/message-internals.c dbus-testutils)
+    set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
     add_test_executable(test-misc-internals ${TEST_DIR}/internals/misc-internals.c dbus-testutils)
     set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 

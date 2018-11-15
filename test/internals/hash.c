@@ -27,40 +27,13 @@
 #include "dbus/dbus-test.h"
 #include "test/test-utils.h"
 
-static DBusTestCase tests[] =
-{
-  { "string", _dbus_string_test },
-  { "sysdeps", _dbus_sysdeps_test },
-  { "data-slot", _dbus_data_slot_test },
-  { "misc", _dbus_misc_test },
-  { "address", _dbus_address_test },
-  { "server", _dbus_server_test },
-  { "object-tree", _dbus_object_tree_test },
-  { "signature", _dbus_signature_test },
-  { "marshalling", _dbus_marshal_test },
-  { "byteswap", _dbus_marshal_byteswap_test },
-  { "memory", _dbus_memory_test },
-  { "mem-pool", _dbus_mem_pool_test },
-  { "list", _dbus_list_test },
-  { "marshal-validate", _dbus_marshal_validate_test },
-  { "credentials", _dbus_credentials_test },
-  { "keyring", _dbus_keyring_test },
-  { "sha", _dbus_sha_test },
-  { "auth", _dbus_auth_test },
-
-#if defined(DBUS_UNIX)
-  { "userdb", _dbus_userdb_test },
-  { "transport-unix", _dbus_transport_unix_test },
-#endif
-
-  { NULL }
-};
+static DBusTestCase test = { "hash", _dbus_hash_test };
 
 int
 main (int    argc,
       char **argv)
 {
-  return _dbus_test_main (argc, argv, _DBUS_N_ELEMENTS (tests), tests,
+  return _dbus_test_main (argc, argv, 1, &test,
                           DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
                           NULL, NULL);
 }
