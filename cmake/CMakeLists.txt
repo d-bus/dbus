@@ -475,11 +475,6 @@ set (DBUS_DAEMON_NAME "dbus-daemon" CACHE STRING "The name of the dbus daemon ex
 
 #include(ConfigureChecks.cmake)
 
-# better use flags for gcc
-if (MINGW)
-	set (HAVE_GNUC_VARARGS 1)
-endif(MINGW)
-
 # compiler definitions
 add_definitions(-DHAVE_CONFIG_H)
 add_definitions(${DBUS_BUS_CFLAGS})
