@@ -47,12 +47,6 @@ static DBusString test_data_dir;
 static void
 test_pre_hook (void)
 {
-  
-  if (_dbus_getenv ("DBUS_TEST_SELINUX")
-      && (!bus_selinux_pre_init ()
-	  || !bus_selinux_full_init ()))
-    _dbus_test_fatal ("Could not init selinux support");
-
   initial_fds = _dbus_check_fdleaks_enter ();
 }
 

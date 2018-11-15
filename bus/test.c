@@ -28,6 +28,8 @@
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-list.h>
 #include <dbus/dbus-sysdeps.h>
+#include <dbus/dbus-test-tap.h>
+#include "selinux.h"
 
 /* The "debug client" watch/timeout handlers don't dispatch messages,
  * as we manually pull them in order to verify them. This is why they
@@ -306,6 +308,13 @@ bus_context_new_test (const DBusString *test_data_dir,
 
       return NULL;
     }
+
+    if (_dbus_getenv ("DBUS_TEST_SELINUX")
+      && (!bus_selinux_pre_init ()
+	  || !bus_selinux_full_init (context, &error)))
+    _dbus_test_fatal ("Could not init selinux support");
+
+  dbus_error_free (&error);
 
   _dbus_string_free (&config_file);
 
