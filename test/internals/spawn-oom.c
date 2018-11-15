@@ -28,7 +28,7 @@
 #include "dbus/dbus-spawn.h"
 #include "dbus/dbus-sysdeps.h"
 #include "dbus/dbus-test.h"
-#include "dbus/dbus-test-wrappers.h"
+#include "test/test-utils.h"
 
 static char *
 get_test_exec (const char *exe,

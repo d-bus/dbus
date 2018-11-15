@@ -35,6 +35,8 @@
 
 #include <dbus/dbus-mainloop.h>
 #include <dbus/dbus-internals.h>
+#include <dbus/dbus-types.h>
+
 typedef DBusLoop TestMainContext;
 
 _DBUS_WARN_UNUSED_RESULT
@@ -63,5 +65,27 @@ void        test_server_shutdown                  (TestMainContext *ctx,
                                                    DBusServer    *server);
 void        test_pending_call_store_reply         (DBusPendingCall *pc,
                                                    void *data);
+
+typedef struct
+{
+  const char *name;
+  dbus_bool_t (*func) (const char *test_data_dir);
+} DBusTestCase;
+
+typedef enum
+{
+  DBUS_TEST_FLAGS_REQUIRE_DATA = (1 << 0),
+  DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS = (1 << 1),
+  DBUS_TEST_FLAGS_CHECK_FD_LEAKS = (1 << 2),
+  DBUS_TEST_FLAGS_NONE = 0
+} DBusTestFlags;
+
+int _dbus_test_main (int                  argc,
+                     char               **argv,
+                     size_t               n_tests,
+                     const DBusTestCase  *tests,
+                     DBusTestFlags        flags,
+                     void               (*test_pre_hook) (void),
+                     void               (*test_post_hook) (void));
 
 #endif

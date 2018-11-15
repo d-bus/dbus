@@ -168,13 +168,6 @@ set (DBUS_UTIL_SOURCES
 	${DBUS_DIR}/dbus-sysdeps-util.c
 )
 
-if (DBUS_ENABLE_EMBEDDED_TESTS)
-	set (DBUS_UTIL_SOURCES 
-		${DBUS_UTIL_SOURCES}
-		${DBUS_DIR}/dbus-test-wrappers.c
-	)
-endif (DBUS_ENABLE_EMBEDDED_TESTS)
-
 set (DBUS_UTIL_HEADERS
 	${DBUS_DIR}/dbus-asv-util.h
 	${DBUS_DIR}/dbus-auth-script.h
@@ -184,7 +177,6 @@ set (DBUS_UTIL_HEADERS
 	${DBUS_DIR}/dbus-pollable-set.h
 	${DBUS_DIR}/dbus-spawn.h
 	${DBUS_DIR}/dbus-test.h
-	${DBUS_DIR}/dbus-test-wrappers.h
 )
 
 ### platform specific settings

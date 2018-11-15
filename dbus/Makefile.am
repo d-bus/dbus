@@ -268,13 +268,6 @@ DBUS_UTIL_SOURCES=				\
 	dbus-sysdeps-util.c			\
 	dbus-test.h
 
-if DBUS_ENABLE_EMBEDDED_TESTS
-DBUS_UTIL_SOURCES += \
-	dbus-test-wrappers.c \
-	dbus-test-wrappers.h \
-	$(NULL)
-endif
-
 libdbus_1_la_SOURCES=				\
 	$(DBUS_LIB_SOURCES)			\
 	$(DBUS_SHARED_SOURCES)

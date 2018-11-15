@@ -120,7 +120,7 @@ test_shell_LDADD = libdbus-testutils.la
 test_spawn_SOURCES = spawn-test.c
 test_spawn_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 test_spawn_oom_SOURCES = internals/spawn-oom.c
-test_spawn_oom_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+test_spawn_oom_LDADD = libdbus-testutils.la
 
 test_assertions_SOURCES = internals/assertions.c
 test_assertions_LDADD = libdbus-testutils.la $(GLIB_LIBS)
@@ -165,25 +165,40 @@ manual_tcp_SOURCES = manual-tcp.c
 manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 test_bus_launch_helper_oom_SOURCES = bus/launch-helper-oom.c
-test_bus_launch_helper_oom_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+test_bus_launch_helper_oom_LDADD = \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
 
 dbus_daemon_launch_helper_for_tests_SOURCES = bus/launch-helper-for-tests.c
 dbus_daemon_launch_helper_for_tests_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
 
 test_bus_system_SOURCES = bus/system.c
-test_bus_system_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+test_bus_system_LDADD = \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
 
 test_bus_SOURCES = bus/main.c
-test_bus_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+test_bus_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
 
 test_bus_dispatch_SOURCES = bus/dispatch.c
-test_bus_dispatch_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+test_bus_dispatch_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
 
 test_bus_dispatch_sha1_SOURCES = bus/dispatch-sha1.c
-test_bus_dispatch_sha1_LDADD = $(top_builddir)/bus/libdbus-daemon-internal.la
+test_bus_dispatch_sha1_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
 
 test_misc_internals_SOURCES = internals/misc-internals.c
-test_misc_internals_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+test_misc_internals_LDADD = libdbus-testutils.la
 
 EXTRA_DIST += dbus-test-runner
 

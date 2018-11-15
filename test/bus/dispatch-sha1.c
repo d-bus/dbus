@@ -26,9 +26,9 @@
 #include "bus/test.h"
 
 #include <dbus/dbus-test-tap.h>
-#include <dbus/dbus-test-wrappers.h>
 
 #include "bus/selinux.h"
+#include "test/test-utils.h"
 
 #ifndef DBUS_ENABLE_EMBEDDED_TESTS
 #error This file is only relevant for the embedded tests

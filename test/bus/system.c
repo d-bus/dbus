@@ -27,7 +27,8 @@
 #include "bus/test.h"
 
 #include <dbus/dbus-test-tap.h>
-#include <dbus/dbus-test-wrappers.h>
+
+#include "test/test-utils.h"
 
 #if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
 #error This file is only relevant for the embedded tests on Unix

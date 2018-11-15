@@ -25,7 +25,7 @@
 
 #include "dbus/dbus-internals.h"
 #include "dbus/dbus-test.h"
-#include "dbus/dbus-test-wrappers.h"
+#include "test/test-utils.h"
 
 static DBusTestCase tests[] =
 {
