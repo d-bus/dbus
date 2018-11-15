@@ -117,10 +117,10 @@ if(HAVE_VA_COPY)
     set(DBUS_VA_COPY va_copy CACHE STRING "va_copy function")
 elseif(HAVE___VA_COPY)
     set(DBUS_VA_COPY __va_copy CACHE STRING "va_copy function")
-else()
+elseif(MSVC)
     # this is used for msvc < 2013
     set(DBUS_VA_COPY _DBUS_VA_COPY_ASSIGN)
-
+else()
     CHECK_C_SOURCE_RUNS("
     #include <stdarg.h>
     #include <stdlib.h>
