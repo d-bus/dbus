@@ -117,13 +117,7 @@ void _dbus_set_verbose (dbus_bool_t state);
 #  define _dbus_verbose_reset _dbus_verbose_reset_real
 #  define _dbus_is_verbose _dbus_is_verbose_real
 #else
-#  ifdef HAVE_ISO_VARARGS
-#    define _dbus_verbose(...) do { } while (0)
-#  elif defined (HAVE_GNUC_VARARGS)
-#    define _dbus_verbose(format...) do { } while (0)
-#  else
-static void _dbus_verbose(const char * x,...) {;}
-#  endif
+#  define _dbus_verbose(...) do { } while (0)
 #  define _dbus_verbose_reset() do { } while (0)
 #  define _dbus_is_verbose() FALSE 
 #endif /* !DBUS_ENABLE_VERBOSE_MODE */

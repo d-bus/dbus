@@ -777,35 +777,6 @@ dnl Make it easy to check if we have MSG_NOSIGNAL without actually having to inc
 AC_CHECK_DECLS([MSG_NOSIGNAL], [], [], [[ #include <sys/types.h>
 #include <sys/socket.h> ]])
 
-dnl check for flavours of varargs macros (test from GLib)
-AC_MSG_CHECKING(for ISO C99 varargs macros in C)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-int a(int p1, int p2, int p3);
-#define call_a(...) a(1,__VA_ARGS__)
-call_a(2,3);
-]])],
-[dbus_have_iso_c_varargs=yes],
-[dbus_have_iso_c_varargs=no])
-AC_MSG_RESULT($dbus_have_iso_c_varargs)
-
-AC_MSG_CHECKING(for GNUC varargs macros)
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[
-int a(int p1, int p2, int p3);
-#define call_a(params...) a(1,params)
-call_a(2,3);
-]])],
-[dbus_have_gnuc_varargs=yes],
-[dbus_have_gnuc_varargs=no])
-AC_MSG_RESULT($dbus_have_gnuc_varargs)
-
-dnl Output varargs tests
-if test x$dbus_have_iso_c_varargs = xyes; then
-    AC_DEFINE(HAVE_ISO_VARARGS,1,[Have ISO C99 varargs macros])
-fi
-if test x$dbus_have_gnuc_varargs = xyes; then
-    AC_DEFINE(HAVE_GNUC_VARARGS,1,[Have GNU-style varargs macros])
-fi
-
 dnl Check for various credentials.
 AC_MSG_CHECKING(for struct cmsgcred)
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[

@@ -176,28 +176,6 @@ if(NOT HAVE_DIRFD)
     " HAVE_DDFD)
 endif()
 
-CHECK_C_SOURCE_COMPILES("
-int a(int p1, int p2, int p3)
-{
-}
-int main()
-{
-    #define call_a(params...) a(1,params)
-    call_a(2,3);
-}
-" HAVE_GNUC_VARARGS)
-
-CHECK_C_SOURCE_COMPILES("
-int a(int p1, int p2, int p3)
-{
-}
-int main()
-{
-    #define call_a(...) a(1,__VA_ARGS__)
-    call_a(2,3);
-}
-" HAVE_ISO_VARARGS)
-
 check_type_size("short"     SIZEOF_SHORT)
 check_type_size("int"       SIZEOF_INT)
 check_type_size("long"      SIZEOF_LONG)
