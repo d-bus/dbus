@@ -53,5 +53,10 @@ dbus_bool_t bus_desktop_file_get_string (BusDesktopFile  *desktop_file,
 					 char           **val,
 					 DBusError       *error);
 
+static inline void
+bus_clear_desktop_file (BusDesktopFile **desktop_p)
+{
+  _dbus_clear_pointer_impl (BusDesktopFile, desktop_p, bus_desktop_file_free);
+}
 
 #endif /* BUS_DESKTOP_FILE_H */

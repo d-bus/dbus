@@ -66,6 +66,12 @@ typedef struct
   
 } BusDesktopFileParser;
 
+#define BUS_DESKTOP_FILE_PARSER_INIT \
+  { \
+    _DBUS_STRING_INIT_INVALID, \
+    NULL, 0, 0, 0, 0 \
+  }
+
 #define VALID_KEY_CHAR 1
 #define VALID_LOCALE_CHAR 2
 static unsigned char valid[256] = { 
@@ -93,10 +99,9 @@ static void report_error (BusDesktopFileParser *parser,
 			  DBusError            *error);
 
 static void
-parser_free (BusDesktopFileParser *parser)
+parser_clear (BusDesktopFileParser *parser)
 {
-  bus_desktop_file_free (parser->desktop_file);
-  
+  bus_clear_desktop_file (&parser->desktop_file);
   _dbus_string_free (&parser->data);
 }
 
@@ -418,13 +423,11 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
       _dbus_string_get_byte (&parser->data, line_end - 1) != ']')
     {
       report_error (parser, "Invalid syntax for section header", BUS_DESKTOP_PARSE_ERROR_INVALID_SYNTAX, error);
-      parser_free (parser);
       return FALSE;
     }
 
   if (!_dbus_string_init (&section_name))
     {
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -433,7 +436,6 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
                               line_end - parser->pos - 2,
                               &section_name, 0))
     {
-      parser_free (parser);
       _dbus_string_free (&section_name);
       BUS_SET_OOM (error);
       return FALSE;
@@ -442,7 +444,6 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
   if (!is_valid_section_name (&section_name))
     {
       report_error (parser, "Invalid characters in section name", BUS_DESKTOP_PARSE_ERROR_INVALID_CHARS, error);
-      parser_free (parser);
       _dbus_string_free (&section_name);
       return FALSE;
     }
@@ -450,7 +451,6 @@ parse_section_start (BusDesktopFileParser *parser, DBusError *error)
   if (open_section (parser, _dbus_string_get_const_data (&section_name)) == NULL)
     {
       _dbus_string_free (&section_name);
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -493,7 +493,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
   if (key_start == key_end)
     {
       report_error (parser, "Empty key name", BUS_DESKTOP_PARSE_ERROR_INVALID_SYNTAX, error);
-      parser_free (parser);
       return FALSE;
     }
 
@@ -517,14 +516,12 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
   if (p < line_end && _dbus_string_get_byte (&parser->data, p) != '=')
     {
       report_error (parser, "Invalid characters in key name", BUS_DESKTOP_PARSE_ERROR_INVALID_CHARS, error);
-      parser_free (parser);
       return FALSE;
     }
 
   if (p == line_end)
     {
       report_error (parser, "No '=' in key/value pair", BUS_DESKTOP_PARSE_ERROR_INVALID_SYNTAX, error);
-      parser_free (parser);
       return FALSE;
     }
 
@@ -540,7 +537,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
   value = unescape_string (parser, &parser->data, value_start, line_end, error);
   if (value == NULL)
     {
-      parser_free (parser);
       return FALSE;
     }
 
@@ -548,7 +544,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
   if (line == NULL)
     {
       dbus_free (value);
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -556,7 +551,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
   if (!_dbus_string_init (&key))
     {
       dbus_free (value);
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -566,7 +560,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
     {
       _dbus_string_free (&key);
       dbus_free (value);
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -575,7 +568,6 @@ parse_key_value (BusDesktopFileParser *parser, DBusError *error)
     {
       _dbus_string_free (&key);
       dbus_free (value);
-      parser_free (parser);
       BUS_SET_OOM (error);
       return FALSE;
     }
@@ -620,9 +612,9 @@ BusDesktopFile*
 bus_desktop_file_load (DBusString *filename,
 		       DBusError  *error)
 {
-  DBusString str;
-  BusDesktopFileParser parser;
+  BusDesktopFileParser parser = BUS_DESKTOP_FILE_PARSER_INIT;
   DBusStat sb;
+  BusDesktopFile *result = NULL;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
   
@@ -630,44 +622,39 @@ bus_desktop_file_load (DBusString *filename,
    * that we do something silly, we still handle doing it below.
    */
   if (!_dbus_stat (filename, &sb, error))
-    return NULL;
+    goto out;
 
   if (sb.size > _DBUS_ONE_KILOBYTE * 128)
     {
       dbus_set_error (error, DBUS_ERROR_FAILED,
                       "Desktop file size (%ld bytes) is too large", (long) sb.size);
-      return NULL;
+      goto out;
     }
   
-  if (!_dbus_string_init (&str))
+  if (!_dbus_string_init (&parser.data))
     {
       BUS_SET_OOM (error);
-      return NULL;
-    }
-  
-  if (!_dbus_file_get_contents (&str, filename, error))
-    {
-      _dbus_string_free (&str);
-      return NULL;
+      goto out;
     }
 
-  if (!_dbus_string_validate_utf8 (&str, 0, _dbus_string_get_length (&str)))
+  if (!_dbus_file_get_contents (&parser.data, filename, error))
+    goto out;
+
+  if (!_dbus_string_validate_utf8 (&parser.data, 0,
+                                   _dbus_string_get_length (&parser.data)))
     {
-      _dbus_string_free (&str);
       dbus_set_error (error, DBUS_ERROR_FAILED,
                       "invalid UTF-8");   
-      return NULL;
+      goto out;
     }
   
   parser.desktop_file = dbus_new0 (BusDesktopFile, 1);
   if (parser.desktop_file == NULL)
     {
-      _dbus_string_free (&str);
       BUS_SET_OOM (error);
-      return NULL;
+      goto out;
     }
   
-  parser.data = str;
   parser.line_num = 1;
   parser.pos = 0;
   parser.len = _dbus_string_get_length (&parser.data);
@@ -678,9 +665,7 @@ bus_desktop_file_load (DBusString *filename,
       if (_dbus_string_get_byte (&parser.data, parser.pos) == '[')
 	{
 	  if (!parse_section_start (&parser, error))
-            {
-              return NULL;
-            }
+            goto out;
 	}
       else if (is_blank_line (&parser) ||
 	       _dbus_string_get_byte (&parser.data, parser.pos) == '#')
@@ -689,21 +674,27 @@ bus_desktop_file_load (DBusString *filename,
 	{
            dbus_set_error(error, DBUS_ERROR_FAILED,
                           "invalid service file: key=value before [Section]");
-           parser_free (&parser);
-           return NULL;
+           goto out;
 	}
       else
 	{
 	  if (!parse_key_value (&parser, error))
-            {
-              return NULL;
-            }
+            goto out;
 	}
     }
 
-  _dbus_string_free (&parser.data);
+  /* Transfer ownership on success */
+  result = parser.desktop_file;
+  parser.desktop_file = NULL;
 
-  return parser.desktop_file;
+out:
+  if (result != NULL)
+    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+  else
+    _DBUS_ASSERT_ERROR_IS_SET (error);
+
+  parser_clear (&parser);
+  return result;
 }
 
 static BusDesktopFileSection *
