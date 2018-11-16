@@ -7,6 +7,13 @@ Bugzilla bugs (indicated by "fd.o #nnn") to Gitlab issues ("dbus#nnn")
 and merge requests ("dbus!nnn"). See README and CONTRIBUTING.md for
 more details.
 
+Dependencies:
+
+• dbus now requires at least a basic level of support for C99 variadic
+  macros, as implemented in gcc >= 3, all versions of Clang, and
+  MSVC >= 2005. In practice this requirement has existed since version
+  1.9.2, but it is now official.
+
 Enhancements:
 
 • Rewrite CONTRIBUTING.md to reflect the current setup
@@ -18,8 +25,22 @@ Enhancements:
 
 • Reference the freedesktop.org Code of Conduct (Simon McVittie)
 
+• Build an implementation of dbus-run-session for Windows
+  (dbus#135, dbus!22; Ralf Habacker)
+
+• On Linux with SELinux, use avc_open() and monitor the AVC netlink fd
+  in the main event loop, instead of using the deprecated avc_init()
+  and a thread (dbus#134, dbus!31; Laurent Bigonville)
+
+• On Linux with SELinux, use the SELINUX_CB_POLICYRELOAD callback
+  to detect policy reloads, instead of monitoring the access vector
+  cache with AVC_CALLBACK_RESET
+  (dbus#134, dbus!31; Laurent Bigonville)
+
+• Avoid double slashes in pkg-config paths (dbus!30, Ralf Habacker)
+
 • Improve test coverage and clean up dead code
-  (fd.o #107739, Simon McVittie)
+  (fd.o #107739, dbus#222; Simon McVittie)
 
 • Allow --enable-relocation in combination with absolute paths for
   --exec-prefix, --libdir (fd.o #107662, Simon McVittie)
@@ -42,11 +63,28 @@ Fixes:
   · backslash escapes are not interpreted in section/group names
   (dbus#208; David King, Simon McVittie)
 
+• Always use select()-based poll() emulation on Darwin-based OSs
+  (macOS, etc.) and on Interix, similar to what libcurl does
+  (dbus#232, dbus!19; Simon McVittie)
+
 • Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
+
+• Extend a test timeout to avoid spurious failures in CI
+  (dbus!26, Simon McVittie)
 
 • Fix build warnings with recent gcc (dbus#208, dbus#225; David King)
 
 • Fix build warnings without libX11 (dbus#228, Simon McVittie)
+
+• Fix whitespace and error behaviour for _dbus_command_from_pid()
+  (dbus#222, dbus!28; Simon McVittie)
+
+• When built with CMake, install dbus-daemon-launch-helper to
+  ${CMAKE_INSTALL_LIBEXECDIR}, analogous to ${libexecdir} in
+  Autotools (dbus!9, Simon McVittie)
+
+• When built with CMake and disabling tests, still install
+  dbus-daemon-launch-helper (dbus!9, Simon McVittie)
 
 Tests and CI:
 
