@@ -71,9 +71,6 @@
 /* for msvc */
 #define _DBUS_VA_COPY_ASSIGN(a1,a2) { a1 = a2; }
 
-/* Define if va_list cannot be copied as a value */
-#cmakedefine DBUS_VA_COPY_AS_ARRAY 1
-
 #cmakedefine DBUS_WITH_GLIB 1
 #cmakedefine GLIB_VERSION_MIN_REQUIRED @GLIB_VERSION_MIN_REQUIRED@
 #cmakedefine GLIB_VERSION_MAX_ALLOWED  @GLIB_VERSION_MAX_ALLOWED@

@@ -14,6 +14,10 @@ Dependencies:
   MSVC >= 2005. In practice this requirement has existed since version
   1.9.2, but it is now official.
 
+• dbus now requires a C99-compatible va_copy() macro (or a __va_copy()
+  macro with the same behaviour), except when building for Windows using
+  MSVC and CMake.
+
 Enhancements:
 
 • Rewrite CONTRIBUTING.md to reflect the current setup

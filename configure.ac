@@ -565,38 +565,7 @@ fi
 
 AS_IF([test -n "$dbus_va_copy_func"],
   [AC_DEFINE_UNQUOTED([DBUS_VA_COPY], [$dbus_va_copy_func], [A 'va_copy' style function])],
-  [
-    AC_LANG_PUSH([C])
-    AC_CACHE_CHECK([whether va_lists can be copied by value],
-                   [dbus_cv_va_val_copy],
-                   [AC_RUN_IFELSE([
-                      AC_LANG_PROGRAM([[
-                        #include <stdarg.h>
-                        #include <stdlib.h>
-                      ]],
-                      [[
-                        static void f (int i, ...) {
-                          va_list args1, args2;
-                          va_start (args1, i);
-                          args2 = args1;
-                          if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
-                            exit (1);
-                          va_end (args1); va_end (args2);
-                        }
-                        int main() {
-                          f (0, 42);
-                          return 0;
-                        }
-                      ]])
-                    ],
-                    [dbus_cv_va_val_copy=yes],
-                    [dbus_cv_va_val_copy=no],
-                    [dbus_cv_va_val_copy=yes])
-                   ])
-    AC_LANG_POP([C])
-    AS_IF([test "x$dbus_cv_va_val_copy" = "xno"],
-      [AC_DEFINE([DBUS_VA_COPY_AS_ARRAY], 1, [Define if 'va_list' cannot be copied as a value])])
-  ])
+  [AC_MSG_ERROR([dbus requires an ISO C99-compatible va_copy() macro, or a compatible __va_copy(), or MSVC >= 2010 and CMake])])
 
 #### Atomic integers
 

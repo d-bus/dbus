@@ -614,20 +614,6 @@ void _dbus_logv (DBusSystemLogSeverity  severity,
                  const char            *msg,
                  va_list args) _DBUS_GNUC_PRINTF (2, 0);
 
-/* Define DBUS_VA_COPY() to do the right thing for copying va_list variables.
- * config.h may have already defined DBUS_VA_COPY as va_copy or __va_copy.
- */
-#if !defined (DBUS_VA_COPY)
-#  if defined (__GNUC__) && defined (__PPC__) && (defined (_CALL_SYSV) || defined (_WIN32))
-#    define DBUS_VA_COPY(ap1, ap2)   (*(ap1) = *(ap2))
-#  elif defined (DBUS_VA_COPY_AS_ARRAY)
-#    define DBUS_VA_COPY(ap1, ap2)   memcpy ((ap1), (ap2), sizeof (va_list))
-#  else /* va_list is a pointer */
-#    define DBUS_VA_COPY(ap1, ap2)   ((ap1) = (ap2))
-#  endif /* va_list is a pointer */
-#endif /* !DBUS_VA_COPY */
-
-
 /**
  * Casts a primitive C type to a byte array and then indexes
  * a particular byte of the array.
