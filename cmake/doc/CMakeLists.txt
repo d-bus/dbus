@@ -1,3 +1,5 @@
+SET(DOC_DIR ${CMAKE_SOURCE_DIR}/../doc)
+
 find_package(Doxygen)
 
 if(DOXYGEN_EXECUTABLE)
@@ -7,11 +9,30 @@ endif(DOXYGEN_EXECUTABLE)
 if (DBUS_ENABLE_DOXYGEN_DOCS)
     set (top_srcdir ${CMAKE_SOURCE_DIR}/..)
     configure_file(${CMAKE_SOURCE_DIR}/../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
-    add_custom_target(doc 
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+    add_custom_target(doc
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
+    )
 endif (DBUS_ENABLE_DOXYGEN_DOCS)
+
+find_program(XSLTPROC_EXECUTABLE xsltproc)
+if(XSLTPROC_EXECUTABLE)
+    message(STATUS "${XSLTPROC_EXECUTABLE} found")
+    set(DBUS_HAVE_XSLTPROC 1)
+endif()
+
+if(DBUS_HAVE_XSLTPROC)
+    add_custom_command(
+        OUTPUT dbus.devhelp2
+        COMMAND ${XSLTPROC_EXECUTABLE} -o dbus.devhelp2 ${DOC_DIR}/doxygen_to_devhelp.xsl api/xml/index.xml
+        DEPENDS ${DOC_DIR}/doxygen_to_devhelp.xsl api/html/index.html
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endif()
 
 #
 # find docbook generator
