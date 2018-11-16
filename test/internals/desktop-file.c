@@ -214,6 +214,7 @@ test_content (const Test *test,
           g_assert_nonnull (error.message);
           g_assert_false (ok);
           g_assert_null (val);
+          dbus_error_free (&error);
         }
       else
         {
@@ -263,6 +264,7 @@ test_invalid (Fixture *f,
   g_assert_nonnull (error.name);
   g_assert_nonnull (error.message);
   g_assert_null (bdf);
+  dbus_error_free (&error);
 
   /* Check that it's OK to ignore the error */
   bdf = bus_desktop_file_load (&str, NULL);
