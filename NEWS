@@ -16,6 +16,13 @@ Fixes:
 • Fix printf formats for pointer-sized integers on 64-bit Windows
   (fd.o #105662, Ralf Habacker)
 
+• Always use select()-based poll() emulation on Darwin-based OSs
+  (macOS, etc.) and on Interix, similar to what libcurl does
+  (dbus#232, dbus!19; Simon McVittie)
+
+• Extend a test timeout to avoid spurious failures in CI
+  (dbus!26, Simon McVittie)
+
 Tests and CI:
 
 • Add Travis-CI builds for 64-bit Windows using mingw-w64
