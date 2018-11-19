@@ -284,7 +284,7 @@ case "$ci_buildsys" in
         export DBUS_TEST_MALLOC_FAILURES=0
         [ "$ci_test" = no ] || ctest -VV || maybe_fail_tests
         ${make} install DESTDIR=$(pwd)/DESTDIR
-        ( cd DESTDIR && find . )
+        ( cd DESTDIR && find . -ls)
         ;;
 esac
 
