@@ -1005,6 +1005,14 @@ test_stop_server (Fixture *f,
   g_clear_error (&f->error);
   g_assert_null (second_confined_conn);
 
+  /* Deleting the socket is not synchronous with respect to stopping
+   * listening on it, so again we are willing to wait a few seconds */
+  for (i = 0; i < 50; i++)
+    {
+      if (g_file_test (f->socket_path, G_FILE_TEST_EXISTS))
+        g_usleep (G_USEC_PER_SEC / 10);
+    }
+
   /* The socket has been deleted */
   g_assert_false (g_file_test (f->socket_path, G_FILE_TEST_EXISTS));
 
