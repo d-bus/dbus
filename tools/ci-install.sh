@@ -131,6 +131,8 @@ case "$ci_distro" in
             debhelper \
             dh-autoreconf \
             dh-exec \
+            docbook-xml \
+            docbook-xsl \
             doxygen \
             dpkg-dev \
             gnome-desktop-testing \
