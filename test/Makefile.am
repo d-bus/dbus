@@ -105,6 +105,9 @@ test_printf_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 test_refs_SOURCES = internals/refs.c
 test_refs_LDADD = libdbus-testutils.la $(GLIB_LIBS)
 
+test_segfault_SOURCES = test-segfault.c
+test_segfault_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+
 test_server_oom_SOURCES = internals/server-oom.c
 test_server_oom_LDADD = libdbus-testutils.la $(GLIB_LIBS)
 
