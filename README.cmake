@@ -6,13 +6,16 @@ Requirements
 - installed libexpat see http://sourceforge.net/projects/expat/ 
     unsupported RelWithDebInfo builds could be fetched 
     from http://sourceforge.net/projects/kde-windows/files/expat/
+- for generating documentation based on docbook files
+    - xsltproc (provided by the distribution or from http://xmlsoft.org/XSLT/xsltproc2.html) and
+    - docbook dtd and stylesheets (provided by the distribution or from https://sourceforge.net/projects/docbook/)
 
 Building
 --------
 
 Win32 MinGW-w64|32
 1. install mingw-w64 from http://sourceforge.net/projects/mingw-w64/
-2. install cmake and libexpat
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 3. get dbus sources
 4. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
 5. mkdir dbus-build
@@ -24,7 +27,7 @@ Win32 MinGW-w64|32
 
 Win32 Microsoft nmake
 1. install MSVC 2010 Express Version from http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
-2. install cmake and libexpat
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 3. get dbus sources
 4. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
 5. mkdir dbus-build
@@ -36,7 +39,7 @@ Win32 Microsoft nmake
 
 Win32 Visual Studio 2010 Express IDE
 1. install MSVC 2010 Express Version from http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
-2. install cmake and libexpat
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 3. get dbus sources
 4. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
 5. mkdir dbus-build
@@ -50,7 +53,7 @@ Win32 Visual Studio 2010 Express IDE
 
 Win32 Visual Studio 2010 Professional IDE
 1. install MSVC 2010 Professional Version
-2. install cmake and libexpat
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 3. get dbus sources
 4. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
 5. mkdir dbus-build
@@ -63,7 +66,7 @@ Win32 Visual Studio 2010 Professional IDE
       devenv dbus.sln /build
 
 Linux
-1. install cmake and libexpat
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 2. get dbus sources
 3. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
 4. mkdir dbus-build
@@ -81,6 +84,12 @@ Configuration flags
 When using the cmake build system the dbus-specific configuration flags that can be given 
 to the cmake program are these (use -D<key>=<value> on command line). The listed values 
 are the defaults (in a typical build - some are platform-specific).
+
+// in case cmake is not able to determine the xsltproc executable (optional)
+XSLTPROC_EXECUTABLE=<path to xsltproc executable)
+
+// in case cmake is not able to determine the installation of the docbook stylesheets (optional)
+DOCBOOKXSL_DIR=<path to docbook stylesheets)
 
 // Choose the type of build, options are: None(CMAKE_CXX_FLAGS or
 // CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.
@@ -169,11 +178,9 @@ MSVC only (Visual Studio >= 2012):
 // Enable code analyzing for MSVC compiler: /analyze
 DBUS_MSVC_ANALYZE:BOOL=OFF
 
-
-Note: The above mentioned options could be extracted after 
-configuring from the output of running "<maketool> help-options" 
-in the build directory. The related entries start with 
-CMAKE_ or DBUS_. 
+Note: Above mentioned options starting with DBUS_ or CMAKE_ could
+be extracted after configuring from the output of running
+"<maketool> help-options" in the build directory.
 
 
 How to compile in dbus into clients with cmake
