@@ -39,6 +39,7 @@
 #ifdef DBUS_UNIX
 #include <sys/wait.h>
 #include <signal.h>
+#include <dbus/dbus-sysdeps-unix.h>
 #else
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-sysdeps-win.h>
@@ -192,6 +193,14 @@ exec_dbus_daemon (const char *dbus_daemon,
   char write_address_fd_as_string[MAX_FD_LEN];
 
   close (bus_address_pipe[PIPE_READ_END]);
+
+  /* Set all fds >= 3 close-on-execute, except for the one that can't be.
+   * We don't want dbus-daemon to inherit random fds we might have
+   * inherited from our caller. (Note that we *do* let the wrapped process
+   * inherit them in exec_app(), in an attempt to be as close as possible
+   * to being a transparent wrapper.) */
+  _dbus_fd_set_all_close_on_exec ();
+  _dbus_fd_clear_close_on_exec (bus_address_pipe[PIPE_WRITE_END]);
 
   sprintf (write_address_fd_as_string, "%d", bus_address_pipe[PIPE_WRITE_END]);
 

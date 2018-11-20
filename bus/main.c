@@ -423,6 +423,10 @@ main (int argc, char **argv)
                error_str, _dbus_strerror (errno));
       return 1;
     }
+
+  /* Set all fds >= 3 close-on-execute. We don't want activated services
+   * to inherit fds we might have inherited from our caller. */
+  _dbus_fd_set_all_close_on_exec ();
 #endif
 
   if (!_dbus_string_init (&config_file))

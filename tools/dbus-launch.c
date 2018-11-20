@@ -1226,7 +1226,17 @@ main (int argc, char **argv)
                "%d", bus_address_to_launcher_pipe[WRITE_END]);
 
       verbose ("Calling exec()\n");
- 
+
+      /* Set all fds >= 3 close-on-execute, except for the ones that
+       * can't be. We don't want dbus-daemon to inherit random fds we
+       * might have inherited from our caller. (Note that in the
+       * deprecated form "dbus-launch myapp", we *do* let "myapp" inherit
+       * them, in an attempt to be as close as possible to being a
+       * transparent wrapper.) */
+      _dbus_fd_set_all_close_on_exec ();
+      _dbus_fd_clear_close_on_exec (bus_address_to_launcher_pipe[WRITE_END]);
+      _dbus_fd_clear_close_on_exec (bus_pid_to_launcher_pipe[WRITE_END]);
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
       {
         /* exec from testdir */
