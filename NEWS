@@ -49,10 +49,15 @@ Enhancements:
 • Allow --enable-relocation in combination with absolute paths for
   --exec-prefix, --libdir (fd.o #107662, Simon McVittie)
 
+• Don't run a test program to check how to copy a va_list, which is
+  awkward for cross-compiling; instead require that va_copy() or
+  __va_copy() exists, except in older MSVC versions where we already
+  know that simple assignment is enough (dbus!35, Simon McVittie)
+
 • Improve CMake build system parity with Autotools
   · In particular, detect inotify, prctl() and getpwnam_r() correctly
     on Linux
-  (dbus#57, dbus#117, dbus#193, dbus#227, dbus!18;
+  (dbus#57, dbus#117, dbus#193, dbus#227, dbus!18, dbus!39;
   Ralf Habacker, Simon McVittie)
 
 Fixes:
@@ -71,7 +76,11 @@ Fixes:
   (macOS, etc.) and on Interix, similar to what libcurl does
   (dbus#232, dbus!19; Simon McVittie)
 
-• Fix some small O(1) memory leaks (fd.o #107320, Simon McVittie)
+• Avoid undefined integer shifts when generating random tokens for
+  the DBUS_COOKIE_SHA1 mechanism (dbus!45, Simon McVittie)
+
+• Fix some minor memory leaks
+  (fd.o #107320, dbus!41, dbus!42; Simon McVittie)
 
 • Extend a test timeout to avoid spurious failures in CI
   (dbus!26, Simon McVittie)
@@ -82,6 +91,9 @@ Fixes:
 
 • Fix whitespace and error behaviour for _dbus_command_from_pid()
   (dbus#222, dbus!28; Simon McVittie)
+
+• Fix a race condition in the containers test
+  (dbus!47, Simon McVittie)
 
 • When built with CMake, install dbus-daemon-launch-helper to
   ${CMAKE_INSTALL_LIBEXECDIR}, analogous to ${libexecdir} in
