@@ -301,10 +301,7 @@ _dbus_transport_new_for_autolaunch (const char *scope, DBusError *error)
     }
 
   result = check_address (_dbus_string_get_const_data (&address), error);
-  if (result == NULL)
-    _DBUS_ASSERT_ERROR_IS_SET (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, result != NULL);
 
  out:
   _dbus_string_free (&address);

@@ -2310,10 +2310,7 @@ bus_driver_handle_become_monitor (DBusConnection *connection,
   ret = TRUE;
 
 out:
-  if (ret)
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_SET (error);
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, ret);
 
   for (iter = _dbus_list_get_first_link (&rules);
       iter != NULL;

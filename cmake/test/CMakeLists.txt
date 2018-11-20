@@ -96,6 +96,7 @@ if(DBUS_WITH_GLIB)
 
     set(TEST_LIBRARIES ${DBUS_INTERNAL_LIBRARIES} dbus-testutils dbus-testutils-glib ${GLIB2_LIBRARIES})
 
+    add_test_executable(test-assertions ${TEST_DIR}/internals/assertions.c ${TEST_LIBRARIES})
     add_test_executable(test-corrupt ${TEST_DIR}/corrupt.c ${TEST_LIBRARIES})
     add_test_executable(test-dbus-daemon ${TEST_DIR}/dbus-daemon.c ${TEST_LIBRARIES})
     add_test_executable(test-dbus-daemon-eavesdrop ${TEST_DIR}/dbus-daemon-eavesdrop.c ${TEST_LIBRARIES})

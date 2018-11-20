@@ -99,11 +99,17 @@ test_shell_LDADD = libdbus-testutils.la
 test_spawn_SOURCES = spawn-test.c
 test_spawn_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
+test_assertions_SOURCES = internals/assertions.c
+test_assertions_LDADD = libdbus-testutils.la $(GLIB_LIBS)
+
 test_printf_SOURCES = internals/printf.c
 test_printf_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 test_refs_SOURCES = internals/refs.c
 test_refs_LDADD = libdbus-testutils.la $(GLIB_LIBS)
+
+test_segfault_SOURCES = test-segfault.c
+test_segfault_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 test_server_oom_SOURCES = internals/server-oom.c
 test_server_oom_LDADD = libdbus-testutils.la $(GLIB_LIBS)
@@ -161,6 +167,7 @@ endif
 
 if DBUS_WITH_GLIB
 installable_tests += \
+	test-assertions \
 	test-corrupt \
 	test-dbus-daemon \
 	test-dbus-daemon-eavesdrop \

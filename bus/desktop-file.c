@@ -688,11 +688,7 @@ bus_desktop_file_load (DBusString *filename,
   parser.desktop_file = NULL;
 
 out:
-  if (result != NULL)
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_SET (error);
-
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, result != NULL);
   parser_clear (&parser);
   return result;
 }

@@ -192,27 +192,64 @@ void _dbus_real_assert_not_reached (const char *explanation,
 #define _DBUS_ALIGNOF(type) \
     (_DBUS_STRUCT_OFFSET (struct { char _1; type _2; }, _2))
 
-#ifdef DBUS_DISABLE_CHECKS
+#if defined(DBUS_DISABLE_CHECKS) || defined(DBUS_DISABLE_ASSERT)
 /* this is an assert and not an error, but in the typical --disable-checks case (you're trying
  * to really minimize code size), disabling these assertions makes sense.
  */
 #define _DBUS_ASSERT_ERROR_IS_SET(error) do { } while (0)
 #define _DBUS_ASSERT_ERROR_IS_CLEAR(error) do { } while (0)
+#define _DBUS_ASSERT_ERROR_XOR_BOOL(error, retval) do { } while (0)
 #else
 static inline void
-_dbus_assert_error_is_set (const DBusError *error)
+_dbus_assert_error_is_set (const DBusError *error,
+                           const char      *file,
+                           int              line,
+                           const char      *func)
 {
-    _dbus_assert (error == NULL || dbus_error_is_set (error));
+  _dbus_real_assert (error == NULL || dbus_error_is_set (error),
+                     "error is set", file, line, func);
 }
 
 static inline void
-_dbus_assert_error_is_clear (const DBusError *error)
+_dbus_assert_error_is_clear (const DBusError *error,
+                           const char      *file,
+                           int              line,
+                           const char      *func)
 {
-    _dbus_assert (error == NULL || !dbus_error_is_set (error));
+  _dbus_real_assert (error == NULL || !dbus_error_is_set (error),
+                     "error is clear", file, line, func);
 }
 
-#define _DBUS_ASSERT_ERROR_IS_SET(error) _dbus_assert_error_is_set(error)
-#define _DBUS_ASSERT_ERROR_IS_CLEAR(error) _dbus_assert_error_is_clear(error)
+static inline void
+_dbus_assert_error_xor_bool (const DBusError *error,
+                             dbus_bool_t      retval,
+                             const char      *file,
+                             int              line,
+                             const char      *func)
+{
+  _dbus_real_assert (error == NULL || dbus_error_is_set (error) == !retval,
+                     "error is consistent with boolean result", file, line, func);
+}
+
+/**
+ * Assert that error is set, unless it is NULL in which case we cannot
+ * tell whether it would have been set.
+ */
+#define _DBUS_ASSERT_ERROR_IS_SET(error) _dbus_assert_error_is_set (error, __FILE__, __LINE__, _DBUS_FUNCTION_NAME)
+
+/**
+ * Assert that error is not set, unless it is NULL in which case we cannot
+ * tell whether it would have been set.
+ */
+#define _DBUS_ASSERT_ERROR_IS_CLEAR(error) _dbus_assert_error_is_clear (error, __FILE__, __LINE__, _DBUS_FUNCTION_NAME)
+
+/**
+ * Assert that error is consistent with retval: if error is not NULL,
+ * it must be set if and only if retval is false.
+ *
+ * retval can be a boolean expression like "result != NULL".
+ */
+#define _DBUS_ASSERT_ERROR_XOR_BOOL(error, retval) _dbus_assert_error_xor_bool (error, retval, __FILE__, __LINE__, _DBUS_FUNCTION_NAME)
 #endif
 
 #define _dbus_return_if_error_is_set(error) _dbus_return_if_fail ((error) == NULL || !dbus_error_is_set ((error)))

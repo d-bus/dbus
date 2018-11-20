@@ -4052,10 +4052,7 @@ _read_subprocess_line_argv (const char *progpath,
  out:
   sigprocmask (SIG_SETMASK, &old_set, NULL);
 
-  if (retval)
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_SET (error);
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, retval);
 
   if (result_pipe[0] != -1)
     close (result_pipe[0]);
