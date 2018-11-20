@@ -38,16 +38,16 @@ application manuals
    <br>
   </td>
   <td  valign=top>
-<a href="dbus-daemon.html">D-Bus Daemon manual</a>
+<a href="dbus-daemon.1.html">D-Bus Daemon manual</a>
    <br>
    <br>
-<a href="dbus-launch.html">D-Bus launch manual</a>
+<a href="dbus-launch.1.html">D-Bus launch manual</a>
    <br>
    <br>
-<a href="dbus-send.html">D-Bus send tool manual</a>
+<a href="dbus-send.1.html">D-Bus send tool manual</a>
    <br>
    <br>
-<a href="dbus-monitor.html">D-Bus monitor manual</a>
+<a href="dbus-monitor.1.html">D-Bus monitor manual</a>
   </td>
  </tr>
 </table>
