@@ -117,29 +117,11 @@ if(HAVE_VA_COPY)
     set(DBUS_VA_COPY va_copy CACHE STRING "va_copy function")
 elseif(HAVE___VA_COPY)
     set(DBUS_VA_COPY __va_copy CACHE STRING "va_copy function")
-else()
+elseif(MSVC)
     # this is used for msvc < 2013
     set(DBUS_VA_COPY _DBUS_VA_COPY_ASSIGN)
-endif()
-
-CHECK_C_SOURCE_RUNS("
-#include <stdarg.h>
-#include <stdlib.h>
-static void f (int i, ...) {
-    va_list args1, args2;
-    va_start (args1, i);
-    args2 = args1;
-    if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
-    exit (1);
-    va_end (args1); va_end (args2);
-}
-int main() {
-    f (0, 42);
-    return 0;
-}
-" VA_COPY_AS_ARRAY)
-if (NOT VA_COPY_AS_ARRAY)
-    set(DBUS_VA_COPY_AS_ARRAY 1 CACHE STRING "Set to 1 if va_list cannot be copied as a value")
+else()
+    message(FATAL_ERROR "dbus requires an ISO C99-compatible va_copy() macro, or a similar __va_copy(), or MSVC >= 2010")
 endif()
 
 CHECK_C_SOURCE_COMPILES("
