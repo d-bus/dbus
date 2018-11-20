@@ -425,6 +425,7 @@ bus_container_instance_new (BusContext *context,
   if (!_dbus_string_steal_data (&path, &self->path))
     goto fail;
 
+  _dbus_string_free (&path);
   return self;
 
 fail:
