@@ -689,6 +689,7 @@ bus_desktop_file_load (DBusString *filename,
 	{
            dbus_set_error(error, DBUS_ERROR_FAILED,
                           "invalid service file: key=value before [Section]");
+           parser_free (&parser);
            return NULL;
 	}
       else
