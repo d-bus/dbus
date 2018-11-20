@@ -2,6 +2,9 @@ SET(DOC_DIR ${CMAKE_SOURCE_DIR}/../doc)
 
 find_package(Doxygen)
 
+# build doc always
+add_custom_target(doc ALL)
+
 if(DOXYGEN_EXECUTABLE)
   OPTION(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
 endif(DOXYGEN_EXECUTABLE)
@@ -14,9 +17,15 @@ if (DBUS_ENABLE_DOXYGEN_DOCS)
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-    add_custom_target(doc
+    add_custom_target(apidoc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    add_dependencies(doc apidoc)
+    add_custom_target(devhelp2
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
     )
+    add_dependencies(doc devhelp2)
 endif (DBUS_ENABLE_DOXYGEN_DOCS)
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
