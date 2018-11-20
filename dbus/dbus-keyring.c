@@ -310,9 +310,7 @@ add_new_key (DBusKey  **keys_p,
 
   s = (const unsigned char*) _dbus_string_get_const_data (&bytes);
       
-  id = s[0] | (s[1] << 8) | (s[2] << 16) | (s[3] << 24);
-  if (id < 0)
-    id = - id;
+  id = s[0] | (s[1] << 8) | (s[2] << 16) | ((s[3] & 0x7f) << 24);
   _dbus_assert (id >= 0);
 
   if (find_key_by_id (keys, n_keys, id) != NULL)
