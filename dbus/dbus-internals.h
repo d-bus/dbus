@@ -198,6 +198,7 @@ void _dbus_real_assert_not_reached (const char *explanation,
  */
 #define _DBUS_ASSERT_ERROR_IS_SET(error) do { } while (0)
 #define _DBUS_ASSERT_ERROR_IS_CLEAR(error) do { } while (0)
+#define _DBUS_ASSERT_ERROR_XOR_BOOL(error, retval) do { } while (0)
 #else
 static inline void
 _dbus_assert_error_is_set (const DBusError *error)
@@ -211,8 +212,32 @@ _dbus_assert_error_is_clear (const DBusError *error)
     _dbus_assert (error == NULL || !dbus_error_is_set (error));
 }
 
+static inline void
+_dbus_assert_error_xor_bool (const DBusError *error,
+                             dbus_bool_t      retval)
+{
+  _dbus_assert (error == NULL || dbus_error_is_set (error) == !retval);
+}
+
+/**
+ * Assert that error is set, unless it is NULL in which case we cannot
+ * tell whether it would have been set.
+ */
 #define _DBUS_ASSERT_ERROR_IS_SET(error) _dbus_assert_error_is_set(error)
+
+/**
+ * Assert that error is not set, unless it is NULL in which case we cannot
+ * tell whether it would have been set.
+ */
 #define _DBUS_ASSERT_ERROR_IS_CLEAR(error) _dbus_assert_error_is_clear(error)
+
+/**
+ * Assert that error is consistent with retval: if error is not NULL,
+ * it must be set if and only if retval is false.
+ *
+ * retval can be a boolean expression like "result != NULL".
+ */
+#define _DBUS_ASSERT_ERROR_XOR_BOOL(error, retval), _dbus_assert_error_xor_bool (error, retval)
 #endif
 
 #define _dbus_return_if_error_is_set(error) _dbus_return_if_fail ((error) == NULL || !dbus_error_is_set ((error)))

@@ -3217,11 +3217,7 @@ _dbus_get_autolaunch_address (const char *scope, DBusString *address,
     }
 
 out:
-  if (retval)
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_SET (error);
-  
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, retval);
   _dbus_global_unlock (mutex);
   _dbus_string_free (&shm_name);
 

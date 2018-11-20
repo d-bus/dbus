@@ -821,10 +821,7 @@ update_directory (BusActivation       *activation,
   retval = TRUE;
 
  out:
-  if (!retval)
-    _DBUS_ASSERT_ERROR_IS_SET (error);
-  else
-    _DBUS_ASSERT_ERROR_IS_CLEAR (error);
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, retval);
 
   if (iter != NULL)
     _dbus_directory_close (iter);

@@ -310,9 +310,7 @@ _dbus_string_save_to_file (const DBusString *str,
 
   _dbus_string_free (&tmp_filename);
 
-  if (!retval)
-    _DBUS_ASSERT_ERROR_IS_SET (error);
-  
+  _DBUS_ASSERT_ERROR_XOR_BOOL (error, retval);
   return retval;
 }
 
