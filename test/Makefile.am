@@ -611,6 +611,7 @@ uninstalled-config-local:
 		sed \
 			-e 's,[@]DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL[@],$(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL),' \
 			-e 's,[@]DBUS_SESSION_BUS_LISTEN_ADDRESS[@],$(DBUS_SESSION_BUS_LISTEN_ADDRESS),' \
+			-e 's,[@]DBUS_NAME_TEST_EXEC[@],$(DBUS_NAME_TEST_EXEC),' \
 			-e 's,[@]DBUS_TEST_DATA[@],@abs_builddir@/data,' \
 			-e 's,[@]DBUS_TEST_EXEC[@],@abs_builddir@,' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \
@@ -628,6 +629,7 @@ if DBUS_ENABLE_INSTALLED_TESTS
 		sed \
 			-e 's,[@]DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL[@],$(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL),' \
 			-e 's,[@]DBUS_SESSION_BUS_LISTEN_ADDRESS[@],$(DBUS_SESSION_BUS_LISTEN_ADDRESS),' \
+			-e 's,[@]DBUS_NAME_TEST_EXEC[@],$(DBUS_NAME_TEST_EXEC),' \
 			-e 's,[@]DBUS_TEST_DATA[@],$(testexecdir)/data,' \
 			-e 's,[@]DBUS_TEST_EXEC[@],$(testexecdir),' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \
