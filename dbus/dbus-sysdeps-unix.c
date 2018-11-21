@@ -3501,6 +3501,28 @@ _dbus_fd_set_close_on_exec (int fd)
 }
 
 /**
+ * Sets the file descriptor to *not* be close-on-exec. This can be called
+ * after _dbus_fd_set_all_close_on_exec() to make exceptions for pipes
+ * used to communicate with child processes.
+ *
+ * @param fd the file descriptor
+ */
+void
+_dbus_fd_clear_close_on_exec (int fd)
+{
+  int val;
+
+  val = fcntl (fd, F_GETFD, 0);
+
+  if (val < 0)
+    return;
+
+  val &= ~FD_CLOEXEC;
+
+  fcntl (fd, F_SETFD, val);
+}
+
+/**
  * Closes a file descriptor.
  *
  * @param fd the file descriptor
@@ -4672,12 +4694,18 @@ _dbus_socket_can_pass_unix_fd (DBusSocket fd)
 #endif
 }
 
-/**
- * Closes all file descriptors except the first three (i.e. stdin,
- * stdout, stderr).
+static void
+close_ignore_error (int fd)
+{
+  close (fd);
+}
+
+/*
+ * Similar to Solaris fdwalk(3), but without the ability to stop iteration,
+ * and may call func for integers that are not actually valid fds.
  */
-void
-_dbus_close_all (void)
+static void
+act_on_fds_3_and_up (void (*func) (int fd))
 {
   int maxfds, i;
 
@@ -4716,7 +4744,7 @@ _dbus_close_all (void)
           if (fd == dirfd (d))
             continue;
 
-          close (fd);
+          func (fd);
         }
 
       closedir (d);
@@ -4734,7 +4762,27 @@ _dbus_close_all (void)
 
   /* close all inherited fds */
   for (i = 3; i < maxfds; i++)
-    close (i);
+    func (i);
+}
+
+/**
+ * Closes all file descriptors except the first three (i.e. stdin,
+ * stdout, stderr).
+ */
+void
+_dbus_close_all (void)
+{
+  act_on_fds_3_and_up (close_ignore_error);
+}
+
+/**
+ * Sets all file descriptors except the first three (i.e. stdin,
+ * stdout, stderr) to be close-on-execute.
+ */
+void
+_dbus_fd_set_all_close_on_exec (void)
+{
+  act_on_fds_3_and_up (_dbus_fd_set_close_on_exec);
 }
 
 /**

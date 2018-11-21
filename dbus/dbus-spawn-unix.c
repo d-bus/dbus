@@ -1063,7 +1063,22 @@ do_exec (int                       child_err_report_fd,
       retval = fcntl (i, F_GETFD);
 
       if (retval != -1 && !(retval & FD_CLOEXEC))
-        _dbus_warn ("Fd %d did not have the close-on-exec flag set!", i);
+        {
+          char description[256] = { 0 };
+          char proc_self_fd[256] = { 0 };
+          size_t description_length = sizeof (description) - 1;
+
+          snprintf (proc_self_fd, sizeof (proc_self_fd) - 1,
+                    "/proc/self/fd/%d", i);
+          proc_self_fd[sizeof (proc_self_fd) - 1] = '\0';
+
+          if (readlink (proc_self_fd, description, description_length) <= 0)
+            snprintf (description, sizeof (description) - 1, "(unknown)");
+
+          description[sizeof (description) - 1] = '\0';
+          _dbus_warn ("Fd %d \"%s\" did not have the close-on-exec flag set!",
+                      i, description);
+        }
     }
 #endif
 
