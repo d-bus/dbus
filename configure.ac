@@ -389,6 +389,60 @@ AS_IF([test x$enable_code_coverage = xyes],[
       [Defined if gcov is enabled to force a rebuild due to config.h changing])
   ])
 
+#### Simple checks for things with no special dependencies
+
+# This construct is only suitable for functions that are in the system's
+# standard C library and do not have unusual dependencies. Other
+# functions need their own checks. Please keep sorted in LC_ALL=C order
+AC_CHECK_FUNCS_ONCE([
+accept4
+clearenv
+fpathconf
+getgrouplist
+getpeereid
+getpeerucred
+getresuid
+getrlimit
+inotify_init1
+issetugid
+localeconv
+nanosleep
+pipe2
+poll
+prctl
+prlimit
+raise
+setenv
+setlocale
+setresuid
+setrlimit
+socketpair
+strtoll
+strtoull
+unsetenv
+usleep
+])
+
+# This construct is only suitable for headers that are self-contained
+# and do not require extra headers to be included first. More complex
+# headers need their own checks. Please keep sorted in LC_ALL=C order
+AC_CHECK_HEADERS_ONCE([
+alloca.h
+byteswap.h
+crt_externs.h
+dirent.h
+errno.h
+locale.h
+signal.h
+stdint.h
+sys/prctl.h
+sys/resource.h
+sys/syslimits.h
+sys/time.h
+unistd.h
+ws2tcpip.h
+])
+
 #### Integer sizes
 
 AC_CHECK_SIZEOF(char)
@@ -589,16 +643,10 @@ AC_DEFINE_UNQUOTED([DBUS_USE_SYNC], [$have_sync], [Use the gcc __sync extension]
 AC_SEARCH_LIBS(socket,[socket network])
 AC_CHECK_FUNC(gethostbyname,,[AC_CHECK_LIB(nsl,gethostbyname)])
 
-AC_CHECK_FUNCS([nanosleep usleep setenv clearenv unsetenv socketpair getgrouplist fpathconf setrlimit poll setlocale localeconv strtoll strtoull issetugid getresuid setresuid getrlimit prlimit])
-
 AC_CHECK_HEADERS([syslog.h])
 if test "x$ac_cv_header_syslog_h" = "xyes"; then
   AC_CHECK_DECLS([LOG_PERROR], [], [], [[#include <syslog.h>]])
 fi
-
-# For test-segfault.c
-AC_CHECK_HEADERS_ONCE([sys/prctl.h])
-AC_CHECK_FUNCS_ONCE([prctl raise])
 
 AC_MSG_CHECKING(for dirfd)
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
@@ -635,31 +683,10 @@ closedir(dirp);
 	fi
 fi
 
-AC_CHECK_HEADERS(sys/resource.h)
-AC_CHECK_HEADERS([sys/time.h])
-
-AC_CHECK_HEADERS(dirent.h)
-
 AC_CHECK_HEADERS([execinfo.h],
 	[AC_SEARCH_LIBS([backtrace], [execinfo],
 		[AC_DEFINE([HAVE_BACKTRACE], [1],
 			[Define to 1 if you have backtrace().])])])
-
-AC_CHECK_HEADERS(errno.h)
-
-AC_CHECK_HEADERS(signal.h)
-
-AC_CHECK_HEADERS(locale.h)
-
-AC_CHECK_HEADERS(byteswap.h)
-
-AC_CHECK_HEADERS(unistd.h)
-
-AC_CHECK_HEADERS([stdint.h])
-
-AC_CHECK_HEADERS(ws2tcpip.h)
-
-AC_CHECK_HEADERS(alloca.h)
 
 # Add -D_POSIX_PTHREAD_SEMANTICS if on Solaris
 #
@@ -737,9 +764,6 @@ dnl check for writev header and writev function so we're
 dnl good to go if HAVE_WRITEV gets defined.
 AC_CHECK_HEADERS(sys/uio.h, [AC_CHECK_FUNCS(writev)])
 
-dnl needed on darwin for NAME_MAX
-AC_CHECK_HEADERS(sys/syslimits.h)
-
 dnl Make it easy to check if we have MSG_NOSIGNAL without actually having to include sys/socket.h
 AC_CHECK_DECLS([MSG_NOSIGNAL], [], [], [[ #include <sys/types.h>
 #include <sys/socket.h> ]])
@@ -766,10 +790,6 @@ AC_CHECK_MEMBER([struct unpcbid.unp_pid],
                 [AC_DEFINE([HAVE_UNPCBID], 1, [Have unpcbid structure])],
                 [],
                 [[#include <sys/un.h>]])
-
-AC_CHECK_FUNCS(getpeerucred getpeereid)
-
-AC_CHECK_FUNCS(pipe2 accept4)
 
 PKG_CHECK_MODULES([EXPAT], [expat])
 
@@ -916,7 +936,6 @@ fi
 dnl check if inotify backend is enabled
 if test x$have_inotify = xyes; then
    AC_DEFINE(DBUS_BUS_ENABLE_INOTIFY,1,[Use inotify])
-   AC_CHECK_FUNCS(inotify_init1)
 fi
 
 AM_CONDITIONAL(DBUS_BUS_ENABLE_INOTIFY, test x$have_inotify = xyes)
@@ -1662,7 +1681,6 @@ AC_DEFINE_UNQUOTED([DBUS_SESSION_BUS_CONNECT_ADDRESS],
   [Fallback address for session bus clients])
 
 # darwin needs this to initialize the environment
-AC_CHECK_HEADERS(crt_externs.h)
 AC_CHECK_FUNC(_NSGetEnviron, [AC_DEFINE(HAVE_NSGETENVIRON, 1, [Define if your system needs _NSGetEnviron to set up the environment])])
 AH_VERBATIM(_DARWIN_ENVIRON,
 [
