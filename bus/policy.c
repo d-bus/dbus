@@ -1018,7 +1018,7 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
             }
         }
 
-      if (rule->d.send.destination != NULL)
+      if (rule->d.send.destination != NULL && !rule->d.send.destination_is_prefix)
         {
           /* receiver can be NULL for messages that are sent to the
            * message bus itself, we check the strings in that case as
@@ -1044,9 +1044,9 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
             {
               DBusString str;
               BusService *service;
-              
+
               _dbus_string_init_const (&str, rule->d.send.destination);
-              
+
               service = bus_registry_lookup (registry, &str);
               if (service == NULL)
                 {
@@ -1058,6 +1058,43 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
               if (!bus_service_has_owner (service, receiver))
                 {
                   _dbus_verbose ("  (policy) skipping rule because dest %s isn't owned by receiver\n",
+                                 rule->d.send.destination);
+                  continue;
+                }
+            }
+        }
+
+      if (rule->d.send.destination != NULL && rule->d.send.destination_is_prefix)
+        {
+          /* receiver can be NULL - the same as in !send.destination_is_prefix */
+          if (receiver == NULL)
+            {
+              const char *destination = dbus_message_get_destination (message);
+              DBusString dest_name;
+
+              if (destination == NULL)
+                {
+                  _dbus_verbose ("  (policy) skipping rule because message has no dest\n");
+                  continue;
+                }
+
+              _dbus_string_init_const (&dest_name, destination);
+
+              if (!_dbus_string_starts_with_words_c_str (&dest_name,
+                                                         rule->d.send.destination,
+                                                         '.'))
+                {
+                  _dbus_verbose ("  (policy) skipping rule because message dest doesn't start with %s\n",
+                                 rule->d.send.destination);
+                  continue;
+                }
+            }
+          else
+            {
+              if (!bus_connection_is_name_owner_by_prefix (receiver,
+                                                           rule->d.send.destination))
+                {
+                  _dbus_verbose ("  (policy) skipping rule because no dest with prefix %s is owned by receiver\n",
                                  rule->d.send.destination);
                   continue;
                 }

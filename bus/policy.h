@@ -76,6 +76,7 @@ struct BusPolicyRule
       unsigned int requested_reply : 1;
       unsigned int log : 1;
       unsigned int broadcast : 2; /**< really a BusPolicyTristate */
+      unsigned int destination_is_prefix : 1;
     } send;
 
     struct

@@ -1298,6 +1298,7 @@ append_rule_from_element (BusConfigParser   *parser,
   const char *send_member;
   const char *send_error;
   const char *send_destination;
+  const char *send_destination_prefix;
   const char *send_path;
   const char *send_type;
   const char *send_requested_reply;
@@ -1341,6 +1342,7 @@ append_rule_from_element (BusConfigParser   *parser,
                           "send_member", &send_member,
                           "send_error", &send_error,
                           "send_destination", &send_destination,
+                          "send_destination_prefix", &send_destination_prefix,
                           "send_path", &send_path,
                           "send_type", &send_type,
                           "send_broadcast", &send_broadcast,
@@ -1364,6 +1366,7 @@ append_rule_from_element (BusConfigParser   *parser,
     return FALSE;
 
   any_send_attribute = (send_destination != NULL ||
+                        send_destination_prefix != NULL ||
                         send_broadcast != NULL ||
                         send_path != NULL ||
                         send_type != NULL ||
@@ -1417,7 +1420,8 @@ append_rule_from_element (BusConfigParser   *parser,
    *     interface + member
    *     error
    * 
-   *   base send_ can combine with send_destination, send_path, send_type, send_requested_reply, send_broadcast, eavesdrop
+   *   base send_ can combine with send_destination, send_destination_prefix, send_path, send_type, send_requested_reply, send_broadcast, eavesdrop
+   *   send_destination must not occur with send_destination_prefix
    *   base receive_ with receive_sender, receive_path, receive_type, receive_requested_reply, eavesdrop
    *
    *   user, group, own, own_prefix must occur alone
@@ -1452,6 +1456,16 @@ append_rule_from_element (BusConfigParser   *parser,
                       "Invalid combination of attributes on element <%s>: "
                       "send_error cannot be combined with send_member or "
                       "send_interface",
+                      element_name);
+      return FALSE;
+    }
+
+  if ((send_destination != NULL) + (send_destination_prefix != NULL) > 1)
+    {
+      dbus_set_error (error, DBUS_ERROR_FAILED,
+                      "Invalid combination of attributes on element <%s>: "
+                      "send_destination cannot be combined with "
+                      "send_destination_prefix",
                       element_name);
       return FALSE;
     }
@@ -1589,7 +1603,16 @@ append_rule_from_element (BusConfigParser   *parser,
       rule->d.send.interface = _dbus_strdup (send_interface);
       rule->d.send.member = _dbus_strdup (send_member);
       rule->d.send.error = _dbus_strdup (send_error);
-      rule->d.send.destination = _dbus_strdup (send_destination);
+      if (send_destination)
+        {
+          rule->d.send.destination = _dbus_strdup (send_destination);
+          rule->d.send.destination_is_prefix = 0;
+        }
+      else if (send_destination_prefix)
+        {
+          rule->d.send.destination = _dbus_strdup (send_destination_prefix);
+          rule->d.send.destination_is_prefix = 1;
+        }
       rule->d.send.max_fds = max_fds;
       rule->d.send.min_fds = min_fds;
 
@@ -1601,7 +1624,7 @@ append_rule_from_element (BusConfigParser   *parser,
         goto nomem;
       if (send_error && rule->d.send.error == NULL)
         goto nomem;
-      if (send_destination && rule->d.send.destination == NULL)
+      if ((send_destination || send_destination_prefix) && rule->d.send.destination == NULL)
         goto nomem;
     }
   else if (any_receive_attribute)
