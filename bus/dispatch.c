@@ -4871,12 +4871,8 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
   if (!check_get_connection_unix_user (context, baz))
     _dbus_test_fatal ("GetConnectionUnixUser message failed");
 
-#ifdef DBUS_WIN_FIXME
-  _dbus_verbose("TODO: testing of GetConnectionUnixProcessID message skipped for now\n");
-#else
   if (!check_get_connection_unix_process_id (context, baz))
     _dbus_test_fatal ("GetConnectionUnixProcessID message failed");
-#endif
 
   if (!check_list_services (context, baz))
     _dbus_test_fatal ("ListActivatableNames message failed");
