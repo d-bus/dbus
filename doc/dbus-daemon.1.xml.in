@@ -791,7 +791,7 @@ Available limit names are:</para>
       "max_incomplete_connections" : max number of unauthenticated
                                      connections
       "max_connections_per_user"   : max number of completed connections from
-                                     the same user
+                                     the same user (only enforced on Unix OSs)
       "max_pending_service_starts" : max number of service launches in
                                      progress at the same time
       "max_names_per_connection"   : max number of names a single
