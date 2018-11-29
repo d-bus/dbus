@@ -660,6 +660,11 @@ test_canonical_path_uae (Fixture *f,
   dbus_clear_message (&m);
 }
 
+static Config max_connections_per_user_config = {
+    NULL, 1, "valid-config-files/max-connections-per-user.conf",
+    TEST_USER_ME, SPECIFY_ADDRESS
+};
+
 static void
 test_max_connections (Fixture *f,
     gconstpointer context)
@@ -667,9 +672,26 @@ test_max_connections (Fixture *f,
   DBusError error = DBUS_ERROR_INIT;
   DBusConnection *third_conn;
   DBusConnection *failing_conn;
+#ifdef DBUS_WIN
+  const Config *config = context;
+#endif
 
   if (f->skip)
     return;
+
+#ifdef DBUS_WIN
+  if (config == &max_connections_per_user_config)
+    {
+      /* <limit name="max_connections_per_user"/> is currently only
+       * implemented in terms of Unix uids. It could be implemented for
+       * Windows SIDs too, but there wouldn't be much point, because we
+       * don't support use of a multi-user dbus-daemon on Windows, so
+       * in practice all connections have the same SID. */
+      g_test_skip ("Maximum connections per Windows SID are not "
+                   "implemented");
+      return;
+    }
+#endif
 
   /* We have two connections already */
   g_assert (f->left_conn != NULL);
@@ -2018,11 +2040,6 @@ static Config listen_unix_runtime_config = {
 
 static Config max_completed_connections_config = {
     NULL, 1, "valid-config-files/max-completed-connections.conf",
-    TEST_USER_ME, SPECIFY_ADDRESS
-};
-
-static Config max_connections_per_user_config = {
-    NULL, 1, "valid-config-files/max-connections-per-user.conf",
     TEST_USER_ME, SPECIFY_ADDRESS
 };
 
