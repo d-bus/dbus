@@ -1401,9 +1401,7 @@ check_get_connection_unix_process_id (BusContext     *context,
   dbus_bool_t retval;
   DBusError error;
   const char *base_service_name;
-#ifdef DBUS_UNIX
   dbus_uint32_t pid;
-#endif
 
   retval = FALSE;
   dbus_error_init (&error);
@@ -1471,15 +1469,6 @@ check_get_connection_unix_process_id (BusContext     *context,
         {
           ; /* good, this is a valid response */
         }
-#ifdef DBUS_WIN
-      else if (dbus_message_is_error (message, DBUS_ERROR_UNIX_PROCESS_ID_UNKNOWN))
-        {
-          /* We are expecting this error, since we know in the test suite we aren't
-           * talking to a client running on UNIX
-           */
-          _dbus_verbose ("Windows correctly does not support GetConnectionUnixProcessID\n");
-        }
-#endif
       else
         {
 #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \
@@ -1500,10 +1489,6 @@ check_get_connection_unix_process_id (BusContext     *context,
     }
   else
     {
-#ifdef DBUS_WIN
-      warn_unexpected (connection, message, "GetConnectionUnixProcessID to fail on Windows");
-      goto out;
-#else
       if (dbus_message_get_type (message) == DBUS_MESSAGE_TYPE_METHOD_RETURN)
         {
           ; /* good, expected */
@@ -1552,7 +1537,6 @@ check_get_connection_unix_process_id (BusContext     *context,
               goto out;
             }
         }
-#endif /* !DBUS_WIN */
     }
 
   if (!check_no_leftovers (context))
