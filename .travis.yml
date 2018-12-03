@@ -41,5 +41,6 @@ env:
   - ci_host=x86_64-w64-mingw32 ci_buildsys=cmake
   - ci_docker=debian:jessie-slim ci_distro=debian ci_suite=jessie
   - ci_docker=debian:stretch-slim ci_distro=debian ci_suite=stretch
+  - ci_docker=debian:buster-slim ci_distro=debian ci_suite=buster
 
 # vim:set sw=2 sts=2 et:

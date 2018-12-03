@@ -127,6 +127,14 @@ build:jessie:
     ci_suite: "jessie"
   script: *script
 
+build:buster:
+  when: manual
+  stage: build
+  image: "debian:buster-slim"
+  variables:
+    ci_suite: "buster"
+  script: *script
+
 build:xenial:
   when: manual
   stage: build
