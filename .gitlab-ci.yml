@@ -135,15 +135,4 @@ build:xenial:
     ci_suite: "xenial"
   script: *script
 
-build:trusty:
-  when: manual
-  stage: build
-  image: "ubuntu:trusty"
-  variables:
-    ci_distro: "ubuntu"
-    ci_suite: "trusty"
-  script:
-    - chown -R user .
-    - sudo -u user -H ./tools/ci-build.sh
-
 # vim:set sw=2 sts=2 et:
