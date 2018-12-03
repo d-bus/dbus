@@ -4389,7 +4389,7 @@
       <para>
         <programlisting>
           org.freedesktop.DBus.AddMatch (bus_proxy,
-                                         "type='signal',name='org.example.App2',path_namespace='/org/example/App2'");
+                                         "type='signal',sender='org.example.App2',path_namespace='/org/example/App2'");
           objects = org.freedesktop.DBus.ObjectManager.GetManagedObjects (app_proxy);
         </programlisting>
       </para>
