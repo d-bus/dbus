@@ -68,6 +68,15 @@ Enhancements:
 
 Fixes:
 
+• Stop the dbus-daemon leaking memory (an error message) if delivering
+  the message that triggered auto-activation is forbidden. This is
+  technically a denial of service because the dbus-daemon will
+  run out of memory eventually, but it's a very slow and noisy one,
+  because all the rejected messages are also very likely to have
+  been logged to the system log, and its scope is typically limited by
+  the finite number of activatable services available.
+  (dbus#234, Simon McVittie)
+
 • Remove __attribute__((__malloc__)) attribute on dbus_realloc(),
   which does not meet the criteria for that attribute in gcc 4.7+,
   potentially leading to miscompilation (fd.o #107741, Simon McVittie)
