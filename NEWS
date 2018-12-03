@@ -1,6 +1,11 @@
 dbus 1.12.12 (UNRELEASED)
 =========================
 
+dbus version control is now hosted on freedesktop.org's Gitlab
+installation, and bug reports and feature requests have switched from
+Bugzilla bugs (indicated by "fd.o #nnn") to Gitlab issues ("dbus#nnn")
+and merge requests ("dbus!nnn").
+
 Enhancements:
 
 • Reference the freedesktop.org Code of Conduct (Simon McVittie)
