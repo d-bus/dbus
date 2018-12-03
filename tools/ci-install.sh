@@ -52,7 +52,7 @@ NULL=
 # OS suite (release, branch) in which we are testing.
 # Typical values for ci_distro=debian: sid, jessie
 # Typical values for ci_distro=fedora might be 25, rawhide
-: "${ci_suite:=trusty}"
+: "${ci_suite:=xenial}"
 
 if [ $(id -u) = 0 ]; then
     sudo=
@@ -79,12 +79,9 @@ case "$ci_distro" in
         $sudo sed -i -e 's/httpredir\.debian\.org/deb.debian.org/g' \
             /etc/apt/sources.list
 
-        # travis-ci has a sources list for Chrome which doesn't support i386
-        : | $sudo tee /etc/apt/sources.list.d/google-chrome.list
-
         case "$ci_suite" in
-            (trusty)
-                # Ubuntu 14.04 didn't have the wine32, wine64 packages
+            (xenial)
+                # Ubuntu 16.04 didn't have the wine32, wine64 packages
                 wine32=wine:i386
                 wine64=wine:amd64
                 ;;
@@ -140,6 +137,7 @@ case "$ci_distro" in
             libexpat-dev \
             libglib2.0-dev \
             libselinux1-dev \
+            libsystemd-dev \
             libx11-dev \
             python \
             python-dbus \
@@ -152,15 +150,6 @@ case "$ci_distro" in
             xvfb \
             ${NULL}
 
-        case "$ci_suite" in
-            (trusty)
-                $sudo apt-get -qq -y install libsystemd-daemon-dev
-                ;;
-            (*)
-                $sudo apt-get -qq -y install libsystemd-dev
-                ;;
-        esac
-
         if [ "$ci_in_docker" = yes ]; then
             # Add the user that we will use to do the build inside the
             # Docker container, and let them use sudo
@@ -171,8 +160,9 @@ case "$ci_distro" in
         fi
 
         case "$ci_suite" in
-            (trusty|jessie)
-                # Ubuntu 14.04's autoconf-archive is too old
+            (jessie|xenial)
+                # autoconf-archive in Debian 8 and Ubuntu 16.04 is too old,
+                # use the one from Debian 9 instead
                 wget http://deb.debian.org/debian/pool/main/a/autoconf-archive/autoconf-archive_20160916-1_all.deb
                 $sudo dpkg -i autoconf-archive_*_all.deb
                 rm autoconf-archive_*_all.deb
