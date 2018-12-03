@@ -23,6 +23,10 @@ Enhancements:
 • Rewrite CONTRIBUTING.md to reflect the current setup
   (dbus!8, Simon McVittie)
 
+• D-Bus Specification v0.34:
+  · Fix an incorrect AddMatch() call in sample code
+    (dbus#221, dbus!56; Philip Withnall)
+
 • Tarball releases no longer contain pre-2007 changelogs and are now
   compressed with xz, so they should be somewhat smaller
   (fd.o #107630; Francesco Turco, Simon McVittie)
@@ -54,9 +58,11 @@ Enhancements:
   __va_copy() exists, except in older MSVC versions where we already
   know that simple assignment is enough (dbus!35, Simon McVittie)
 
-• Improve CMake build system parity with Autotools
-  · In particular, detect inotify, prctl() and getpwnam_r() correctly
-    on Linux
+• Simplify configure checks (dbus!10, Simon McVittie)
+
+• Improve CMake build system parity with Autotools, including:
+  · Detect inotify, prctl() and getpwnam_r() correctly on Linux
+  · Use xsltproc instead of meinproc4 for documentation
   (dbus#57, dbus#117, dbus#193, dbus#227, dbus!18, dbus!39;
   Ralf Habacker, Simon McVittie)
 
@@ -79,11 +85,25 @@ Fixes:
 • Avoid undefined integer shifts when generating random tokens for
   the DBUS_COOKIE_SHA1 mechanism (dbus!45, Simon McVittie)
 
+• Document the max-connections-per-user limit as unimplemented on
+  Windows, and don't fail tests when it isn't enforced there
+  (dbus!54, Simon McVittie)
+
+• Avoid unnecessary file descriptors being inherited by dbus-daemon and
+  dbus-launch subprocesses (dbus!50, Simon McVittie)
+
 • Fix some minor memory leaks
   (fd.o #107320, dbus!41, dbus!42; Simon McVittie)
 
+• Don't fail tests if GetConnectionUnixProcessID() succeeds on Windows,
+  which it normally will since 1.7.x
+  (dbus#239, dbus!55; Simon McVittie)
+
 • Extend a test timeout to avoid spurious failures in CI
   (dbus!26, Simon McVittie)
+
+• Avoid undefined signed integer operations when generating random
+  message content during regression tests (dbus!46, Simon McVittie)
 
 • Fix build warnings with recent gcc (dbus#208, dbus#225; David King)
 
