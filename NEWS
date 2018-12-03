@@ -1,6 +1,11 @@
 dbus 1.10.28 (UNRELEASED)
 ==
 
+dbus version control is now hosted on freedesktop.org's Gitlab
+installation, and bug reports and feature requests have switched from
+Bugzilla bugs (indicated by "fd.o #nnn") to Gitlab issues ("dbus#nnn")
+and merge requests ("dbus!nnn").
+
 Fixes:
 
 • Prevent reading up to 3 bytes beyond the end of a truncated message.
