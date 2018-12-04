@@ -149,7 +149,7 @@ BONUS_FILES = \
 	$(top_srcdir)/AUTHORS \
 	$(top_srcdir)/NEWS \
 	$(top_srcdir)/COPYING \
-	$(top_srcdir)/ChangeLog
+	$(NULL)
 
 dbus-docs: $(STATIC_DOCS) $(dist_dtd_DATA) $(MAN_XML_FILES) $(dist_doc_DATA) $(dist_html_DATA) $(MAN_HTML_FILES) $(BONUS_FILES) doxygen.stamp $(XMLTO_HTML) $(YELP_HTML)
 	$(AM_V_at)rm -rf $@ $@.tmp
