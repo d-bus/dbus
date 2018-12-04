@@ -167,6 +167,15 @@ case "$ci_distro" in
                 $sudo dpkg -i autoconf-archive_*_all.deb
                 rm autoconf-archive_*_all.deb
                 ;;
+
+            (stretch)
+                # Debian 9 'stretch' didn't have the ducktype package
+                ;;
+
+            (*)
+                # assume Ubuntu 18.04 'bionic', Debian 10 'buster' or newer
+                $sudo apt-get -qq -y install ducktype
+                ;;
         esac
         ;;
 
