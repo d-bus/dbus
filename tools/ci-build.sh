@@ -237,7 +237,7 @@ case "$ci_buildsys" in
         [ "$ci_test" = no ] || ${make} distcheck || maybe_fail_tests
 
         ${make} install DESTDIR=$(pwd)/DESTDIR
-        ( cd DESTDIR && find . )
+        ( cd DESTDIR && find . -ls )
 
         if [ "$ci_sudo" = yes ] && [ "$ci_test" = yes ]; then
             sudo ${make} install
