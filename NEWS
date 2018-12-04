@@ -18,6 +18,11 @@ Dependencies:
   macro with the same behaviour), except when building for Windows using
   MSVC and CMake.
 
+• Building documentation using CMake now requires xsltproc, Docbook DTDs
+  (for example docbook-xml on Debian derivatives), and Docbook XSLT
+  stylesheets (for example docbook-xsl on Debian derivatives). Using
+  KDE's meinproc4 documentation processor is no longer supported.
+
 Enhancements:
 
 • Rewrite CONTRIBUTING.md to reflect the current setup
