@@ -1,5 +1,7 @@
-dbus 1.12.12 (UNRELEASED)
+dbus 1.12.12 (2018-12-04)
 =========================
+
+The “draconic disciple” release.
 
 dbus version control is now hosted on freedesktop.org's Gitlab
 installation, and bug reports and feature requests have switched from
