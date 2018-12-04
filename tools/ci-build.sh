@@ -223,7 +223,6 @@ case "$ci_buildsys" in
             --enable-installed-tests \
             --enable-maintainer-mode \
             --enable-modular-tests \
-            --with-glib \
             "$@"
 
         ${make}
