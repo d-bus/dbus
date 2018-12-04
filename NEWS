@@ -1,5 +1,7 @@
-dbus 1.13.8 (UNRELEASED)
+dbus 1.13.8 (2018-12-04)
 ========================
+
+The “demanding dragon” release.
 
 dbus version control is now hosted on freedesktop.org's Gitlab
 installation, and bug reports and feature requests have switched from

@@ -6,8 +6,8 @@
 <article id="index">
   <articleinfo>
     <title>D-Bus Specification</title>
-    <releaseinfo>Version 0.33</releaseinfo>
-    <date>2018-04-27</date>
+    <releaseinfo>Version 0.34</releaseinfo>
+    <date>2018-12-04</date>
     <authorgroup>
       <author>
         <firstname>Havoc</firstname>
@@ -77,6 +77,16 @@
        <revremark>
          See <ulink url='http://cgit.freedesktop.org/dbus/dbus/log/doc/dbus-specification.xml'>commit log</ulink>
        </revremark>
+     </revision>
+     <revision>
+       <revnumber>0.34</revnumber>
+       <date>2018-12-04</date>
+       <authorinitials>pwithnall</authorinitials>
+       <revdescription>
+         <itemizedlist>
+           <listitem><simpara>Correct ObjectManager example AddMatch rule</simpara></listitem>
+         </itemizedlist>
+       </revdescription>
      </revision>
      <revision>
        <revnumber>0.33</revnumber>
