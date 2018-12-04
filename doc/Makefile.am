@@ -172,7 +172,7 @@ dbus-docs: $(STATIC_DOCS) $(dist_dtd_DATA) $(MAN_XML_FILES) $(dist_doc_DATA) $(d
 	$(AM_V_at)mv $@.tmp $@
 
 dbus-docs.tar.xz: dbus-docs
-	$(AM_V_GEN)tar czf $@ $<
+	$(AM_V_GEN)tar --xz -c -f $@ $<
 
 DOC_SERVER = dbus.freedesktop.org
 DOC_WWW_DIR = /srv/dbus.freedesktop.org/www
