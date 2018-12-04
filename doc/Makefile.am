@@ -189,7 +189,6 @@ else
 maintainer-upload-docs:
 	@echo "Can't upload documentation! Re-run configure with"
 	@echo "  --enable-doxygen-docs --enable-xml-docs --enable-ducktype-docs"
-	@echo "and ensure that man2html is installed."
 	@false
 endif
 
