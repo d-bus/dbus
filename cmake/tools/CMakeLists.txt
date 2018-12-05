@@ -91,13 +91,7 @@ if(WIN32)
     list(APPEND dbus_update_activation_environment_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 if(WIN32 AND NOT MSVC)
-    # avoid dbus-update-activation-environment triggering UAC
-    # 1 is the resource ID, ID_MANIFEST
-    # 24 is the resource type, RT_MANIFEST
-    # constants are used because of a bug in windres
-    # see https://stackoverflow.com/questions/33000158/embed-manifest-file-to-require-administrator-execution-level-with-mingw32
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/disable-uac.rc "1 24 \"${CMAKE_SOURCE_DIR}/../tools/Win32.Manifest\"\n")
-    list(APPEND dbus_update_activation_environment_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/disable-uac.rc)
+    add_uac_manifest(dbus_update_activation_environment_SOURCES)
 endif()
 add_executable(dbus-update-activation-environment ${dbus_update_activation_environment_SOURCES})
 target_link_libraries(dbus-update-activation-environment ${DBUS_LIBRARIES})
