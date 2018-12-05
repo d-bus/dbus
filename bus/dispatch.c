@@ -4939,7 +4939,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
     _dbus_test_fatal ("shell success service auto start failed");
   _dbus_test_ok ("%s:%s - check_shell_service_success_auto_start", _DBUS_FUNCTION_NAME, filename);
 
-#ifdef DBUS_WIN_FIXME
+#ifdef DBUS_WIN
   _dbus_verbose("TODO: Fix memory leaks after running check_shell_service_success_auto_start\n");
   _dbus_sleep_milliseconds (500);
 #endif
