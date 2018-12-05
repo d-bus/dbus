@@ -1894,6 +1894,7 @@ test_fd_limit (Fixture *f,
 {
 #ifdef HAVE_PRLIMIT
   struct rlimit lim;
+  struct rlimit new_limit;
   const struct passwd *pwd = NULL;
 #endif
 
@@ -1921,7 +1922,7 @@ test_fd_limit (Fixture *f,
     }
 
   if (prlimit (getpid (), RLIMIT_NOFILE, NULL, &lim) < 0)
-    g_error ("prlimit(): %s", g_strerror (errno));
+    g_error ("get prlimit (self): %s", g_strerror (errno));
 
   g_test_message ("our RLIMIT_NOFILE: rlim_cur: %ld, rlim_max: %ld",
                   (long) lim.rlim_cur, (long) lim.rlim_max);
@@ -1933,8 +1934,33 @@ test_fd_limit (Fixture *f,
       return;
     }
 
+  new_limit = lim;
+  new_limit.rlim_cur = DESIRED_RLIMIT;
+  new_limit.rlim_max = DESIRED_RLIMIT;
+
+  /* Try to increase the rlimit ourselves. If we're root in an
+   * unprivileged Linux container, then we won't have CAP_SYS_RESOURCE
+   * and this will fail with EPERM. If so, the dbus-daemon wouldn't be
+   * able to increase its rlimit either. */
+  if (prlimit (getpid (), RLIMIT_NOFILE, &new_limit, NULL) < 0)
+    {
+      gchar *message;
+
+      message = g_strdup_printf ("Cannot test, we cannot change the rlimit so "
+                                 "presumably neither can the dbus-daemon: %s",
+                                 g_strerror (errno));
+      g_test_skip (message);
+      g_free (message);
+      return;
+    }
+
+  /* Immediately put our original limit back so it won't interfere with
+   * subsequent tests. This should always succeed. */
+  if (prlimit (getpid (), RLIMIT_NOFILE, &lim, NULL) < 0)
+    g_error ("Cannot restore our original limits: %s", g_strerror (errno));
+
   if (prlimit (f->daemon_pid, RLIMIT_NOFILE, NULL, &lim) < 0)
-    g_error ("prlimit(): %s", g_strerror (errno));
+    g_error ("get prlimit (dbus-daemon): %s", g_strerror (errno));
 
   g_test_message ("dbus-daemon's RLIMIT_NOFILE: rlim_cur: %ld, rlim_max: %ld",
                   (long) lim.rlim_cur, (long) lim.rlim_max);
