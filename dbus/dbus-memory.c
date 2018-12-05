@@ -254,7 +254,7 @@ dbus_bool_t
 _dbus_decrement_fail_alloc_counter (void)
 {
   _dbus_initialize_malloc_debug ();
-#ifdef DBUS_WIN_FIXME
+#ifdef DBUS_WIN
   {
     static dbus_bool_t called = 0;
 

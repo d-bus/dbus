@@ -31,7 +31,12 @@ if(DBUS_BUILD_TESTS AND CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Win
 endif()
 
 macro(add_test_executable _target _source)
-    add_executable(${_target} ${_source})
+    set(_sources "${_source}")
+    if(WIN32 AND NOT MSVC)
+        # avoid triggering UAC
+        add_uac_manifest(_sources)
+    endif()
+    add_executable(${_target} ${_sources})
     target_link_libraries(${_target} ${ARGN})
     if (CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # run tests with binfmt_misc
@@ -58,7 +63,12 @@ macro(add_test_executable _target _source)
 endmacro(add_test_executable)
 
 macro(add_helper_executable _target _source)
-    add_executable(${_target} ${_source})
+    set(_sources "${_source}")
+    if(WIN32 AND NOT MSVC)
+        # avoid triggering UAC
+        add_uac_manifest(_sources)
+    endif()
+    add_executable(${_target} ${_sources})
     target_link_libraries(${_target} ${ARGN})
 endmacro(add_helper_executable)
 
@@ -114,4 +124,24 @@ macro(generate_warning_cflags target warnings disabled_warnings error_warnings)
     if(DEBUG_MACROS)
         message("generate_warning_cflags return: ${${target}}")
     endif()
+endmacro()
+
+#
+# Avoid triggering UAC
+#
+# This macro adds an rc file to _sources that is
+# linked to a target and prevents UAC from making
+# requests for administrator access.
+#
+macro(add_uac_manifest _sources)
+    # 1 is the resource ID, ID_MANIFEST
+    # 24 is the resource type, RT_MANIFEST
+    # constants are used because of a bug in windres
+    # see https://stackoverflow.com/questions/33000158/embed-manifest-file-to-require-administrator-execution-level-with-mingw32
+    get_filename_component(UAC_FILE ${CMAKE_SOURCE_DIR}/../tools/Win32.Manifest REALPATH)
+    set(outfile ${CMAKE_BINARY_DIR}/disable-uac.rc)
+    if(NOT EXISTS outfile)
+        file(WRITE ${outfile} "1 24 \"${UAC_FILE}\"\n")
+    endif()
+    list(APPEND ${_sources} ${outfile})
 endmacro()

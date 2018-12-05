@@ -234,7 +234,6 @@
 // system type defines
 #if defined(_WIN32) || defined(_WIN64) || defined (_WIN32_WCE)
 # define DBUS_WIN
-# define DBUS_WIN_FIXME 1
 # ifdef _WIN32_WCE
 #  define DBUS_WINCE
 # else
