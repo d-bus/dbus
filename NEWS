@@ -1,7 +1,24 @@
 dbus 1.13.10 (UNRELEASED)
 =========================
 
-...
+Fixes:
+
+• Avoid possible memory corruption in certain DBusHashTableIter use
+  patterns, which in practice were never used (dbus!44, Simon McVittie)
+
+• Avoid a test failure on Linux when built in a container as uid 0, but
+  without the necessary privileges to increase resource limits
+  (dbus!58, Debian #908092; Simon McVittie)
+
+• Fix test failures in test-syslog and test-sysdeps under Windows
+  (dbus#238, dbus#243, dbus!61, dbus!62; Simon McVittie)
+
+Tests and CI:
+
+• Rewrite Python tests into C to reduce circular dependencies and
+  facilitate use of AddressSanitizer (dbus!37, Simon McVittie)
+
+• Do CI builds in a more minimal environment (dbus!63, Simon McVittie)
 
 dbus 1.13.8 (2018-12-04)
 ========================
