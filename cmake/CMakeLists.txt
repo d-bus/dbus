@@ -482,9 +482,9 @@ add_definitions(${DBUS_BUS_CFLAGS})
 
 if (DBUS_BUILD_TESTS)
     # set variables used for the .in files (substituted by configure_file) in test/data:
-    set(DBUS_TEST_EXEC ${EXECUTABLE_OUTPUT_PATH}${IDE_BIN})
-    set(DBUS_TEST_DATA ${CMAKE_BINARY_DIR}/test/data)
-    set(TEST_LAUNCH_HELPER_BINARY ${EXECUTABLE_OUTPUT_PATH}/dbus-daemon-launch-helper-test)
+    set(DBUS_TEST_EXEC ${Z_DRIVE_IF_WINE}${EXECUTABLE_OUTPUT_PATH}${IDE_BIN})
+    set(DBUS_TEST_DATA ${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/test/data)
+    set(TEST_LAUNCH_HELPER_BINARY ${Z_DRIVE_IF_WINE}${EXECUTABLE_OUTPUT_PATH}/dbus-daemon-launch-helper-test)
     if (UNIX)
         set(TEST_SOCKET_DIR ${DBUS_SESSION_SOCKET_DIR})
         set(TEST_LISTEN "unix:tmpdir=${TEST_SOCKET_DIR}")

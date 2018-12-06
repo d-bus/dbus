@@ -151,6 +151,9 @@ win32 only:
 // enable win32 debug port for message output
 DBUS_USE_OUTPUT_DEBUG_STRING:BOOL=OFF
 
+// use wine to run cross compiled test applications (only for cross compiling for Windows)
+DBUS_USE_WINE:BOOL=OFF
+
 gcc only:
 // compile with coverage profiling instrumentation
 DBUS_GCOV_ENABLED:BOOL=OFF
