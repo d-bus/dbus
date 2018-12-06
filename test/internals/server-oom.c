@@ -46,6 +46,15 @@ test_new_server (void        *user_data,
   DBusServer *server = NULL;
   dbus_bool_t result = FALSE;
 
+#ifdef DBUS_WIN
+  if (strstr (listen_address, "bind=*") != NULL)
+    {
+      g_test_skip ("bind=* not tested on Windows to avoid a firewall-exception request (dbus#64)");
+      result = TRUE;
+      goto out;
+    }
+#endif
+
   server = dbus_server_listen (listen_address, &error);
 
   if (server == NULL)
