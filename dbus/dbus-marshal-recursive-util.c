@@ -2168,7 +2168,7 @@ uint16_read_multi (TestTypeNode   *node,
   check_expected_type (reader, node->klass->typecode);
 
   _dbus_type_reader_read_fixed_multi (reader,
-                                      &values,
+                                      (const void **) &values,
                                       &n_elements);
 
   if (n_elements != count)
@@ -2294,7 +2294,7 @@ uint32_read_multi (TestTypeNode   *node,
   check_expected_type (reader, node->klass->typecode);
 
   _dbus_type_reader_read_fixed_multi (reader,
-                                      &values,
+                                      (const void **) &values,
                                       &n_elements);
 
   if (n_elements != count)

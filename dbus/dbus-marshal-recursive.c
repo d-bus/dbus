@@ -922,7 +922,7 @@ _dbus_type_reader_get_array_length (const DBusTypeReader  *reader)
  */
 void
 _dbus_type_reader_read_fixed_multi (const DBusTypeReader  *reader,
-                                    void                  *value,
+                                    const void           **value,
                                     int                   *n_elements)
 {
   int element_type;
@@ -956,12 +956,11 @@ _dbus_type_reader_read_fixed_multi (const DBusTypeReader  *reader,
   _dbus_assert (remaining_len <= total_len);
 
   if (remaining_len == 0)
-    *(const DBusBasicValue**) value = NULL;
+    *value = NULL;
   else
-    *(const DBusBasicValue**) value =
-      (void*) _dbus_string_get_const_data_len (reader->value_str,
-                                               reader->value_pos,
-                                               remaining_len);
+    *value = _dbus_string_get_const_data_len (reader->value_str,
+                                              reader->value_pos,
+                                              remaining_len);
 
   *n_elements = remaining_len / alignment;
   _dbus_assert ((remaining_len % alignment) == 0);

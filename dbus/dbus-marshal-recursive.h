@@ -119,7 +119,7 @@ void        _dbus_type_reader_read_basic                (const DBusTypeReader  *
 int         _dbus_type_reader_get_array_length          (const DBusTypeReader  *reader);
 DBUS_PRIVATE_EXPORT
 void        _dbus_type_reader_read_fixed_multi          (const DBusTypeReader  *reader,
-                                                         void                  *value,
+                                                         const void           **value,
                                                          int                   *n_elements);
 void        _dbus_type_reader_read_raw                  (const DBusTypeReader  *reader,
                                                          const unsigned char  **value_location);
