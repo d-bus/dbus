@@ -40,7 +40,7 @@ main (int    argc,
   connection = dbus_bus_get (DBUS_BUS_SESSION, &error);
   if (connection == NULL)
     {
-      fprintf (stderr, "*** Failed to open connection to system bus: %s\n",
+      fprintf (stderr, "*** Failed to open connection to session bus: %s\n",
                error.message);
       dbus_error_free (&error);
       return 1;
