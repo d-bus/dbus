@@ -381,7 +381,7 @@ run_session (const char *dbus_daemon,
              char      **argv,
              int         prog_arg)
 {
-  char *dbus_daemon_argv[3];
+  char *dbus_daemon_argv[4];
   int ret = 127;
   HANDLE server_handle = NULL;
   HANDLE app_handle = NULL;
