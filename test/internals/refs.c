@@ -198,6 +198,9 @@ static void
 setup (Fixture *f,
     gconstpointer data)
 {
+#ifdef DBUS_WIN
+  const char *dbus_test_slow = NULL;
+#endif
   if (!dbus_threads_init_default ())
     g_error ("OOM");
 
@@ -207,17 +210,20 @@ setup (Fixture *f,
   f->n_threads = N_THREADS;
   f->n_refs = N_REFS;
 
-  // wine sets WINESERVERSOCKET for its child processes automatically
-  if (g_getenv ("WINESERVERSOCKET") != NULL)
+#ifdef DBUS_WIN
+  dbus_test_slow = g_getenv ("DBUS_TEST_SLOW");
+
+  if (dbus_test_slow == NULL || atoi (dbus_test_slow) < 1)
     {
       /* Our reference-counting is really slow under Wine (it involves
-       * IPC to wineserver). Do fewer iterations: enough to demonstrate
-       * that it works, rather than a performance test.
+       * IPC to wineserver) or Windows 7 guest on VirtualBox (5.22).
+       * Do fewer iterations:  enough to demonstrate that it works,
+       * rather than seriously trying to reproduce race conditions.
        */
       f->n_threads = 10;
       f->n_refs = 10;
     }
-
+#endif
   f->loop = _dbus_loop_new ();
   g_assert (f->loop != NULL);
 
