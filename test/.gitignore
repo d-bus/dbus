@@ -33,6 +33,7 @@ manual-dir-iter
 manual-tcp
 test-dbus-daemon-eavesdrop
 test-printf
+/test-privserver
 test-refs
 test-syntax
 test-syslog
