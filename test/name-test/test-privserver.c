@@ -133,6 +133,8 @@ main (int argc, char *argv[])
 
   dbus_connection_unref (session);
 
+  dbus_server_unref (server);
+
   _dbus_loop_unref (loop);
 
   dbus_free (testdata);
