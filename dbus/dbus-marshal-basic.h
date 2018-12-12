@@ -191,7 +191,7 @@ void          _dbus_marshal_read_basic        (const DBusString *str,
 void          _dbus_marshal_read_fixed_multi  (const DBusString *str,
                                                int               pos,
                                                int               element_type,
-                                               void             *value,
+                                               const void      **value,
                                                int               n_elements,
                                                int               byte_order,
                                                int              *new_pos);

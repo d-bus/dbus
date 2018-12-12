@@ -893,9 +893,9 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
         }
       else if (dbus_type_is_basic (spec_type))
         {
-          DBusBasicValue *ptr;
+          void *ptr;
 
-          ptr = va_arg (var_args, DBusBasicValue*);
+          ptr = va_arg (var_args, void *);
 
           _dbus_assert (ptr != NULL);
 
@@ -906,7 +906,7 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
         {
           int element_type;
           int spec_element_type;
-          const DBusBasicValue **ptr;
+          const void **ptr;
           int *n_elements_p;
           DBusTypeReader array;
 
@@ -928,7 +928,7 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
           if (dbus_type_is_fixed (spec_element_type) &&
               element_type != DBUS_TYPE_UNIX_FD)
             {
-              ptr = va_arg (var_args, const DBusBasicValue**);
+              ptr = va_arg (var_args, const void **);
               n_elements_p = va_arg (var_args, int*);
 
               _dbus_assert (ptr != NULL);
@@ -936,8 +936,7 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
 
               _dbus_type_reader_recurse (&real->u.reader, &array);
 
-              _dbus_type_reader_read_fixed_multi (&array,
-                                                  (void *) ptr, n_elements_p);
+              _dbus_type_reader_read_fixed_multi (&array, ptr, n_elements_p);
             }
           else if (_DBUS_TYPE_IS_STRINGLIKE (spec_element_type))
             {
@@ -1060,7 +1059,7 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
           else if (dbus_type_is_basic (spec_type))
             {
               /* move the index forward */
-              va_arg (copy_args, DBusBasicValue *);
+              va_arg (copy_args, const void *);
             }
           else if (spec_type == DBUS_TYPE_ARRAY)
             {
@@ -1070,7 +1069,7 @@ _dbus_message_iter_get_args_valist (DBusMessageIter *iter,
               if (dbus_type_is_fixed (spec_element_type))
                 {
                   /* move the index forward */
-                  va_arg (copy_args, const DBusBasicValue **);
+                  va_arg (copy_args, const void **);
                   va_arg (copy_args, int *);
                 }
               else if (_DBUS_TYPE_IS_STRINGLIKE (spec_element_type))
@@ -1872,8 +1871,8 @@ dbus_message_append_args_valist (DBusMessage *message,
     {
       if (dbus_type_is_basic (type))
         {
-          const DBusBasicValue *value;
-          value = va_arg (var_args, const DBusBasicValue*);
+          const void *value;
+          value = va_arg (var_args, const void *);
 
           if (!dbus_message_iter_append_basic (&iter,
                                                type,
@@ -1899,10 +1898,10 @@ dbus_message_append_args_valist (DBusMessage *message,
           if (dbus_type_is_fixed (element_type) &&
               element_type != DBUS_TYPE_UNIX_FD)
             {
-              const DBusBasicValue **value;
+              const void **value;
               int n_elements;
 
-              value = va_arg (var_args, const DBusBasicValue**);
+              value = va_arg (var_args, const void **);
               n_elements = va_arg (var_args, int);
               
               if (!dbus_message_iter_append_fixed_array (&array,
