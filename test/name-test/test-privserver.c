@@ -34,7 +34,7 @@ new_connection_callback (DBusServer     *server,
     dbus_connection_close (new_connection);
 }
 
-static DBusHandlerResult 
+static DBusHandlerResult
 filter_session_message (DBusConnection     *connection,
                         DBusMessage        *message,
                         void               *user_data)
