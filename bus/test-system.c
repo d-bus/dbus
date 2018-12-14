@@ -64,9 +64,6 @@ main (int argc, char **argv)
 
   _dbus_string_init_const (&test_data_dir, dir);
 
-  if (!_dbus_threads_init_debug ())
-    _dbus_test_fatal ("OOM initializing debug threads");
-
   test_pre_hook ();
   _dbus_test_diag ("%s: Running config file parser (trivial) test", argv[0]);
   if (!bus_config_parser_trivial_test (&test_data_dir))
