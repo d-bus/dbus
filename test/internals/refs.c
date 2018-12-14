@@ -220,8 +220,9 @@ setup (Fixture *f,
        * Do fewer iterations:  enough to demonstrate that it works,
        * rather than seriously trying to reproduce race conditions.
        */
-      f->n_threads = 10;
-      f->n_refs = 10;
+      f->n_threads = 100;
+      f->n_refs = 1000;
+      g_info ("reducing number of threads/refs to %d/%d", f->n_threads, f->n_refs);
     }
 #endif
   f->loop = _dbus_loop_new ();
