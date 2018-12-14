@@ -5,6 +5,7 @@
 /autom4te.cache
 /build-aux/
 /bus/tmpfiles.d/dbus.conf
+/cmake/DBus1Config*.cmake
 /config.cache
 /config.h
 /config.h.in

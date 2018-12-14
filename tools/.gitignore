@@ -4,5 +4,6 @@
 /dbus-run-session
 /dbus-send
 /dbus-test-tool
+/dbus-update-activation-environment
 /dbus-uuidgen
 /run-with-tmp-session-bus.conf

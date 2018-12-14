@@ -7,12 +7,16 @@
 /dbus.socket
 /example-session-disable-stats.conf
 /example-system-enable-stats.conf
+/legacy-config/*.conf
 /messagebus
 /messagebus-config
 /org.freedesktop.dbus-session.plist
 /rc.messagebus
 /session.conf
 /system.conf
+/systemd-user/dbus.service
+/systemd-user/dbus.socket
+/sysusers.d/dbus.conf
 /test-bus
 /test-bus-launch-helper
 /test-bus-system
