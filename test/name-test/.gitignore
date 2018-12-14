@@ -1,4 +1,3 @@
-echo-error-output.tmp
 tmp-session-bus.*.conf
 test-ids
 test-names

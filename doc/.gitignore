@@ -2,7 +2,6 @@
 *.1.xml
 *.1.html
 api
-dbus.devhelp
 /dbus.devhelp2
 dbus-specification.html
 dbus-test-plan.html

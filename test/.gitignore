@@ -1,15 +1,10 @@
-echo-server
-echo-client
 test-bus
-unbase64
-break-loader
 test-spawn
 test-corrupt
 test-exit
 test-segfault
 test-service
 test-sleep-forever
-decode-gcov
 test-shell
 test-shell-service
 test-names
