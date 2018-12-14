@@ -1,4 +1,4 @@
-/tmp-session-bus.*.conf
+/test-autolaunch
 /test-ids
 /test-names
 /test-pending-call-dispatch
@@ -6,4 +6,4 @@
 /test-privserver-client
 /test-shutdown
 /test-threads-init
-/test-autolaunch
+/tmp-session-bus.*.conf

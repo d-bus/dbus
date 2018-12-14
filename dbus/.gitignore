@@ -1,4 +1,4 @@
-/test-dbus
-/dbus-arch-deps.h
 /.dbus-keyrings
+/dbus-arch-deps.h
+/test-dbus
 /versioninfo.rc
