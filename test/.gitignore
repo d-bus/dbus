@@ -1,18 +1,7 @@
-.deps
-.libs
-Makefile
-Makefile.in
-*.lo
-*.la
-*.o
 echo-server
 echo-client
 test-bus
 unbase64
-*.bb
-*.bbg
-*.da
-*.gcov
 break-loader
 test-spawn
 test-corrupt
@@ -37,4 +26,3 @@ test-printf
 test-refs
 test-syntax
 test-syslog
-internals/.dirstamp

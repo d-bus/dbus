@@ -30,11 +30,16 @@
 *.gcda
 *.gcno
 *.gcov
+*.la
+*.lo
 *.o
 *.orig
 *.rej
 *~
 .*.sw?
+.deps/
+.dirstamp
+.libs/
 Makefile
 Makefile.in
 cscope.out

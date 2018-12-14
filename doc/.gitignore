@@ -1,13 +1,6 @@
-.deps
-.libs
-Makefile
-Makefile.in
 *.1
 *.1.xml
 *.1.html
-*.lo
-*.la
-*.o
 api
 dbus.devhelp
 /dbus.devhelp2
