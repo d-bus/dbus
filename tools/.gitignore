@@ -1,8 +1,8 @@
-dbus-send
-dbus-monitor
-dbus-cleanup-sockets
-dbus-launch
-dbus-uuidgen
-dbus-run-session
-run-with-tmp-session-bus.conf
-dbus-test-tool
+/dbus-send
+/dbus-monitor
+/dbus-cleanup-sockets
+/dbus-launch
+/dbus-uuidgen
+/dbus-run-session
+/run-with-tmp-session-bus.conf
+/dbus-test-tool
