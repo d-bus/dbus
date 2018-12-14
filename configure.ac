@@ -1556,12 +1556,10 @@ AC_ARG_WITH(dbus-test-dir, AS_HELP_STRING([--with-dbus-test-dir=[dirname]],[path
 			   DBUS_PWD=$withval)
 
 DBUS_TEST_EXEC="$DBUS_PWD/test"
-DBUS_NAME_TEST_EXEC="$DBUS_PWD/test/name-test"
 DBUS_TEST_DATA="$DBUS_PWD/test/data"
 
 AC_SUBST([DBUS_TEST_DATA])
 AC_SUBST([DBUS_TEST_EXEC])
-AC_SUBST([DBUS_NAME_TEST_EXEC])
 
 AC_DEFINE_UNQUOTED([DBUS_EXEEXT], ["$EXEEXT"],
                    [Extension for executables, typically empty or .exe])

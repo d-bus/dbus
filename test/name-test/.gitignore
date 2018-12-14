@@ -8,7 +8,6 @@ test-ids
 test-names
 test-pending-call-dispatch
 test-pending-call-timeout
-test-privserver
 test-privserver-client
 test-shutdown
 test-threads-init
