@@ -278,19 +278,20 @@ ENABLE_TESTING()
 #endif(${generatedFileInSourceDir})
 #########################################################################
 
-if (WIN32 OR CYGWIN)
-	set (LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR}/bin)
-else (WIN32 OR CYGWIN)
-	set (LIBRARY_OUTPUT_PATH  ${CMAKE_BINARY_DIR}/lib)
-endif (WIN32 OR CYGWIN)
-
-set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+########### build output path definitions ###############
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+if(WIN32 OR CYGWIN)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
+set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # for including config.h and for includes like <dir/foo.h>
 include_directories( ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR} ${CMAKE_INCLUDE_PATH} )
 
 # linker search directories
-link_directories(${DBUS_LIB_DIR} ${LIBRARY_OUTPUT_PATH} )
+link_directories(${DBUS_LIB_DIR} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} )
 include_directories( ${CMAKE_LIBRARY_PATH}  )
 
 set(DBUS_INCLUDES)
@@ -482,9 +483,9 @@ add_definitions(${DBUS_BUS_CFLAGS})
 
 if (DBUS_BUILD_TESTS)
     # set variables used for the .in files (substituted by configure_file) in test/data:
-    set(DBUS_TEST_EXEC ${Z_DRIVE_IF_WINE}${EXECUTABLE_OUTPUT_PATH}${IDE_BIN})
+    set(DBUS_TEST_EXEC ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN})
     set(DBUS_TEST_DATA ${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/test/data)
-    set(TEST_LAUNCH_HELPER_BINARY ${Z_DRIVE_IF_WINE}${EXECUTABLE_OUTPUT_PATH}/dbus-daemon-launch-helper-test)
+    set(TEST_LAUNCH_HELPER_BINARY ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/dbus-daemon-launch-helper-test)
     if (UNIX)
         set(TEST_SOCKET_DIR ${DBUS_SESSION_SOCKET_DIR})
         set(TEST_LISTEN "unix:tmpdir=${TEST_SOCKET_DIR}")
