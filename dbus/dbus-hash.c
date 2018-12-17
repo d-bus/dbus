@@ -1,17 +1,17 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* dbus-hash.c Generic hash table utility (internal to D-Bus implementation)
- * 
+ *
  * Copyright (C) 2002  Red Hat, Inc.
  * Copyright (c) 1991-1993 The Regents of the University of California.
  * Copyright (c) 1994 Sun Microsystems, Inc.
- * 
+ *
  * Hash table implementation based on generic/tclHash.c from the Tcl
  * source code. The original Tcl license applies to portions of the
- * code from tclHash.c; the Tcl license follows this standad D-Bus 
+ * code from tclHash.c; the Tcl license follows this standad D-Bus
  * license information.
  *
  * Licensed under the Academic Free License version 2.1
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -21,13 +21,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  */
-/* 
+/*
  * The following copyright applies to code from the Tcl distribution.
  *
  * Copyright (c) 1991-1993 The Regents of the University of California.
@@ -37,7 +37,7 @@
  * California, Sun Microsystems, Inc., Scriptics Corporation, and
  * other parties.  The following terms apply to all files associated
  * with the software unless explicitly disclaimed in individual files.
- * 
+ *
  * The authors hereby grant permission to use, copy, modify,
  * distribute, and license this software and its documentation for any
  * purpose, provided that existing copyright notices are retained in
@@ -47,20 +47,20 @@
  * software may be copyrighted by their authors and need not follow
  * the licensing terms described here, provided that the new terms are
  * clearly indicated on the first page of each file where they apply.
- * 
+ *
  * IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY
  * PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
  * DAMAGES ARISING OUT OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION,
  * OR ANY DERIVATIVES THEREOF, EVEN IF THE AUTHORS HAVE BEEN ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
- * 
+ *
  * THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES,
  * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
  * NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN "AS IS" BASIS,
  * AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
  * MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- * 
+ *
  * GOVERNMENT USE: If you are acquiring this software on behalf of the
  * U.S. government, the Government shall have only "Restricted Rights"
  * in the software and related documentation as defined in the Federal
