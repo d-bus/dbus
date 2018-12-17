@@ -126,7 +126,7 @@ _dbus_credentials_test (const char *test_data_dir)
   DBusString str;
   const dbus_gid_t *gids;
   size_t n;
-  
+
   if (test_data_dir == NULL)
     return TRUE;
 
@@ -137,7 +137,7 @@ _dbus_credentials_test (const char *test_data_dir)
   /* test refcounting */
   _dbus_credentials_ref (creds);
   _dbus_credentials_unref (creds);
-  
+
   _dbus_assert (_dbus_credentials_include (creds, DBUS_CREDENTIAL_UNIX_USER_ID));
   _dbus_assert (_dbus_credentials_include (creds, DBUS_CREDENTIAL_UNIX_PROCESS_ID));
   _dbus_assert (_dbus_credentials_include (creds, DBUS_CREDENTIAL_UNIX_GROUP_IDS));
@@ -168,7 +168,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (_dbus_credentials_get_unix_uid (creds2) == 12);
   _dbus_assert (_dbus_credentials_get_pid (creds2) == 511);
-  _dbus_assert (strcmp (_dbus_credentials_get_windows_sid (creds2), SAMPLE_SID) == 0);  
+  _dbus_assert (strcmp (_dbus_credentials_get_windows_sid (creds2), SAMPLE_SID) == 0);
   _dbus_assert (_dbus_credentials_get_unix_gids (creds2, &gids, &n));
   _dbus_assert (n == 4);
   _dbus_assert (gids[0] == 42);
@@ -177,9 +177,9 @@ _dbus_credentials_test (const char *test_data_dir)
   _dbus_assert (gids[3] == 5678);
 
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
-  
+
   /* Same user if both unix and windows are the same */
   creds2 = make_credentials (12, DBUS_PID_UNSET, 0, SAMPLE_SID);
   if (creds2 == NULL)
@@ -196,7 +196,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
 
   /* Not the same user if Windows is different */
@@ -206,7 +206,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (!_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
 
   /* Not the same user if Unix is missing */
@@ -216,7 +216,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
 
   /* Not the same user if Unix is different */
@@ -226,7 +226,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (!_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
 
   /* Not the same user if both are missing */
@@ -236,7 +236,7 @@ _dbus_credentials_test (const char *test_data_dir)
 
   _dbus_assert (!_dbus_credentials_same_user (creds, creds2));
   _dbus_assert (_dbus_credentials_are_superset (creds, creds2));
-  
+
   _dbus_credentials_unref (creds2);
 
   /* Same user, but not a superset, if groups are different */
