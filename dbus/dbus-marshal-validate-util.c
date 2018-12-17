@@ -433,7 +433,7 @@ _dbus_marshal_validate_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
   _dbus_string_free (&str);
 
   /* Body validation; test basic validation of valid bodies for both endian */
-  
+
   {
     int sequence;
     DBusString signature;
@@ -465,7 +465,7 @@ _dbus_marshal_validate_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
         _dbus_string_set_length (&body, 0);
         ++sequence;
       }
-                                                     
+
     sequence = 0;
     while (_dbus_test_generate_bodies (sequence, DBUS_BIG_ENDIAN,
                                        &signature, &body))
@@ -493,7 +493,7 @@ _dbus_marshal_validate_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
     _dbus_string_free (&signature);
     _dbus_string_free (&body);
   }
-  
+
   return TRUE;
 }
 

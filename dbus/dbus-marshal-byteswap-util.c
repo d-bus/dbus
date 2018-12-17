@@ -41,7 +41,7 @@ do_byteswap_test (int byte_order)
     _dbus_test_fatal ("oom");
 
   opposite_order = byte_order == DBUS_LITTLE_ENDIAN ? DBUS_BIG_ENDIAN : DBUS_LITTLE_ENDIAN;
-  
+
   sequence = 0;
   while (_dbus_test_generate_bodies (sequence, byte_order, &signature, &body))
     {
@@ -64,7 +64,7 @@ do_byteswap_test (int byte_order)
                               &body, 0);
       _dbus_type_reader_init (&copy_reader, opposite_order, &signature, 0,
                               &copy, 0);
-      
+
       if (!_dbus_type_reader_equal_values (&body_reader, &copy_reader))
         {
           _dbus_verbose_bytes_of_string (&signature, 0,
@@ -76,9 +76,9 @@ do_byteswap_test (int byte_order)
 
           _dbus_test_fatal ("Byte-swapped data did not have same values as original data");
         }
-      
+
       _dbus_string_free (&copy);
-      
+
       _dbus_string_set_length (&signature, 0);
       _dbus_string_set_length (&body, 0);
       ++sequence;
