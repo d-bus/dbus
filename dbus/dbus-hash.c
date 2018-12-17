@@ -1,9 +1,14 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* dbus-hash.c Generic hash table utility (internal to D-Bus implementation)
  *
- * Copyright (C) 2002  Red Hat, Inc.
- * Copyright (c) 1991-1993 The Regents of the University of California.
- * Copyright (c) 1994 Sun Microsystems, Inc.
+ * Copyright 1991-1993 The Regents of the University of California.
+ * Copyright 1994 Sun Microsystems, Inc.
+ * Copyright 2002-2005 Red Hat, Inc.
+ * Copyright 2003 Joe Shaw
+ * Copyright 2006 Sjoerd Simons
+ * Copyright 2010 Fridrich Štrba
+ * Copyright 2016 Ralf Habacker
+ * Copyright 2017 Endless Mobile, Inc.
  *
  * Hash table implementation based on generic/tclHash.c from the Tcl
  * source code. The original Tcl license applies to portions of the
