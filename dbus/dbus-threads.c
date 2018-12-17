@@ -445,10 +445,4 @@ dbus_threads_init_default (void)
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
-dbus_bool_t
-_dbus_threads_init_debug (void)
-{
-  return dbus_threads_init (NULL);
-}
-
 #endif /* DBUS_ENABLE_EMBEDDED_TESTS */

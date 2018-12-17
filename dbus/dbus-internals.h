@@ -406,9 +406,6 @@ void        _dbus_unlock (DBusGlobalLock lock);
 #define _DBUS_UNLOCK(name)              _dbus_unlock (_DBUS_LOCK_##name)
 
 DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_threads_init_debug (void);
-
-DBUS_PRIVATE_EXPORT
 dbus_bool_t   _dbus_address_append_escaped (DBusString       *escaped,
                                             const DBusString *unescaped);
 

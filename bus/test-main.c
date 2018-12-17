@@ -108,9 +108,6 @@ main (int argc, char **argv)
   _dbus_close_all ();
 #endif
 
-  if (!_dbus_threads_init_debug ())
-    _dbus_test_fatal ("OOM initializing debug threads");
-
   test_one ("expire-list", bus_expire_list_test);
   test_one ("config-parser", bus_config_parser_test);
   test_one ("signals", bus_signals_test);

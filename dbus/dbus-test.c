@@ -90,9 +90,6 @@ void
 _dbus_run_tests (const char   *test_data_dir,
                  const char   *specific_test)
 {
-  if (!_dbus_threads_init_debug ())
-    _dbus_test_fatal ("debug threads init failed");
-
   if (test_data_dir == NULL)
     test_data_dir = _dbus_getenv ("DBUS_TEST_DATA");
 
