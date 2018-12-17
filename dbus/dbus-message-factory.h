@@ -35,7 +35,7 @@ DBUS_BEGIN_DECLS
 typedef struct
 {
   DBusValidity expected_validity;
-  
+
   DBusString data;
 
 } DBusMessageData;
