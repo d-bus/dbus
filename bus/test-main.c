@@ -1,7 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* test-main.c  main() for make check
  *
- * Copyright (C) 2003 Red Hat, Inc.
+ * Copyright 2003-2009 Red Hat, Inc.
+ * Copyright 2011-2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
  *

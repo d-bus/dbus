@@ -1,7 +1,8 @@
 /* -*- mode: C; c-file-style: "gnu" -*- */
 /* test-main.c  main() for make check
  *
- * Copyright (C) 2003 Red Hat, Inc.
+ * Copyright 2003-2007 Red Hat, Inc.
+ * Copyright 2013-2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
  *
