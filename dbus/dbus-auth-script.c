@@ -71,7 +71,7 @@ append_quoted_string (DBusString       *dest,
       if (in_backslash)
         {
           unsigned char a;
-          
+
           if (b == 'r')
             a = '\r';
           else if (b == 'n')
@@ -86,7 +86,7 @@ append_quoted_string (DBusString       *dest,
 
           if (!_dbus_string_append_byte (dest, a))
             return FALSE;
-          
+
           in_backslash = FALSE;
         }
       else if (b == '\\')
@@ -115,7 +115,7 @@ append_quoted_string (DBusString       *dest,
                 return FALSE;
             }
         }
-      
+
       ++i;
     }
 
@@ -139,7 +139,7 @@ same_first_word (const DBusString *a,
 
 static DBusAuthState
 auth_state_from_string (const DBusString *str)
-{ 
+{
   if (_dbus_string_starts_with_c_str (str, "WAITING_FOR_INPUT"))
     return DBUS_AUTH_STATE_WAITING_FOR_INPUT;
   else if (_dbus_string_starts_with_c_str (str, "WAITING_FOR_MEMORY"))
@@ -270,13 +270,13 @@ _dbus_auth_script_run (const DBusString *filename)
   DBusAuthState state;
   DBusString context;
   DBusString guid;
-  
+
   retval = FALSE;
   auth = NULL;
 
   _dbus_string_init_const (&guid, "5fa01f4202cd837709a3274ca0df9d00");
   _dbus_string_init_const (&context, "org_freedesktop_test");
-  
+
   if (!_dbus_string_init (&file))
     return FALSE;
 
@@ -305,11 +305,11 @@ _dbus_auth_script_run (const DBusString *filename)
 
  next_iteration:
   while (_dbus_string_pop_line (&file, &line))
-    {      
+    {
       line_no += 1;
 
       /* _dbus_warn ("%s", _dbus_string_get_const_data (&line)); */
-      
+
       _dbus_string_delete_leading_blanks (&line);
 
       if (auth != NULL)
@@ -328,7 +328,7 @@ _dbus_auth_script_run (const DBusString *filename)
                 }
             }
         }
-      
+
       if (_dbus_string_get_length (&line) == 0)
         {
           /* empty line */
@@ -376,7 +376,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "CLIENT"))
         {
           DBusCredentials *creds;
-          
+
           if (auth != NULL)
             {
               _dbus_warn ("already created a DBusAuth (CLIENT or SERVER given twice)");
@@ -402,7 +402,7 @@ _dbus_auth_script_run (const DBusString *filename)
               auth = NULL;
               goto out;
             }
-              
+
           if (!_dbus_auth_set_credentials (auth, creds))
             {
               _dbus_warn ("no memory for setting credentials");
@@ -411,14 +411,14 @@ _dbus_auth_script_run (const DBusString *filename)
               _dbus_credentials_unref (creds);
               goto out;
             }
-          
+
           _dbus_credentials_unref (creds);
         }
       else if (_dbus_string_starts_with_c_str (&line,
                                                "SERVER"))
         {
           DBusCredentials *creds;
-          
+
           if (auth != NULL)
             {
               _dbus_warn ("already created a DBusAuth (CLIENT or SERVER given twice)");
@@ -444,7 +444,7 @@ _dbus_auth_script_run (const DBusString *filename)
               auth = NULL;
               goto out;
             }
-              
+
           if (!_dbus_auth_set_credentials (auth, creds))
             {
               _dbus_warn ("no memory for setting credentials");
@@ -453,7 +453,7 @@ _dbus_auth_script_run (const DBusString *filename)
               _dbus_credentials_unref (creds);
               goto out;
             }
-          
+
           _dbus_credentials_unref (creds);
 
           _dbus_auth_set_context (auth, &context);
@@ -493,7 +493,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "SEND"))
         {
           DBusString to_send;
-          
+
           _dbus_string_delete_first_word (&line);
 
           if (!_dbus_string_init (&to_send))
@@ -511,7 +511,7 @@ _dbus_auth_script_run (const DBusString *filename)
             }
 
           _dbus_verbose ("Sending '%s'\n", _dbus_string_get_const_data (&to_send));
-          
+
           if (!_dbus_string_append (&to_send, "\r\n"))
             {
               _dbus_warn ("failed to append \\r\\n from line %d",
@@ -523,7 +523,7 @@ _dbus_auth_script_run (const DBusString *filename)
           /* Replace USERID_HEX with our username in hex */
           {
             int where;
-            
+
             if (_dbus_string_find (&to_send, 0,
                                    "USERID_HEX", &where))
               {
@@ -545,7 +545,7 @@ _dbus_auth_script_run (const DBusString *filename)
                   }
 
                 _dbus_string_delete (&to_send, where, (int) strlen ("USERID_HEX"));
-                
+
                 if (!_dbus_string_hex_encode (&username, 0,
 					      &to_send, where))
                   {
@@ -571,7 +571,7 @@ _dbus_auth_script_run (const DBusString *filename)
                   }
 
                 _dbus_string_delete (&to_send, where, (int) strlen ("USERNAME_HEX"));
-                
+
                 if (!_dbus_string_hex_encode (username, 0,
 					      &to_send, where))
                   {
@@ -605,14 +605,14 @@ _dbus_auth_script_run (const DBusString *filename)
 
             _dbus_auth_return_buffer (auth, buffer);
           }
-          
+
           _dbus_string_free (&to_send);
         }
       else if (_dbus_string_starts_with_c_str (&line,
                                                "EXPECT_STATE"))
         {
           DBusAuthState expected;
-          
+
           _dbus_string_delete_first_word (&line);
 
           expected = auth_state_from_string (&line);
@@ -635,7 +635,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "EXPECT_COMMAND"))
         {
           DBusString received;
-          
+
           _dbus_string_delete_first_word (&line);
 
           if (!_dbus_string_init (&received))
@@ -661,7 +661,7 @@ _dbus_auth_script_run (const DBusString *filename)
               _dbus_string_free (&received);
               goto out;
             }
-          
+
           _dbus_string_free (&received);
         }
       else if (_dbus_string_starts_with_c_str (&line,
@@ -669,7 +669,7 @@ _dbus_auth_script_run (const DBusString *filename)
         {
           DBusString expected;
           const DBusString *unused;
-          
+
           _dbus_string_delete_first_word (&line);
 
           if (!_dbus_string_init (&expected))
@@ -687,7 +687,7 @@ _dbus_auth_script_run (const DBusString *filename)
             }
 
           _dbus_auth_get_unused_bytes (auth, &unused);
-          
+
           if (_dbus_string_equal (&expected, unused))
             {
               _dbus_auth_delete_unused_bytes (auth);
@@ -706,7 +706,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "EXPECT_HAVE_NO_CREDENTIALS"))
         {
           DBusCredentials *authorized_identity;
-          
+
           authorized_identity = _dbus_auth_get_identity (auth);
           if (!_dbus_credentials_are_anonymous (authorized_identity))
             {
@@ -718,7 +718,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "EXPECT_HAVE_SOME_CREDENTIALS"))
         {
           DBusCredentials *authorized_identity;
-          
+
           authorized_identity = _dbus_auth_get_identity (auth);
           if (_dbus_credentials_are_anonymous (authorized_identity))
             {
@@ -730,7 +730,7 @@ _dbus_auth_script_run (const DBusString *filename)
                                                "EXPECT"))
         {
           DBusString expected;
-          
+
           _dbus_string_delete_first_word (&line);
 
           if (!_dbus_string_init (&expected))
@@ -767,7 +767,7 @@ _dbus_auth_script_run (const DBusString *filename)
         goto parse_failed;
 
       goto next_iteration; /* skip parse_failed */
-      
+
     parse_failed:
       {
         _dbus_warn ("couldn't process line %d \"%s\"",
@@ -800,9 +800,9 @@ _dbus_auth_script_run (const DBusString *filename)
       _dbus_warn ("Leftover data: %s", _dbus_string_get_const_data (&from_auth));
       goto out;
     }
-  
+
   retval = TRUE;
-  
+
  out:
   if (auth)
     _dbus_auth_unref (auth);
@@ -810,7 +810,7 @@ _dbus_auth_script_run (const DBusString *filename)
   _dbus_string_free (&file);
   _dbus_string_free (&line);
   _dbus_string_free (&from_auth);
-  
+
   return retval;
 }
 
