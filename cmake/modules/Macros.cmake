@@ -59,11 +59,11 @@ macro(add_test_executable _target _source)
     set(_env)
     list(APPEND _env "DBUS_SESSION_BUS_ADDRESS=")
     list(APPEND _env "DBUS_FATAL_WARNINGS=1")
-    list(APPEND _env "DBUS_TEST_DAEMON=${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/bin/dbus-daemon${EXEEXT}")
-    list(APPEND _env "DBUS_TEST_DATA=${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/test/data")
-    list(APPEND _env "DBUS_TEST_DBUS_LAUNCH=${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/bin/dbus-launch${EXEEXT}")
+    list(APPEND _env "DBUS_TEST_DAEMON=${DBUS_TEST_DAEMON}")
+    list(APPEND _env "DBUS_TEST_DATA=${DBUS_TEST_DATA}")
+    list(APPEND _env "DBUS_TEST_DBUS_LAUNCH=${DBUS_TEST_DBUS_LAUNCH}")
     list(APPEND _env "DBUS_TEST_EXEC=${DBUS_TEST_EXEC}")
-    list(APPEND _env "DBUS_TEST_HOMEDIR=${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/dbus")
+    list(APPEND _env "DBUS_TEST_HOMEDIR=${DBUS_TEST_HOMEDIR}")
     list(APPEND _env "DBUS_TEST_UNINSTALLED=1")
     set_tests_properties(${_target} PROPERTIES ENVIRONMENT "${_env}")
 endmacro(add_test_executable)
@@ -78,6 +78,32 @@ macro(add_helper_executable _target _source)
     target_link_libraries(${_target} ${ARGN})
 endmacro(add_helper_executable)
 
+macro(add_session_test_executable _target _source)
+    set(_sources "${_source}")
+    if(WIN32 AND NOT MSVC)
+        # avoid triggering UAC
+        add_uac_manifest(_sources)
+    endif()
+    add_executable(${_target} ${_sources})
+    target_link_libraries(${_target} ${ARGN})
+    add_test(NAME ${_target}
+        COMMAND
+        ${TEST_WRAPPER}
+        ${DBUS_TEST_RUN_SESSION}
+        --config-file=${DBUS_TEST_DATA}/valid-config-files/tmp-session.conf
+        --dbus-daemon=${DBUS_TEST_DAEMON}
+        ${Z_DRIVE_IF_WINE}$<TARGET_FILE:${_target}>
+        --tap
+    )
+    set(_env)
+    list(APPEND _env "DBUS_SESSION_BUS_PID=")
+    list(APPEND _env "DBUS_SESSION_BUS_ADDRESS=")
+    list(APPEND _env "DBUS_FATAL_WARNINGS=1")
+    list(APPEND _env "DBUS_TEST_DAEMON=${DBUS_TEST_DAEMON}")
+    list(APPEND _env "DBUS_TEST_DATA=${DBUS_TEST_DATA}")
+    list(APPEND _env "DBUS_TEST_HOMEDIR=${DBUS_TEST_HOMEDIR}")
+    set_tests_properties(${_target} PROPERTIES ENVIRONMENT "${_env}")
+endmacro(add_session_test_executable)
 
 #
 # generate compiler flags from MSVC warning identifiers (e.g. '4114') or gcc warning keys (e.g. 'pointer-sign')
