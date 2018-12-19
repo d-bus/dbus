@@ -223,6 +223,21 @@ configured in the files "@EXPANDED_DATADIR@/dbus-1/system.conf" and
 overrides in those files to avoid modifying the primary configuration
 files.</para>
 
+<para>The standard system bus normally reads additional XML files from
+  <filename>@EXPANDED_DATADIR@/dbus-1/system.d</filename>. Third-party
+  packages should install the default policies necessary for correct
+  operation into that directory, which has been supported since dbus 1.10
+  (released in 2015).</para>
+
+<para>The standard system bus normally also reads XML files from
+  <filename>@EXPANDED_SYSCONFDIR@/dbus-1/system.d</filename>, which
+  should be used by system administrators if they wish to override
+  default policies.</para>
+
+<para>Third-party packages would historically install XML files into
+  <filename>@EXPANDED_SYSCONFDIR@/dbus-1/system.d</filename>, but this
+  practice is now considered to be deprecated: that directory should
+  be treated as reserved for the system administrator.</para>
 
 <para>The configuration file is an XML document. It must have the following
 doctype declaration:</para>
@@ -302,12 +317,10 @@ to be absent.</para>
 point. Files in the directory are included in undefined order.
 Only files ending in ".conf" are included.</para>
 
-
 <para>This is intended to allow extension of the system bus by particular
 packages. For example, if CUPS wants to be able to send out
 notification of printer queue changes, it could install a file to
-@EXPANDED_DATADIR@/dbus-1/system.d or
-@EXPANDED_SYSCONFDIR@/dbus-1/system.d that allowed all apps to receive
+@EXPANDED_DATADIR@/dbus-1/system.d that allowed all apps to receive
 this message and allowed the printer daemon user to send it.</para>
 
 <itemizedlist remap='TP'>
