@@ -1197,6 +1197,179 @@ signal to the daemon has no effect on the mediation mode.</para>
 
 </refsect1>
 
+<refsect1 id='session_services'>
+  <title>INTEGRATING SESSION SERVICES</title>
+
+  <para>
+    Integration files are not mandatory for session services: any program
+    with access to the session bus can request a well-known name and
+    provide D-Bus interfaces.
+  </para>
+
+  <para>
+    Many D-Bus session services support <firstterm>service
+    activation</firstterm>, a mechanism in which the
+    <command>dbus-daemon</command> can launch the service on-demand,
+    either by running the session service itself or by communicating
+    with <command>systemd --user</command>. This is set up by
+    creating a <firstterm>service file</firstterm> in the directory
+    <filename><replaceable>${datadir}</replaceable>/dbus-1/services</filename>,
+    for example:
+
+<programlisting>
+[D-BUS Service]
+Name=<replaceable>com.example.SessionService1</replaceable>
+Exec=<replaceable>/usr/bin/example-session-service</replaceable>
+# Optional
+SystemdService=<replaceable>example-session-service</replaceable>
+</programlisting>
+
+    See the
+    <ulink url="https://dbus.freedesktop.org/doc/dbus-specification.html">D-Bus
+      Specification</ulink> for details of the contents and interpretation
+    of service files.</para>
+
+  <para>If there is a service file for
+    <replaceable>com.example.SessionService1</replaceable>, it should be named
+    <filename><replaceable>com.example.SessionService1</replaceable>.service</filename>,
+    although for compatibility with legacy services this is not mandatory.
+  </para>
+
+  <para>Session services that declare the optional
+    <literal>SystemdService</literal> must also provide a systemd user
+    service unit file whose name or <literal>Alias</literal> matches the
+    <literal>SystemdService</literal> (see
+    <citerefentry>
+      <refentrytitle>systemd.unit</refentrytitle>
+      <manvolnum>5</manvolnum>
+    </citerefentry>,
+    <citerefentry>
+      <refentrytitle>systemd.service</refentrytitle>
+      <manvolnum>5</manvolnum>
+    </citerefentry> for further details on systemd service units), for
+    example:
+
+<programlisting>
+[Unit]
+Description=Example session service
+
+[Service]
+Type=dbus
+BusName=<replaceable>com.example.SessionService1</replaceable>
+ExecStart=<replaceable>/usr/bin/example-session-service</replaceable>
+</programlisting>
+  </para>
+</refsect1>
+
+<refsect1 id='system_services'>
+  <title>INTEGRATING SYSTEM SERVICES</title>
+
+  <para>
+    The standard system bus does not allow method calls or owning well-known
+    bus names by default, so a useful D-Bus system service will normally
+    need to configure a default security policy that allows it to work.
+    D-Bus system services should install a default policy file in
+    <filename><replaceable>${datadir}</replaceable>/dbus-1/service.d</filename>,
+    containing the policy rules necessary to make that system service
+    functional. A best-practice policy file will often look like this:
+
+<programlisting>
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE busconfig PUBLIC
+ "-//freedesktop//DTD D-BUS Bus Configuration 1.0//EN"
+ "http://www.freedesktop.org/standards/dbus/1.0/busconfig.dtd"&gt;
+&lt;busconfig&gt;
+  &lt;policy user="<replaceable>_example</replaceable>"&gt;
+    &lt;allow own="<replaceable>com.example.Example1</replaceable>"/&gt;
+  &lt;/policy&gt;
+
+  &lt;policy context="default"&gt;
+    &lt;allow send_destination="<replaceable>com.example.Example1</replaceable>"/&gt;
+  &lt;/policy&gt;
+&lt;/busconfig&gt;
+</programlisting>
+
+    where <replaceable>_example</replaceable> is the username of the
+    system uid that will run the system service daemon process, and
+    <replaceable>com.example.Example1</replaceable> is its well-known
+    bus name.</para>
+
+  <para>The policy file for <replaceable>com.example.Example1</replaceable>
+    should normally be named
+    <filename><replaceable>com.example.Example1</replaceable>.conf</filename>.
+  </para>
+
+  <para>Some existing system services rely on more complex &lt;policy&gt;
+    rules to control the messages that the service can receive. However,
+    the <command>dbus-daemon</command>'s policy language is not well-suited
+    to finer-grained policies: any policy has to be expressed in terms of
+    D-Bus interfaces and method names, not in terms of higher-level
+    domain-specific concepts like removable or built-in devices. It is
+    recommended that new services should normally accept method call messages
+    from all callers, then apply a sysadmin-controllable policy to decide
+    whether to obey the requests contained in those method call messages,
+    for example by consulting
+    <ulink url="https://www.freedesktop.org/wiki/Software/polkit/">polkit</ulink>.
+  </para>
+
+  <para>
+    Like session services, many D-Bus system services support service
+    activation, a mechanism in which the <command>dbus-daemon</command>
+    can launch the service on-demand, either by running the system service
+    itself or by communicating with <command>systemd</command>. This is set
+    up by creating a service file in the directory
+    <filename><replaceable>${datadir}</replaceable>/dbus-1/system-services</filename>,
+    for example:
+
+<programlisting>
+[D-BUS Service]
+Name=<replaceable>com.example.Example1</replaceable>
+Exec=<replaceable>/usr/sbin/example-service</replaceable>
+User=<replaceable>_example</replaceable>
+# Optional
+SystemdService=<replaceable>dbus-com.example.Example1.service</replaceable>
+</programlisting>
+
+    See the
+    <ulink url="https://dbus.freedesktop.org/doc/dbus-specification.html">D-Bus
+      Specification</ulink> for details of the contents and interpretation
+    of service files.</para>
+
+  <para>If there is a service file for
+    <replaceable>com.example.Example1</replaceable>, it must be named
+    <filename><replaceable>com.example.Example1</replaceable>.service</filename>.
+  </para>
+
+  <para>System services that declare the optional
+    <literal>SystemdService</literal> must also provide a systemd
+    service unit file whose name or <literal>Alias</literal> matches the
+    <literal>SystemdService</literal> (see
+    <citerefentry>
+      <refentrytitle>systemd.unit</refentrytitle>
+      <manvolnum>5</manvolnum>
+    </citerefentry>,
+    <citerefentry>
+      <refentrytitle>systemd.service</refentrytitle>
+      <manvolnum>5</manvolnum>
+    </citerefentry> for further details on systemd service units), for
+    example:
+
+<programlisting>
+[Unit]
+Description=Example service
+
+[Service]
+Type=dbus
+BusName=<replaceable>com.example.Example1</replaceable>
+ExecStart=<replaceable>/usr/sbin/example-service</replaceable>
+
+[Install]
+WantedBy=multi-user.target
+Alias=dbus-<replaceable>com.example.Example1</replaceable>.service
+</programlisting>
+  </para>
+</refsect1>
+
 <refsect1 id='selinux'><title>SELinux</title>
 <para>See <ulink url='http://www.nsa.gov/selinux/'>http://www.nsa.gov/selinux/</ulink> for full details on SELinux. Some useful excerpts:</para>
 
