@@ -1,6 +1,21 @@
 dbus 1.13.10 (UNRELEASED)
 =========================
 
+Deprecations:
+
+• Third-party software should install default dbus policies for the system
+  bus into ${datadir}/dbus-1/system.d (this has been supported since dbus
+  1.10, released in August 2015). Installing default dbus policies in
+  ${sysconfdir}/dbus-1/system.d is now considered to be deprecated. Policy
+  files in ${sysconfdir}/dbus-1/system.d continue to be read, but this
+  directory should only be used by system administrators wishing to
+  override the default policies.
+
+  The ${datadir} applicable to dbus is usually /usr/share and the
+  ${sysconfdir} is usually /etc.
+
+• A similar pattern applies to the session bus policies in session.d.
+
 Fixes:
 
 • Avoid possible memory corruption in certain DBusHashTableIter use
