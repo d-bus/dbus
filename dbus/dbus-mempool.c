@@ -629,7 +629,7 @@ time_for_size (int size)
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_mem_pool_test (void)
+_dbus_mem_pool_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   int i;
   int element_sizes[] = { 4, 8, 16, 50, 124 };

@@ -5023,23 +5023,27 @@ bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 #endif
 
 dbus_bool_t
-bus_dispatch_test (const DBusString *test_data_dir)
+bus_dispatch_test (const char *test_data_dir_cstr)
 {
+  DBusString test_data_dir;
+
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
+
   /* run normal activation tests */
   _dbus_verbose ("Normal activation tests\n");
-  if (!bus_dispatch_test_conf (test_data_dir,
+  if (!bus_dispatch_test_conf (&test_data_dir,
   			       "valid-config-files/debug-allow-all.conf", FALSE))
     return FALSE;
 
 #ifndef DBUS_WIN
   /* run launch-helper activation tests */
   _dbus_verbose ("Launch helper activation tests\n");
-  if (!bus_dispatch_test_conf (test_data_dir,
+  if (!bus_dispatch_test_conf (&test_data_dir,
   			       "valid-config-files-system/debug-allow-all-pass.conf", TRUE))
     return FALSE;
 
   /* run select launch-helper activation tests on broken service files */
-  if (!bus_dispatch_test_conf_fail (test_data_dir,
+  if (!bus_dispatch_test_conf_fail (&test_data_dir,
   			            "valid-config-files-system/debug-allow-all-fail.conf"))
     return FALSE;
 #endif
@@ -5048,18 +5052,20 @@ bus_dispatch_test (const DBusString *test_data_dir)
 }
 
 dbus_bool_t
-bus_dispatch_sha1_test (const DBusString *test_data_dir)
+bus_dispatch_sha1_test (const char *test_data_dir_cstr)
 {
+  DBusString test_data_dir;
   BusContext *context;
   DBusConnection *foo;
   DBusError error;
 
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
   dbus_error_init (&error);
 
   /* Test SHA1 authentication */
   _dbus_verbose ("Testing SHA1 context\n");
 
-  context = bus_context_new_test (test_data_dir,
+  context = bus_context_new_test (&test_data_dir,
                                   "valid-config-files/debug-allow-all-sha1.conf");
   if (context == NULL)
     return FALSE;
@@ -5092,11 +5098,11 @@ bus_dispatch_sha1_test (const DBusString *test_data_dir)
   return TRUE;
 }
 
-#ifdef HAVE_UNIX_FD_PASSING
-
 dbus_bool_t
-bus_unix_fds_passing_test(const DBusString *test_data_dir)
+bus_unix_fds_passing_test (const char *test_data_dir_cstr)
 {
+#ifdef HAVE_UNIX_FD_PASSING
+  DBusString test_data_dir;
   BusContext *context;
   DBusConnection *foo, *bar;
   DBusError error;
@@ -5105,9 +5111,11 @@ bus_unix_fds_passing_test(const DBusString *test_data_dir)
   int x, y, z;
   char r;
 
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
   dbus_error_init (&error);
 
-  context = bus_context_new_test (test_data_dir, "valid-config-files/debug-allow-all.conf");
+  context = bus_context_new_test (&test_data_dir,
+                                  "valid-config-files/debug-allow-all.conf");
   if (context == NULL)
     _dbus_test_fatal ("could not alloc context");
 
@@ -5239,8 +5247,10 @@ bus_unix_fds_passing_test(const DBusString *test_data_dir)
 
   bus_context_unref (context);
 
+#else
+  _dbus_test_skip ("fd-passing not supported on this platform");
+#endif
   return TRUE;
 }
-#endif
 
 #endif /* DBUS_ENABLE_EMBEDDED_TESTS */

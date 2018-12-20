@@ -1631,7 +1631,7 @@ steal (void *ptr)
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_hash_test (void)
+_dbus_hash_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   int i;
   DBusHashTable *table1;

@@ -368,7 +368,7 @@ test_free_slot_data_func (void *data)
  * Test function for data slots
  */
 dbus_bool_t
-_dbus_data_slot_test (void)
+_dbus_data_slot_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusDataSlotAllocator allocator;
   DBusDataSlotList list;

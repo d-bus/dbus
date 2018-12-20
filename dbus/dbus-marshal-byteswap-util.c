@@ -92,7 +92,7 @@ do_byteswap_test (int byte_order)
 }
 
 dbus_bool_t
-_dbus_marshal_byteswap_test (void)
+_dbus_marshal_byteswap_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   do_byteswap_test (DBUS_LITTLE_ENDIAN);
   do_byteswap_test (DBUS_BIG_ENDIAN);

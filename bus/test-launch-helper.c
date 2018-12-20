@@ -25,11 +25,9 @@
 #include "test.h"
 #include "activation-helper.h"
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <dbus/dbus-internals.h>
-#include <dbus/dbus-misc.h>
 #include <dbus/dbus-test-tap.h>
+#include <dbus/dbus-test-wrappers.h>
 
 #if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
 #error This file is only relevant for the embedded tests on Unix
@@ -72,24 +70,13 @@ bus_activation_helper_oom_test (void        *data,
 
 #endif
 
-int
-main (int argc, char **argv)
+static dbus_bool_t
+bus_activation_helper_test (const char *test_data_dir)
 {
-  const char *dir;
   DBusString config_file;
 
-  if (argc > 1 && strcmp (argv[1], "--tap") != 0)
-    dir = argv[1];
-  else
-    dir = _dbus_getenv ("DBUS_TEST_DATA");
-
-  if (dir == NULL)
-    _dbus_test_fatal ("Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable");
-
-  _dbus_test_diag ("%s: Running launch helper OOM checks", argv[0]);
-
   if (!_dbus_string_init (&config_file) ||
-      !_dbus_string_append (&config_file, dir) ||
+      !_dbus_string_append (&config_file, test_data_dir) ||
       !_dbus_string_append (&config_file, "/valid-config-files-system/debug-allow-all-pass.conf"))
     _dbus_test_fatal ("OOM during initialization");
 
@@ -105,9 +92,20 @@ main (int argc, char **argv)
     _dbus_test_fatal ("OOM test failed");
 
   /* ... otherwise it must have passed */
-  _dbus_test_ok ("%s", argv[0]);
+  return TRUE;
+}
 
-  _dbus_test_check_memleaks (argv[0]);
+static DBusTestCase test =
+{
+  "activation-helper",
+  bus_activation_helper_test,
+};
 
-  return _dbus_test_done_testing ();
+int
+main (int argc, char **argv)
+{
+  return _dbus_test_main (argc, argv, 1, &test,
+                          (DBUS_TEST_FLAGS_REQUIRE_DATA |
+                           DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS),
+                          NULL, NULL);
 }

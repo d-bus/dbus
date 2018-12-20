@@ -411,7 +411,7 @@ _dbus_transport_open_platform_specific (DBusAddressEntry  *entry,
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
 dbus_bool_t
-_dbus_transport_unix_test (void)
+_dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusConnection *c;
   DBusError error;

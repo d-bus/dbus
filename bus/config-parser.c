@@ -3990,16 +3990,19 @@ test_default_system_servicedirs (void)
 #endif
 		   
 dbus_bool_t
-bus_config_parser_test (const DBusString *test_data_dir)
+bus_config_parser_test (const char *test_data_dir_cstr)
 {
-  if (test_data_dir == NULL ||
-      _dbus_string_get_length (test_data_dir) == 0)
+  DBusString test_data_dir;
+
+  if (test_data_dir_cstr == NULL || test_data_dir_cstr[0] == '\0')
     {
       _dbus_test_diag ("No test data");
       return TRUE;
     }
 
-  if (!test_default_session_servicedirs (test_data_dir))
+  _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
+
+  if (!test_default_session_servicedirs (&test_data_dir))
     return FALSE;
 
 #ifdef DBUS_WIN
@@ -4009,18 +4012,21 @@ bus_config_parser_test (const DBusString *test_data_dir)
     return FALSE;
 #endif
 
-  if (!process_test_valid_subdir (test_data_dir, "valid-config-files", VALID))
+  if (!process_test_valid_subdir (&test_data_dir, "valid-config-files",
+                                  VALID))
     return FALSE;
 
 #ifndef DBUS_WIN
-  if (!process_test_valid_subdir (test_data_dir, "valid-config-files-system", VALID))
+  if (!process_test_valid_subdir (&test_data_dir,
+                                  "valid-config-files-system", VALID))
     return FALSE;
 #endif
 
-  if (!process_test_valid_subdir (test_data_dir, "invalid-config-files", INVALID))
+  if (!process_test_valid_subdir (&test_data_dir, "invalid-config-files",
+                                  INVALID))
     return FALSE;
 
-  if (!process_test_equiv_subdir (test_data_dir, "equiv-config-files"))
+  if (!process_test_equiv_subdir (&test_data_dir, "equiv-config-files"))
     return FALSE;
 
   return TRUE;

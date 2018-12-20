@@ -226,7 +226,7 @@ _DBUS_STRING_DEFINE_STATIC (test_static_string, "hello");
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_string_test (void)
+_dbus_string_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusString str = _DBUS_STRING_INIT_INVALID;
   DBusString other;

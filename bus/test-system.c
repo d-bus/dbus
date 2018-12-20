@@ -22,56 +22,27 @@
  */
 
 #include <config.h>
+
 #include "test.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <dbus/dbus-string.h>
-#include <dbus/dbus-sysdeps.h>
-#include <dbus/dbus-internals.h>
+
 #include <dbus/dbus-test-tap.h>
+#include <dbus/dbus-test-wrappers.h>
 
 #if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
 #error This file is only relevant for the embedded tests on Unix
 #endif
 
-static void
-test_pre_hook (void)
+static DBusTestCase test =
 {
-}
-
-static const char *progname = "";
-static void
-test_post_hook (void)
-{
-  _dbus_test_check_memleaks (progname);
-}
+  "config-parser-trivial",
+  bus_config_parser_trivial_test
+};
 
 int
 main (int argc, char **argv)
 {
-  const char *dir;
-  DBusString test_data_dir;
-
-  progname = argv[0];
-
-  if (argc > 1 && strcmp (argv[1], "--tap") != 0)
-    dir = argv[1];
-  else
-    dir = _dbus_getenv ("DBUS_TEST_DATA");
-
-  if (dir == NULL)
-    _dbus_test_fatal ("Must specify test data directory as argv[1] or in DBUS_TEST_DATA env variable");
-
-  _dbus_string_init_const (&test_data_dir, dir);
-
-  test_pre_hook ();
-  _dbus_test_diag ("%s: Running config file parser (trivial) test", argv[0]);
-  if (!bus_config_parser_trivial_test (&test_data_dir))
-    _dbus_test_fatal ("OOM creating parser");
-
-  /* All failure modes for this test are currently fatal */
-  _dbus_test_ok ("%s", argv[0]);
-  test_post_hook ();
-
-  return _dbus_test_done_testing ();
+  return _dbus_test_main (argc, argv, 1, &test,
+                          (DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS |
+                           DBUS_TEST_FLAGS_REQUIRE_DATA),
+                          NULL, NULL);
 }

@@ -106,7 +106,7 @@ static const ValidityTest signature_tests[] = {
 };
 
 dbus_bool_t
-_dbus_marshal_validate_test (void)
+_dbus_marshal_validate_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusString str;
   int i;

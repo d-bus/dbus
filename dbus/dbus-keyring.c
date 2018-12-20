@@ -1023,7 +1023,7 @@ _dbus_keyring_get_hex_key (DBusKeyring       *keyring,
 #include <stdio.h>
 
 dbus_bool_t
-_dbus_keyring_test (void)
+_dbus_keyring_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   DBusString context;
   DBusKeyring *ring1;

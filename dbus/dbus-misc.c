@@ -232,7 +232,7 @@ dbus_get_version (int *major_version_p,
 
 
 dbus_bool_t
-_dbus_misc_test (void)
+_dbus_misc_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   int major, minor, micro;
   DBusString str;

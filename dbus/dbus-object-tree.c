@@ -2319,7 +2319,7 @@ object_tree_test_iteration (void        *data,
  * @returns #TRUE on success.
  */
 dbus_bool_t
-_dbus_object_tree_test (void)
+_dbus_object_tree_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
   return _dbus_test_oom_handling ("object tree",
                                   object_tree_test_iteration,
