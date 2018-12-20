@@ -31,6 +31,9 @@
 #error This file is only relevant for the embedded tests
 #endif
 
+#include <stdlib.h>
+#include <string.h>
+
 #include "dbus/dbus-message-internal.h"
 #include "dbus/dbus-test-tap.h"
 
@@ -41,6 +44,27 @@
 #ifdef DBUS_UNIX
 # include <dbus/dbus-sysdeps-unix.h>
 #endif
+
+/*
+ * Like strdup(), but crash on out-of-memory, and pass through NULL
+ * unchanged (the "0" in the name is meant to be a mnemonic for this,
+ * similar to g_strcmp0()).
+ */
+static char *
+strdup0_or_die (const char *str)
+{
+  char *ret;
+
+  if (str == NULL)
+    return NULL;  /* not an error */
+
+  ret = strdup (str);
+
+  if (ret == NULL)
+    _dbus_test_fatal ("Out of memory");
+
+  return ret;
+}
 
 /*
  * _dbus_test_main:
@@ -66,8 +90,8 @@ _dbus_test_main (int                  argc,
                  void               (*test_pre_hook) (void),
                  void               (*test_post_hook) (void))
 {
-  const char *test_data_dir;
-  const char *specific_test;
+  char *test_data_dir;
+  char *specific_test;
   size_t i;
 
 #ifdef DBUS_UNIX
@@ -79,10 +103,19 @@ _dbus_test_main (int                  argc,
   setlocale(LC_ALL, "");
 #endif
 
+  /* We can't assume that strings from _dbus_getenv() will remain valid
+   * forever, because some tests call setenv(), which is allowed to
+   * reallocate the entire environment block, and in Wine it seems that it
+   * genuinely does; so we copy them.
+   *
+   * We can't use _dbus_strdup() here because the test might be checking
+   * for memory leaks, so we don't want any libdbus allocations still
+   * alive at the end; so we use strdup(), which is not in Standard C but
+   * is available in both POSIX and Windows. */
   if (argc > 1 && strcmp (argv[1], "--tap") != 0)
-    test_data_dir = argv[1];
+    test_data_dir = strdup0_or_die (argv[1]);
   else
-    test_data_dir = _dbus_getenv ("DBUS_TEST_DATA");
+    test_data_dir = strdup0_or_die (_dbus_getenv ("DBUS_TEST_DATA"));
 
   if (test_data_dir != NULL)
     _dbus_test_diag ("Test data in %s", test_data_dir);
@@ -93,9 +126,9 @@ _dbus_test_main (int                  argc,
     _dbus_test_diag ("No test data!");
 
   if (argc > 2)
-    specific_test = argv[2];
+    specific_test = strdup0_or_die (argv[2]);
   else
-    specific_test = _dbus_getenv ("DBUS_TEST_ONLY");
+    specific_test = strdup0_or_die (_dbus_getenv ("DBUS_TEST_ONLY"));
 
   for (i = 0; i < n_tests; i++)
     {
@@ -142,6 +175,9 @@ _dbus_test_main (int                  argc,
       if (flags & DBUS_TEST_FLAGS_CHECK_FD_LEAKS)
         _dbus_check_fdleaks_leave (initial_fds);
     }
+
+  free (test_data_dir);
+  free (specific_test);
 
   return _dbus_test_done_testing ();
 }
