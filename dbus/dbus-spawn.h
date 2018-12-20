@@ -47,7 +47,7 @@ typedef enum {
 dbus_bool_t _dbus_spawn_async_with_babysitter     (DBusBabysitter           **sitter_p,
                                                    const char                *log_name,
                                                    char              * const *argv,
-                                                   char                     **env,
+                                                   char              * const *env,
                                                    DBusSpawnFlags             flags,
                                                    DBusSpawnChildSetupFunc    child_setup,
                                                    void                      *user_data,

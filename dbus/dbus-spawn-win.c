@@ -68,7 +68,6 @@ struct DBusBabysitter
 
     int argc;
     char **argv;
-    char **envp;
 
     HANDLE thread_handle;
     HANDLE child_handle;
@@ -127,7 +126,6 @@ _dbus_babysitter_new (void)
 
   sitter->argc = 0;
   sitter->argv = NULL;
-  sitter->envp = NULL;
 
   sitter->watches = _dbus_watch_list_new ();
   if (sitter->watches == NULL)
@@ -222,16 +220,6 @@ _dbus_babysitter_unref (DBusBabysitter *sitter)
               }
           dbus_free (sitter->argv);
           sitter->argv = NULL;
-        }
-
-      if (sitter->envp != NULL)
-        {
-          char **e = sitter->envp;
-
-          while (*e)
-            dbus_free (*e++);
-          dbus_free (sitter->envp);
-          sitter->envp = NULL;
         }
 
       if (sitter->child_handle != NULL)
@@ -636,7 +624,7 @@ dbus_bool_t
 _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
                                    const char                *log_name,
                                    char              * const *argv,
-                                   char                     **envp,
+                                   char              * const *envp,
                                    DBusSpawnFlags             flags _DBUS_GNUC_UNUSED,
                                    DBusSpawnChildSetupFunc    child_setup _DBUS_GNUC_UNUSED,
                                    void                      *user_data _DBUS_GNUC_UNUSED,
@@ -711,13 +699,13 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
       _DBUS_SET_OOM (error);
       goto out0;
     }
-  sitter->envp = envp;
 
   PING();
   _dbus_verbose ("babysitter: spawn child '%s'\n", sitter->argv[0]);
 
   PING();
-  handle = _dbus_spawn_program (sitter->log_name, sitter->argv, sitter->envp);
+  handle = _dbus_spawn_program (sitter->log_name, sitter->argv,
+                                (char **) envp);
 
   PING();
   if (handle != INVALID_HANDLE_VALUE)

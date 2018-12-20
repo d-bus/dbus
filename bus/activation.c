@@ -2301,6 +2301,7 @@ bus_activation_activate_service (BusActivation  *activation,
     }
 
   dbus_free_string_array (argv);
+  dbus_free_string_array (envp);
   envp = NULL;
 
   _dbus_assert (pending_activation->babysitter != NULL);
