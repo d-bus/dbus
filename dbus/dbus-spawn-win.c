@@ -600,26 +600,7 @@ babysitter (void *parameter)
 {
   int ret = 0;
   DBusBabysitter *sitter = (DBusBabysitter *) parameter;
-  HANDLE handle;
 
-  PING();
-  _dbus_verbose ("babysitter: spawning %s\n", sitter->log_name);
-
-  PING();
-  handle = _dbus_spawn_program (sitter->log_name, sitter->argv, sitter->envp);
-
-  PING();
-  if (handle != INVALID_HANDLE_VALUE)
-    {
-      sitter->child_handle = handle;
-    }
-  else
-    {
-      sitter->child_handle = NULL;
-      sitter->have_spawn_errno = TRUE;
-      sitter->spawn_errno = GetLastError();
-    }
-  
   PING();
   SetEvent (sitter->start_sync_event);
 
@@ -663,7 +644,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
 {
   DBusBabysitter *sitter;
   DWORD sitter_thread_id;
-  
+  HANDLE handle;
+
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
   _dbus_assert (argv[0] != NULL);
 
@@ -730,6 +712,24 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
       goto out0;
     }
   sitter->envp = envp;
+
+  PING();
+  _dbus_verbose ("babysitter: spawn child '%s'\n", sitter->argv[0]);
+
+  PING();
+  handle = _dbus_spawn_program (sitter->log_name, sitter->argv, sitter->envp);
+
+  PING();
+  if (handle != INVALID_HANDLE_VALUE)
+    {
+      sitter->child_handle = handle;
+    }
+  else
+    {
+      sitter->child_handle = NULL;
+      sitter->have_spawn_errno = TRUE;
+      sitter->spawn_errno = GetLastError();
+    }
 
   PING();
   sitter->thread_handle = (HANDLE) CreateThread (NULL, 0, babysitter,
