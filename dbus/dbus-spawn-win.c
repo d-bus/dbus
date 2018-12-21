@@ -683,6 +683,9 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
       sitter->child_handle = NULL;
       sitter->have_spawn_errno = TRUE;
       sitter->spawn_errno = GetLastError();
+      dbus_set_error_const (error, DBUS_ERROR_SPAWN_EXEC_FAILED,
+                            "Failed to spawn child");
+      goto out0;
     }
 
   PING();
