@@ -674,11 +674,7 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
     }
 
   PING();
-  if (handle != INVALID_HANDLE_VALUE)
-    {
-      sitter->child_handle = handle;
-    }
-  else
+  if (handle == INVALID_HANDLE_VALUE)
     {
       sitter->child_handle = NULL;
       sitter->have_spawn_errno = TRUE;
@@ -687,6 +683,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
                             "Failed to spawn child");
       goto out0;
     }
+
+  sitter->child_handle = handle;
 
   PING();
   sitter->thread_handle = (HANDLE) CreateThread (NULL, 0, babysitter,
