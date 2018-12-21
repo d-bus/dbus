@@ -61,9 +61,6 @@
 struct DBusBabysitter
   {
     DBusAtomic refcount;
-
-    HANDLE start_sync_event;
-
     char *log_name;
 
     HANDLE thread_handle;
@@ -109,13 +106,6 @@ _dbus_babysitter_new (void)
   old_refcount = _dbus_atomic_inc (&sitter->refcount);
 
   _dbus_babysitter_trace_ref (sitter, old_refcount, old_refcount+1, __FUNCTION__);
-
-  sitter->start_sync_event = CreateEvent (NULL, FALSE, FALSE, NULL);
-  if (sitter->start_sync_event == NULL)
-    {
-      _dbus_babysitter_unref (sitter);
-      return NULL;
-    }
 
   sitter->child_handle = NULL;
 
@@ -217,13 +207,6 @@ _dbus_babysitter_unref (DBusBabysitter *sitter)
 
       if (sitter->watches)
         _dbus_watch_list_free (sitter->watches);
-
-      if (sitter->start_sync_event != NULL)
-        {
-          PING();
-          CloseHandle (sitter->start_sync_event);
-          sitter->start_sync_event = NULL;
-        }
 
       if (sitter->thread_handle)
         {
@@ -570,8 +553,6 @@ babysitter (void *parameter)
   DBusBabysitter *sitter = (DBusBabysitter *) parameter;
 
   PING();
-  SetEvent (sitter->start_sync_event);
-
   if (sitter->child_handle != NULL)
     {
       DWORD status;
@@ -715,9 +696,6 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
                             "Failed to create new thread");
       goto out0;
     }
-
-  PING();
-  WaitForSingleObject (sitter->start_sync_event, INFINITE);
 
   PING();
   if (sitter_p != NULL)
