@@ -66,9 +66,6 @@ struct DBusBabysitter
 
     char *log_name;
 
-    int argc;
-    char **argv;
-
     HANDLE thread_handle;
     HANDLE child_handle;
     DBusSocket socket_to_babysitter;	/* Connection to the babysitter thread */
@@ -123,9 +120,6 @@ _dbus_babysitter_new (void)
   sitter->child_handle = NULL;
 
   sitter->socket_to_babysitter = sitter->socket_to_main = _dbus_socket_get_invalid ();
-
-  sitter->argc = 0;
-  sitter->argv = NULL;
 
   sitter->watches = _dbus_watch_list_new ();
   if (sitter->watches == NULL)
@@ -189,7 +183,6 @@ close_socket_to_babysitter (DBusBabysitter *sitter)
 void
 _dbus_babysitter_unref (DBusBabysitter *sitter)
 {
-  int i;
   dbus_int32_t old_refcount;
 
   PING();
@@ -207,19 +200,6 @@ _dbus_babysitter_unref (DBusBabysitter *sitter)
         {
           _dbus_close_socket (sitter->socket_to_main, NULL);
           sitter->socket_to_main.sock = INVALID_SOCKET;
-        }
-
-      PING();
-      if (sitter->argv != NULL)
-        {
-          for (i = 0; i < sitter->argc; i++)
-            if (sitter->argv[i] != NULL)
-              {
-                dbus_free (sitter->argv[i]);
-                sitter->argv[i] = NULL;
-              }
-          dbus_free (sitter->argv);
-          sitter->argv = NULL;
         }
 
       if (sitter->child_handle != NULL)
@@ -633,6 +613,8 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
   DBusBabysitter *sitter;
   DWORD sitter_thread_id;
   HANDLE handle;
+  int argc;
+  char **my_argv = NULL;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
   _dbus_assert (argv[0] != NULL);
@@ -693,19 +675,22 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
       goto out0;
     }
 
-  sitter->argc = protect_argv (argv, &sitter->argv);
-  if (sitter->argc == -1)
+  argc = protect_argv (argv, &my_argv);
+  if (argc == -1)
     {
       _DBUS_SET_OOM (error);
       goto out0;
     }
 
-  PING();
-  _dbus_verbose ("babysitter: spawn child '%s'\n", sitter->argv[0]);
+  _dbus_verbose ("babysitter: spawn child '%s'\n", my_argv[0]);
 
   PING();
-  handle = _dbus_spawn_program (sitter->log_name, sitter->argv,
-                                (char **) envp);
+  handle = _dbus_spawn_program (sitter->log_name, my_argv, (char **) envp);
+
+  if (my_argv != NULL)
+    {
+      dbus_free_string_array (my_argv);
+    }
 
   PING();
   if (handle != INVALID_HANDLE_VALUE)
