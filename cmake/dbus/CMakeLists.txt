@@ -288,7 +288,7 @@ if(WIN32)
             COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:dbus-1>" "$<TARGET_FILE_DIR:dbus-1>/${CMAKE_SHARED_LIBRARY_PREFIX}dbus-1${CMAKE_SHARED_LIBRARY_SUFFIX}"
             COMMENT "Create non versioned dbus-1 library for legacy applications"
         )
-        install(FILES ${LEGACY_FILE_NAME} DESTINATION bin)
+        install(FILES ${LEGACY_FILE_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
     endif()
     if(WINCE)
         target_link_libraries(dbus-1 ws2)

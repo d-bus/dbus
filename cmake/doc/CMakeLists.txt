@@ -84,9 +84,9 @@ macro(DOCBOOK _sources _format)
         endif ()
         add_dependencies(xmldoc ${_outname})
         if (${_format} STREQUAL "man")
-            install(FILES ${_outfile} DESTINATION share/man/man1)
+            install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)
         else()
-            install(FILES ${_outfile} DESTINATION share/doc/dbus)
+            install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
         endif()
     else()
         message(STATUS "skipping xml doc generating for ${_infile}, file not found")
@@ -152,7 +152,7 @@ docbook(${CMAKE_BINARY_DIR}/doc/dbus-update-activation-environment.1.xml html)
 # handle html index file
 #
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/index.html.cmake ${CMAKE_CURRENT_BINARY_DIR}/index.html )
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION share/doc/dbus)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
 set (EXTRA_DIST
     ${DOC_DIR}/busconfig.dtd
@@ -160,6 +160,6 @@ set (EXTRA_DIST
     ${DOC_DIR}/introspect.xsl
 )
 
-install(FILES ${EXTRA_DIST} DESTINATION share/doc/dbus)
+install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
 endif()

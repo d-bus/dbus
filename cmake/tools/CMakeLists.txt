@@ -129,4 +129,4 @@ target_link_libraries(dbus-run-session ${DBUS_INTERNAL_LIBRARIES})
 install(TARGETS dbus-run-session ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 # create the /var/lib/dbus directory for dbus-uuidgen
-install(DIRECTORY DESTINATION var/lib/dbus)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_LOCALSTATEDIR}/lib/dbus)
