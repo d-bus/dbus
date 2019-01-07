@@ -121,6 +121,10 @@ backported_g_steal_pointer (gpointer pointer_to_pointer)
 }
 #endif
 
+#ifndef g_assert_nonnull
+#define g_assert_nonnull(a) g_assert (a != NULL)
+#endif
+
 gboolean test_check_tcp_works (void);
 
 void test_store_result_cb (GObject *source_object,
