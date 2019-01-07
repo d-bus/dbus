@@ -61,14 +61,7 @@
 struct DBusBabysitter
   {
     DBusAtomic refcount;
-
-    HANDLE start_sync_event;
-
     char *log_name;
-
-    int argc;
-    char **argv;
-    char **envp;
 
     HANDLE thread_handle;
     HANDLE child_handle;
@@ -114,20 +107,9 @@ _dbus_babysitter_new (void)
 
   _dbus_babysitter_trace_ref (sitter, old_refcount, old_refcount+1, __FUNCTION__);
 
-  sitter->start_sync_event = CreateEvent (NULL, FALSE, FALSE, NULL);
-  if (sitter->start_sync_event == NULL)
-    {
-      _dbus_babysitter_unref (sitter);
-      return NULL;
-    }
-
   sitter->child_handle = NULL;
 
   sitter->socket_to_babysitter = sitter->socket_to_main = _dbus_socket_get_invalid ();
-
-  sitter->argc = 0;
-  sitter->argv = NULL;
-  sitter->envp = NULL;
 
   sitter->watches = _dbus_watch_list_new ();
   if (sitter->watches == NULL)
@@ -191,7 +173,6 @@ close_socket_to_babysitter (DBusBabysitter *sitter)
 void
 _dbus_babysitter_unref (DBusBabysitter *sitter)
 {
-  int i;
   dbus_int32_t old_refcount;
 
   PING();
@@ -211,29 +192,6 @@ _dbus_babysitter_unref (DBusBabysitter *sitter)
           sitter->socket_to_main.sock = INVALID_SOCKET;
         }
 
-      PING();
-      if (sitter->argv != NULL)
-        {
-          for (i = 0; i < sitter->argc; i++)
-            if (sitter->argv[i] != NULL)
-              {
-                dbus_free (sitter->argv[i]);
-                sitter->argv[i] = NULL;
-              }
-          dbus_free (sitter->argv);
-          sitter->argv = NULL;
-        }
-
-      if (sitter->envp != NULL)
-        {
-          char **e = sitter->envp;
-
-          while (*e)
-            dbus_free (*e++);
-          dbus_free (sitter->envp);
-          sitter->envp = NULL;
-        }
-
       if (sitter->child_handle != NULL)
         {
           CloseHandle (sitter->child_handle);
@@ -249,13 +207,6 @@ _dbus_babysitter_unref (DBusBabysitter *sitter)
 
       if (sitter->watches)
         _dbus_watch_list_free (sitter->watches);
-
-      if (sitter->start_sync_event != NULL)
-        {
-          PING();
-          CloseHandle (sitter->start_sync_event);
-          sitter->start_sync_event = NULL;
-        }
 
       if (sitter->thread_handle)
         {
@@ -600,29 +551,8 @@ babysitter (void *parameter)
 {
   int ret = 0;
   DBusBabysitter *sitter = (DBusBabysitter *) parameter;
-  HANDLE handle;
 
   PING();
-  _dbus_verbose ("babysitter: spawning %s\n", sitter->log_name);
-
-  PING();
-  handle = _dbus_spawn_program (sitter->log_name, sitter->argv, sitter->envp);
-
-  PING();
-  if (handle != INVALID_HANDLE_VALUE)
-    {
-      sitter->child_handle = handle;
-    }
-  else
-    {
-      sitter->child_handle = NULL;
-      sitter->have_spawn_errno = TRUE;
-      sitter->spawn_errno = GetLastError();
-    }
-  
-  PING();
-  SetEvent (sitter->start_sync_event);
-
   if (sitter->child_handle != NULL)
     {
       DWORD status;
@@ -655,7 +585,7 @@ dbus_bool_t
 _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
                                    const char                *log_name,
                                    char              * const *argv,
-                                   char                     **envp,
+                                   char              * const *envp,
                                    DBusSpawnFlags             flags _DBUS_GNUC_UNUSED,
                                    DBusSpawnChildSetupFunc    child_setup _DBUS_GNUC_UNUSED,
                                    void                      *user_data _DBUS_GNUC_UNUSED,
@@ -663,7 +593,10 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
 {
   DBusBabysitter *sitter;
   DWORD sitter_thread_id;
-  
+  HANDLE handle;
+  int argc;
+  char **my_argv = NULL;
+
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
   _dbus_assert (argv[0] != NULL);
 
@@ -723,13 +656,35 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
       goto out0;
     }
 
-  sitter->argc = protect_argv (argv, &sitter->argv);
-  if (sitter->argc == -1)
+  argc = protect_argv (argv, &my_argv);
+  if (argc == -1)
     {
       _DBUS_SET_OOM (error);
       goto out0;
     }
-  sitter->envp = envp;
+
+  _dbus_verbose ("babysitter: spawn child '%s'\n", my_argv[0]);
+
+  PING();
+  handle = _dbus_spawn_program (sitter->log_name, my_argv, (char **) envp);
+
+  if (my_argv != NULL)
+    {
+      dbus_free_string_array (my_argv);
+    }
+
+  PING();
+  if (handle == INVALID_HANDLE_VALUE)
+    {
+      sitter->child_handle = NULL;
+      sitter->have_spawn_errno = TRUE;
+      sitter->spawn_errno = GetLastError();
+      dbus_set_error_const (error, DBUS_ERROR_SPAWN_EXEC_FAILED,
+                            "Failed to spawn child");
+      goto out0;
+    }
+
+  sitter->child_handle = handle;
 
   PING();
   sitter->thread_handle = (HANDLE) CreateThread (NULL, 0, babysitter,
@@ -742,9 +697,6 @@ _dbus_spawn_async_with_babysitter (DBusBabysitter           **sitter_p,
                             "Failed to create new thread");
       goto out0;
     }
-
-  PING();
-  WaitForSingleObject (sitter->start_sync_event, INFINITE);
 
   PING();
   if (sitter_p != NULL)
