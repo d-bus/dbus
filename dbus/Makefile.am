@@ -122,7 +122,7 @@ DBUS_UTIL_arch_sources = 			\
 endif
 
 if DBUS_HAVE_LINUX_EPOLL
-DBUS_UTIL_arch_sources += dbus-socket-set-epoll.c
+DBUS_UTIL_arch_sources += dbus-pollable-set-epoll.c
 endif
 
 dbusinclude_HEADERS=				\
@@ -260,9 +260,9 @@ DBUS_UTIL_SOURCES=				\
 	dbus-shell.c				\
 	dbus-shell.h				\
 	$(DBUS_UTIL_arch_sources)		\
-	dbus-socket-set.h			\
-	dbus-socket-set.c			\
-	dbus-socket-set-poll.c			\
+	dbus-pollable-set.h			\
+	dbus-pollable-set.c			\
+	dbus-pollable-set-poll.c			\
 	dbus-spawn.h				\
 	dbus-string-util.c			\
 	dbus-sysdeps-util.c			\

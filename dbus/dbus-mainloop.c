@@ -29,7 +29,7 @@
 
 #include <dbus/dbus-hash.h>
 #include <dbus/dbus-list.h>
-#include <dbus/dbus-socket-set.h>
+#include <dbus/dbus-pollable-set.h>
 #include <dbus/dbus-timeout.h>
 #include <dbus/dbus-watch.h>
 
@@ -40,7 +40,7 @@ struct DBusLoop
   int refcount;
   /** DBusPollable => dbus_malloc'd DBusList ** of references to DBusWatch */
   DBusHashTable *watches;
-  DBusSocketSet *socket_set;
+  DBusPollableSet *pollable_set;
   DBusList *timeouts;
   int callback_list_serial;
   int watch_count;
@@ -116,15 +116,15 @@ _dbus_loop_new (void)
   loop->watches = _dbus_hash_table_new (DBUS_HASH_POLLABLE, NULL,
                                         free_watch_table_entry);
 
-  loop->socket_set = _dbus_socket_set_new (0);
+  loop->pollable_set = _dbus_pollable_set_new (0);
 
-  if (loop->watches == NULL || loop->socket_set == NULL)
+  if (loop->watches == NULL || loop->pollable_set == NULL)
     {
       if (loop->watches != NULL)
         _dbus_hash_table_unref (loop->watches);
 
-      if (loop->socket_set != NULL)
-        _dbus_socket_set_free (loop->socket_set);
+      if (loop->pollable_set != NULL)
+        _dbus_pollable_set_free (loop->pollable_set);
 
       dbus_free (loop);
       return NULL;
@@ -163,7 +163,7 @@ _dbus_loop_unref (DBusLoop *loop)
         }
 
       _dbus_hash_table_unref (loop->watches);
-      _dbus_socket_set_free (loop->socket_set);
+      _dbus_pollable_set_free (loop->pollable_set);
       dbus_free (loop);
     }
 }
@@ -263,9 +263,9 @@ refresh_watches_for_fd (DBusLoop      *loop,
     }
 
   if (interested)
-    _dbus_socket_set_enable (loop->socket_set, fd, flags);
+    _dbus_pollable_set_enable (loop->pollable_set, fd, flags);
   else
-    _dbus_socket_set_disable (loop->socket_set, fd);
+    _dbus_pollable_set_disable (loop->pollable_set, fd);
 }
 
 dbus_bool_t
@@ -293,7 +293,7 @@ _dbus_loop_add_watch (DBusLoop  *loop,
 
   if (_dbus_list_length_is_one (watches))
     {
-      if (!_dbus_socket_set_add (loop->socket_set, fd,
+      if (!_dbus_pollable_set_add (loop->pollable_set, fd,
                                  dbus_watch_get_flags (watch),
                                  dbus_watch_get_enabled (watch)))
         {
@@ -354,7 +354,7 @@ _dbus_loop_remove_watch (DBusLoop         *loop,
                * entry, and stop reserving space for it in the socket set */
               if (gc_watch_table_entry (loop, watches, fd))
                 {
-                  _dbus_socket_set_remove (loop->socket_set, fd);
+                  _dbus_pollable_set_remove (loop->pollable_set, fd);
                 }
 
               return;
@@ -570,7 +570,7 @@ _dbus_loop_iterate (DBusLoop     *loop,
 {  
 #define N_STACK_DESCRIPTORS 64
   dbus_bool_t retval;
-  DBusSocketEvent ready_fds[N_STACK_DESCRIPTORS];
+  DBusPollableEvent ready_fds[N_STACK_DESCRIPTORS];
   int i;
   DBusList *link;
   int n_ready;
@@ -660,8 +660,8 @@ _dbus_loop_iterate (DBusLoop     *loop,
   _dbus_verbose ("  polling on %d descriptors timeout %ld\n", _DBUS_N_ELEMENTS (ready_fds), timeout);
 #endif
 
-  n_ready = _dbus_socket_set_poll (loop->socket_set, ready_fds,
-                                   _DBUS_N_ELEMENTS (ready_fds), timeout);
+  n_ready = _dbus_pollable_set_poll (loop->pollable_set, ready_fds,
+                                     _DBUS_N_ELEMENTS (ready_fds), timeout);
 
   /* re-enable any watches we skipped this time */
   if (loop->oom_watch_pending)
