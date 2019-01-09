@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* dbus-socket-set-epoll.c - a socket set implemented via Linux epoll(4)
+/* dbus-pollable-set-epoll.c - a pollable set implemented via Linux epoll(4)
  *
  * Copyright © 2011 Nokia Corporation
  *
@@ -23,7 +23,7 @@
  */
 
 #include <config.h>
-#include "dbus-socket-set.h"
+#include "dbus-pollable-set.h"
 
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-sysdeps.h>
@@ -40,22 +40,22 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 typedef struct {
-    DBusSocketSet parent;
+    DBusPollableSet parent;
     int epfd;
-} DBusSocketSetEpoll;
+} DBusPollableSetEpoll;
 
-static inline DBusSocketSetEpoll *
-socket_set_epoll_cast (DBusSocketSet *set)
+static inline DBusPollableSetEpoll *
+socket_set_epoll_cast (DBusPollableSet *set)
 {
-  _dbus_assert (set->cls == &_dbus_socket_set_epoll_class);
-  return (DBusSocketSetEpoll *) set;
+  _dbus_assert (set->cls == &_dbus_pollable_set_epoll_class);
+  return (DBusPollableSetEpoll *) set;
 }
 
 /* this is safe to call on a partially-allocated socket set */
 static void
-socket_set_epoll_free (DBusSocketSet *set)
+socket_set_epoll_free (DBusPollableSet *set)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
 
   if (self == NULL)
     return;
@@ -66,17 +66,17 @@ socket_set_epoll_free (DBusSocketSet *set)
   dbus_free (self);
 }
 
-DBusSocketSet *
-_dbus_socket_set_epoll_new (void)
+DBusPollableSet *
+_dbus_pollable_set_epoll_new (void)
 {
-  DBusSocketSetEpoll *self;
+  DBusPollableSetEpoll *self;
 
-  self = dbus_new0 (DBusSocketSetEpoll, 1);
+  self = dbus_new0 (DBusPollableSetEpoll, 1);
 
   if (self == NULL)
     return NULL;
 
-  self->parent.cls = &_dbus_socket_set_epoll_class;
+  self->parent.cls = &_dbus_pollable_set_epoll_class;
 
   self->epfd = epoll_create1 (EPOLL_CLOEXEC);
 
@@ -97,11 +97,11 @@ _dbus_socket_set_epoll_new (void)
 
   if (self->epfd == -1)
     {
-      socket_set_epoll_free ((DBusSocketSet *) self);
+      socket_set_epoll_free ((DBusPollableSet *) self);
       return NULL;
     }
 
-  return (DBusSocketSet *) self;
+  return (DBusPollableSet *) self;
 }
 
 static uint32_t
@@ -135,12 +135,12 @@ epoll_events_to_watch_flags (uint32_t events)
 }
 
 static dbus_bool_t
-socket_set_epoll_add (DBusSocketSet  *set,
-                      DBusPollable    fd,
-                      unsigned int    flags,
-                      dbus_bool_t     enabled)
+socket_set_epoll_add (DBusPollableSet  *set,
+                      DBusPollable      fd,
+                      unsigned int      flags,
+                      dbus_bool_t       enabled)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
   struct epoll_event event;
   int err;
 
@@ -189,11 +189,11 @@ socket_set_epoll_add (DBusSocketSet  *set,
 }
 
 static void
-socket_set_epoll_enable (DBusSocketSet  *set,
-                         DBusPollable    fd,
-                         unsigned int    flags)
+socket_set_epoll_enable (DBusPollableSet  *set,
+                         DBusPollable      fd,
+                         unsigned int      flags)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
   struct epoll_event event;
   int err;
 
@@ -230,10 +230,10 @@ socket_set_epoll_enable (DBusSocketSet  *set,
 }
 
 static void
-socket_set_epoll_disable (DBusSocketSet  *set,
-                          DBusPollable    fd)
+socket_set_epoll_disable (DBusPollableSet  *set,
+                          DBusPollable      fd)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
   struct epoll_event event;
   int err;
 
@@ -266,10 +266,10 @@ socket_set_epoll_disable (DBusSocketSet  *set,
 }
 
 static void
-socket_set_epoll_remove (DBusSocketSet  *set,
-                         DBusPollable    fd)
+socket_set_epoll_remove (DBusPollableSet  *set,
+                         DBusPollable      fd)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
   int err;
   /* Kernels < 2.6.9 require a non-NULL struct pointer, even though its
    * contents are ignored */
@@ -289,12 +289,12 @@ socket_set_epoll_remove (DBusSocketSet  *set,
 #define N_STACK_DESCRIPTORS 64
 
 static int
-socket_set_epoll_poll (DBusSocketSet   *set,
-                       DBusSocketEvent *revents,
-                       int              max_events,
-                       int              timeout_ms)
+socket_set_epoll_poll (DBusPollableSet   *set,
+                       DBusPollableEvent *revents,
+                       int                max_events,
+                       int                timeout_ms)
 {
-  DBusSocketSetEpoll *self = socket_set_epoll_cast (set);
+  DBusPollableSetEpoll *self = socket_set_epoll_cast (set);
   struct epoll_event events[N_STACK_DESCRIPTORS];
   int n_ready;
   int i;
@@ -317,7 +317,7 @@ socket_set_epoll_poll (DBusSocketSet   *set,
   return n_ready;
 }
 
-DBusSocketSetClass _dbus_socket_set_epoll_class = {
+DBusPollableSetClass _dbus_pollable_set_epoll_class = {
     socket_set_epoll_free,
     socket_set_epoll_add,
     socket_set_epoll_remove,

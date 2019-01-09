@@ -1,6 +1,6 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /*
- * dbus-socket-set.c - used to bolt file descriptors onto a bus
+ * dbus-pollable-set.c - a set of pollable objects (file descriptors, sockets or handles)
  *
  * Copyright © 2011 Nokia Corporation
  *
@@ -24,21 +24,21 @@
  */
 
 #include <config.h>
-#include <dbus/dbus-socket-set.h>
+#include <dbus/dbus-pollable-set.h>
 
-DBusSocketSet *
-_dbus_socket_set_new (int size_hint)
+DBusPollableSet *
+_dbus_pollable_set_new (int size_hint)
 {
-  DBusSocketSet *ret;
+  DBusPollableSet *ret;
 
 #ifdef DBUS_HAVE_LINUX_EPOLL
-  ret = _dbus_socket_set_epoll_new ();
+  ret = _dbus_pollable_set_epoll_new ();
 
   if (ret != NULL)
     return ret;
 #endif
 
-  ret = _dbus_socket_set_poll_new (size_hint);
+  ret = _dbus_pollable_set_poll_new (size_hint);
 
   if (ret != NULL)
     return ret;

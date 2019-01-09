@@ -1,5 +1,5 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
-/* dbus-socket-set-poll.c - a socket set implemented via _dbus_poll
+/* dbus-pollable-set-poll.c - a pollable set implemented via _dbus_poll
  *
  * Copyright © 2011 Nokia Corporation
  *
@@ -23,7 +23,7 @@
  */
 
 #include <config.h>
-#include "dbus-socket-set.h"
+#include "dbus-pollable-set.h"
 
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-list.h>
@@ -33,12 +33,12 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
 typedef struct {
-    DBusSocketSet      parent;
-    DBusPollFD        *fds;
-    int                n_fds;
-    int                n_reserved;
-    int                n_allocated;
-} DBusSocketSetPoll;
+    DBusPollableSet      parent;
+    DBusPollFD          *fds;
+    int                  n_fds;
+    int                  n_reserved;
+    int                  n_allocated;
+} DBusPollableSetPoll;
 
 #define REALLOC_INCREMENT 8
 #define MINIMUM_SIZE 8
@@ -50,38 +50,38 @@ typedef struct {
 #define DEFAULT_SIZE_HINT MINIMUM_SIZE
 #endif
 
-static inline DBusSocketSetPoll *
-socket_set_poll_cast (DBusSocketSet *set)
+static inline DBusPollableSetPoll *
+socket_set_poll_cast (DBusPollableSet *set)
 {
-  _dbus_assert (set->cls == &_dbus_socket_set_poll_class);
-  return (DBusSocketSetPoll *) set;
+  _dbus_assert (set->cls == &_dbus_pollable_set_poll_class);
+  return (DBusPollableSetPoll *) set;
 }
 
 /* this is safe to call on a partially-allocated socket set */
 static void
-socket_set_poll_free (DBusSocketSet *set)
+socket_set_poll_free (DBusPollableSet *set)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
 
   dbus_free (self->fds);
   dbus_free (self);
   _dbus_verbose ("freed socket set %p\n", self);
 }
 
-DBusSocketSet *
-_dbus_socket_set_poll_new (int size_hint)
+DBusPollableSet *
+_dbus_pollable_set_poll_new (int size_hint)
 {
-  DBusSocketSetPoll *ret;
+  DBusPollableSetPoll *ret;
 
   if (size_hint <= 0)
     size_hint = DEFAULT_SIZE_HINT;
 
-  ret = dbus_new0 (DBusSocketSetPoll, 1);
+  ret = dbus_new0 (DBusPollableSetPoll, 1);
 
   if (ret == NULL)
     return NULL;
 
-  ret->parent.cls = &_dbus_socket_set_poll_class;
+  ret->parent.cls = &_dbus_pollable_set_poll_class;
   ret->n_fds = 0;
   ret->n_allocated = size_hint;
 
@@ -91,12 +91,12 @@ _dbus_socket_set_poll_new (int size_hint)
     {
       /* socket_set_poll_free specifically supports half-constructed
        * socket sets */
-      socket_set_poll_free ((DBusSocketSet *) ret);
+      socket_set_poll_free ((DBusPollableSet *) ret);
       return NULL;
     }
 
   _dbus_verbose ("new socket set at %p\n", ret);
-  return (DBusSocketSet *) ret;
+  return (DBusPollableSet *) ret;
 }
 
 static short
@@ -113,12 +113,12 @@ watch_flags_to_poll_events (unsigned int flags)
 }
 
 static dbus_bool_t
-socket_set_poll_add (DBusSocketSet  *set,
-                     DBusPollable    fd,
-                     unsigned int    flags,
-                     dbus_bool_t     enabled)
+socket_set_poll_add (DBusPollableSet  *set,
+                     DBusPollable      fd,
+                     unsigned int      flags,
+                     dbus_bool_t       enabled)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
 #ifndef DBUS_DISABLE_ASSERT
   int i;
 
@@ -160,11 +160,11 @@ socket_set_poll_add (DBusSocketSet  *set,
 }
 
 static void
-socket_set_poll_enable (DBusSocketSet *set,
-                        DBusPollable   fd,
-                        unsigned int   flags)
+socket_set_poll_enable (DBusPollableSet *set,
+                        DBusPollable     fd,
+                        unsigned int     flags)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
   int i;
 
   for (i = 0; i < self->n_fds; i++)
@@ -186,10 +186,10 @@ socket_set_poll_enable (DBusSocketSet *set,
 }
 
 static void
-socket_set_poll_disable (DBusSocketSet *set,
+socket_set_poll_disable (DBusPollableSet *set,
                          DBusPollable   fd)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
   int i;
 
   for (i = 0; i < self->n_fds; i++)
@@ -209,10 +209,10 @@ socket_set_poll_disable (DBusSocketSet *set,
 }
 
 static void
-socket_set_poll_remove (DBusSocketSet *set,
-                        DBusPollable   fd)
+socket_set_poll_remove (DBusPollableSet *set,
+                        DBusPollable     fd)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
 
   socket_set_poll_disable (set, fd);
   self->n_reserved--;
@@ -266,12 +266,12 @@ watch_flags_from_poll_revents (short revents)
 /** This is basically Linux's epoll_wait(2) implemented in terms of poll(2);
  * it returns results into a caller-supplied buffer so we can be reentrant. */
 static int
-socket_set_poll_poll (DBusSocketSet   *set,
-                      DBusSocketEvent *revents,
-                      int              max_events,
-                      int              timeout_ms)
+socket_set_poll_poll (DBusPollableSet   *set,
+                      DBusPollableEvent *revents,
+                      int                max_events,
+                      int                timeout_ms)
 {
-  DBusSocketSetPoll *self = socket_set_poll_cast (set);
+  DBusPollableSetPoll *self = socket_set_poll_cast (set);
   int i;
   int n_events;
   int n_ready;
@@ -308,7 +308,7 @@ socket_set_poll_poll (DBusSocketSet   *set,
   return n_events;
 }
 
-DBusSocketSetClass _dbus_socket_set_poll_class = {
+DBusPollableSetClass _dbus_pollable_set_poll_class = {
     socket_set_poll_free,
     socket_set_poll_add,
     socket_set_poll_remove,
