@@ -1,5 +1,6 @@
 # where to look first for cmake modules, before ${CMAKE_ROOT}/Modules/ is checked
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
 
 # we do not need to have WIN32 defined
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
@@ -22,11 +23,11 @@ endif()
 
 # detect version
 include(MacrosAutotools)
-autoinit(../configure.ac)
+autoinit(configure.ac)
 autoversion(dbus)
 
-if(EXISTS ${CMAKE_SOURCE_DIR}/../config.h.in)
-	autoheaderchecks(${CMAKE_SOURCE_DIR}/../config.h.in ${CMAKE_SOURCE_DIR}/ConfigureChecks.cmake ${CMAKE_SOURCE_DIR}/config.h.cmake)
+if(EXISTS ${CMAKE_SOURCE_DIR}/config.h.in)
+	autoheaderchecks(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/cmake/ConfigureChecks.cmake ${CMAKE_SOURCE_DIR}/cmake/config.h.cmake)
 else()
     message(STATUS "Generate config.h.in with autogen.sh to enable cmake header difference check.")
 endif()
@@ -147,7 +148,7 @@ endif()
 add_definitions(-D_GNU_SOURCE)
 
 # do config checks
-INCLUDE(ConfigureChecks.cmake)
+INCLUDE(ConfigureChecks)
 
 # @TODO: how to remove last dir from ${CMAKE_SOURCE_DIR} ?
 SET(DBUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
@@ -288,7 +289,7 @@ endif()
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # for including config.h and for includes like <dir/foo.h>
-include_directories( ${CMAKE_SOURCE_DIR}/.. ${CMAKE_BINARY_DIR} ${CMAKE_INCLUDE_PATH} )
+include_directories(. ${CMAKE_BINARY_DIR} ${CMAKE_INCLUDE_PATH})
 
 # linker search directories
 link_directories(${DBUS_LIB_DIR} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY} )
@@ -511,10 +512,10 @@ set(DBUS_INTERNAL_LIBRARIES dbus-internal)
 set (DBUS_INTERNAL_ADD_LIBRARY_OPTIONS STATIC)
 set (DBUS_INTERNAL_CLIENT_DEFINITIONS "-DDBUS_COMPILATION")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
+configure_file(cmake/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
 if (WIN32)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbus-env.bat.cmake ${CMAKE_BINARY_DIR}/bin/dbus-env.bat )
+configure_file(cmake/dbus-env.bat.cmake ${CMAKE_BINARY_DIR}/bin/dbus-env.bat )
     install(FILES ${CMAKE_BINARY_DIR}/bin/dbus-env.bat DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
@@ -523,11 +524,11 @@ endif()
 #
 set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/DBus1)
 if(WIN32)
-   configure_file(DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+   configure_file(cmake/DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 else()
-   configure_file(DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+   configure_file(cmake/DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 endif()
-configure_file(DBus1ConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake" @ONLY)
+configure_file(cmake/DBus1ConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake" @ONLY)
 install(FILES
     "${CMAKE_BINARY_DIR}/DBus1Config.cmake"
     "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake"
@@ -657,7 +658,7 @@ endforeach()
 
 MESSAGE(" ")
 
-INCLUDE(modules/CPackInstallConfig.cmake)
+INCLUDE(CPackInstallConfig)
 
 add_custom_target(help-options
     cmake -LH 
@@ -689,7 +690,7 @@ if(UNIX)
         set(datadir "\${prefix}/${CMAKE_INSTALL_DATADIR}")
         set(datarootdir "\${prefix}/${CMAKE_INSTALL_DATADIR}")
         set(dbus_daemondir "\${prefix}/${CMAKE_INSTALL_BINDIR}")
-        configure_file(../dbus-1.pc.in ${CMAKE_BINARY_DIR}/dbus-1.pc @ONLY)
+        configure_file(dbus-1.pc.in ${CMAKE_BINARY_DIR}/dbus-1.pc @ONLY)
         install(FILES ${CMAKE_BINARY_DIR}/dbus-1.pc DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     endif()
 endif()

@@ -1,68 +1,68 @@
 add_definitions("-DDBUS_COMPILATION")
 
 set (dbus_send_SOURCES
-	../../tools/dbus-print-message.c			
-	../../tools/dbus-print-message.h			
-	../../tools/dbus-send.c
-	../../tools/tool-common.c
-	../../tools/tool-common.h
+	dbus-print-message.c			
+	dbus-print-message.h			
+	dbus-send.c
+	tool-common.c
+	tool-common.h
 )
 
 set (dbus_monitor_SOURCES
-	../../tools/dbus-monitor.c				
-	../../tools/dbus-print-message.c			
-	../../tools/dbus-print-message.h
-	../../tools/tool-common.c
-	../../tools/tool-common.h
+	dbus-monitor.c				
+	dbus-print-message.c			
+	dbus-print-message.h
+	tool-common.c
+	tool-common.h
 )
 
 set (dbus_test_tool_SOURCES
-	../../tools/dbus-echo.c
-	../../tools/dbus-spam.c
-	../../tools/tool-common.c
-	../../tools/tool-common.h
-	../../tools/test-tool.c
-	../../tools/test-tool.h
+	dbus-echo.c
+	dbus-spam.c
+	tool-common.c
+	tool-common.h
+	test-tool.c
+	test-tool.h
 )
 
 set (dbus_update_activation_environment_SOURCES
-	../../tools/dbus-update-activation-environment.c
-	../../tools/tool-common.c
-	../../tools/tool-common.h
+	dbus-update-activation-environment.c
+	tool-common.c
+	tool-common.h
 )
 
 if (WIN32)
 set (dbus_launch_SOURCES
-	../../tools/dbus-launch-win.c
+	dbus-launch-win.c
 )
 else (WIN32)
 set (dbus_launch_SOURCES
-	../../tools/dbus-launch.c
-	../../tools/tool-common.c
-	../../tools/tool-common.h
+	dbus-launch.c
+	tool-common.c
+	tool-common.h
 )
 endif (WIN32)
 
 if (DBUS_BUILD_X11)
 set (dbus_launch_SOURCES
      ${dbus_launch_SOURCES}
-     ../../tools/dbus-launch-x11.c
+     dbus-launch-x11.c
 )
 endif(DBUS_BUILD_X11)
 
 set (dbus_cleanup_sockets_SOURCES
-	../../tools/dbus-cleanup-sockets.c
+	dbus-cleanup-sockets.c
 )
 
 set (dbus_run_session_SOURCES
-    ../../tools/dbus-run-session.c
+    dbus-run-session.c
 )
 
 if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-send")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(${CMAKE_SOURCE_DIR}/../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     list(APPEND dbus_send_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 
@@ -74,7 +74,7 @@ if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-test-tool")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(${CMAKE_SOURCE_DIR}/../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     list(APPEND dbus_test_tool_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 
@@ -87,7 +87,7 @@ if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-update-activation-environment")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(${CMAKE_SOURCE_DIR}/../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     list(APPEND dbus_update_activation_environment_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 if(WIN32 AND NOT MSVC)
@@ -101,7 +101,7 @@ if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-launch")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(${CMAKE_SOURCE_DIR}/../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     list(APPEND dbus_launch_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 
@@ -116,7 +116,7 @@ if(WIN32)
     set(DBUS_VER_INTERNAL_NAME "dbus-monitor")
     set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(${CMAKE_SOURCE_DIR}/../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     list(APPEND dbus_monitor_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
 endif()
 

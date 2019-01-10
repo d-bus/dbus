@@ -175,7 +175,7 @@ macro(add_uac_manifest _sources)
     # 24 is the resource type, RT_MANIFEST
     # constants are used because of a bug in windres
     # see https://stackoverflow.com/questions/33000158/embed-manifest-file-to-require-administrator-execution-level-with-mingw32
-    get_filename_component(UAC_FILE ${CMAKE_SOURCE_DIR}/../tools/Win32.Manifest REALPATH)
+    get_filename_component(UAC_FILE ${CMAKE_SOURCE_DIR}/tools/Win32.Manifest REALPATH)
     set(outfile ${CMAKE_BINARY_DIR}/disable-uac.rc)
     if(NOT EXISTS outfile)
         file(WRITE ${outfile} "1 24 \"${UAC_FILE}\"\n")
