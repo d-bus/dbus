@@ -484,6 +484,12 @@ add_definitions(${DBUS_BUS_CFLAGS})
 if (DBUS_BUILD_TESTS)
     # set variables used for the .in files (substituted by configure_file) in test/data:
     set(DBUS_TEST_EXEC ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN})
+    # Working directory for build-time tests, so that they'll pick up
+    # the correct libdbus-1-3.dll on Windows.
+    # This happens to be the same as DBUS_TEST_EXEC, but its meaning is
+    # different, and it has no direct Autotools equivalent (Autotools
+    # tests automatically get their own ${builddir} as working directory).
+    set(DBUS_TEST_WORKING_DIR ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN})
     set(DBUS_TEST_DATA ${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/test/data)
     set(DBUS_TEST_DAEMON ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN}/dbus-daemon${EXEEXT})
     set(DBUS_TEST_DBUS_LAUNCH ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN}/dbus-launch${EXEEXT})

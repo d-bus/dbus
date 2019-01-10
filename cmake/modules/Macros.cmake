@@ -54,7 +54,11 @@ macro(add_test_executable _target _source)
             add_test(NAME ${_target} COMMAND ${TEST_WRAPPER} ${Z_DRIVE_IF_WINE}$<TARGET_FILE:${_target}> --tap)
         endif()
     else()
-        add_test(NAME ${_target} COMMAND $<TARGET_FILE:${_target}> --tap)
+        add_test(
+            NAME ${_target}
+            COMMAND $<TARGET_FILE:${_target}> --tap
+            WORKING_DIRECTORY ${DBUS_TEST_WORKING_DIR}
+        )
     endif()
     set(_env)
     list(APPEND _env "DBUS_SESSION_BUS_ADDRESS=")
@@ -94,6 +98,7 @@ macro(add_session_test_executable _target _source)
         --dbus-daemon=${DBUS_TEST_DAEMON}
         ${Z_DRIVE_IF_WINE}$<TARGET_FILE:${_target}>
         --tap
+        WORKING_DIRECTORY ${DBUS_TEST_WORKING_DIR}
     )
     set(_env)
     list(APPEND _env "DBUS_SESSION_BUS_PID=")
