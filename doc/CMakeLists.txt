@@ -72,8 +72,6 @@ macro(DOCBOOK _sources _format)
         set(STYLESHEET "${DOCBOOKXSL_DIR}/html/docbook.xsl")
     endif()
     set(_outfile ${CMAKE_CURRENT_BINARY_DIR}/${_outname})
-
-    set(_outfile ${CMAKE_CURRENT_BINARY_DIR}/${_outname})
     if(EXISTS ${_sources})
         if(XSLTPROC_EXECUTABLE)
             add_custom_target(${_outname}
