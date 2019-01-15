@@ -236,11 +236,7 @@ if(DEFINED DBUS_LIBRARY_REVISION)
 endif()
 
 if(WIN32)
-    set(DBUS_VER_INTERNAL_NAME "${CMAKE_SHARED_LIBRARY_PREFIX}dbus-1-${DBUS_LIBRARY_MAJOR}")
-    set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    set(DBUS_VER_FILE_TYPE "VFT_DLL")
-    configure_file(versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo.rc)
-    list(APPEND libdbus_SOURCES versioninfo.rc)
+    add_library_version_info(libdbus_SOURCES "${CMAKE_SHARED_LIBRARY_PREFIX}dbus-1-${DBUS_LIBRARY_MAJOR}")
 endif()
 
 if(MSVC_IDE)

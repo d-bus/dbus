@@ -90,11 +90,7 @@ include_directories(
 )
 
 if(WIN32)
-    set(DBUS_VER_INTERNAL_NAME "dbus-daemon")
-    set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-    set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
-    list(APPEND BUS_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+    add_executable_version_info(BUS_SOURCES "dbus-daemon")
 endif()
 
 add_library(dbus-daemon-internal STATIC ${BUS_SOURCES})
@@ -127,11 +123,7 @@ if (DBUS_SERVICE)
 	#	${BUS_SOURCES}
 	)
 
-    set(DBUS_VER_INTERNAL_NAME "dbus-service")
-    set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_EXECUTABLE_SUFFIX}")
-    set(DBUS_VER_FILE_TYPE "VFT_APP")
-    configure_file(../dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
-    list(APPEND dbus_service_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
+	add_executable_version_info(dbus_service_SOURCES "dbus-service")
 	add_executable(dbus-service ${dbus_service_SOURCES} )
 	target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 	set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
