@@ -1738,6 +1738,7 @@ doc/dbus-send.1.xml
 doc/dbus-test-tool.1.xml
 doc/dbus-update-activation-environment.1.xml
 doc/dbus-uuidgen.1.xml
+doc/index.html
 dbus-1.pc
 dbus-1-uninstalled.pc
 cmake/DBus1Config.cmake:cmake/DBus1Config.pkgconfig.in

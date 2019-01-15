@@ -149,7 +149,7 @@ docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml htm
 #
 # handle html index file
 #
-configure_file(../cmake/doc/index.html.cmake ${CMAKE_CURRENT_BINARY_DIR}/index.html )
+configure_file(index.html.in ${CMAKE_CURRENT_BINARY_DIR}/index.html)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
 set (EXTRA_DIST
