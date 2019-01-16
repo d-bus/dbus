@@ -1341,15 +1341,9 @@ bus_rules_check_can_own (DBusList *rules,
         }
       else if (rule->d.own.prefix)
         {
-          const char *data;
-          char next_char;
-          if (!_dbus_string_starts_with_c_str (service_name,
-                                               rule->d.own.service_name))
-            continue;
-
-          data = _dbus_string_get_const_data (service_name);
-          next_char = data[strlen (rule->d.own.service_name)];
-          if (next_char != '\0' && next_char != '.')
+          if (!_dbus_string_starts_with_words_c_str (service_name,
+                                                     rule->d.own.service_name,
+                                                     '.'))
             continue;
         }
 

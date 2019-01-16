@@ -338,6 +338,10 @@ dbus_bool_t   _dbus_string_starts_with_c_str     (const DBusString  *a,
 dbus_bool_t   _dbus_string_ends_with_c_str       (const DBusString  *a,
                                                   const char        *c_str);
 DBUS_PRIVATE_EXPORT
+dbus_bool_t   _dbus_string_starts_with_words_c_str (const DBusString  *a,
+                                                    const char        *c_str,
+                                                    char               word_separator);
+DBUS_PRIVATE_EXPORT
 dbus_bool_t   _dbus_string_pop_line              (DBusString        *source,
                                                   DBusString        *dest);
 DBUS_PRIVATE_EXPORT

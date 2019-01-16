@@ -2238,6 +2238,32 @@ _dbus_string_starts_with_c_str (const DBusString *a,
 }
 
 /**
+ * Checks whether a string starts with the given C string, after which it ends or is separated from
+ * the rest by a given separator character.
+ *
+ * @param a the string
+ * @param c_str the C string
+ * @param word_separator the separator
+ * @returns #TRUE if string starts with it
+ */
+dbus_bool_t
+_dbus_string_starts_with_words_c_str (const DBusString  *a,
+                                      const char        *c_str,
+                                      char               word_separator)
+{
+  char next_char;
+  const char *data;
+  _dbus_assert (c_str != NULL);
+
+  if (!_dbus_string_starts_with_c_str (a, c_str))
+    return FALSE;
+
+  data = _dbus_string_get_const_data (a);
+  next_char = data[strlen (c_str)];
+  return next_char == '\0' || next_char == word_separator;
+}
+
+/**
  * Appends a two-character hex digit to a string, where the hex digit
  * has the value of the given byte.
  *
