@@ -49,4 +49,4 @@ DISTCHECK_CONFIGURE_FLAGS = \
 ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
