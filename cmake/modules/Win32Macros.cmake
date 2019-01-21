@@ -16,7 +16,7 @@ if (WIN32)
     # opens the related .sln file with paths setting specified at 
     # configure time. 
     #
-    MACRO (addExplorerWrapper _projectname)
+    macro(addExplorerWrapper _projectname)
         # write explorer wrappers
         get_filename_component(CMAKE_BIN_PATH ${CMAKE_COMMAND} PATH)
         set (ADD_PATH "${CMAKE_BIN_PATH}")
@@ -40,5 +40,5 @@ if (WIN32)
                 write_file (${CMAKE_BINARY_DIR}/${_projectname}-sln.bat "set PATH=${ADD_PATH};%PATH%\nstart ${_projectname}.sln")
             endif (CMAKE_BUILD_TOOL STREQUAL  "nmake")
         endif (MINGW)
-    ENDMACRO (addExplorerWrapper)
+    endmacro(addExplorerWrapper)
 endif(WIN32)
