@@ -38,37 +38,13 @@
  */
 
 DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_hash_test              (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_list_test              (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_marshal_test           (const char *test_data_dir);
-
-dbus_bool_t _dbus_marshal_recursive_test (const char *test_data_dir);
-dbus_bool_t _dbus_marshal_byteswap_test  (const char *test_data_dir);
-dbus_bool_t _dbus_marshal_validate_test  (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_misc_test              (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_signature_test         (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_mem_pool_test          (const char *test_data_dir);
 
-dbus_bool_t _dbus_string_test            (const char *test_data_dir);
-
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_address_test           (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_server_test            (const char *test_data_dir);
-
-dbus_bool_t _dbus_message_test           (const char *test_data_dir);
-dbus_bool_t _dbus_auth_test              (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_sha_test               (const char *test_data_dir);
@@ -79,26 +55,13 @@ dbus_bool_t _dbus_keyring_test           (const char *test_data_dir);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_data_slot_test         (const char *test_data_dir);
 
-dbus_bool_t _dbus_sysdeps_test           (const char *test_data_dir);
-dbus_bool_t _dbus_spawn_test             (const char *test_data_dir);
-
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_userdb_test            (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_transport_unix_test    (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_memory_test            (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_object_tree_test       (const char *test_data_dir);
-
-dbus_bool_t _dbus_credentials_test       (const char *test_data_dir);
-
-dbus_bool_t _dbus_test_generate_bodies   (int         sequence,
-                                          int         byte_order,
-                                          DBusString *signature,
-                                          DBusString *body);
 
 #endif /* DBUS_TEST_H */

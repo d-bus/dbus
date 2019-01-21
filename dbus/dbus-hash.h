@@ -75,6 +75,7 @@ DBUS_PRIVATE_EXPORT
 DBusHashTable* _dbus_hash_table_new                (DBusHashType      type,
                                                     DBusFreeFunction  key_free_function,
                                                     DBusFreeFunction  value_free_function);
+DBUS_PRIVATE_EXPORT
 DBusHashTable* _dbus_hash_table_ref                (DBusHashTable    *table);
 DBUS_PRIVATE_EXPORT
 void           _dbus_hash_table_unref              (DBusHashTable    *table);

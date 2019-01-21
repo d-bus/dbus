@@ -1,7 +1,8 @@
-/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
+/* -*- mode: C; c-file-style: "gnu" -*- */
 /* test-main.c  main() for make check
  *
- * Copyright (C) 2003 Red Hat, Inc.
+ * Copyright 2003-2007 Red Hat, Inc.
+ * Copyright 2013-2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -23,47 +24,27 @@
 
 #include <config.h>
 
-#include "test.h"
+#include "bus/test.h"
 
 #include <dbus/dbus-test-tap.h>
-#include <dbus/dbus-test-wrappers.h>
 
-#include "selinux.h"
+#include "test/test-utils.h"
 
-#ifndef DBUS_ENABLE_EMBEDDED_TESTS
-#error This file is only relevant for the embedded tests
+#if !defined(DBUS_ENABLE_EMBEDDED_TESTS) || !defined(DBUS_UNIX)
+#error This file is only relevant for the embedded tests on Unix
 #endif
 
-static void
-test_pre_hook (void)
+static DBusTestCase test =
 {
-}
-
-static void
-test_post_hook (void)
-{
-  if (_dbus_getenv ("DBUS_TEST_SELINUX"))
-    bus_selinux_shutdown ();
-}
-
-static DBusTestCase tests[] =
-{
-  { "expire-list", bus_expire_list_test },
-  { "config-parser", bus_config_parser_test },
-  { "signals", bus_signals_test },
-  { "dispatch-sha1", bus_dispatch_sha1_test },
-  { "dispatch", bus_dispatch_test },
-  { "activation-service-reload", bus_activation_service_reload_test },
-  { "unix-fds-passing", bus_unix_fds_passing_test },
-  { NULL }
+  "config-parser-trivial",
+  bus_config_parser_trivial_test
 };
 
 int
 main (int argc, char **argv)
 {
-  return _dbus_test_main (argc, argv, _DBUS_N_ELEMENTS (tests), tests,
+  return _dbus_test_main (argc, argv, 1, &test,
                           (DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS |
-                           DBUS_TEST_FLAGS_CHECK_FD_LEAKS |
                            DBUS_TEST_FLAGS_REQUIRE_DATA),
-                          test_pre_hook, test_post_hook);
+                          NULL, NULL);
 }

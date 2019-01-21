@@ -1,7 +1,10 @@
 /* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*- */
 /* test.h  unit test routines
  *
- * Copyright (C) 2003 Red Hat, Inc.
+ * Copyright 2003-2007 Red Hat, Inc.
+ * Copyright 2003-2004 Imendio
+ * Copyright 2009 Lennart Poettering
+ * Copyright 2018 Collabora Ltd.
  *
  * Licensed under the Academic Free License version 2.1
  *

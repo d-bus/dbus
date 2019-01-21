@@ -1,5 +1,69 @@
+/*
+ * Copyright 2002-2008 Red Hat Inc.
+ * Copyright 2011-2017 Collabora Ltd.
+ *
+ * SPDX-License-Identifier: MIT
+ *
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation files
+ * (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy, modify, merge,
+ * publish, distribute, sublicense, and/or sell copies of the Software,
+ * and to permit persons to whom the Software is furnished to do so,
+ * subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 #include <config.h>
 #include "test-utils.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+#if HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
+#ifdef DBUS_UNIX
+# include <dbus/dbus-sysdeps-unix.h>
+#endif
+
+#include "dbus/dbus-message-internal.h"
+#include "dbus/dbus-test-tap.h"
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+/*
+ * Like strdup(), but crash on out-of-memory, and pass through NULL
+ * unchanged (the "0" in the name is meant to be a mnemonic for this,
+ * similar to g_strcmp0()).
+ */
+static char *
+strdup0_or_die (const char *str)
+{
+  char *ret;
+
+  if (str == NULL)
+    return NULL;  /* not an error */
+
+  ret = strdup (str);
+
+  if (ret == NULL)
+    _dbus_test_fatal ("Out of memory");
+
+  return ret;
+}
+#endif
 
 typedef struct
 {
@@ -389,3 +453,122 @@ test_pending_call_store_reply (DBusPendingCall *pc,
   *message_p = dbus_pending_call_steal_reply (pc);
   _dbus_assert (*message_p != NULL);
 }
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+/*
+ * _dbus_test_main:
+ * @argc: number of command-line arguments
+ * @argv: array of @argc arguments
+ * @n_tests: length of @tests
+ * @tests: array of @n_tests tests
+ * @flags: flags affecting all tests
+ * @test_pre_hook: if not %NULL, called before each test
+ * @test_post_hook: if not %NULL, called after each test
+ *
+ * Wrapper for dbus tests that do not use GLib. Processing of @tests
+ * can be terminated early by an entry with @name = NULL, which is a
+ * convenient way to put a trailing comma on every "real" test entry
+ * without breaking compilation on pedantic C compilers.
+ */
+int
+_dbus_test_main (int                  argc,
+                 char               **argv,
+                 size_t               n_tests,
+                 const DBusTestCase  *tests,
+                 DBusTestFlags        flags,
+                 void               (*test_pre_hook) (void),
+                 void               (*test_post_hook) (void))
+{
+  char *test_data_dir;
+  char *specific_test;
+  size_t i;
+
+#ifdef DBUS_UNIX
+  /* close any inherited fds so dbus-spawn's check for close-on-exec works */
+  _dbus_close_all ();
+#endif
+
+#if HAVE_SETLOCALE
+  setlocale(LC_ALL, "");
+#endif
+
+  /* We can't assume that strings from _dbus_getenv() will remain valid
+   * forever, because some tests call setenv(), which is allowed to
+   * reallocate the entire environment block, and in Wine it seems that it
+   * genuinely does; so we copy them.
+   *
+   * We can't use _dbus_strdup() here because the test might be checking
+   * for memory leaks, so we don't want any libdbus allocations still
+   * alive at the end; so we use strdup(), which is not in Standard C but
+   * is available in both POSIX and Windows. */
+  if (argc > 1 && strcmp (argv[1], "--tap") != 0)
+    test_data_dir = strdup0_or_die (argv[1]);
+  else
+    test_data_dir = strdup0_or_die (_dbus_getenv ("DBUS_TEST_DATA"));
+
+  if (test_data_dir != NULL)
+    _dbus_test_diag ("Test data in %s", test_data_dir);
+  else if (flags & DBUS_TEST_FLAGS_REQUIRE_DATA)
+    _dbus_test_fatal ("Must specify test data directory as argv[1] or "
+                      "in DBUS_TEST_DATA environment variable");
+  else
+    _dbus_test_diag ("No test data!");
+
+  if (argc > 2)
+    specific_test = strdup0_or_die (argv[2]);
+  else
+    specific_test = strdup0_or_die (_dbus_getenv ("DBUS_TEST_ONLY"));
+
+  for (i = 0; i < n_tests; i++)
+    {
+      long before, after;
+      DBusInitialFDs *initial_fds = NULL;
+
+      if (tests[i].name == NULL)
+        break;
+
+      if (n_tests > 1 &&
+          specific_test != NULL &&
+          strcmp (specific_test, tests[i].name) != 0)
+        {
+          _dbus_test_skip ("%s - Only intending to run %s",
+                           tests[i].name, specific_test);
+          continue;
+        }
+
+      _dbus_test_diag ("Running test: %s", tests[i].name);
+      _dbus_get_monotonic_time (&before, NULL);
+
+      if (test_pre_hook)
+        test_pre_hook ();
+
+      if (flags & DBUS_TEST_FLAGS_CHECK_FD_LEAKS)
+        initial_fds = _dbus_check_fdleaks_enter ();
+
+      if (tests[i].func (test_data_dir))
+        _dbus_test_ok ("%s", tests[i].name);
+      else
+        _dbus_test_not_ok ("%s", tests[i].name);
+
+      _dbus_get_monotonic_time (&after, NULL);
+
+      _dbus_test_diag ("%s test took %ld seconds",
+                       tests[i].name, after - before);
+
+      if (test_post_hook)
+        test_post_hook ();
+
+      if (flags & DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS)
+        _dbus_test_check_memleaks (tests[i].name);
+
+      if (flags & DBUS_TEST_FLAGS_CHECK_FD_LEAKS)
+        _dbus_check_fdleaks_leave (initial_fds);
+    }
+
+  free (test_data_dir);
+  free (specific_test);
+
+  return _dbus_test_done_testing ();
+}
+
+#endif

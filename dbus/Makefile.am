@@ -245,17 +245,8 @@ DBUS_SHARED_SOURCES=				\
 DBUS_UTIL_SOURCES=				\
 	dbus-asv-util.c				\
 	dbus-asv-util.h				\
-	dbus-auth-script.c			\
-	dbus-auth-script.h			\
-	dbus-auth-util.c			\
-	dbus-credentials-util.c			\
 	dbus-mainloop.c				\
 	dbus-mainloop.h				\
-	dbus-marshal-byteswap-util.c		\
-	dbus-marshal-recursive-util.c		\
-	dbus-marshal-validate-util.c		\
-	dbus-message-factory.c			\
-	dbus-message-factory.h			\
 	dbus-message-util.c			\
 	dbus-shell.c				\
 	dbus-shell.h				\
@@ -267,14 +258,6 @@ DBUS_UTIL_SOURCES=				\
 	dbus-string-util.c			\
 	dbus-sysdeps-util.c			\
 	dbus-test.h
-
-if DBUS_ENABLE_EMBEDDED_TESTS
-DBUS_UTIL_SOURCES += \
-	dbus-spawn-test.c \
-	dbus-test-wrappers.c \
-	dbus-test-wrappers.h \
-	$(NULL)
-endif
 
 libdbus_1_la_SOURCES=				\
 	$(DBUS_LIB_SOURCES)			\
@@ -324,16 +307,6 @@ libdbus_1_la_LIBADD += libdbus-init-win.la
 endif
 
 noinst_PROGRAMS =
-
-if DBUS_ENABLE_EMBEDDED_TESTS
-# We can't actually run this til we've reached test/
-noinst_PROGRAMS += test-dbus
-endif
-
-test_dbus_SOURCES=				\
-	dbus-test-main.c
-
-test_dbus_LDADD = libdbus-internal.la
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
 @CODE_COVERAGE_RULES@

@@ -22,10 +22,13 @@
  */
 
 #include <config.h>
-#include "dbus-internals.h"
-#include "dbus-test.h"
-#include "dbus-auth.h"
-#include <dbus/dbus-test-tap.h>
+
+#include "misc-internals.h"
+
+#include "dbus/dbus-auth.h"
+#include "dbus/dbus-internals.h"
+#include "dbus/dbus-test-tap.h"
+#include "dbus/dbus-test.h"
 
 /**
  * @addtogroup DBusAuth
@@ -50,17 +53,17 @@ process_test_subdir (const DBusString          *test_base_dir,
 
   retval = FALSE;
   dir = NULL;
-  
+
   if (!_dbus_string_init (&test_directory))
     _dbus_test_fatal ("didn't allocate test_directory");
 
   _dbus_string_init_const (&filename, subdir);
-  
+
   if (!_dbus_string_copy (test_base_dir, 0,
                           &test_directory, 0))
     _dbus_test_fatal ("couldn't copy test_base_dir to test_directory");
 
-  if (!_dbus_concat_dir_and_file (&test_directory, &filename))    
+  if (!_dbus_concat_dir_and_file (&test_directory, &filename))
     _dbus_test_fatal ("couldn't allocate full path");
 
   _dbus_string_free (&filename);
@@ -83,7 +86,7 @@ process_test_subdir (const DBusString          *test_base_dir,
   while (_dbus_directory_get_next_file (dir, &filename, &error))
     {
       DBusString full_path;
-      
+
       if (!_dbus_string_init (&full_path))
         _dbus_test_fatal ("couldn't init string");
 
@@ -119,9 +122,9 @@ process_test_subdir (const DBusString          *test_base_dir,
       dbus_error_free (&error);
       goto failed;
     }
-    
+
   retval = TRUE;
-  
+
  failed:
 
   if (dir)
@@ -139,28 +142,28 @@ process_test_dirs (const char *test_data_dir)
   dbus_bool_t retval;
 
   retval = FALSE;
-  
+
   _dbus_string_init_const (&test_directory, test_data_dir);
 
   if (!process_test_subdir (&test_directory, "auth"))
     goto failed;
 
   retval = TRUE;
-  
+
  failed:
 
   _dbus_string_free (&test_directory);
-  
+
   return retval;
 }
 
 dbus_bool_t
 _dbus_auth_test (const char *test_data_dir)
 {
-  
+
   if (test_data_dir == NULL)
     return TRUE;
-  
+
   if (!process_test_dirs (test_data_dir))
     return FALSE;
 

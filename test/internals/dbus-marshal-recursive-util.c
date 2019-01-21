@@ -23,12 +23,14 @@
 
 #include <config.h>
 
+#include "dbus-marshal-recursive-util.h"
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 
-#include "dbus-marshal-recursive.h"
-#include "dbus-marshal-basic.h"
-#include "dbus-signature.h"
-#include "dbus-internals.h"
+#include "dbus/dbus-marshal-recursive.h"
+#include "dbus/dbus-marshal-basic.h"
+#include "dbus/dbus-signature.h"
+#include "dbus/dbus-internals.h"
 #include <dbus/dbus-test-tap.h>
 #include <string.h>
 
@@ -85,7 +87,7 @@ equal_values_helper (DBusTypeReader *lhs,
 
       basic_value_zero (&lhs_value);
       basic_value_zero (&rhs_value);
-      
+
       _dbus_type_reader_read_basic (lhs, &lhs_value);
       _dbus_type_reader_read_basic (rhs, &rhs_value);
 
@@ -124,8 +126,8 @@ _dbus_type_reader_equal_values (const DBusTypeReader *lhs,
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 
-#include "dbus-test.h"
-#include "dbus-list.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-list.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1611,7 +1613,7 @@ build_body (TestTypeNode **nodes,
 
   data_block_init_reader_writer (&block,
                                  &reader, &writer);
-  
+
   /* DBusTypeWriter assumes it's writing into an existing signature,
    * so doesn't add nul on its own. We have to do that.
    */
@@ -1633,7 +1635,7 @@ build_body (TestTypeNode **nodes,
                               body, 0))
     _dbus_test_fatal ("oom");
 
-  data_block_free (&block);  
+  data_block_free (&block);
 }
 
 dbus_bool_t
@@ -1652,7 +1654,7 @@ _dbus_test_generate_bodies (int           sequence,
     return FALSE;
 
   n_nodes = 1;
-  
+
   build_body (nodes, n_nodes, byte_order, signature, body);
 
 
@@ -1662,7 +1664,7 @@ _dbus_test_generate_bodies (int           sequence,
       node_destroy (nodes[i]);
       ++i;
     }
-  
+
   return TRUE;
 }
 
@@ -2681,7 +2683,7 @@ object_path_from_seed (char          *buf,
           ++i;
           buf[i] = v;
           ++i;
-          
+
           v += 1;
         }
     }
@@ -3304,7 +3306,7 @@ dict_write_value (TestTypeNode   *node,
       _dbus_string_free (&entry_value_signature);
       return FALSE;
     }
-  
+
   child = _dbus_list_get_first (&container->children);
 
   if (!node_build_signature (child,
@@ -3347,19 +3349,19 @@ dict_write_value (TestTypeNode   *node,
                                           DBUS_TYPE_INT32,
                                           &key))
         goto oom;
-      
+
       if (!node_write_value (child, block, &entry_sub, seed + i))
         goto oom;
 
       if (!_dbus_type_writer_unrecurse (&sub, &entry_sub))
         goto oom;
-      
+
       ++i;
     }
 
   if (!_dbus_type_writer_unrecurse (writer, &sub))
     goto oom;
-  
+
   _dbus_string_free (&entry_value_signature);
   _dbus_string_free (&dict_entry_signature);
   return TRUE;
@@ -3394,20 +3396,20 @@ dict_read_or_set_value (TestTypeNode   *node,
       _dbus_type_reader_recurse (reader, &sub);
 
       check_expected_type (&sub, DBUS_TYPE_DICT_ENTRY);
-      
+
       i = 0;
       while (i < n_entries)
         {
           DBusTypeReader entry_sub;
 
           check_expected_type (&sub, DBUS_TYPE_DICT_ENTRY);
-          
+
           _dbus_type_reader_recurse (&sub, &entry_sub);
-          
+
           if (realign_root == NULL)
             {
               dbus_int32_t v;
-              
+
               check_expected_type (&entry_sub, DBUS_TYPE_INT32);
 
               _dbus_type_reader_read_basic (&entry_sub, &v);
@@ -3415,7 +3417,7 @@ dict_read_or_set_value (TestTypeNode   *node,
               _dbus_assert (v == (dbus_int32_t) uint32_from_seed (seed + i));
 
               NEXT_EXPECTING_TRUE (&entry_sub);
-              
+
               if (!node_read_value (child, &entry_sub, seed + i))
                 return FALSE;
 
@@ -3424,22 +3426,22 @@ dict_read_or_set_value (TestTypeNode   *node,
           else
             {
               dbus_int32_t v;
-              
+
               v = (dbus_int32_t) uint32_from_seed (seed + i);
-              
+
               if (!_dbus_type_reader_set_basic (&entry_sub,
                                                 &v,
                                                 realign_root))
                 return FALSE;
 
               NEXT_EXPECTING_TRUE (&entry_sub);
-              
+
               if (!node_set_value (child, &entry_sub, realign_root, seed + i))
                 return FALSE;
 
               NEXT_EXPECTING_FALSE (&entry_sub);
             }
-          
+
           if (i == (n_entries - 1))
             NEXT_EXPECTING_FALSE (&sub);
           else
@@ -3483,7 +3485,7 @@ dict_build_signature (TestTypeNode   *node,
 
   if (!_dbus_string_append (str, DBUS_DICT_ENTRY_BEGIN_CHAR_AS_STRING DBUS_TYPE_INT32_AS_STRING))
     goto oom;
-  
+
   if (!node_build_signature (_dbus_list_get_first (&container->children),
                              str))
     goto oom;

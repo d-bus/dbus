@@ -82,7 +82,9 @@ DIR_WATCH_SOURCE=dir-watch-default.c
 endif
 endif
 
-BUS_SOURCES=					\
+noinst_LTLIBRARIES = libdbus-daemon-internal.la
+
+libdbus_daemon_internal_la_SOURCES =		\
 	activation.c				\
 	activation.h				\
 	activation-exit-codes.h			\
@@ -127,17 +129,17 @@ BUS_SOURCES=					\
 	utils.h					\
 	$(NULL)
 
-dbus_daemon_SOURCES=				\
-	$(BUS_SOURCES)				\
-	main.c
+libdbus_daemon_internal_la_LIBADD = \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(top_builddir)/dbus/libdbus-internal.la \
+	$(EFENCE) \
+	$(DBUS_BUS_LIBS) \
+	$(NULL)
 
-dbus_daemon_LDADD=					\
-	$(top_builddir)/dbus/libdbus-1.la	\
-	$(top_builddir)/dbus/libdbus-internal.la	\
-	$(EFENCE)					\
-	$(DBUS_BUS_LIBS)
+dbus_daemon_SOURCES = main.c
+dbus_daemon_LDADD = libdbus-daemon-internal.la
 
-LAUNCH_HELPER_SOURCES=				\
+liblaunch_helper_internal_la_SOURCES =		\
 	config-loader-expat.c			\
 	config-parser-common.c			\
 	config-parser-common.h			\
@@ -149,102 +151,29 @@ LAUNCH_HELPER_SOURCES=				\
 	utils.h					\
 	activation-exit-codes.h			\
 	activation-helper.h	  		\
-	activation-helper.c
-
-## This is the installed launch helper with the setuid checks
-dbus_daemon_launch_helper_SOURCES=		\
-	activation-helper-bin.c			\
-	$(LAUNCH_HELPER_SOURCES)
-
-dbus_daemon_launch_helper_LDADD=		\
-	$(top_builddir)/dbus/libdbus-1.la \
-	$(top_builddir)/dbus/libdbus-internal.la	\
-	$(DBUS_LAUNCHER_LIBS)
-
-## we build another binary so we can do the launch testing without root privs.
-## DO NOT INSTALL THIS FILE
-dbus_daemon_launch_helper_test_SOURCES=		\
-	activation-helper-bin.c			\
-	$(LAUNCH_HELPER_SOURCES)
-
-dbus_daemon_launch_helper_test_LDADD=		\
-	$(top_builddir)/dbus/libdbus-1.la \
-	$(top_builddir)/dbus/libdbus-internal.la \
-	$(DBUS_LAUNCHER_LIBS)
-
-dbus_daemon_launch_helper_test_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-DACTIVATION_LAUNCHER_TEST
-
-## we build yet another binary so we can do the OOM tests
-## DO NOT INSTALL THIS FILE
-test_bus_launch_helper_SOURCES=		\
-	test-launch-helper.c   		\
-	$(LAUNCH_HELPER_SOURCES)
-
-test_bus_launch_helper_LDADD=		\
-	$(top_builddir)/dbus/libdbus-1.la \
-	$(top_builddir)/dbus/libdbus-internal.la \
-	$(DBUS_LAUNCHER_LIBS)
 	$(NULL)
 
-test_bus_launch_helper_CPPFLAGS = \
-	$(AM_CPPFLAGS) \
-	-DACTIVATION_LAUNCHER_TEST	\
-	-DACTIVATION_LAUNCHER_DO_OOM
+## This is the installed launch helper with the setuid checks
+## All files that have special cases #ifdef ACTIVATION_LAUNCHER_TEST must
+## be listed here and included in test/bus/launch-helper-for-tests.c,
+## not in liblaunch-helper-internal.la.
+dbus_daemon_launch_helper_SOURCES = \
+	activation-helper.c \
+	activation-helper-bin.c \
+	$(NULL)
+dbus_daemon_launch_helper_LDADD = liblaunch-helper-internal.la
+
+liblaunch_helper_internal_la_LIBADD = \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(top_builddir)/dbus/libdbus-internal.la \
+	$(DBUS_LAUNCHER_LIBS)
 
 noinst_PROGRAMS =
 dbus_daemon_exec_PROGRAMS = dbus-daemon
 if DBUS_UNIX
+noinst_LTLIBRARIES += liblaunch-helper-internal.la
 libexec_PROGRAMS = dbus-daemon-launch-helper
 endif DBUS_UNIX
-
-## Note that TESTS has special meaning (stuff to use in make check).
-## We don't actually want to run any of these tests until test/ has been
-## compiled, so we don't put them in TESTS here; we run them in test/
-## instead.
-
-if DBUS_ENABLE_EMBEDDED_TESTS
-## we use noinst_PROGRAMS not check_PROGRAMS so that we build
-## even when not doing "make check"
-
-# run as a test by test/Makefile.am
-noinst_PROGRAMS += test-bus
-
-if DBUS_UNIX
-# run as a test by test/Makefile.am
-noinst_PROGRAMS += test-bus-launch-helper test-bus-system
-# this is used by the tests but is not,itself, a test
-noinst_PROGRAMS += dbus-daemon-launch-helper-test
-endif DBUS_UNIX
-
-endif DBUS_ENABLE_EMBEDDED_TESTS
-
-test_bus_system_SOURCES=			\
-	config-loader-expat.c			\
-	config-parser-common.c			\
-	config-parser-common.h			\
-	config-parser-trivial.c			\
-	config-parser-trivial.h			\
-	utils.c					\
-	utils.h					\
-	test-system.c
-
-test_bus_system_LDADD = \
-	$(top_builddir)/dbus/libdbus-1.la \
-	$(top_builddir)/dbus/libdbus-internal.la \
-	$(DBUS_BUS_LIBS) \
-	$(NULL)
-
-test_bus_SOURCES=				\
-	$(BUS_SOURCES)				\
-	test-main.c
-
-test_bus_LDADD = \
-	$(top_builddir)/dbus/libdbus-1.la \
-	$(top_builddir)/dbus/libdbus-internal.la \
-	$(DBUS_BUS_LIBS) \
-	$(NULL)
 
 install-data-hook:
 	$(mkinstalldirs) $(DESTDIR)$(dbusdatadir)/session.d

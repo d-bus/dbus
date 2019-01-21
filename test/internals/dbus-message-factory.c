@@ -26,10 +26,14 @@
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 #include "dbus-message-factory.h"
-#include "dbus-message-private.h"
-#include "dbus-signature.h"
-#include "dbus-test.h"
-#include <dbus/dbus-test-tap.h>
+
+#include "dbus/dbus-message-private.h"
+#include "dbus/dbus-signature.h"
+#include "dbus/dbus-test.h"
+#include "dbus/dbus-test-tap.h"
+
+#include "dbus-marshal-recursive-util.h"
+
 #include <stdio.h>
 
 typedef enum
@@ -142,25 +146,25 @@ generate_trivial_inner (DBusMessageDataIter *iter,
       {
         DBusMessageIter iter2;
         const char *v_STRING = "This is an error";
-        
+
         dbus_message_iter_init_append (message, &iter2);
         if (!dbus_message_iter_append_basic (&iter2,
                                              DBUS_TYPE_STRING,
                                              &v_STRING))
           _dbus_test_fatal ("oom");
       }
-      
+
       set_reply_serial (message);
       break;
     default:
       return FALSE;
     }
-  
+
   if (message == NULL)
     _dbus_test_fatal ("oom");
 
   *message_p = message;
-  
+
   return TRUE;
 }
 
@@ -206,7 +210,7 @@ generate_many_bodies_inner (DBusMessageDataIter *iter,
       _dbus_marshal_set_uint32 (&message->header.data, BODY_LENGTH_OFFSET,
                                 _dbus_string_get_length (&message->body),
                                 byte_order);
-      
+
       *message_p = message;
     }
   else
@@ -214,7 +218,7 @@ generate_many_bodies_inner (DBusMessageDataIter *iter,
       dbus_message_unref (message);
       *message_p = NULL;
     }
-  
+
   _dbus_string_free (&signature);
   _dbus_string_free (&body);
 
@@ -230,7 +234,7 @@ generate_from_message (DBusString            *data,
   dbus_message_lock (message);
 
   *expected_validity = DBUS_VALID;
-  
+
   /* move for efficiency, since we'll nuke the message anyway */
   if (!_dbus_string_move (&message->header.data, 0,
                           data, 0))
@@ -254,7 +258,7 @@ generate_outer (DBusMessageDataIter   *iter,
     return FALSE;
 
   iter_next (iter);
-  
+
   _dbus_assert (message != NULL);
 
   generate_from_message (data, expected_validity, message);
@@ -317,7 +321,7 @@ simple_method_return (void)
     _dbus_test_fatal ("oom");
 
   set_reply_serial (message);
-  
+
   return message;
 }
 
@@ -333,7 +337,7 @@ simple_error (void)
     _dbus_test_fatal ("oom");
 
   set_reply_serial (message);
-  
+
   return message;
 }
 
@@ -400,7 +404,7 @@ generate_special (DBusMessageDataIter   *iter,
   dbus_int32_t v_INT32;
 
   _dbus_assert (_dbus_string_get_length (data) == 0);
-  
+
   message = NULL;
   pos = -1;
   v_INT32 = 42;
@@ -420,7 +424,7 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       /* set an invalid typecode */
       _dbus_string_set_byte (data, pos + 1, '$');
 
@@ -431,7 +435,7 @@ generate_special (DBusMessageDataIter   *iter,
       char long_sig[DBUS_MAXIMUM_TYPE_RECURSION_DEPTH+2];
       const char *v_STRING;
       int i;
-      
+
       message = simple_method_call ();
       if (!dbus_message_append_args (message,
                                      DBUS_TYPE_INT32, &v_INT32,
@@ -459,7 +463,7 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_EXCEEDED_MAXIMUM_ARRAY_RECURSION;
     }
   else if (item_seq == 2)
@@ -467,7 +471,7 @@ generate_special (DBusMessageDataIter   *iter,
       char long_sig[DBUS_MAXIMUM_TYPE_RECURSION_DEPTH*2+4];
       const char *v_STRING;
       int i;
-      
+
       message = simple_method_call ();
       if (!dbus_message_append_args (message,
                                      DBUS_TYPE_INT32, &v_INT32,
@@ -492,7 +496,7 @@ generate_special (DBusMessageDataIter   *iter,
           ++i;
         }
       long_sig[i] = DBUS_TYPE_INVALID;
-      
+
       v_STRING = long_sig;
       if (!_dbus_header_set_field_basic (&message->header,
                                          DBUS_HEADER_FIELD_SIGNATURE,
@@ -504,7 +508,7 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_EXCEEDED_MAXIMUM_STRUCT_RECURSION;
     }
   else if (item_seq == 3)
@@ -521,9 +525,9 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, pos + 1, DBUS_STRUCT_BEGIN_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_STRUCT_STARTED_BUT_NOT_ENDED;
     }
   else if (item_seq == 4)
@@ -540,9 +544,9 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, pos + 1, DBUS_STRUCT_END_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_STRUCT_ENDED_BUT_NOT_STARTED;
     }
   else if (item_seq == 5)
@@ -559,19 +563,19 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, pos + 1, DBUS_STRUCT_BEGIN_CHAR);
       _dbus_string_set_byte (data, pos + 2, DBUS_STRUCT_END_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_STRUCT_HAS_NO_FIELDS;
     }
   else if (item_seq == 6)
     {
       message = simple_method_call ();
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, TYPE_OFFSET, DBUS_MESSAGE_TYPE_INVALID);
-      
+
       *expected_validity = DBUS_INVALID_BAD_MESSAGE_TYPE;
     }
   else if (item_seq == 7)
@@ -579,9 +583,9 @@ generate_special (DBusMessageDataIter   *iter,
       /* Messages of unknown type are considered valid */
       message = simple_method_call ();
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, TYPE_OFFSET, 100);
-      
+
       *expected_validity = DBUS_VALID;
     }
   else if (item_seq == 8)
@@ -591,7 +595,7 @@ generate_special (DBusMessageDataIter   *iter,
       message = simple_method_call ();
       byte_order = _dbus_header_get_byte_order (&message->header);
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_marshal_set_uint32 (data, BODY_LENGTH_OFFSET,
                                 DBUS_MAXIMUM_MESSAGE_LENGTH / 2 + 4,
                                 byte_order);
@@ -645,7 +649,7 @@ generate_special (DBusMessageDataIter   *iter,
         _dbus_test_fatal ("oom");
 
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_VALID;
     }
   else if (item_seq == 13)
@@ -657,7 +661,7 @@ generate_special (DBusMessageDataIter   *iter,
         _dbus_test_fatal ("oom");
 
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_MISSING_INTERFACE;
     }
   else if (item_seq == 14)
@@ -668,7 +672,7 @@ generate_special (DBusMessageDataIter   *iter,
         _dbus_test_fatal ("oom");
 
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_MISSING_REPLY_SERIAL;
     }
   else if (item_seq == 15)
@@ -679,7 +683,7 @@ generate_special (DBusMessageDataIter   *iter,
         _dbus_test_fatal ("oom");
 
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_MISSING_ERROR_NAME;
     }
   else if (item_seq == 16)
@@ -688,7 +692,7 @@ generate_special (DBusMessageDataIter   *iter,
       const char *v_STRING;
       int i;
       int n_begins;
-      
+
       message = simple_method_call ();
       if (!dbus_message_append_args (message,
                                      DBUS_TYPE_INT32, &v_INT32,
@@ -711,7 +715,7 @@ generate_special (DBusMessageDataIter   *iter,
 
       long_sig[i] = DBUS_TYPE_INT32;
       ++i;
-      
+
       while (n_begins > 0)
         {
           long_sig[i] = DBUS_DICT_ENTRY_END_CHAR;
@@ -719,7 +723,7 @@ generate_special (DBusMessageDataIter   *iter,
           n_begins -= 1;
         }
       long_sig[i] = DBUS_TYPE_INVALID;
-      
+
       v_STRING = long_sig;
       if (!_dbus_header_set_field_basic (&message->header,
                                          DBUS_HEADER_FIELD_SIGNATURE,
@@ -731,7 +735,7 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       *expected_validity = DBUS_INVALID_EXCEEDED_MAXIMUM_DICT_ENTRY_RECURSION;
     }
   else if (item_seq == 17)
@@ -751,7 +755,7 @@ generate_special (DBusMessageDataIter   *iter,
 
       _dbus_string_set_byte (data, pos + 1, DBUS_TYPE_ARRAY);
       _dbus_string_set_byte (data, pos + 2, DBUS_DICT_ENTRY_BEGIN_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_DICT_ENTRY_STARTED_BUT_NOT_ENDED;
     }
   else if (item_seq == 18)
@@ -768,9 +772,9 @@ generate_special (DBusMessageDataIter   *iter,
                                   DBUS_HEADER_FIELD_SIGNATURE,
                                   NULL, &pos);
       generate_from_message (data, expected_validity, message);
-      
+
       _dbus_string_set_byte (data, pos + 1, DBUS_DICT_ENTRY_END_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_DICT_ENTRY_ENDED_BUT_NOT_STARTED;
     }
   else if (item_seq == 19)
@@ -791,7 +795,7 @@ generate_special (DBusMessageDataIter   *iter,
       _dbus_string_set_byte (data, pos + 1, DBUS_TYPE_ARRAY);
       _dbus_string_set_byte (data, pos + 2, DBUS_DICT_ENTRY_BEGIN_CHAR);
       _dbus_string_set_byte (data, pos + 3, DBUS_DICT_ENTRY_END_CHAR);
-      
+
       *expected_validity = DBUS_INVALID_DICT_ENTRY_HAS_NO_FIELDS;
     }
   else if (item_seq == 20)
@@ -840,7 +844,7 @@ generate_wrong_length (DBusMessageDataIter *iter,
     return FALSE;
 
   _dbus_assert (len_seq < _DBUS_N_ELEMENTS (lengths));
-  
+
   iter_recurse (iter);
   if (!generate_many_bodies (iter, data, expected_validity))
     {
@@ -862,7 +866,7 @@ generate_wrong_length (DBusMessageDataIter *iter,
       *expected_validity = DBUS_INVALID_FOR_UNKNOWN_REASON;
     }
   else
-    {      
+    {
       if (!_dbus_string_lengthen (data, adjust))
         _dbus_test_fatal ("oom");
       *expected_validity = DBUS_INVALID_TOO_MUCH_DATA;
@@ -873,9 +877,9 @@ generate_wrong_length (DBusMessageDataIter *iter,
     int old_body_len;
     int new_body_len;
     int byte_order;
-    
+
     _dbus_assert (_dbus_string_get_length (data) >= DBUS_MINIMUM_HEADER_SIZE);
-    
+
     byte_order = _dbus_string_get_byte (data, BYTE_ORDER_OFFSET);
     old_body_len = _dbus_marshal_read_uint32 (data,
                                               BODY_LENGTH_OFFSET,
@@ -892,7 +896,7 @@ generate_wrong_length (DBusMessageDataIter *iter,
 
     _dbus_verbose ("changing body len from %u to %u by adjust %d\n",
                    old_body_len, new_body_len, adjust);
-    
+
     _dbus_marshal_set_uint32 (data, BODY_LENGTH_OFFSET,
                               new_body_len,
                               byte_order);
@@ -922,7 +926,7 @@ generate_byte_changed (DBusMessageDataIter *iter,
   byte_seq = iter_get_sequence (iter);
   iter_next (iter);
   iter_unrecurse (iter);
-  
+
   if (byte_seq == _dbus_string_get_length (data))
     {
       _dbus_string_set_length (data, 0);
@@ -966,21 +970,21 @@ find_next_typecode (DBusMessageDataIter *iter,
   _dbus_string_set_length (data, 0);
 
   body_seq = iter_get_sequence (iter);
-  
+
   if (!generate_many_bodies (iter, data, expected_validity))
     return FALSE;
   /* Undo the "next" in generate_many_bodies */
   iter_set_sequence (iter, body_seq);
-  
+
   iter_recurse (iter);
   while (TRUE)
     {
       _dbus_assert (iter->depth == (base_depth + 1));
-      
+
       byte_seq = iter_get_sequence (iter);
 
       _dbus_assert (byte_seq <= _dbus_string_get_length (data));
-      
+
       if (byte_seq == _dbus_string_get_length (data))
         {
           /* reset byte count */
@@ -1005,7 +1009,7 @@ find_next_typecode (DBusMessageDataIter *iter,
   iter_unrecurse (iter);
 
   _dbus_assert (iter->depth == (base_depth + 0));
-  
+
   return TRUE;
 }
 
@@ -1047,7 +1051,7 @@ generate_typecode_changed (DBusMessageDataIter *iter,
  restart:
   _dbus_assert (iter->depth == (base_depth + 0));
   _dbus_string_set_length (data, 0);
-  
+
   if (!find_next_typecode (iter, data, expected_validity))
     return FALSE;
 
@@ -1055,13 +1059,13 @@ generate_typecode_changed (DBusMessageDataIter *iter,
   byte_seq = iter_get_sequence (iter);
 
   _dbus_assert (byte_seq < _dbus_string_get_length (data));
-  
+
   iter_recurse (iter);
   typecode_seq = iter_get_sequence (iter);
   iter_next (iter);
 
   _dbus_assert (typecode_seq <= _DBUS_N_ELEMENTS (typecodes));
-  
+
   if (typecode_seq == _DBUS_N_ELEMENTS (typecodes))
     {
       _dbus_assert (iter->depth == (base_depth + 2));
@@ -1084,7 +1088,7 @@ generate_typecode_changed (DBusMessageDataIter *iter,
   _dbus_test_diag ("Changing byte %d in message %d to %c",
           byte_seq, iter_get_sequence (iter), typecodes[typecode_seq]);
 #endif
-  
+
   _dbus_string_set_byte (data, byte_seq, typecodes[typecode_seq]);
   *expected_validity = DBUS_VALIDITY_UNKNOWN;
   return TRUE;
@@ -1129,12 +1133,12 @@ generate_uint32_changed (DBusMessageDataIter *iter,
    */
 
   base_depth = iter->depth;
-  
+
  next_body:
   _dbus_assert (iter->depth == (base_depth + 0));
   _dbus_string_set_length (data, 0);
   body_seq = iter_get_sequence (iter);
-  
+
   if (!generate_many_bodies (iter, data, expected_validity))
     return FALSE;
 
@@ -1145,7 +1149,7 @@ generate_uint32_changed (DBusMessageDataIter *iter,
  next_change:
   _dbus_assert (iter->depth == (base_depth + 1));
   change_seq = iter_get_sequence (iter);
-  
+
   if (change_seq == _DBUS_N_ELEMENTS (uint32_changes))
     {
       /* Reset change count */
@@ -1156,7 +1160,7 @@ generate_uint32_changed (DBusMessageDataIter *iter,
     }
 
   _dbus_assert (iter->depth == (base_depth + 1));
-  
+
   iter_recurse (iter);
   _dbus_assert (iter->depth == (base_depth + 2));
   byte_seq = iter_get_sequence (iter);
@@ -1180,11 +1184,11 @@ generate_uint32_changed (DBusMessageDataIter *iter,
       iter_next (iter);
       goto next_change;
     }
-  
+
   _dbus_assert (byte_seq <= (_dbus_string_get_length (data) - 4));
 
   byte_order = _dbus_string_get_byte (data, BYTE_ORDER_OFFSET);
-  
+
   v_UINT32 = _dbus_marshal_read_uint32 (data, byte_seq, byte_order, NULL);
 
   change = &uint32_changes[change_seq];
@@ -1206,26 +1210,26 @@ generate_uint32_changed (DBusMessageDataIter *iter,
     _dbus_test_diag ("adjust by %d", (int) change->value);
   else
     _dbus_test_diag ("set to %u", change->value);
-  
+
   _dbus_test_diag (" \t%u -> %u",
           _dbus_marshal_read_uint32 (data, byte_seq, byte_order, NULL),
           v_UINT32);
 #endif
-  
+
   _dbus_marshal_set_uint32 (data, byte_seq, v_UINT32, byte_order);
   *expected_validity = DBUS_VALIDITY_UNKNOWN;
 
   _dbus_assert (iter->depth == (base_depth + 1));
   iter_unrecurse (iter);
   _dbus_assert (iter->depth == (base_depth + 0));
-          
+
   return TRUE;
 }
 
 typedef struct
 {
   const char *name;
-  DBusMessageGeneratorFunc func;  
+  DBusMessageGeneratorFunc func;
 } DBusMessageGenerator;
 
 static const DBusMessageGenerator generators[] = {
@@ -1251,7 +1255,7 @@ void
 _dbus_message_data_iter_init (DBusMessageDataIter *iter)
 {
   int i;
-  
+
   iter->depth = 0;
   i = 0;
   while (i < _DBUS_MESSAGE_DATA_MAX_NESTING)
@@ -1271,17 +1275,17 @@ _dbus_message_data_iter_get_and_next (DBusMessageDataIter *iter,
 
  restart:
   generator = iter_get_sequence (iter);
-  
+
   if (generator == _DBUS_N_ELEMENTS (generators))
     return FALSE;
 
   iter_recurse (iter);
-  
+
   if (iter_first_in_series (iter))
     {
       _dbus_test_diag (" testing message loading: %s ", generators[generator].name);
     }
-  
+
   func = generators[generator].func;
 
   if (!_dbus_string_init (&data->data))

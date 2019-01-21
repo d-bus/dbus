@@ -77,6 +77,9 @@ add_test_executable(test-printf ${TEST_DIR}/internals/printf.c dbus-testutils)
 add_helper_executable(test-privserver ${TEST_DIR}/test-privserver.c dbus-testutils)
 add_helper_executable(test-shell-service ${test-shell-service_SOURCES} dbus-testutils)
 add_helper_executable(test-spawn ${test-spawn_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
+if(NOT WINCE)
+    add_test_executable(test-spawn-oom ${TEST_DIR}/internals/spawn-oom.c dbus-testutils)
+endif()
 add_helper_executable(test-exit ${test-exit_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 # the second argument of add_helper_executable() is a whitespace-separated
 # list of source files and the third and subsequent arguments are libraries
@@ -87,6 +90,60 @@ add_helper_executable(manual-tcp ${manual-tcp_SOURCES} ${DBUS_INTERNAL_LIBRARIES
 add_helper_executable(manual-backtrace ${TEST_DIR}/manual-backtrace.c dbus-1)
 if(WIN32)
     add_helper_executable(manual-paths ${manual-paths_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
+endif()
+
+if(DBUS_ENABLE_EMBEDDED_TESTS)
+    add_test_executable(test-hash ${TEST_DIR}/internals/hash.c dbus-testutils)
+    set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/marshal-recursive.c)
+    add_test_executable(test-marshal-recursive "${SOURCES}" dbus-testutils)
+    set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/dbus-message-factory.c
+                ${TEST_DIR}/internals/dbus-message-factory.h
+                ${TEST_DIR}/internals/dbus-message-util.c
+                ${TEST_DIR}/internals/dbus-message-util.h
+                ${TEST_DIR}/internals/message-internals.c)
+    add_test_executable(test-message-internals "${SOURCES}" dbus-testutils)
+    set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/internals/dbus-auth-script.c
+                ${TEST_DIR}/internals/dbus-auth-script.h
+                ${TEST_DIR}/internals/dbus-auth-util.c
+                ${TEST_DIR}/internals/dbus-credentials-util.c
+                ${TEST_DIR}/internals/dbus-marshal-byteswap-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.c
+                ${TEST_DIR}/internals/dbus-marshal-recursive-util.h
+                ${TEST_DIR}/internals/dbus-marshal-validate-util.c
+                ${TEST_DIR}/internals/dbus-string-util.c
+                ${TEST_DIR}/internals/dbus-sysdeps-util.c
+                ${TEST_DIR}/internals/misc-internals.c
+                ${TEST_DIR}/internals/misc-internals.h)
+    add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
+    set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/bus/main.c)
+    add_test_executable(test-bus "${SOURCES}" dbus-daemon-internal dbus-testutils ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/bus/dispatch.c)
+    add_test_executable(test-bus-dispatch "${SOURCES}" dbus-daemon-internal dbus-testutils ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus-dispatch PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    set(SOURCES ${TEST_DIR}/bus/dispatch-sha1.c)
+    add_test_executable(test-bus-dispatch-sha1 "${SOURCES}" dbus-daemon-internal dbus-testutils ${EXPAT_LIBRARIES})
+    set_target_properties(test-bus-dispatch-sha1 PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+
+    if(NOT WIN32)
+        add_test_executable(test-bus-system ${TEST_DIR}/bus/system.c launch-helper-internal dbus-testutils)
+        add_test_executable(test-bus-launch-helper-oom ${TEST_DIR}/bus/launch-helper-oom.c launch-helper-internal dbus-testutils)
+        add_helper_executable(dbus-daemon-launch-helper-for-tests ${TEST_DIR}/bus/launch-helper-for-tests.c launch-helper-internal)
+    endif()
 endif()
 
 if(DBUS_WITH_GLIB)

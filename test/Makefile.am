@@ -58,8 +58,12 @@ EXTRA_DIST += glib-tap-test.sh
 EXTRA_DIST += tap-test.sh.in
 
 TESTS =
+noinst_PROGRAMS =
 
 if DBUS_ENABLE_EMBEDDED_TESTS
+
+uninstallable_test_programs =
+
 ## break-loader removed for now
 ## these binaries are used in tests but are not themselves tests
 TEST_BINARIES = \
@@ -71,19 +75,29 @@ TEST_BINARIES = \
 	test-shell-service \
 	$(NULL)
 
-## These are conceptually part of directories that come earlier in SUBDIRS
-## order, but we don't want to run them til we arrive in this directory,
-## since they depend on stuff from this directory. We wrap some of them in a
-## simple shell script to get TAP output.
-
-TESTS += ../bus/test-bus$(EXEEXT)
-
-if DBUS_UNIX
-TESTS += ../bus/test-bus-launch-helper$(EXEEXT)
-TESTS += ../bus/test-bus-system$(EXEEXT)
+if !DBUS_WINCE
+uninstallable_test_programs += test-spawn-oom
 endif
 
-TESTS += ../dbus/test-dbus$(EXEEXT)
+uninstallable_test_programs += \
+	test-bus \
+	test-bus-dispatch \
+	test-bus-dispatch-sha1 \
+	test-hash \
+	test-marshal-recursive \
+	test-message-internals \
+	test-misc-internals \
+	$(NULL)
+
+if DBUS_UNIX
+uninstallable_test_programs += test-bus-launch-helper-oom
+uninstallable_test_programs += test-bus-system
+# this is used by the tests but is not, itself, a test
+TEST_BINARIES += dbus-daemon-launch-helper-for-tests
+endif
+
+noinst_PROGRAMS += $(uninstallable_test_programs)
+TESTS += $(uninstallable_test_programs)
 
 else !DBUS_ENABLE_EMBEDDED_TESTS
 
@@ -91,7 +105,7 @@ TEST_BINARIES=
 
 endif !DBUS_ENABLE_EMBEDDED_TESTS
 
-noinst_PROGRAMS= $(TEST_BINARIES)
+noinst_PROGRAMS += $(TEST_BINARIES)
 
 # This helper is meant to crash, so if we're compiling the rest with
 # AddressSanitizer, we need to stop it from catching the SIGSEGV and
@@ -108,6 +122,8 @@ test_shell_SOURCES = shell-test.c
 test_shell_LDADD = libdbus-testutils.la
 test_spawn_SOURCES = spawn-test.c
 test_spawn_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+test_spawn_oom_SOURCES = internals/spawn-oom.c
+test_spawn_oom_LDADD = libdbus-testutils.la
 
 test_assertions_SOURCES = internals/assertions.c
 test_assertions_LDADD = libdbus-testutils.la $(GLIB_LIBS)
@@ -150,6 +166,76 @@ manual_paths_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 manual_tcp_SOURCES = manual-tcp.c
 manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+
+test_bus_launch_helper_oom_SOURCES = bus/launch-helper-oom.c
+test_bus_launch_helper_oom_LDADD = \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
+
+dbus_daemon_launch_helper_for_tests_SOURCES = bus/launch-helper-for-tests.c
+dbus_daemon_launch_helper_for_tests_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+
+test_bus_system_SOURCES = bus/system.c
+test_bus_system_LDADD = \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
+
+test_bus_SOURCES = bus/main.c
+test_bus_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
+
+test_bus_dispatch_SOURCES = bus/dispatch.c
+test_bus_dispatch_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
+
+test_bus_dispatch_sha1_SOURCES = bus/dispatch-sha1.c
+test_bus_dispatch_sha1_LDADD = \
+	$(top_builddir)/bus/libdbus-daemon-internal.la \
+	libdbus-testutils.la \
+	$(NULL)
+
+test_hash_SOURCES = internals/hash.c
+test_hash_LDADD = libdbus-testutils.la
+
+test_marshal_recursive_SOURCES = \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
+	internals/marshal-recursive.c \
+	$(NULL)
+test_marshal_recursive_LDADD = libdbus-testutils.la
+
+test_message_internals_SOURCES = \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
+	internals/dbus-message-factory.c \
+	internals/dbus-message-factory.h \
+	internals/dbus-message-util.c \
+	internals/dbus-message-util.h \
+	internals/message-internals.c \
+	$(NULL)
+test_message_internals_LDADD = libdbus-testutils.la
+
+test_misc_internals_SOURCES = \
+	internals/dbus-auth-script.c \
+	internals/dbus-auth-script.h \
+	internals/dbus-auth-util.c \
+	internals/dbus-credentials-util.c \
+	internals/dbus-marshal-byteswap-util.c \
+	internals/dbus-marshal-recursive-util.c \
+	internals/dbus-marshal-recursive-util.h \
+	internals/dbus-marshal-validate-util.c \
+	internals/dbus-string-util.c \
+	internals/dbus-sysdeps-util.c \
+	internals/misc-internals.c \
+	internals/misc-internals.h \
+	$(NULL)
+test_misc_internals_LDADD = libdbus-testutils.la
 
 EXTRA_DIST += dbus-test-runner
 
@@ -632,7 +718,7 @@ uninstalled-config-local:
 			-e 's,[@]DBUS_TEST_EXEC[@],@abs_builddir@,' \
 			-e 's,[@]DBUS_USER[@],$(DBUS_USER),' \
 			-e 's,[@]EXEEXT[@],$(EXEEXT),' \
-			-e 's,[@]TEST_LAUNCH_HELPER_BINARY[@],@abs_top_builddir@/bus/dbus-daemon-launch-helper-test$(EXEEXT),' \
+			-e 's,[@]TEST_LAUNCH_HELPER_BINARY[@],@abs_top_builddir@/test/dbus-daemon-launch-helper-for-tests$(EXEEXT),' \
 			-e 's,[@]TEST_LISTEN[@],$(TEST_LISTEN),' \
 			< $(srcdir)/"$$F" > "$${F%.in}"; \
 	done

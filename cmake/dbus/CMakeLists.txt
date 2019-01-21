@@ -152,14 +152,7 @@ set (DBUS_SHARED_HEADERS
 ### to be unless they move to DBUS_SHARED_SOURCES later)
 set (DBUS_UTIL_SOURCES
 	${DBUS_DIR}/dbus-asv-util.c
-	${DBUS_DIR}/dbus-auth-script.c
-	${DBUS_DIR}/dbus-auth-util.c
-	${DBUS_DIR}/dbus-credentials-util.c
 	${DBUS_DIR}/dbus-mainloop.c
-	${DBUS_DIR}/dbus-marshal-byteswap-util.c
-	${DBUS_DIR}/dbus-marshal-recursive-util.c
-	${DBUS_DIR}/dbus-marshal-validate-util.c
-	${DBUS_DIR}/dbus-message-factory.c
 	${DBUS_DIR}/dbus-message-util.c
 	${DBUS_DIR}/dbus-shell.c
 	${DBUS_DIR}/dbus-pollable-set.c
@@ -168,24 +161,13 @@ set (DBUS_UTIL_SOURCES
 	${DBUS_DIR}/dbus-sysdeps-util.c
 )
 
-if (DBUS_ENABLE_EMBEDDED_TESTS)
-	set (DBUS_UTIL_SOURCES 
-		${DBUS_UTIL_SOURCES}
-		${DBUS_DIR}/dbus-spawn-test.c
-		${DBUS_DIR}/dbus-test-wrappers.c
-	)
-endif (DBUS_ENABLE_EMBEDDED_TESTS)
-
 set (DBUS_UTIL_HEADERS
 	${DBUS_DIR}/dbus-asv-util.h
-	${DBUS_DIR}/dbus-auth-script.h
 	${DBUS_DIR}/dbus-mainloop.h
-	${DBUS_DIR}/dbus-message-factory.h
 	${DBUS_DIR}/dbus-shell.h
 	${DBUS_DIR}/dbus-pollable-set.h
 	${DBUS_DIR}/dbus-spawn.h
 	${DBUS_DIR}/dbus-test.h
-	${DBUS_DIR}/dbus-test-wrappers.h
 )
 
 ### platform specific settings
@@ -341,11 +323,6 @@ else(WIN32)
         target_link_libraries(dbus-internal ${LIBSOCKET})
     endif()
 endif(WIN32)
-
-if (DBUS_ENABLE_EMBEDDED_TESTS)
-	add_test_executable(test-dbus ${CMAKE_SOURCE_DIR}/../dbus/dbus-test-main.c ${DBUS_INTERNAL_LIBRARIES})
-	set_target_properties(test-dbus PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
-ENDIF (DBUS_ENABLE_EMBEDDED_TESTS)
 
 if (UNIX)
 # set version info
