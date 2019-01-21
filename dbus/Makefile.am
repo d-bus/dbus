@@ -329,7 +329,7 @@ test_dbus_SOURCES=				\
 test_dbus_LDADD = libdbus-internal.la
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
 
 clean-local:
 	$(AM_V_at)rm -fr ./.dbus-keyrings

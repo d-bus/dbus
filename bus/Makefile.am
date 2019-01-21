@@ -6,7 +6,7 @@ systemdtmpfilesdir = $(prefix)/lib/tmpfiles.d
 systemdsysusersdir = $(prefix)/lib/sysusers.d
 
 DBUS_BUS_LIBS = \
-	$(CODE_COVERAGE_LDFLAGS) \
+	$(CODE_COVERAGE_LIBS) \
 	$(EXPAT_LIBS) \
 	$(SELINUX_LIBS) \
 	$(APPARMOR_LIBS) \
@@ -16,7 +16,7 @@ DBUS_BUS_LIBS = \
 	$(NULL)
 
 DBUS_LAUNCHER_LIBS = \
-	$(CODE_COVERAGE_LDFLAGS) \
+	$(CODE_COVERAGE_LIBS) \
 	$(EXPAT_LIBS) \
 	$(THREAD_LIBS) \
 	$(NETWORK_libs) \
@@ -306,4 +306,4 @@ systemduserunit_DATA = \
 endif
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
