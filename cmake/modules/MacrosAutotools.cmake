@@ -155,14 +155,14 @@ endmacro(autoheaderchecks)
 # not implemented yet
 # 
 macro(autoconfig template output)
-	file(READ ${template} contents)
-	# Convert file contents into a CMake list (where each element in the list
-	# is one line of the file)
-	STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
-	STRING(REGEX REPLACE "\n" ";" contents "${contents}")
-	foreach(line contents)
-		message(STATUS ${line})
-		# find #undef lines
-		# append to config.h #define <variable-name> <variable-content>
-	endforeach()
+    file(READ ${template} contents)
+    # Convert file contents into a CMake list (where each element in the list
+    # is one line of the file)
+    STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
+    STRING(REGEX REPLACE "\n" ";" contents "${contents}")
+    foreach(line contents)
+        message(STATUS ${line})
+        # find #undef lines
+        # append to config.h #define <variable-name> <variable-content>
+    endforeach()
 endmacro()

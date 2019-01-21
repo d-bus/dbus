@@ -1,9 +1,9 @@
 
 if (DBUS_INSTALL_SYSTEM_LIBS)
-	if (MINGW)
-	else (MINGW)
-		INCLUDE(InstallRequiredSystemLibraries)
-	endif (MINGW)
+    if (MINGW)
+    else (MINGW)
+        INCLUDE(InstallRequiredSystemLibraries)
+    endif (MINGW)
         install(FILES ${LIBEXPAT_LIBRARIES} DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif (DBUS_INSTALL_SYSTEM_LIBS)
 
