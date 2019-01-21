@@ -25,9 +25,9 @@ if (WIN32)
             get_filename_component(QT_BIN_PATH ${QT_QMAKE_EXECUTABLE} PATH)
             set (ADD_PATH "${ADD_PATH};${QT_BIN_PATH}")
         endif (QT_QMAKE_EXECUTABLE)
-        
+
         # add here more pathes 
-        
+
         if (MINGW)
             get_filename_component(MINGW_BIN_PATH ${CMAKE_CXX_COMPILER} PATH)
             set (ADD_PATH "${ADD_PATH};${MINGW_BIN_PATH}")
