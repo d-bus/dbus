@@ -46,7 +46,7 @@ macro(add_test_executable _target _source)
     endif()
     add_executable(${_target} ${_sources})
     target_link_libraries(${_target} ${ARGN})
-    if (CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    if(CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL "Windows")
         # run tests with binfmt_misc
         if(HAVE_BINFMT_WINE_SUPPORT)
             add_test(NAME ${_target} COMMAND $<TARGET_FILE:${_target}> --tap)

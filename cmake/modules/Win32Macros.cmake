@@ -6,7 +6,7 @@
 # Redistribution and use is allowed according to the terms of the BSD license.
 #
 
-if (WIN32)
+if(WIN32)
     #
     # addExplorerWrapper creates batch files for fast access 
     # to the build environment from the win32 explorer. 
@@ -19,26 +19,26 @@ if (WIN32)
     macro(addExplorerWrapper _projectname)
         # write explorer wrappers
         get_filename_component(CMAKE_BIN_PATH ${CMAKE_COMMAND} PATH)
-        set (ADD_PATH "${CMAKE_BIN_PATH}")
+        set(ADD_PATH "${CMAKE_BIN_PATH}")
 
-        if (QT_QMAKE_EXECUTABLE)
+        if(QT_QMAKE_EXECUTABLE)
             get_filename_component(QT_BIN_PATH ${QT_QMAKE_EXECUTABLE} PATH)
-            set (ADD_PATH "${ADD_PATH};${QT_BIN_PATH}")
-        endif (QT_QMAKE_EXECUTABLE)
+            set(ADD_PATH "${ADD_PATH};${QT_BIN_PATH}")
+        endif(QT_QMAKE_EXECUTABLE)
 
         # add here more pathes 
 
-        if (MINGW)
+        if(MINGW)
             get_filename_component(MINGW_BIN_PATH ${CMAKE_CXX_COMPILER} PATH)
-            set (ADD_PATH "${ADD_PATH};${MINGW_BIN_PATH}")
-            write_file (${CMAKE_BINARY_DIR}/${_projectname}-shell.bat "set PATH=${ADD_PATH};%PATH%\ncmd.exe")
-        else (MINGW)
-            if (CMAKE_BUILD_TOOL STREQUAL  "nmake")
+            set(ADD_PATH "${ADD_PATH};${MINGW_BIN_PATH}")
+            write_file(${CMAKE_BINARY_DIR}/${_projectname}-shell.bat "set PATH=${ADD_PATH};%PATH%\ncmd.exe")
+        else(MINGW)
+            if(CMAKE_BUILD_TOOL STREQUAL  "nmake")
                 get_filename_component(VC_BIN_PATH ${CMAKE_CXX_COMPILER} PATH)
-                write_file (${CMAKE_BINARY_DIR}/${_projectname}-shell.bat "set PATH=${ADD_PATH};%PATH%\ncall \"${VC_BIN_PATH}\\vcvars32.bat\"\ncmd.exe")
-            else (CMAKE_BUILD_TOOL STREQUAL  "nmake")
-                write_file (${CMAKE_BINARY_DIR}/${_projectname}-sln.bat "set PATH=${ADD_PATH};%PATH%\nstart ${_projectname}.sln")
-            endif (CMAKE_BUILD_TOOL STREQUAL  "nmake")
-        endif (MINGW)
+                write_file(${CMAKE_BINARY_DIR}/${_projectname}-shell.bat "set PATH=${ADD_PATH};%PATH%\ncall \"${VC_BIN_PATH}\\vcvars32.bat\"\ncmd.exe")
+            else(CMAKE_BUILD_TOOL STREQUAL  "nmake")
+                write_file(${CMAKE_BINARY_DIR}/${_projectname}-sln.bat "set PATH=${ADD_PATH};%PATH%\nstart ${_projectname}.sln")
+            endif(CMAKE_BUILD_TOOL STREQUAL  "nmake")
+        endif(MINGW)
     endmacro(addExplorerWrapper)
 endif(WIN32)

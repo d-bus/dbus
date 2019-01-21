@@ -1,11 +1,11 @@
 
-if (DBUS_INSTALL_SYSTEM_LIBS)
-    if (MINGW)
-    else (MINGW)
+if(DBUS_INSTALL_SYSTEM_LIBS)
+    if(MINGW)
+    else(MINGW)
         include(InstallRequiredSystemLibraries)
-    endif (MINGW)
+    endif(MINGW)
         install(FILES ${LIBEXPAT_LIBRARIES} DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif (DBUS_INSTALL_SYSTEM_LIBS)
+endif(DBUS_INSTALL_SYSTEM_LIBS)
 
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "D-BUS For Windows")
 set(CPACK_PACKAGE_VENDOR "D-BUS Windows Team")
