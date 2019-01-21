@@ -282,7 +282,10 @@ else
 SYMBOL_EXPORT_LDFLAGS=
 endif
 
-libdbus_1_la_LIBADD= $(LIBDBUS_LIBS)
+libdbus_1_la_LIBADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(LIBDBUS_LIBS) \
+	$(NULL)
 libdbus_1_la_LDFLAGS = \
 	$(AM_LDFLAGS) \
 	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
@@ -290,7 +293,11 @@ libdbus_1_la_LDFLAGS = \
 	-no-undefined \
 	$(NULL)
 
-libdbus_internal_la_LIBADD=$(LIBDBUS_LIBS) libdbus-1.la
+libdbus_internal_la_LIBADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(LIBDBUS_LIBS) \
+	libdbus-1.la \
+	$(NULL)
 
 if DBUS_WIN
 AM_CXXFLAGS = \

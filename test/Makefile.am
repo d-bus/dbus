@@ -176,7 +176,10 @@ test_bus_launch_helper_oom_LDADD = \
 	$(NULL)
 
 dbus_daemon_launch_helper_for_tests_SOURCES = bus/launch-helper-for-tests.c
-dbus_daemon_launch_helper_for_tests_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+dbus_daemon_launch_helper_for_tests_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	$(NULL)
 
 test_bus_system_SOURCES = bus/system.c
 test_bus_system_LDADD = \
