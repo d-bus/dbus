@@ -10,7 +10,7 @@ AC_INIT([dbus], [dbus_version], [https://gitlab.freedesktop.org/dbus/dbus/issues
 
 AC_CONFIG_AUX_DIR([build-aux])
 
-m4_pattern_forbid([^AX_],
+m4_pattern_forbid([^AX_(CHECK_ENABLE_DEBUG|CODE_COVERAGE|COMPILER_FLAGS|COMPILER_FLAGS_(CFLAGS|CXXFLAGS|LDFLAGS))\b],
   [Unexpanded AX_ macro found. Please install GNU autoconf-archive])
 
 AC_CANONICAL_HOST
