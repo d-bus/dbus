@@ -141,9 +141,6 @@ void        _dbus_group_info_free     (DBusGroupInfo    *info);
 DBUS_PRIVATE_EXPORT
 dbus_uid_t    _dbus_geteuid (void);
 
-dbus_bool_t _dbus_parse_uid (const DBusString  *uid_str,
-                             dbus_uid_t        *uid);
-
 DBUS_PRIVATE_EXPORT
 void _dbus_close_all (void);
 DBUS_PRIVATE_EXPORT
