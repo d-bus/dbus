@@ -1,5 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir) \
+	$(CODE_COVERAGE_CPPFLAGS) \
 	$(DBUS_STATIC_BUILD_CPPFLAGS) \
 	$(DBUS_X_CFLAGS) \
 	-DDBUS_COMPILATION \
@@ -64,6 +65,7 @@ dbus_launch_CPPFLAGS = \
 	$(AM_CPPFLAGS) \
 	$(NULL)
 dbus_launch_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(DBUS_X_LIBS) \
 	$(NULL)
@@ -72,6 +74,7 @@ dbus_run_session_SOURCES =			\
 	dbus-run-session.c
 
 dbus_run_session_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-internal.la \
 	$(NULL)
 
@@ -82,15 +85,18 @@ dbus_uuidgen_SOURCES=				\
 	dbus-uuidgen.c
 
 dbus_send_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(NULL)
 
 dbus_monitor_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(NETWORK_libs) \
 	$(NULL)
 
 dbus_uuidgen_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(NULL)
 
@@ -107,14 +113,20 @@ dbus_test_tool_SOURCES = \
 	test-tool.c \
 	test-tool.h \
 	$(NULL)
-dbus_test_tool_LDADD = $(top_builddir)/dbus/libdbus-1.la
+dbus_test_tool_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
 
 dbus_update_activation_environment_SOURCES = \
 	dbus-update-activation-environment.c \
 	tool-common.c \
 	tool-common.h \
 	$(NULL)
-dbus_update_activation_environment_LDADD = $(top_builddir)/dbus/libdbus-1.la
+dbus_update_activation_environment_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
 
 if DBUS_WIN
 SUFFIXES = .rc

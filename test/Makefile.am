@@ -43,9 +43,9 @@ libdbus_testutils_la_SOURCES += \
 endif
 
 libdbus_testutils_la_LIBADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(top_builddir)/dbus/libdbus-internal.la \
-	$(CODE_COVERAGE_LDFLAGS) \
 	$(NULL)
 
 TEST_EXTENSIONS = .sh
@@ -142,6 +142,8 @@ test_segfault_SOURCES = \
 	disable-crash-handling.h \
 	test-segfault.c \
 	$(NULL)
+# Deliberately not adding CODE_COVERAGE_LIBS here because we really
+# don't care about coverage for the test program that segfaults!
 
 test_server_oom_SOURCES = internals/server-oom.c
 test_server_oom_LDADD = libdbus-testutils.la $(GLIB_LIBS)
@@ -174,7 +176,10 @@ test_bus_launch_helper_oom_LDADD = \
 	$(NULL)
 
 dbus_daemon_launch_helper_for_tests_SOURCES = bus/launch-helper-for-tests.c
-dbus_daemon_launch_helper_for_tests_LDADD = $(top_builddir)/bus/liblaunch-helper-internal.la
+dbus_daemon_launch_helper_for_tests_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/bus/liblaunch-helper-internal.la \
+	$(NULL)
 
 test_bus_system_SOURCES = bus/system.c
 test_bus_system_LDADD = \
@@ -813,4 +818,4 @@ $(installable_test_meta_with_config): %_with_config.test: %$(EXEEXT) Makefile
 	) > $@.tmp && mv $@.tmp $@
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am

@@ -1,5 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir) \
+	$(CODE_COVERAGE_CPPFLAGS) \
 	$(DBUS_STATIC_BUILD_CPPFLAGS) \
 	$(VALGRIND_CFLAGS) \
 	-DDBUS_COMPILATION \
@@ -68,14 +69,38 @@ if DBUS_ENABLE_EMBEDDED_TESTS
 ## build even when not doing "make check"
 noinst_PROGRAMS=test-pending-call-dispatch test-pending-call-timeout test-pending-call-disconnected test-threads-init test-ids test-shutdown test-privserver-client test-autolaunch
 
-test_pending_call_dispatch_LDADD=$(top_builddir)/dbus/libdbus-1.la
-test_pending_call_timeout_LDADD=$(top_builddir)/dbus/libdbus-1.la
-test_pending_call_disconnected_LDADD=$(top_builddir)/dbus/libdbus-1.la
-test_threads_init_LDADD=$(top_builddir)/dbus/libdbus-1.la
-test_ids_LDADD=$(top_builddir)/dbus/libdbus-1.la
+test_pending_call_dispatch_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
+test_pending_call_timeout_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
+test_pending_call_disconnected_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
+test_threads_init_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
+test_ids_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	$(top_builddir)/dbus/libdbus-1.la \
+	$(NULL)
 
-test_shutdown_LDADD=../libdbus-testutils.la
-test_privserver_client_LDADD=../libdbus-testutils.la
-test_autolaunch_LDADD=../libdbus-testutils.la
+test_shutdown_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	../libdbus-testutils.la \
+	$(NULL)
+test_privserver_client_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	../libdbus-testutils.la \
+	$(NULL)
+test_autolaunch_LDADD = \
+	$(CODE_COVERAGE_LIBS) \
+	../libdbus-testutils.la \
+	$(NULL)
 
 endif
