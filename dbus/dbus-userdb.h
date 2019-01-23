@@ -107,8 +107,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_get_user_id_and_primary_group (const DBusString  *username,
                                                  dbus_uid_t        *uid_p,
                                                  dbus_gid_t        *gid_p);
-dbus_bool_t _dbus_credentials_from_uid          (dbus_uid_t         user_id,
-                                                 DBusCredentials   *credentials);
 dbus_bool_t _dbus_groups_from_uid		(dbus_uid_t            uid,
                                                  dbus_gid_t          **group_ids,
                                                  int                  *n_group_ids);
