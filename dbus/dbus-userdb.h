@@ -66,11 +66,6 @@ dbus_bool_t       _dbus_user_database_get_username  (DBusUserDatabase     *db,
                                                      const DBusString     *username,
                                                      const DBusUserInfo  **info,
                                                      DBusError            *error);
-dbus_bool_t       _dbus_user_database_get_groupname (DBusUserDatabase     *db,
-                                                     const DBusString     *groupname,
-                                                     const DBusGroupInfo **info,
-                                                     DBusError            *error);
-
 DBUS_PRIVATE_EXPORT
 DBusUserInfo*  _dbus_user_database_lookup       (DBusUserDatabase *db,
                                                  dbus_uid_t        uid,

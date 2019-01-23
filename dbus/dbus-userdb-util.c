@@ -181,8 +181,10 @@ _dbus_get_group_id (const DBusString  *groupname,
       return FALSE;
     }
 
-  if (!_dbus_user_database_get_groupname (db, groupname,
-                                          &info, NULL))
+  info = _dbus_user_database_lookup_group (db, DBUS_GID_UNSET, groupname,
+                                           NULL);
+
+  if (info == NULL)
     {
       _dbus_user_database_unlock_system ();
       return FALSE;
@@ -337,27 +339,6 @@ _dbus_user_database_lookup_group (DBusUserDatabase *db,
       
       return info;
     }
-}
-
-
-/**
- * Gets the user information for the given group name,
- * returned group info should not be freed. 
- *
- * @param db user database
- * @param groupname the group name
- * @param info return location for const ref to group info
- * @param error error location
- * @returns #FALSE if error is set
- */
-dbus_bool_t
-_dbus_user_database_get_groupname (DBusUserDatabase     *db,
-                                   const DBusString     *groupname,
-                                   const DBusGroupInfo **info,
-                                   DBusError            *error)
-{
-  *info = _dbus_user_database_lookup_group (db, DBUS_GID_UNSET, groupname, error);
-  return *info != NULL;
 }
 
 /**
