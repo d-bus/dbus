@@ -12,8 +12,8 @@ macro(autoinit config)
     file(READ ${config} _configure_ac_raw)
     # Convert file contents into a CMake list (where each element in the list
     # is one line of the file)
-    STRING(REGEX REPLACE ";" "\\\\;" _configure_ac "${_configure_ac_raw}")
-    STRING(REGEX REPLACE "\n" ";" _configure_ac "${_configure_ac}")
+    string(REGEX REPLACE ";" "\\\\;" _configure_ac "${_configure_ac_raw}")
+    string(REGEX REPLACE "\n" ";" _configure_ac "${_configure_ac}")
 endmacro()
 
 # extracts version information from autoconf config file
@@ -31,14 +31,14 @@ endmacro()
 # 
 macro(autoversion prefix)
     string(TOUPPER ${prefix} prefix_upper)
-    string (REGEX REPLACE ".*${prefix}_major_version], .([0-9]+).*" "\\1" ${prefix_upper}_MAJOR_VERSION ${_configure_ac_raw})
-    string (REGEX REPLACE ".*${prefix}_minor_version], .([0-9]+).*" "\\1" ${prefix_upper}_MINOR_VERSION ${_configure_ac_raw})
-    string (REGEX REPLACE ".*${prefix}_micro_version], .([0-9]+).*" "\\1" ${prefix_upper}_MICRO_VERSION ${_configure_ac_raw})
-    set (${prefix_upper}_VERSION ${${prefix_upper}_MAJOR_VERSION}.${${prefix_upper}_MINOR_VERSION}.${${prefix_upper}_MICRO_VERSION})
-    set (${prefix_upper}_VERSION_STRING "${${prefix_upper}_VERSION}")
-    string (REGEX REPLACE ".*LT_AGE=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_AGE ${_configure_ac_raw})
-    string (REGEX REPLACE ".*LT_CURRENT=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_CURRENT ${_configure_ac_raw})
-    string (REGEX REPLACE ".*LT_REVISION=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_REVISION ${_configure_ac_raw})
+    string(REGEX REPLACE ".*${prefix}_major_version], .([0-9]+).*" "\\1" ${prefix_upper}_MAJOR_VERSION ${_configure_ac_raw})
+    string(REGEX REPLACE ".*${prefix}_minor_version], .([0-9]+).*" "\\1" ${prefix_upper}_MINOR_VERSION ${_configure_ac_raw})
+    string(REGEX REPLACE ".*${prefix}_micro_version], .([0-9]+).*" "\\1" ${prefix_upper}_MICRO_VERSION ${_configure_ac_raw})
+    set(${prefix_upper}_VERSION ${${prefix_upper}_MAJOR_VERSION}.${${prefix_upper}_MINOR_VERSION}.${${prefix_upper}_MICRO_VERSION})
+    set(${prefix_upper}_VERSION_STRING "${${prefix_upper}_VERSION}")
+    string(REGEX REPLACE ".*LT_AGE=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_AGE ${_configure_ac_raw})
+    string(REGEX REPLACE ".*LT_CURRENT=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_CURRENT ${_configure_ac_raw})
+    string(REGEX REPLACE ".*LT_REVISION=([0-9]+).*" "\\1" ${prefix_upper}_LIBRARY_REVISION ${_configure_ac_raw})
 endmacro()
 
 #
@@ -99,7 +99,7 @@ macro(autopackage name version url support_url)
 #define PACKAGE \"@PACKAGE@\"
 #define VERSION \"@VERSION@\"
 " AUTOPACKAGE_CONFIG_H_TEMPLATE)
-endmacro(autopackage)
+endmacro()
 
 #
 # define a cmake variable from autotools AC_DEFINE statement
@@ -107,10 +107,10 @@ endmacro(autopackage)
 macro(autodefine name)
     foreach(line ${_configure_ac})
         if(line MATCHES ".*AC_DEFINE(.*${name}.*).*")
-            string (REGEX REPLACE ".*AC_DEFINE(.*).*" "\\1" value ${line})
-            string (REGEX REPLACE "[^[]*\\[[^]]*\\], *\\[([^]]*)\\],.*" "\\1" value2 ${value})
-            string (REPLACE "[" "" value3 ${value2})
-            string (REPLACE "]" "" value4 ${value3})
+            string(REGEX REPLACE ".*AC_DEFINE(.*).*" "\\1" value ${line})
+            string(REGEX REPLACE "[^[]*\\[[^]]*\\], *\\[([^]]*)\\],.*" "\\1" value2 ${value})
+            string(REPLACE "[" "" value3 ${value2})
+            string(REPLACE "]" "" value4 ${value3})
             set(${name} ${value4})
         endif()
     endforeach()
@@ -120,12 +120,12 @@ macro(autoheaderchecks config_h_in configure_checks_file config_h_cmake)
     file(READ ${configure_checks_file} configure_checks_file_raw)
     file(READ ${config_h_in} _config_h_in_raw)
     file(READ ${config_h_cmake} _config_h_cmake_raw)
-    STRING(REGEX REPLACE ";" "\\\\;" _config_h_in "${_config_h_in_raw}")
-    STRING(REGEX REPLACE "\n" ";" _config_h_in "${_config_h_in}")
+    string(REGEX REPLACE ";" "\\\\;" _config_h_in "${_config_h_in_raw}")
+    string(REGEX REPLACE "\n" ";" _config_h_in "${_config_h_in}")
     foreach(line ${_config_h_in})
         #message(STATUS ${line})
         if(line MATCHES ".*HAVE_.*_H.*")
-            string (REGEX REPLACE ".*HAVE_(.*)_H.*" "\\1" key ${line})
+            string(REGEX REPLACE ".*HAVE_(.*)_H.*" "\\1" key ${line})
             set(full_key "HAVE_${key}_H")
             if(key MATCHES ".*_.*")
                 string(REGEX MATCH "^[A-Z0-9]+" dir ${key})
@@ -148,21 +148,21 @@ macro(autoheaderchecks config_h_in configure_checks_file config_h_cmake)
             endif()
         endif()
     endforeach()
-endmacro(autoheaderchecks)
+endmacro()
 
 #
 # parses config.h template and create cmake equivalent 
 # not implemented yet
 # 
 macro(autoconfig template output)
-	file(READ ${template} contents)
-	# Convert file contents into a CMake list (where each element in the list
-	# is one line of the file)
-	STRING(REGEX REPLACE ";" "\\\\;" contents "${contents}")
-	STRING(REGEX REPLACE "\n" ";" contents "${contents}")
-	foreach(line contents)
-		message(STATUS ${line})
-		# find #undef lines
-		# append to config.h #define <variable-name> <variable-content>
-	endforeach()
+    file(READ ${template} contents)
+    # Convert file contents into a CMake list (where each element in the list
+    # is one line of the file)
+    string(REGEX REPLACE ";" "\\\\;" contents "${contents}")
+    string(REGEX REPLACE "\n" ";" contents "${contents}")
+    foreach(line contents)
+        message(STATUS ${line})
+        # find #undef lines
+        # append to config.h #define <variable-name> <variable-content>
+    endforeach()
 endmacro()
