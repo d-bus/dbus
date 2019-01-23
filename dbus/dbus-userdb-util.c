@@ -361,27 +361,6 @@ _dbus_user_database_get_groupname (DBusUserDatabase     *db,
 }
 
 /**
- * Gets the user information for the given GID,
- * returned group info should not be freed. 
- *
- * @param db user database
- * @param gid the group ID
- * @param info return location for const ref to group info
- * @param error error location
- * @returns #FALSE if error is set
- */
-dbus_bool_t
-_dbus_user_database_get_gid (DBusUserDatabase     *db,
-                             dbus_gid_t            gid,
-                             const DBusGroupInfo **info,
-                             DBusError            *error)
-{
-  *info = _dbus_user_database_lookup_group (db, gid, NULL, error);
-  return *info != NULL;
-}
-
-
-/**
  * Gets all groups  corresponding to the given UID. Returns #FALSE
  * if no memory, or user isn't known, but always initializes
  * group_ids to a NULL array. 
