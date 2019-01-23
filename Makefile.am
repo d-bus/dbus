@@ -20,21 +20,14 @@ EXTRA_DIST =			\
 	README.wince		\
 	README.cygwin		\
 	README.launchd		\
-	cmake/CMakeLists.txt \
-	cmake/ConfigureChecks.cmake \
-	cmake/DBus1Config.cmake.in \
-	cmake/DBus1Config.pkgconfig.in \
-	cmake/DBus1ConfigVersion.cmake.in \
-	cmake/bus \
-	cmake/bus-test.bat.cmake \
-	cmake/config.h.cmake \
-	cmake/dbus \
-	cmake/dbus-env.bat.cmake \
-	cmake/doc \
-	cmake/i686-w64-mingw32.cmake \
-	cmake/modules \
-	cmake/test \
-	cmake/tools \
+	CMakeLists.txt \
+	bus/CMakeLists.txt \
+	dbus/CMakeLists.txt \
+	doc/CMakeLists.txt \
+	test/CMakeLists.txt \
+	test/name-test/CMakeLists.txt \
+	tools/CMakeLists.txt \
+	cmake \
 	$(NULL)
 
 all-local: Doxyfile

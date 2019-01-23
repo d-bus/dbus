@@ -21,7 +21,7 @@ Win32 MinGW-w64|32
 5. mkdir dbus-build
 6. cd dbus-build
 7. run 
-    cmake -G "MinGW Makefiles" [<options, see below>] <dbus-src-root>/cmake
+    cmake -G "MinGW Makefiles" [<options, see below>] <dbus-src-root>
     mingw32-make
     mingw32-make install
 
@@ -33,7 +33,7 @@ Win32 Microsoft nmake
 5. mkdir dbus-build
 6. cd dbus-build
 7. run 
-    cmake -G "NMake Makefiles" [<options, see below>] <dbus-src-root>/cmake
+    cmake -G "NMake Makefiles" [<options, see below>] <dbus-src-root>
     nmake
     nmake install
 
@@ -45,7 +45,7 @@ Win32 Visual Studio 2010 Express IDE
 5. mkdir dbus-build
 6. cd dbus-build
 7. run
-      cmake -G "Visual Studio 10" [<options, see below>] <dbus-src-root>/cmake
+      cmake -G "Visual Studio 10" [<options, see below>] <dbus-src-root>
 8a. open IDE with
       vcexpress dbus.sln
 8b. for immediate build run
@@ -59,7 +59,7 @@ Win32 Visual Studio 2010 Professional IDE
 5. mkdir dbus-build
 6. cd dbus-build
 7. run 
-      cmake -G "Visual Studio 10" [<options, see below>] <dbus-src-root>/cmake
+      cmake -G "Visual Studio 10" [<options, see below>] <dbus-src-root>
 8a. open IDE with
       devenv dbus.sln
 8b. for immediate build run
@@ -72,7 +72,7 @@ Linux
 4. mkdir dbus-build
 5. cd dbus-build
 6. run 
-    cmake -G "<for available targets, see cmake --help for a list>" [<options, see below>] <dbus-src-root>/cmake
+    cmake -G "<for available targets, see cmake --help for a list>" [<options, see below>] <dbus-src-root>
     make
     make install
 

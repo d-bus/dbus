@@ -317,7 +317,7 @@ case "$ci_buildsys" in
                 ;;
         esac
 
-        cmake "$@" ../cmake
+        cmake "$@" ..
 
         ${make}
         # The test coverage for OOM-safety is too verbose to be useful on

@@ -1,5 +1,3 @@
-SET(DOC_DIR ${CMAKE_SOURCE_DIR}/../doc)
-
 #
 # api documentation
 #
@@ -13,8 +11,8 @@ if(DOXYGEN_EXECUTABLE)
 endif(DOXYGEN_EXECUTABLE)
 
 if (DBUS_ENABLE_DOXYGEN_DOCS)
-    set (top_srcdir ${CMAKE_SOURCE_DIR}/..)
-    configure_file(${CMAKE_SOURCE_DIR}/../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
+    set (top_srcdir ${CMAKE_SOURCE_DIR})
+    configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
@@ -29,6 +27,7 @@ if (DBUS_ENABLE_DOXYGEN_DOCS)
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
     )
     add_dependencies(doc devhelp2)
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api/html/ DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/api)
 endif (DBUS_ENABLE_DOXYGEN_DOCS)
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
@@ -40,10 +39,11 @@ endif()
 if(DBUS_HAVE_XSLTPROC)
     add_custom_command(
         OUTPUT dbus.devhelp2
-        COMMAND ${XSLTPROC_EXECUTABLE} -o dbus.devhelp2 ${DOC_DIR}/doxygen_to_devhelp.xsl api/xml/index.xml
-        DEPENDS ${DOC_DIR}/doxygen_to_devhelp.xsl api/html/index.html
+        COMMAND ${XSLTPROC_EXECUTABLE} -o dbus.devhelp2 ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_to_devhelp.xsl api/xml/index.xml
+        DEPENDS doxygen_to_devhelp.xsl api/html/index.html
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2 DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 endif()
 
 #
@@ -72,8 +72,6 @@ macro(DOCBOOK _sources _format)
         set(STYLESHEET "${DOCBOOKXSL_DIR}/html/docbook.xsl")
     endif()
     set(_outfile ${CMAKE_CURRENT_BINARY_DIR}/${_outname})
-
-    set(_outfile ${CMAKE_CURRENT_BINARY_DIR}/${_outname})
     if(EXISTS ${_sources})
         if(XSLTPROC_EXECUTABLE)
             add_custom_target(${_outname}
@@ -99,7 +97,7 @@ endmacro(DOCBOOK)
 MACRO (COPYDIR _src _type)
     FOREACH(FILE_TYPE ${_type})
     	FOREACH(DIR ${_src})
-    		FILE(GLOB FILES "${CMAKE_SOURCE_DIR}/../${DIR}/${FILE_TYPE}" )
+    		FILE(GLOB FILES "${DIR}/${FILE_TYPE}" )
     		FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
     		FOREACH(FILE ${FILES})
     			GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME)
@@ -116,48 +114,48 @@ ENDMACRO (COPYDIR)
 COPYDIR(doc *.png)
 COPYDIR(doc *.svg)
 
-docbook(${DOC_DIR}/dbus-test-plan.xml html)
-docbook(${DOC_DIR}/dbus-tutorial.xml html)
-docbook(${DOC_DIR}/dbus-specification.xml html)
-docbook(${DOC_DIR}/dbus-faq.xml html)
+docbook(${CMAKE_CURRENT_SOURCE_DIR}/dbus-test-plan.xml html)
+docbook(${CMAKE_CURRENT_SOURCE_DIR}/dbus-tutorial.xml html)
+docbook(${CMAKE_CURRENT_SOURCE_DIR}/dbus-specification.xml html)
+docbook(${CMAKE_CURRENT_SOURCE_DIR}/dbus-faq.xml html)
 
-configure_file(${DOC_DIR}/dbus-cleanup-sockets.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-cleanup-sockets.1.xml)
-configure_file(${DOC_DIR}/dbus-daemon.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-daemon.1.xml)
-configure_file(${DOC_DIR}/dbus-launch.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-launch.1.xml)
-configure_file(${DOC_DIR}/dbus-monitor.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-monitor.1.xml)
-configure_file(${DOC_DIR}/dbus-send.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-send.1.xml)
-configure_file(${DOC_DIR}/dbus-test-tool.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-test-tool.1.xml)
-configure_file(${DOC_DIR}/dbus-update-activation-environment.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-update-activation-environment.1.xml)
-configure_file(${DOC_DIR}/dbus-uuidgen.1.xml.in ${CMAKE_BINARY_DIR}/doc/dbus-uuidgen.1.xml)
+configure_file(dbus-cleanup-sockets.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-cleanup-sockets.1.xml)
+configure_file(dbus-daemon.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml)
+configure_file(dbus-launch.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml)
+configure_file(dbus-monitor.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml)
+configure_file(dbus-send.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml)
+configure_file(dbus-test-tool.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml)
+configure_file(dbus-update-activation-environment.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml)
+configure_file(dbus-uuidgen.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-uuidgen.1.xml)
 if(UNIX)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-daemon.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-monitor.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-send.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-test-tool.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-launch.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-uuidgen.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-cleanup-sockets.1.xml man)
-    docbook(${CMAKE_BINARY_DIR}/doc/dbus-update-activation-environment.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-uuidgen.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-cleanup-sockets.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml man)
 endif()
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-daemon.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-monitor.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-send.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-test-tool.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-launch.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-uuidgen.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-cleanup-sockets.1.xml html)
-docbook(${CMAKE_BINARY_DIR}/doc/dbus-update-activation-environment.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-uuidgen.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-cleanup-sockets.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml html)
 
 #
 # handle html index file
 #
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/index.html.cmake ${CMAKE_CURRENT_BINARY_DIR}/index.html )
+configure_file(index.html.in ${CMAKE_CURRENT_BINARY_DIR}/index.html)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
 set (EXTRA_DIST
-    ${DOC_DIR}/busconfig.dtd
-    ${DOC_DIR}/introspect.dtd
-    ${DOC_DIR}/introspect.xsl
+    busconfig.dtd
+    introspect.dtd
+    introspect.xsl
 )
 
 install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
