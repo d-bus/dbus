@@ -12,6 +12,7 @@ endif()
 
 if(DBUS_ENABLE_DOXYGEN_DOCS)
     set(top_srcdir ${CMAKE_SOURCE_DIR})
+    set(top_builddir ${CMAKE_BINARY_DIR})
     if(WIN32)
         set(DBUS_GENERATE_MAN NO)
     else()
