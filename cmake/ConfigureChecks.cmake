@@ -186,7 +186,7 @@ elseif(SIZEOF___INT64 EQUAL 8)
     set(DBUS_UINT64_CONSTANT "(val##ui64)")
 else(SIZEOF_INT EQUAL 8)
     message(FATAL_ERROR "Could not find a 64-bit integer type")
-endif(SIZEOF_INT EQUAL 8)
+endif()
 
 # DBUS_INT32_TYPE
 if(SIZEOF_INT EQUAL 4)
@@ -195,14 +195,14 @@ elseif(SIZEOF_LONG EQUAL 4)
     set(DBUS_INT32_TYPE "long")
 elseif(SIZEOF_LONG_LONG EQUAL 4)
     set(DBUS_INT32_TYPE "long long")
-endif(SIZEOF_INT EQUAL 4)
+endif()
 
 # DBUS_INT16_TYPE
 if(SIZEOF_INT EQUAL 2)
     set(DBUS_INT16_TYPE "int")
 elseif(SIZEOF_SHORT EQUAL 2)
     set(DBUS_INT16_TYPE "short")
-endif(SIZEOF_INT EQUAL 2)
+endif()
 
 find_program(DOXYGEN doxygen)
 find_program(XMLTO xmlto)

@@ -99,7 +99,7 @@ macro(autopackage name version url support_url)
 #define PACKAGE \"@PACKAGE@\"
 #define VERSION \"@VERSION@\"
 " AUTOPACKAGE_CONFIG_H_TEMPLATE)
-endmacro(autopackage)
+endmacro()
 
 #
 # define a cmake variable from autotools AC_DEFINE statement
@@ -148,7 +148,7 @@ macro(autoheaderchecks config_h_in configure_checks_file config_h_cmake)
             endif()
         endif()
     endforeach()
-endmacro(autoheaderchecks)
+endmacro()
 
 #
 # parses config.h template and create cmake equivalent 
