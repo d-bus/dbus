@@ -94,7 +94,7 @@ fi
 
 # setup dir to apply
 s=$(dirname $0)
-root=$(realpath $s/../cmake)
+root=$(realpath $s/..)
 
 #echo $exp
 #echo $root
