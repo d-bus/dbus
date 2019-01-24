@@ -117,10 +117,10 @@ endif()
 
 if(DBUS_SERVICE)
     set(dbus_service_SOURCES
-            bus-service-win.c
-    # TODO: add additional files
-    #    service-main.c
-    #    ${BUS_SOURCES}
+        bus-service-win.c
+        # TODO: add additional files
+        #    service-main.c
+        #    ${BUS_SOURCES}
     )
 
     add_executable_version_info(dbus_service_SOURCES "dbus-service")

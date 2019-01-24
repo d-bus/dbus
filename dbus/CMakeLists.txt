@@ -215,10 +215,10 @@ else(WIN32)
 endif()
 
 if(DBUS_HAVE_LINUX_EPOLL)
-        set(DBUS_UTIL_SOURCES
-                ${DBUS_UTIL_SOURCES}
-                dbus-pollable-set-epoll.c
-        )
+    set(DBUS_UTIL_SOURCES
+        ${DBUS_UTIL_SOURCES}
+        dbus-pollable-set-epoll.c
+    )
 endif()
 
 set(libdbus_SOURCES
@@ -253,8 +253,8 @@ find_library(LIBSOCKET socket)
 
 ### Client library
 add_library(dbus-1 SHARED
-            ${libdbus_SOURCES}
-            ${libdbus_HEADERS}
+    ${libdbus_SOURCES}
+    ${libdbus_HEADERS}
 )
 
 if(WIN32)
@@ -298,8 +298,8 @@ install(FILES ${dbusinclude_ARCH_HEADERS} DESTINATION ${CMAKE_INSTALL_LIBDIR}/db
 ### Internal library, used for the daemon, tools and tests, compiled statically.
 
 add_library(dbus-internal ${DBUS_INTERNAL_ADD_LIBRARY_OPTIONS}
-            ${DBUS_UTIL_SOURCES}
-            ${DBUS_UTIL_HEADERS}
+    ${DBUS_UTIL_SOURCES}
+    ${DBUS_UTIL_HEADERS}
 )
 target_link_libraries(dbus-internal dbus-1)
 if(WIN32)

@@ -36,7 +36,7 @@ set(test-shell-service_SOURCES
 )
 
 set(test-shell_SOURCES
-        shell-test.c
+    shell-test.c
 )
 
 set(test-spawn_SOURCES
@@ -95,34 +95,40 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     add_test_executable(test-hash internals/hash.c dbus-testutils)
     set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/marshal-recursive.c)
+    set(SOURCES
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/marshal-recursive.c
+    )
     add_test_executable(test-marshal-recursive "${SOURCES}" dbus-testutils)
     set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/dbus-message-factory.c
-                internals/dbus-message-factory.h
-                internals/dbus-message-util.c
-                internals/dbus-message-util.h
-                internals/message-internals.c)
+    set(SOURCES
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/dbus-message-factory.c
+        internals/dbus-message-factory.h
+        internals/dbus-message-util.c
+        internals/dbus-message-util.h
+        internals/message-internals.c
+    )
     add_test_executable(test-message-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-auth-script.c
-                internals/dbus-auth-script.h
-                internals/dbus-auth-util.c
-                internals/dbus-credentials-util.c
-                internals/dbus-marshal-byteswap-util.c
-                internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/dbus-marshal-validate-util.c
-                internals/dbus-string-util.c
-                internals/dbus-sysdeps-util.c
-                internals/misc-internals.c
-                internals/misc-internals.h)
+    set(SOURCES
+        internals/dbus-auth-script.c
+        internals/dbus-auth-script.h
+        internals/dbus-auth-util.c
+        internals/dbus-credentials-util.c
+        internals/dbus-marshal-byteswap-util.c
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/dbus-marshal-validate-util.c
+        internals/dbus-string-util.c
+        internals/dbus-sysdeps-util.c
+        internals/misc-internals.c
+        internals/misc-internals.h
+    )
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 

@@ -329,10 +329,10 @@ option(DBUS_DISABLE_CHECKS "Disable public API sanity checking" OFF)
 if(NOT MSVC)
     option(DBUS_GCOV_ENABLED "compile with coverage profiling instrumentation (gcc only)" OFF)
     if(DBUS_GCOV_ENABLED)
-            add_definitions(-fprofile-arcs -ftest-coverage)
-            # FIXME!!!!
-            ## remove optimization
-    #        CFLAGS=`echo "$CFLAGS" | sed -e 's/-O[0-9]*//g'`
+        add_definitions(-fprofile-arcs -ftest-coverage)
+        # FIXME!!!!
+        ## remove optimization
+        # CFLAGS=`echo "$CFLAGS" | sed -e 's/-O[0-9]*//g'`
     endif()
 endif()
 
@@ -371,12 +371,15 @@ set(atomic_int OFF)
 set(atomic_int486 OFF)
 if(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
     find_program(UNAME_EXECUTABLE
-                    NAMES uname
-                    PATHS /bin /usr/bin /usr/local/bin c:/Programme/MSys/bin d:/Programme/MSys/bin)
+        NAMES uname
+        PATHS /bin /usr/bin /usr/local/bin c:/Programme/MSys/bin d:/Programme/MSys/bin
+    )
 
     if(UNAME_EXECUTABLE)
-        execute_process(COMMAND ${UNAME_EXECUTABLE} "-m"
-                        OUTPUT_VARIABLE UNAME_OUTPUT)
+        execute_process(
+            COMMAND ${UNAME_EXECUTABLE} "-m"
+            OUTPUT_VARIABLE UNAME_OUTPUT
+        )
 
         if("UNAME_OUTPUT" MATCHES "^.*i[0123]86.*$")
             set(atomic_int ON)
