@@ -21,9 +21,9 @@ foreach(FILE ${FILES})
     set(TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
     if(CONFIG_VERBOSE)
         message("FROM: ${FILE}\nTO: ${TARGET}\n")
-    endif(CONFIG_VERBOSE)
+    endif()
     configure_file(${FILE} ${TARGET} )
-endforeach(FILE)
+endforeach()
 
 
 if(DBUS_BUS_ENABLE_INOTIFY)
@@ -32,7 +32,7 @@ elseif(DBUS_BUS_ENABLE_KQUEUE)
     set(DIR_WATCH_SOURCE dir-watch-kqueue.c)
 else(DBUS_BUS_ENABLE_INOTIFY)
     set(DIR_WATCH_SOURCE dir-watch-default.c)
-endif(DBUS_BUS_ENABLE_INOTIFY)
+endif()
 
 set(BUS_SOURCES
     activation.c
@@ -81,7 +81,7 @@ if(DBUS_ENABLE_STATS)
         stats.c
         stats.h
     )
-endif(DBUS_ENABLE_STATS)
+endif()
 
 include_directories(
     ${CMAKE_BINARY_DIR}
@@ -128,7 +128,7 @@ if(DBUS_SERVICE)
     target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
     set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
     install(TARGETS dbus-service ${INSTALL_TARGETS_DEFAULT_ARGS})
-endif(DBUS_SERVICE)
+endif()
 
 set(LAUNCH_HELPER_SOURCES
     config-loader-expat.c
@@ -144,11 +144,11 @@ if(NOT WIN32)
 
     add_executable(dbus-daemon-launch-helper activation-helper.c activation-helper-bin.c )
     target_link_libraries(dbus-daemon-launch-helper launch-helper-internal)
-endif(NOT WIN32)
+endif()
 
 if(MSVC)
     project_source_group(${GROUP_CODE} bus_test_SOURCES dummy)
-endif(MSVC)
+endif()
 
 ## mop up the gcov files
 #clean-local:

@@ -69,7 +69,7 @@ else(UNIX)
         dbus-transport-win.c
         dbus-server-win.c
     )
-endif(UNIX)
+endif()
 
 set(DBUS_LIB_HEADERS
     dbus-auth.h
@@ -106,7 +106,7 @@ else(UNIX)
     set(DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
         dbus-transport-win.h
     )
-endif(UNIX)
+endif()
 
 
 ### source code that goes in the installed client library
@@ -192,7 +192,7 @@ if(WIN32)
     set(DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
         dbus-sysdeps-wince-glue.h
     )
-    endif(WINCE)
+    endif()
 else(WIN32)
     set(DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
         dbus-file-unix.c
@@ -212,7 +212,7 @@ else(WIN32)
         dbus-userdb-util.c
         dbus-sysdeps-util-unix.c
     )
-endif(WIN32)
+endif()
 
 if(DBUS_HAVE_LINUX_EPOLL)
         set(DBUS_UTIL_SOURCES
@@ -243,7 +243,7 @@ if(MSVC_IDE)
     project_source_group(${GROUP_CODE} DBUS_LIB_SOURCES DBUS_LIB_HEADERS)
     project_source_group(${GROUP_CODE} DBUS_SHARED_SOURCES DBUS_SHARED_HEADERS)
     project_source_group(${GROUP_CODE} DBUS_UTIL_SOURCES DBUS_UTIL_SOURCES)
-endif(MSVC_IDE)
+endif()
 
 # for clock_getres() on e.g. GNU/Linux (but not Android)
 find_library(LIBRT rt)
@@ -270,7 +270,7 @@ if(WIN32)
         target_link_libraries(dbus-1 ws2)
     else(WINCE)
         target_link_libraries(dbus-1 ws2_32 advapi32 netapi32 iphlpapi dbghelp)
-    endif(WINCE)
+    endif()
 else(WIN32)
     if(DEFINED DBUS_LIBRARY_REVISION)
         set_target_properties(dbus-1 PROPERTIES VERSION ${DBUS_LIBRARY_MAJOR}.${DBUS_LIBRARY_AGE}.${DBUS_LIBRARY_REVISION} SOVERSION ${DBUS_LIBRARY_MAJOR})
@@ -282,14 +282,14 @@ else(WIN32)
     if(LIBSOCKET)
         target_link_libraries(dbus-1 ${LIBSOCKET})
     endif()
-endif(WIN32)
+endif()
 
 # Assume that Linux has -Wl,--version-script and other platforms do not
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
     set(SOVERSION ${DBUS_LIBRARY_MAJOR})
     configure_file(Version.in ${CMAKE_CURRENT_BINARY_DIR}/Version)
     set_target_properties(dbus-1 PROPERTIES LINK_FLAGS -Wl,--version-script=${CMAKE_CURRENT_BINARY_DIR}/Version)
-endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+endif()
 
 install(TARGETS dbus-1 ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES ${dbusinclude_HEADERS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/dbus-1.0/dbus)
@@ -307,7 +307,7 @@ if(WIN32)
         target_link_libraries(dbus-internal ws2)
     else(WINCE)
         target_link_libraries(dbus-internal ws2_32 advapi32 netapi32 iphlpapi)
-    endif(WINCE)
+    endif()
 else(WIN32)
     target_link_libraries(dbus-internal ${CMAKE_THREAD_LIBS_INIT})
     if(LIBRT)
@@ -316,11 +316,11 @@ else(WIN32)
     if(LIBSOCKET)
         target_link_libraries(dbus-internal ${LIBSOCKET})
     endif()
-endif(WIN32)
+endif()
 
 if(UNIX)
 # set version info
-endif(UNIX)
+endif()
 
 
 ## mop up the gcov files

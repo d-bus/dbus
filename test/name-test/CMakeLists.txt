@@ -10,4 +10,4 @@ add_session_test_executable(test-pending-call-dispatch test-pending-call-dispatc
 add_session_test_executable(test-pending-call-timeout test-pending-call-timeout.c ${DBUS_INTERNAL_LIBRARIES})
 add_session_test_executable(test-shutdown test-shutdown.c dbus-testutils)
 add_session_test_executable(test-thread-init test-threads-init.c ${DBUS_INTERNAL_LIBRARIES})
-endif(DBUS_ENABLE_EMBEDDED_TESTS)
+endif()

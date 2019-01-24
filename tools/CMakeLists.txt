@@ -41,14 +41,14 @@ set(dbus_launch_SOURCES
     tool-common.c
     tool-common.h
 )
-endif(WIN32)
+endif()
 
 if(DBUS_BUILD_X11)
 set(dbus_launch_SOURCES
      ${dbus_launch_SOURCES}
      dbus-launch-x11.c
 )
-endif(DBUS_BUILD_X11)
+endif()
 
 set(dbus_cleanup_sockets_SOURCES
     dbus-cleanup-sockets.c
@@ -92,7 +92,7 @@ add_executable(dbus-launch ${dbus_launch_SOURCES})
 target_link_libraries(dbus-launch ${DBUS_LIBRARIES})
 if(DBUS_BUILD_X11)
   target_link_libraries(dbus-launch ${X11_LIBRARIES} )
-endif(DBUS_BUILD_X11)
+endif()
 install(TARGETS dbus-launch ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 if(WIN32)

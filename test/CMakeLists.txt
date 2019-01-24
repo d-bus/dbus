@@ -211,7 +211,7 @@ set(CONFIG_VERBOSE 1)
 
 foreach(DIR ${TESTDIRS})
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
-endforeach(DIR)
+endforeach()
 
 ### copy tests to builddir so that generated tests and static tests 
 ### are all in one place.
@@ -225,10 +225,10 @@ foreach(FILE_TYPE *.message-raw *.auth-script *.sha1 *.txt *.conf *.service)
             configure_file(${FILE} ${TARGET} COPYONLY)
             if(CONFIG_VERBOSE)
                 message("${FILE}")
-            endif(CONFIG_VERBOSE)
-        endforeach(FILE)
-    endforeach(DIR)
-endforeach(FILE_TYPE)
+            endif()
+        endforeach()
+    endforeach()
+endforeach()
 
 ### generate test files
 message(STATUS "Generating test files from templates into test directory")
@@ -243,10 +243,10 @@ foreach(FILE_TYPE *.conf.in *.service.in)
       configure_file(${FILE} ${TARGET} @ONLY IMMEDIATE)
       if(CONFIG_VERBOSE)
         message("${FILE}")
-      endif(CONFIG_VERBOSE)
-    endforeach(FILE)
-  endforeach(DIR)
-endforeach(FILE_TYPE)
+      endif()
+    endforeach()
+  endforeach()
+endforeach()
 
 message(STATUS "Copying generated bus config files to test directory")
 configure_file(../bus/session.conf.in ${CMAKE_BINARY_DIR}/test/data/valid-config-files/session.conf @ONLY)
