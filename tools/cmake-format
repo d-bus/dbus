@@ -22,6 +22,7 @@ if test -z "$1"; then
 	echo "   --keyword-spaces    remove spaces between keyword and opening bracket"
 	echo "   --tabs              replace tabs by 4 spaces"
 	echo "   --trailing-spaces   remove trailing spaces"
+	echo "   --check-indents     check indents"
 	exit 1
 fi
 
@@ -94,16 +95,32 @@ fi
 
 # setup dir to apply
 s=$(dirname $0)
-root=$(realpath $s/../cmake)
+root=$(realpath $s/..)
 
 #echo $exp
 #echo $root
 
-echo "locations with unusual indention level changes, please inspect"
+if test "$1" = "--check-indents"; then
+    echo "locations with unusual indention level changes, please inspect"
+fi
+
+# script for checking indents
+awk='BEGIN { debug=0; indent=0 }
+$0 ~ /^ {0}/ && $0 !~ /^$/{ indent=0; }
+$0 ~ /^ {4}/ { indent=1; }
+$0 ~ /^ {8}/ { indent=2; }
+$0 ~ /^ {12}/ { indent=3; }
+debug == 1 { print FILENAME "[" NR "]:" indent " " oldindent ":  " $0; }
+{ if (indent - oldindent > 1) print FILENAME ":" NR ":" $0; }
+{ oldindent = indent;}
+'
+
 # apply to cmake related files
 for i in $(find $root -name 'CMakeLists.txt' -o -name '*.cmake' | grep -v README.cmake | grep -v config.h.cmake | grep -v bat.cmake | grep -v '/Find'); do
 	# apply style
-	sed -i "$exp" $i
-	# show unusual indention changes
-	gawk 'BEGIN { indent=0 } $0 ~ /^ {0}/ && $0 !~ /^$/{ indent=0; }  $0 ~ /^ {4}/ { indent=1; } $0 ~ /^ {8}/ { indent=2; } $0 ~ /^ {12}/ { indent=3; } {  if (indent - oldindent > 1) print FILENAME ":" NR ":" $0; oldindent=indent;}' $i
+	if ! test "$1" = "--check-indents"; then
+		sed -i "$exp" $i
+	else
+		gawk "$awk" $i
+	fi
 done

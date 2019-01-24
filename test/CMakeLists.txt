@@ -15,56 +15,56 @@ target_link_libraries(dbus-testutils ${DBUS_INTERNAL_LIBRARIES})
 
 add_subdirectory( name-test )
 
-set (manual-dir-iter_SOURCES
+set(manual-dir-iter_SOURCES
     manual-dir-iter.c
 )
 
-set (test-service_SOURCES
+set(test-service_SOURCES
     test-service.c
 )
 
-set (test-names_SOURCES
+set(test-names_SOURCES
     test-names.c
 )
 
-set (break_loader_SOURCES
+set(break_loader_SOURCES
     break-loader.c
 )
 
-set (test-shell-service_SOURCES
+set(test-shell-service_SOURCES
     test-shell-service.c
 )
 
-set (test-shell_SOURCES
-        shell-test.c
+set(test-shell_SOURCES
+    shell-test.c
 )
 
-set (test-spawn_SOURCES
+set(test-spawn_SOURCES
     spawn-test.c
 )
 
-set (test-exit_SOURCES
+set(test-exit_SOURCES
     test-exit.c
 )
 
 # We have to compile a separate copy of disable-crash-handling.c for
 # test-segfault rather than using the libdbus-testutils library, because
 # otherwise it would fail to link when using the AddressSanitizer.
-set (test-segfault_SOURCES
+set(test-segfault_SOURCES
     disable-crash-handling.c
     disable-crash-handling.h
     test-segfault.c
 )
 
-set (test-sleep-forever_SOURCES
+set(test-sleep-forever_SOURCES
     test-sleep-forever.c
 )
 
-set (manual-tcp_SOURCES
+set(manual-tcp_SOURCES
     manual-tcp.c
 )
 
-set (manual-paths_SOURCES
+set(manual-paths_SOURCES
     manual-paths.c
 )
 
@@ -95,34 +95,40 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     add_test_executable(test-hash internals/hash.c dbus-testutils)
     set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/marshal-recursive.c)
+    set(SOURCES
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/marshal-recursive.c
+    )
     add_test_executable(test-marshal-recursive "${SOURCES}" dbus-testutils)
     set_target_properties(test-marshal-recursive PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/dbus-message-factory.c
-                internals/dbus-message-factory.h
-                internals/dbus-message-util.c
-                internals/dbus-message-util.h
-                internals/message-internals.c)
+    set(SOURCES
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/dbus-message-factory.c
+        internals/dbus-message-factory.h
+        internals/dbus-message-util.c
+        internals/dbus-message-util.h
+        internals/message-internals.c
+    )
     add_test_executable(test-message-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
-    set(SOURCES internals/dbus-auth-script.c
-                internals/dbus-auth-script.h
-                internals/dbus-auth-util.c
-                internals/dbus-credentials-util.c
-                internals/dbus-marshal-byteswap-util.c
-                internals/dbus-marshal-recursive-util.c
-                internals/dbus-marshal-recursive-util.h
-                internals/dbus-marshal-validate-util.c
-                internals/dbus-string-util.c
-                internals/dbus-sysdeps-util.c
-                internals/misc-internals.c
-                internals/misc-internals.h)
+    set(SOURCES
+        internals/dbus-auth-script.c
+        internals/dbus-auth-script.h
+        internals/dbus-auth-util.c
+        internals/dbus-credentials-util.c
+        internals/dbus-marshal-byteswap-util.c
+        internals/dbus-marshal-recursive-util.c
+        internals/dbus-marshal-recursive-util.h
+        internals/dbus-marshal-validate-util.c
+        internals/dbus-string-util.c
+        internals/dbus-sysdeps-util.c
+        internals/misc-internals.c
+        internals/misc-internals.h
+    )
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
@@ -184,7 +190,7 @@ if(DBUS_WITH_GLIB)
 endif()
 
 ### keep these in creation order, i.e. uppermost dirs first 
-set (TESTDIRS
+set(TESTDIRS
     data
     data/invalid-messages
     data/auth
@@ -207,47 +213,47 @@ set (TESTDIRS
     data/equiv-config-files/entities
     data/equiv-config-files/entities/basic.d
 )
-set (CONFIG_VERBOSE 1)
+set(CONFIG_VERBOSE 1)
 
-FOREACH(DIR ${TESTDIRS})
-    FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
-ENDFOREACH(DIR)
+foreach(DIR ${TESTDIRS})
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
+endforeach()
 
 ### copy tests to builddir so that generated tests and static tests 
 ### are all in one place.
-MESSAGE(STATUS "Copying test files to test directory")
-FOREACH(FILE_TYPE *.message-raw *.auth-script *.sha1 *.txt *.conf *.service)
-    FOREACH(DIR ${TESTDIRS})
-        FILE(GLOB FILES "${DIR}/${FILE_TYPE}" )
-        FOREACH(FILE ${FILES})
-            GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME)
-            SET (TARGET ${CMAKE_CURRENT_BINARY_DIR}/${DIR}/${FILENAME})
+message(STATUS "Copying test files to test directory")
+foreach(FILE_TYPE *.message-raw *.auth-script *.sha1 *.txt *.conf *.service)
+    foreach(DIR ${TESTDIRS})
+        file(GLOB FILES "${DIR}/${FILE_TYPE}" )
+        foreach(FILE ${FILES})
+            get_filename_component(FILENAME ${FILE} NAME)
+            set(TARGET ${CMAKE_CURRENT_BINARY_DIR}/${DIR}/${FILENAME})
             configure_file(${FILE} ${TARGET} COPYONLY)
-            IF (CONFIG_VERBOSE)
-                MESSAGE("${FILE}")
-            ENDIF (CONFIG_VERBOSE)
-        ENDFOREACH(FILE)
-    ENDFOREACH(DIR)
-ENDFOREACH(FILE_TYPE)
+            if(CONFIG_VERBOSE)
+                message("${FILE}")
+            endif()
+        endforeach()
+    endforeach()
+endforeach()
 
 ### generate test files
-MESSAGE(STATUS "Generating test files from templates into test directory")
+message(STATUS "Generating test files from templates into test directory")
 
-FOREACH(FILE_TYPE *.conf.in *.service.in)
-  FOREACH(DIR ${TESTDIRS})
-    FILE(GLOB FILES "${DIR}/${FILE_TYPE}" )
-    FOREACH(FILE ${FILES})
-      GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME)
-      STRING(REGEX REPLACE "\\.in$" "" FILENAME ${FILENAME})
-      SET (TARGET ${CMAKE_CURRENT_BINARY_DIR}/${DIR}/${FILENAME})
-      configure_file(${FILE} ${TARGET} @ONLY IMMEDIATE)
-      IF (CONFIG_VERBOSE)
-        MESSAGE("${FILE}")
-      ENDIF (CONFIG_VERBOSE)
-    ENDFOREACH(FILE)
-  ENDFOREACH(DIR)
-ENDFOREACH(FILE_TYPE)
+foreach(FILE_TYPE *.conf.in *.service.in)
+    foreach(DIR ${TESTDIRS})
+    file(GLOB FILES "${DIR}/${FILE_TYPE}" )
+    foreach(FILE ${FILES})
+        get_filename_component(FILENAME ${FILE} NAME)
+        string(REGEX REPLACE "\\.in$" "" FILENAME ${FILENAME})
+        set(TARGET ${CMAKE_CURRENT_BINARY_DIR}/${DIR}/${FILENAME})
+        configure_file(${FILE} ${TARGET} @ONLY IMMEDIATE)
+        if(CONFIG_VERBOSE)
+        message("${FILE}")
+        endif()
+    endforeach()
+    endforeach()
+endforeach()
 
-MESSAGE(STATUS "Copying generated bus config files to test directory")
+message(STATUS "Copying generated bus config files to test directory")
 configure_file(../bus/session.conf.in ${CMAKE_BINARY_DIR}/test/data/valid-config-files/session.conf @ONLY)
 configure_file(../bus/system.conf.in ${CMAKE_BINARY_DIR}/test/data/valid-config-files-system/system.conf @ONLY)

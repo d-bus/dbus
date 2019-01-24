@@ -8,14 +8,14 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 project(dbus)
 
 # we need to be up to date
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+endif()
 
 if(CMAKE_MAJOR_VERSION GREATER 2)
     cmake_policy(SET CMP0026 NEW)
-    if (CMAKE_MAJOR_VERSION GREATER 4 OR CMAKE_MINOR_VERSION GREATER 1)
+    if(CMAKE_MAJOR_VERSION GREATER 4 OR CMAKE_MINOR_VERSION GREATER 1)
         cmake_policy(SET CMP0053 NEW)
         cmake_policy(SET CMP0054 NEW)
     endif()
@@ -27,13 +27,13 @@ autoinit(configure.ac)
 autoversion(dbus)
 
 if(EXISTS ${CMAKE_SOURCE_DIR}/config.h.in)
-	autoheaderchecks(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/cmake/ConfigureChecks.cmake ${CMAKE_SOURCE_DIR}/cmake/config.h.cmake)
+    autoheaderchecks(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_SOURCE_DIR}/cmake/ConfigureChecks.cmake ${CMAKE_SOURCE_DIR}/cmake/config.h.cmake)
 else()
     message(STATUS "Generate config.h.in with autogen.sh to enable cmake header difference check.")
 endif()
 
 # used by file version info
-set (DBUS_PATCH_VERSION "0")
+set(DBUS_PATCH_VERSION "0")
 
 # set PACKAGE_... variables
 autopackage(
@@ -45,25 +45,25 @@ autopackage(
 
 include(Macros)
 string(TIMESTAMP DBUS_BUILD_TIMESTAMP "%Y%m%d%H%M" UTC)
-set (BUILD_FILEVERSION ${DBUS_MAJOR_VERSION},${DBUS_MINOR_VERSION},${DBUS_MICRO_VERSION},${DBUS_PATCH_VERSION})
-set (BUILD_TIMESTAMP ${DBUS_BUILD_TIMESTAMP})
+set(BUILD_FILEVERSION ${DBUS_MAJOR_VERSION},${DBUS_MINOR_VERSION},${DBUS_MICRO_VERSION},${DBUS_PATCH_VERSION})
+set(BUILD_TIMESTAMP ${DBUS_BUILD_TIMESTAMP})
 
 ########### basic vars ###############
 
 include(GNUInstallDirs)
 
-if (DBUSDIR)
-	set(DBUS_INSTALL_DIR "${DBUSDIR}")
-endif (DBUSDIR)
-if ($ENV{DBUSDIR})
-	set(DBUS_INSTALL_DIR "$ENV{DBUSDIR}")
-endif ($ENV{DBUSDIR})
+if(DBUSDIR)
+    set(DBUS_INSTALL_DIR "${DBUSDIR}")
+endif()
+if($ENV{DBUSDIR})
+    set(DBUS_INSTALL_DIR "$ENV{DBUSDIR}")
+endif()
 
-if (DBUS_INSTALL_DIR)
-	set(CMAKE_INSTALL_PREFIX "${DBUS_INSTALL_DIR}" CACHE PATH "install prefix" FORCE)
-else (DBUS_INSTALL_DIR)
-	set(DBUS_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
-endif (DBUS_INSTALL_DIR)
+if(DBUS_INSTALL_DIR)
+    set(CMAKE_INSTALL_PREFIX "${DBUS_INSTALL_DIR}" CACHE PATH "install prefix" FORCE)
+else(DBUS_INSTALL_DIR)
+    set(DBUS_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}")
+endif()
 
 set(DBUS_PREFIX ${DBUS_INSTALL_DIR})
 
@@ -88,7 +88,7 @@ set(SYSCONFDIR_FROM_PKGDATADIR ${CMAKE_INSTALL_FULL_SYSCONFDIR})
 set(DATADIR_FROM_PKGSYSCONFDIR ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 
-option (DBUS_RELOCATABLE "Attempt to make metadata relocatable" ON)
+option(DBUS_RELOCATABLE "Attempt to make metadata relocatable" ON)
 
 # For simplicity, we're not relocatable if CMAKE_INSTALL_LIBDIR
 # is something more complicated (e.g. Debian multiarch);
@@ -106,32 +106,32 @@ set(DBUS_LIBEXECDIR          ${CMAKE_INSTALL_FULL_LIBEXECDIR})
 set(DBUS_DATADIR             ${CMAKE_INSTALL_FULL_DATADIR})
 
 #enable building of shared library
-SET(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS ON)
 
 set(INSTALL_TARGETS_DEFAULT_ARGS EXPORT DBus1Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-if (CYGWIN)
-   set (WIN32)
-endif (CYGWIN)
+if(CYGWIN)
+    set(WIN32)
+endif()
 
 # search for required packages
-if (WIN32)
+if(WIN32)
     # include local header first to avoid using old installed header
-    set (CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/..)
-	find_package(LibIconv)
+    set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/..)
+    find_package(LibIconv)
     include(Win32Macros)
     addExplorerWrapper(${CMAKE_PROJECT_NAME})
-endif (WIN32)
+endif()
 
 if(NOT WIN32)
-	set (CMAKE_THREAD_PREFER_PTHREAD ON)
-	include (FindThreads)
-endif(NOT WIN32)
+    set(CMAKE_THREAD_PREFER_PTHREAD ON)
+    include(FindThreads)
+endif()
 
-option (DBUS_DISABLE_ASSERT "Disable assertion checking" OFF)
+option(DBUS_DISABLE_ASSERT "Disable assertion checking" OFF)
 
-option (DBUS_ENABLE_STATS "enable bus daemon usage statistics" OFF)
-option (DBUS_ENABLE_CONTAINERS "enable restricted servers for app-containers" OFF)
+option(DBUS_ENABLE_STATS "enable bus daemon usage statistics" OFF)
+option(DBUS_ENABLE_CONTAINERS "enable restricted servers for app-containers" OFF)
 
 if(WIN32)
     set(FD_SETSIZE "8192" CACHE STRING "The maximum number of connections that can be handled at once")
@@ -141,24 +141,24 @@ find_package(EXPAT)
 find_package(X11)
 find_package(GLib2)
 if(GLIB2_FOUND)
-    option (DBUS_WITH_GLIB "build with glib" ON)
+    option(DBUS_WITH_GLIB "build with glib" ON)
 endif()
 
 # analogous to AC_USE_SYSTEM_EXTENSIONS in configure.ac
 add_definitions(-D_GNU_SOURCE)
 
 # do config checks
-INCLUDE(ConfigureChecks)
+include(ConfigureChecks)
 
 # @TODO: how to remove last dir from ${CMAKE_SOURCE_DIR} ?
-SET(DBUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
+set(DBUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 
 # make some more macros available
-include (MacroLibrary)
+include(MacroLibrary)
 
 if(VCS)
-	set(DBUS_VERBOSE_C_S 1 CACHE STRING "verbose mode" FORCE)
-endif(VCS)
+    set(DBUS_VERBOSE_C_S 1 CACHE STRING "verbose mode" FORCE)
+endif()
 
 if(MSVC)
     # controll folders in msvc projects
@@ -166,11 +166,11 @@ if(MSVC)
     if(NOT GROUP_CODE)
         #set(GROUP_CODE split) #cmake default
         set(GROUP_CODE flat)
-    endif(NOT GROUP_CODE)
-    ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
-    SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   /FIconfig.h")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /FIconfig.h")
-    option (DBUS_MSVC_ANALYZE "Enable code analyzing for MSVC compiler: /analyze" OFF)
+    endif()
+    add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   /FIconfig.h")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /FIconfig.h")
+    option(DBUS_MSVC_ANALYZE "Enable code analyzing for MSVC compiler: /analyze" OFF)
 endif()
 
 #
@@ -226,19 +226,19 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGS_CFLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS_CFLAGS}")
 
 
-if (UNIX AND NOT DBUS_DISABLE_ASSERT)
-	# required for backtrace
-	SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -Wl,--export-dynamic")
-	SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--export-dynamic")
-	add_definitions(-DDBUS_BUILT_R_DYNAMIC)
-endif (UNIX AND NOT DBUS_DISABLE_ASSERT)
+if(UNIX AND NOT DBUS_DISABLE_ASSERT)
+    # required for backtrace
+    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -Wl,--export-dynamic")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--export-dynamic")
+    add_definitions(-DDBUS_BUILT_R_DYNAMIC)
+endif()
 
 if(DBUS_WITH_GLIB)
     autodefine(GLIB_VERSION_MIN_REQUIRED)
     autodefine(GLIB_VERSION_MAX_ALLOWED)
 endif()
 
-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
 
 #########################################################################
 # Windows CE (>= 5.0.0)
@@ -260,13 +260,13 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
 #
 if(WINCE)
 
-MESSAGE("Building for WinCE (${CMAKE_SYSTEM_VERSION})")
+message("Building for WinCE (${CMAKE_SYSTEM_VERSION})")
 
-endif(WINCE)
+endif()
 #########################################################################
 
 
-ENABLE_TESTING()
+enable_testing()
 
 #########################################################################
 # Disallow in-source build
@@ -286,7 +286,7 @@ if(WIN32 OR CYGWIN)
 else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 endif()
-set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # for including config.h and for includes like <dir/foo.h>
 include_directories(. ${CMAKE_BINARY_DIR} ${CMAKE_INCLUDE_PATH})
@@ -297,72 +297,72 @@ include_directories( ${CMAKE_LIBRARY_PATH}  )
 
 set(DBUS_INCLUDES)
 
-ENABLE_TESTING()
+enable_testing()
 
 ########### command line options ###############
-option (DBUS_BUILD_TESTS "enable unit test code" ON)
- 
+option(DBUS_BUILD_TESTS "enable unit test code" ON)
+
 if(DBUS_BUILD_TESTS)
-    set (DBUS_ENABLE_EMBEDDED_TESTS ON)
-    set (DBUS_ENABLE_MODULAR_TESTS ON)
-endif(DBUS_BUILD_TESTS)
+    set(DBUS_ENABLE_EMBEDDED_TESTS ON)
+    set(DBUS_ENABLE_MODULAR_TESTS ON)
+endif()
 
-option (DBUS_USE_OUTPUT_DEBUG_STRING "enable win32 debug port for message output" OFF)
+option(DBUS_USE_OUTPUT_DEBUG_STRING "enable win32 debug port for message output" OFF)
 if(WIN32)
-	# win32 dbus service support - this support is not complete
-	option (DBUS_SERVICE "enable dbus service installer" OFF)
-endif(WIN32)
+    # win32 dbus service support - this support is not complete
+    option(DBUS_SERVICE "enable dbus service installer" OFF)
+endif()
 
-option (DBUS_ENABLE_ANSI "enable -ansi -pedantic gcc flags" OFF)
+option(DBUS_ENABLE_ANSI "enable -ansi -pedantic gcc flags" OFF)
 if(DBUS_ENABLE_ANSI)
-   if(NOT MSVC)
+    if(NOT MSVC)
         add_definitions(-ansi -D_POSIX_C_SOURCE=199309L -D_BSD_SOURCE -pedantic)
-   else(NOT MSVC)
+    else(NOT MSVC)
         add_definitions(-Za -D_POSIX_C_SOURCE=199309L -D_BSD_SOURCE -W4)
-   endif(NOT MSVC)
-endif(DBUS_ENABLE_ANSI)
+    endif()
+endif()
 
-option (DBUS_ENABLE_VERBOSE_MODE "support verbose debug mode" ON)
+option(DBUS_ENABLE_VERBOSE_MODE "support verbose debug mode" ON)
 
-option (DBUS_DISABLE_CHECKS "Disable public API sanity checking" OFF)
+option(DBUS_DISABLE_CHECKS "Disable public API sanity checking" OFF)
 
 if(NOT MSVC)
-    option (DBUS_GCOV_ENABLED "compile with coverage profiling instrumentation (gcc only)" OFF)
+    option(DBUS_GCOV_ENABLED "compile with coverage profiling instrumentation (gcc only)" OFF)
     if(DBUS_GCOV_ENABLED)
-            add_definitions(-fprofile-arcs -ftest-coverage)
-            # FIXME!!!!
-            ## remove optimization
-    #        CFLAGS=`echo "$CFLAGS" | sed -e 's/-O[0-9]*//g'`
-    endif(DBUS_GCOV_ENABLED)
-endif(NOT MSVC)
+        add_definitions(-fprofile-arcs -ftest-coverage)
+        # FIXME!!!!
+        ## remove optimization
+        # CFLAGS=`echo "$CFLAGS" | sed -e 's/-O[0-9]*//g'`
+    endif()
+endif()
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-    option (DBUS_BUS_ENABLE_INOTIFY "build with inotify support (linux only)" ON)
+    option(DBUS_BUS_ENABLE_INOTIFY "build with inotify support (linux only)" ON)
     if(DBUS_BUS_ENABLE_INOTIFY)
         if(NOT HAVE_SYS_INOTIFY_H)
             message(FATAL_ERROR "sys/inotify.h not found!")
-        endif(NOT HAVE_SYS_INOTIFY_H)
-    endif(DBUS_BUS_ENABLE_INOTIFY)
+        endif()
+    endif()
 elseif("${CMAKE_SYSTEM_NAME}" MATCHES ".*BSD")
-    option (DBUS_BUS_ENABLE_KQUEUE "build with kqueue support (FreeBSD only)" ON)
+    option(DBUS_BUS_ENABLE_KQUEUE "build with kqueue support (FreeBSD only)" ON)
     if(DBUS_BUS_ENABLE_KQUEUE)
         if(NOT HAVE_SYS_EVENT_H)
             message(FATAL_ERROR "sys/event.h not found!")
-        endif(NOT HAVE_SYS_EVENT_H)
-    endif(DBUS_BUS_ENABLE_KQUEUE)
-endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
+        endif()
+    endif()
+endif()
 
-STRING(TOUPPER ${CMAKE_SYSTEM_NAME} sysname)
+string(TOUPPER ${CMAKE_SYSTEM_NAME} sysname)
 if("${sysname}" MATCHES ".*SOLARIS.*")
-    option (HAVE_CONSOLE_OWNER_FILE "enable console owner file (solaris only)" ON)
+    option(HAVE_CONSOLE_OWNER_FILE "enable console owner file(solaris only)" ON)
     if(HAVE_CONSOLE_OWNER_FILE)
-        set (DBUS_CONSOLE_OWNER_FILE "/dev/console" CACHE STRING "Directory to check for console ownerhip")
-    endif(HAVE_CONSOLE_OWNER_FILE)
-endif("${sysname}" MATCHES ".*SOLARIS.*")
+        set(DBUS_CONSOLE_OWNER_FILE "/dev/console" CACHE STRING "Directory to check for console ownerhip")
+    endif()
+endif()
 
 if(NOT EXPAT_FOUND)
     message(FATAL_ERROR "expat not found!")
-endif(NOT EXPAT_FOUND)
+endif()
 
 # all missing or hardcoded for now
 
@@ -370,13 +370,16 @@ endif(NOT EXPAT_FOUND)
 set(atomic_int OFF)
 set(atomic_int486 OFF)
 if(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
-    FIND_PROGRAM(UNAME_EXECUTABLE
-                    NAMES uname
-                    PATHS /bin /usr/bin /usr/local/bin c:/Programme/MSys/bin d:/Programme/MSys/bin)
+    find_program(UNAME_EXECUTABLE
+        NAMES uname
+        PATHS /bin /usr/bin /usr/local/bin c:/Programme/MSys/bin d:/Programme/MSys/bin
+    )
 
     if(UNAME_EXECUTABLE)
-        EXECUTE_PROCESS(COMMAND ${UNAME_EXECUTABLE} "-m"
-                        OUTPUT_VARIABLE UNAME_OUTPUT)
+        execute_process(
+            COMMAND ${UNAME_EXECUTABLE} "-m"
+            OUTPUT_VARIABLE UNAME_OUTPUT
+        )
 
         if("UNAME_OUTPUT" MATCHES "^.*i[0123]86.*$")
             set(atomic_int ON)
@@ -384,40 +387,40 @@ if(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
             if("UNAME_OUTPUT" MATCHES "^.*i?86.*$")
                 set(atomic_int ON)
                 set(atomic_int_486 ON)
-            endif("UNAME_OUTPUT" MATCHES "^.*i?86.*$")
-        endif("UNAME_OUTPUT" MATCHES "^.*i[0123]86.*$")
-    endif(UNAME_EXECUTABLE)
-endif(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
+            endif()
+        endif()
+    endif()
+endif()
 
 if(X11_FOUND)
-  option (DBUS_BUILD_X11 "Build with X11 autolaunch support " ON)
-endif(X11_FOUND)
+    option(DBUS_BUILD_X11 "Build with X11 autolaunch support " ON)
+endif()
 
 # test binary names
-if (WIN32)
+if(WIN32)
     # follow Automake's naming convention so we can share .in files
-    set (EXEEXT ${CMAKE_EXECUTABLE_SUFFIX})
-endif(WIN32)
+    set(EXEEXT ${CMAKE_EXECUTABLE_SUFFIX})
+endif()
 
-if (MSVC_IDE)
+if(MSVC_IDE)
     if(CMAKE_BUILD_TYPE MATCHES Debug)
-		set(IDE_BIN /Debug )
-		message(STATUS)
-		message(STATUS "Visual Studio: test programs will only work with 'Debug' configuration!")
-		message(STATUS "To run tests with 'Release' configuration use -DCMAKE_BUILD_TYPE=Release")
-		message(STATUS "Add '..\\..\\test\\data' to the command line option of the test programs")
-		message(STATUS)
+        set(IDE_BIN /Debug )
+        message(STATUS)
+        message(STATUS "Visual Studio: test programs will only work with 'Debug' configuration!")
+        message(STATUS "To run tests with 'Release' configuration use -DCMAKE_BUILD_TYPE=Release")
+        message(STATUS "Add '..\\..\\test\\data' to the command line option of the test programs")
+        message(STATUS)
     else(CMAKE_BUILD_TYPE MATCHES Debug)
-		set(IDE_BIN /Release)
-		message(STATUS)
-		message(STATUS "Visual Studio: test programs will only work with 'Release' configuration!")
-		message(STATUS "To run tests with 'Debug' configuration use -DCMAKE_BUILD_TYPE=Debug")
-		message(STATUS "Add '..\\..\\test\\data' to the command line option of the test programs")
-		message(STATUS)
-    endif(CMAKE_BUILD_TYPE MATCHES Debug)
-	set (TEST_PATH_FORCE FORCE)
-	FILE(REMOVE ${CMAKE_BINARY_DIR}/data/dbus-1/services)
-endif (MSVC_IDE)
+        set(IDE_BIN /Release)
+        message(STATUS)
+        message(STATUS "Visual Studio: test programs will only work with 'Release' configuration!")
+        message(STATUS "To run tests with 'Debug' configuration use -DCMAKE_BUILD_TYPE=Debug")
+        message(STATUS "Add '..\\..\\test\\data' to the command line option of the test programs")
+        message(STATUS)
+    endif()
+    set(TEST_PATH_FORCE FORCE)
+    file(REMOVE ${CMAKE_BINARY_DIR}/data/dbus-1/services)
+endif()
 
 #### Find socket directories
 if(UNIX)
@@ -433,9 +436,9 @@ if(UNIX)
 endif()
 
  # Not used on Windows, where there is no system bus
-set (DBUS_SYSTEM_PID_FILE ${DBUS_RUNSTATEDIR}/dbus/pid)
+set(DBUS_SYSTEM_PID_FILE ${DBUS_RUNSTATEDIR}/dbus/pid)
 
-set (DBUS_CONSOLE_AUTH_DIR "" CACHE STRING "Directory to check for pam_console/pam_foreground flag files, or empty to ignore")
+set(DBUS_CONSOLE_AUTH_DIR "" CACHE STRING "Directory to check for pam_console/pam_foreground flag files, or empty to ignore")
 
 # This won't work on Windows. It's not meant to - the system bus is
 # meaningless on Windows anyway.
@@ -445,33 +448,33 @@ set (DBUS_CONSOLE_AUTH_DIR "" CACHE STRING "Directory to check for pam_console/p
 # and also to connect to. If this ever changes, it'll need to be split into
 # two variables, one for the listening address and one for the connecting
 # address.
-set (DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "unix:path=${DBUS_RUNSTATEDIR}/dbus/system_bus_socket" CACHE STRING "system bus default address")
+set(DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "unix:path=${DBUS_RUNSTATEDIR}/dbus/system_bus_socket" CACHE STRING "system bus default address")
 
-if (WIN32)
-  set (DBUS_SESSION_BUS_LISTEN_ADDRESS "autolaunch:" CACHE STRING "session bus default listening address")
-  set (DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
+if(WIN32)
+    set(DBUS_SESSION_BUS_LISTEN_ADDRESS "autolaunch:" CACHE STRING "session bus default listening address")
+    set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
 
-  set (DBUS_SYSTEM_CONFIG_FILE "share/dbus-1/system.conf")
-  set (DBUS_SESSION_CONFIG_FILE "share/dbus-1/session.conf")
+    set(DBUS_SYSTEM_CONFIG_FILE "share/dbus-1/system.conf")
+    set(DBUS_SESSION_CONFIG_FILE "share/dbus-1/session.conf")
   # bus-test expects a non empty string
-  set (DBUS_USER "Administrator")
-  set (DBUS_TEST_USER "guest")
-  set (DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<!--<auth>EXTERNAL</auth>-->")
-else (WIN32)
-  set (DBUS_SESSION_BUS_LISTEN_ADDRESS "unix:tmpdir=${DBUS_SESSION_SOCKET_DIR}" CACHE STRING "session bus default listening address")
-  set (DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
-  set (sysconfdir "")
-  set (configdir ${sysconfdir}/dbus-1 )
-  set (DBUS_SYSTEM_CONFIG_FILE  ${configdir}/system.conf)
-  set (DBUS_SESSION_CONFIG_FILE ${configdir}/session.conf)
-  set (DBUS_USER "messagebus")
-  set (DBUS_TEST_USER "nobody")
+    set(DBUS_USER "Administrator")
+    set(DBUS_TEST_USER "guest")
+    set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<!--<auth>EXTERNAL</auth>-->")
+else(WIN32)
+    set(DBUS_SESSION_BUS_LISTEN_ADDRESS "unix:tmpdir=${DBUS_SESSION_SOCKET_DIR}" CACHE STRING "session bus default listening address")
+    set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
+    set(sysconfdir "")
+    set(configdir ${sysconfdir}/dbus-1 )
+    set(DBUS_SYSTEM_CONFIG_FILE  ${configdir}/system.conf)
+    set(DBUS_SESSION_CONFIG_FILE ${configdir}/session.conf)
+    set(DBUS_USER "messagebus")
+    set(DBUS_TEST_USER "nobody")
   # For best security, assume that all non-Windows platforms can do
   # credentials-passing.
-  set (DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<auth>EXTERNAL</auth>")
-endif (WIN32)
+    set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<auth>EXTERNAL</auth>")
+endif()
 
-set (DBUS_DAEMON_NAME "dbus-daemon" CACHE STRING "The name of the dbus daemon executable")
+set(DBUS_DAEMON_NAME "dbus-daemon" CACHE STRING "The name of the dbus daemon executable")
 
 ########### create config.h ###############
 
@@ -482,7 +485,7 @@ add_definitions(-DHAVE_CONFIG_H)
 add_definitions(${DBUS_BUS_CFLAGS})
 
 
-if (DBUS_BUILD_TESTS)
+if(DBUS_BUILD_TESTS)
     # set variables used for the .in files (substituted by configure_file) in test/data:
     set(DBUS_TEST_EXEC ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN})
     # Working directory for build-time tests, so that they'll pick up
@@ -497,24 +500,24 @@ if (DBUS_BUILD_TESTS)
     set(DBUS_TEST_HOMEDIR ${Z_DRIVE_IF_WINE}${CMAKE_BINARY_DIR}/dbus)
     set(DBUS_TEST_RUN_SESSION ${Z_DRIVE_IF_WINE}${CMAKE_RUNTIME_OUTPUT_DIRECTORY}${IDE_BIN}/dbus-run-session${EXEEXT})
     set(TEST_LAUNCH_HELPER_BINARY ${Z_DRIVE_IF_WINE}${DBUS_TEST_EXEC}/dbus-daemon-launch-helper-for-tests${EXEEXT})
-    if (UNIX)
+    if(UNIX)
         set(TEST_SOCKET_DIR ${DBUS_SESSION_SOCKET_DIR})
         set(TEST_LISTEN "unix:tmpdir=${TEST_SOCKET_DIR}")
     endif()
-    if (WIN32)
-        set (TEST_LISTEN "tcp:host=localhost")
-    endif (WIN32)
-endif  (DBUS_BUILD_TESTS)
+    if(WIN32)
+        set(TEST_LISTEN "tcp:host=localhost")
+    endif()
+endif()
 
 set(DBUS_LIBRARIES dbus-1)
 set(DBUS_INTERNAL_LIBRARIES dbus-internal)
 
-set (DBUS_INTERNAL_ADD_LIBRARY_OPTIONS STATIC)
-set (DBUS_INTERNAL_CLIENT_DEFINITIONS "-DDBUS_COMPILATION")
+set(DBUS_INTERNAL_ADD_LIBRARY_OPTIONS STATIC)
+set(DBUS_INTERNAL_CLIENT_DEFINITIONS "-DDBUS_COMPILATION")
 
 configure_file(cmake/config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h )
 
-if (WIN32)
+if(WIN32)
 configure_file(cmake/dbus-env.bat.cmake ${CMAKE_BINARY_DIR}/bin/dbus-env.bat )
     install(FILES ${CMAKE_BINARY_DIR}/bin/dbus-env.bat DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
@@ -524,9 +527,9 @@ endif()
 #
 set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/DBus1)
 if(WIN32)
-   configure_file(cmake/DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+    configure_file(cmake/DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 else()
-   configure_file(cmake/DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+    configure_file(cmake/DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 endif()
 configure_file(cmake/DBus1ConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake" @ONLY)
 install(FILES
@@ -543,24 +546,24 @@ endif()
 
 add_subdirectory( dbus )
 add_subdirectory( bus )
-if (DBUS_BUILD_TESTS)
-	add_subdirectory( test )
-	add_custom_target(check
-		COMMAND ctest -R ^test-.*
-	)
-endif (DBUS_BUILD_TESTS)
+if(DBUS_BUILD_TESTS)
+    add_subdirectory( test )
+    add_custom_target(check
+        COMMAND ctest -R ^test-.*
+    )
+endif()
 add_subdirectory( tools )
 add_subdirectory( doc )
 
 
-OPTION(DBUS_INSTALL_SYSTEM_LIBS "install required system libraries" OFF)
-MESSAGE(" ")
-MESSAGE("set -DDBUS_INSTALL_SYSTEM_LIBS=1 to install runtime libraries too")
-MESSAGE("set DBUSDIR (environment or cmake option) to overwrite the default install directory ")
-MESSAGE(" ")
-MESSAGE(" ")
-GET_FILENAME_COMPONENT(C_COMPILER ${CMAKE_C_COMPILER} NAME)
-GET_FILENAME_COMPONENT(CXX_COMPILER ${CMAKE_CXX_COMPILER} NAME)
+option(DBUS_INSTALL_SYSTEM_LIBS "install required system libraries" OFF)
+message(" ")
+message("set -DDBUS_INSTALL_SYSTEM_LIBS=1 to install runtime libraries too")
+message("set DBUSDIR (environment or cmake option) to overwrite the default install directory ")
+message(" ")
+message(" ")
+get_filename_component(C_COMPILER ${CMAKE_C_COMPILER} NAME)
+get_filename_component(CXX_COMPILER ${CMAKE_CXX_COMPILER} NAME)
 
 message("                  D-BUS ${DBUS_VERSION}                               ")
 message("                  =============                                       ")
@@ -623,45 +626,45 @@ endif()
 message("        'make check' socket dir:  ${TEST_SOCKET_DIR}                  ")
 endif()
 message("        Test listen address:      ${TEST_LISTEN}                      ")
-if (MSVC)
+if(MSVC)
 message("        build timestamp:          ${DBUS_BUILD_TIMESTAMP}             ")
-endif (MSVC)
+endif()
 
-MESSAGE(" ")
-if (DBUS_BUILD_TESTS)
+message(" ")
+if(DBUS_BUILD_TESTS)
     message("NOTE: building with unit tests increases the size of the installed library and renders it insecure.")
-endif(DBUS_BUILD_TESTS)
+endif()
 
-if (DBUS_BUILD_TESTS AND DBUS_DISABLE_ASSERT)
+if(DBUS_BUILD_TESTS AND DBUS_DISABLE_ASSERT)
     message("NOTE: building with unit tests but without assertions means tests may not properly report failures (this configuration is only useful when doing something like profiling the tests)")
-endif(DBUS_BUILD_TESTS AND DBUS_DISABLE_ASSERT)
+endif()
 
-if (DBUS_GCOV_ENABLED)
+if(DBUS_GCOV_ENABLED)
     message("NOTE: building with coverage profiling is definitely for developers only.")
-endif(DBUS_GCOV_ENABLED)
+endif()
 
-if (DBUS_ENABLE_VERBOSE_MODE)
+if(DBUS_ENABLE_VERBOSE_MODE)
     message("NOTE: building with verbose mode increases library size, may slightly increase security risk, and decreases performance.")
-endif(DBUS_ENABLE_VERBOSE_MODE)
+endif()
 
 if(NOT DBUS_DISABLE_ASSERT)
     message("NOTE: building with assertions increases library size and decreases performance.")
-endif(NOT DBUS_DISABLE_ASSERT)
+endif()
 
-if (DBUS_DISABLE_CHECKS)
+if(DBUS_DISABLE_CHECKS)
     message("NOTE: building without checks for arguments passed to public API makes it harder to debug apps using D-BUS, but will slightly decrease D-BUS library size and _very_ slightly improve performance.")
-endif(DBUS_DISABLE_CHECKS)
+endif()
 
 foreach(_note ${FOOTNOTES})
     message(${_note})
 endforeach()
 
-MESSAGE(" ")
+message(" ")
 
-INCLUDE(CPackInstallConfig)
+include(CPackInstallConfig)
 
 add_custom_target(help-options
-    cmake -LH 
+    cmake -LH
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 

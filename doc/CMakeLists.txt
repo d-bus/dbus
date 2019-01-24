@@ -7,11 +7,11 @@ find_package(Doxygen)
 add_custom_target(doc ALL)
 
 if(DOXYGEN_EXECUTABLE)
-  OPTION(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
-endif(DOXYGEN_EXECUTABLE)
+    option(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
+endif()
 
-if (DBUS_ENABLE_DOXYGEN_DOCS)
-    set (top_srcdir ${CMAKE_SOURCE_DIR})
+if(DBUS_ENABLE_DOXYGEN_DOCS)
+    set(top_srcdir ${CMAKE_SOURCE_DIR})
     configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
@@ -28,7 +28,7 @@ if (DBUS_ENABLE_DOXYGEN_DOCS)
     )
     add_dependencies(doc devhelp2)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api/html/ DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/api)
-endif (DBUS_ENABLE_DOXYGEN_DOCS)
+endif()
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
 if(XSLTPROC_EXECUTABLE)
@@ -79,9 +79,9 @@ macro(DOCBOOK _sources _format)
                 DEPENDS ${_infile}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             )
-        endif ()
+        endif()
         add_dependencies(xmldoc ${_outname})
-        if (${_format} STREQUAL "man")
+        if(${_format} STREQUAL "man")
             install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)
         else()
             install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
@@ -89,27 +89,27 @@ macro(DOCBOOK _sources _format)
     else()
         message(STATUS "skipping xml doc generating for ${_infile}, file not found")
     endif()
-endmacro(DOCBOOK)
+endmacro()
 
 ### copy tests to builddir so that generated tests and static tests 
 ### are all in one place.
 ### todo how to add more filetypes 
-MACRO (COPYDIR _src _type)
-    FOREACH(FILE_TYPE ${_type})
-    	FOREACH(DIR ${_src})
-    		FILE(GLOB FILES "${DIR}/${FILE_TYPE}" )
-    		FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
-    		FOREACH(FILE ${FILES})
-    			GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME)
-    			SET (TARGET ${CMAKE_BINARY_DIR}/${DIR}/${FILENAME})
-    			configure_file(${FILE} ${TARGET} COPYONLY)
-    			IF (CONFIG_VERBOSE)
-    				MESSAGE("FROM: ${FILE}\nTO: ${TARGET}\n")
-    			ENDIF (CONFIG_VERBOSE)
-    		ENDFOREACH(FILE)
-    	ENDFOREACH(DIR)
-    ENDFOREACH(FILE_TYPE)
-ENDMACRO (COPYDIR)
+macro(COPYDIR _src _type)
+    foreach(FILE_TYPE ${_type})
+        foreach(DIR ${_src})
+            file(GLOB FILES "${DIR}/${FILE_TYPE}" )
+            file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
+            foreach(FILE ${FILES})
+                get_filename_component(FILENAME ${FILE} NAME)
+                set(TARGET ${CMAKE_BINARY_DIR}/${DIR}/${FILENAME})
+                configure_file(${FILE} ${TARGET} COPYONLY)
+                if(CONFIG_VERBOSE)
+                    message("FROM: ${FILE}\nTO: ${TARGET}\n")
+                endif()
+            endforeach()
+        endforeach()
+    endforeach()
+endmacro()
 
 COPYDIR(doc *.png)
 COPYDIR(doc *.svg)
@@ -152,7 +152,7 @@ docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml htm
 configure_file(index.html.in ${CMAKE_CURRENT_BINARY_DIR}/index.html)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
-set (EXTRA_DIST
+set(EXTRA_DIST
     busconfig.dtd
     introspect.dtd
     introspect.xsl
