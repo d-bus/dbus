@@ -16,7 +16,7 @@ endif()
 # copy services for local daemon start to local service dir data/dbus-1/services
 SET (SERVICE_FILES test/data/valid-service-files)
 FILE(GLOB FILES "${SERVICE_FILES}/*.service.in" )
-FOREACH(FILE ${FILES})	
+FOREACH(FILE ${FILES})
 	GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME_WE)
 	SET (TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
 	IF (CONFIG_VERBOSE)
@@ -34,46 +34,46 @@ else (DBUS_BUS_ENABLE_INOTIFY)
     set (DIR_WATCH_SOURCE dir-watch-default.c)
 endif (DBUS_BUS_ENABLE_INOTIFY)
 
-set (BUS_SOURCES 
-	activation.c				
-	activation.h				
+set (BUS_SOURCES
+	activation.c
+	activation.h
 	apparmor.c
 	apparmor.h
 	audit.c
 	audit.h
-	bus.c					
-	bus.h					
+	bus.c
+	bus.h
 	config-loader-expat.c
-	config-parser.c				
+	config-parser.c
 	config-parser.h
 	config-parser-common.c
 	config-parser-common.h
 #    config-parser-trivial.c
 	connection.c
-	connection.h				
+	connection.h
 	containers.c
 	containers.h
-	desktop-file.c				
-	desktop-file.h				
-	dir-watch.h				
-	dispatch.c				
-	dispatch.h				
-	driver.c				
-	driver.h				
-	expirelist.c				
-	expirelist.h				
-	policy.c				
-	policy.h				
-	selinux.h				
-	selinux.c				
-	services.c				
-	services.h				
-	signals.c				
-	signals.h				
-	test.c					
-	test.h					
-	utils.c					
-	utils.h					
+	desktop-file.c
+	desktop-file.h
+	dir-watch.h
+	dispatch.c
+	dispatch.h
+	driver.c
+	driver.h
+	expirelist.c
+	expirelist.h
+	policy.c
+	policy.h
+	selinux.h
+	selinux.c
+	services.c
+	services.h
+	signals.c
+	signals.h
+	test.c
+	test.h
+	utils.c
+	utils.h
 	${DIR_WATCH_SOURCE}
 )
 if(DBUS_ENABLE_STATS)

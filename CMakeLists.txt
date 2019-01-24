@@ -301,7 +301,7 @@ ENABLE_TESTING()
 
 ########### command line options ###############
 option (DBUS_BUILD_TESTS "enable unit test code" ON)
- 
+
 if(DBUS_BUILD_TESTS)
     set (DBUS_ENABLE_EMBEDDED_TESTS ON)
     set (DBUS_ENABLE_MODULAR_TESTS ON)
@@ -661,7 +661,7 @@ MESSAGE(" ")
 INCLUDE(CPackInstallConfig)
 
 add_custom_target(help-options
-    cmake -LH 
+    cmake -LH
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
 )
 

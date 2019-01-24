@@ -60,12 +60,12 @@ set (DBUS_LIB_SOURCES
 
 
 if(UNIX)
-	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES} 
+	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
 		dbus-transport-unix.c
 		dbus-server-unix.c
 	)
 else(UNIX)
-	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES} 
+	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
 		dbus-transport-win.c
 		dbus-server-win.c
 	)
@@ -99,11 +99,11 @@ set (DBUS_LIB_HEADERS
 	${CMAKE_BINARY_DIR}/config.h
 )
 if(UNIX)
-	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS} 
+	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
 		dbus-transport-unix.h
 	)
 else(UNIX)
-	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS} 
+	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
 		dbus-transport-win.h
 	)
 endif(UNIX)
@@ -170,14 +170,14 @@ set (DBUS_UTIL_HEADERS
 
 ### platform specific settings
 if (WIN32)
-	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES} 
+	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
 		dbus-file-win.c
 		dbus-init-win.cpp
 		dbus-sysdeps-win.c
 		dbus-pipe-win.c
 		dbus-sysdeps-thread-win.c
 	)
-	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS} 
+	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
 		dbus-sockets-win.h
 		dbus-sysdeps-win.h
 	)
@@ -194,14 +194,14 @@ if (WIN32)
 	)
 	endif(WINCE)
 else (WIN32)
-	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES} 
+	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
 		dbus-file-unix.c
 		dbus-pipe-unix.c
 		dbus-sysdeps-unix.c
 		dbus-sysdeps-pthread.c
 		dbus-userdb.c
 	)
-	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS} 
+	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
 		dbus-server-unix.h
 		dbus-transport-unix.h
 		dbus-sysdeps-unix.h
@@ -226,7 +226,7 @@ set(libdbus_SOURCES
 	${DBUS_SHARED_SOURCES}
 )
 
-set(libdbus_HEADERS 
+set(libdbus_HEADERS
 	${DBUS_LIB_HEADERS}
 	${DBUS_SHARED_HEADERS}
 )

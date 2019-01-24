@@ -1,16 +1,16 @@
 add_definitions("-DDBUS_COMPILATION")
 
 set (dbus_send_SOURCES
-	dbus-print-message.c			
-	dbus-print-message.h			
+	dbus-print-message.c
+	dbus-print-message.h
 	dbus-send.c
 	tool-common.c
 	tool-common.h
 )
 
 set (dbus_monitor_SOURCES
-	dbus-monitor.c				
-	dbus-print-message.c			
+	dbus-monitor.c
+	dbus-print-message.c
 	dbus-print-message.h
 	tool-common.c
 	tool-common.h
