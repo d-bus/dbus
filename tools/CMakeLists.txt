@@ -91,7 +91,7 @@ endif()
 add_executable(dbus-launch ${dbus_launch_SOURCES})
 target_link_libraries(dbus-launch ${DBUS_LIBRARIES})
 if(DBUS_BUILD_X11)
-  target_link_libraries(dbus-launch ${X11_LIBRARIES} )
+    target_link_libraries(dbus-launch ${X11_LIBRARIES} )
 endif()
 install(TARGETS dbus-launch ${INSTALL_TARGETS_DEFAULT_ARGS})
 

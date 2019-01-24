@@ -7,7 +7,7 @@ find_package(Doxygen)
 add_custom_target(doc ALL)
 
 if(DOXYGEN_EXECUTABLE)
-  option(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
+    option(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
 endif()
 
 if(DBUS_ENABLE_DOXYGEN_DOCS)

@@ -111,7 +111,7 @@ set(BUILD_SHARED_LIBS ON)
 set(INSTALL_TARGETS_DEFAULT_ARGS EXPORT DBus1Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 if(CYGWIN)
-   set(WIN32)
+    set(WIN32)
 endif()
 
 # search for required packages
@@ -315,11 +315,11 @@ endif()
 
 option(DBUS_ENABLE_ANSI "enable -ansi -pedantic gcc flags" OFF)
 if(DBUS_ENABLE_ANSI)
-   if(NOT MSVC)
+    if(NOT MSVC)
         add_definitions(-ansi -D_POSIX_C_SOURCE=199309L -D_BSD_SOURCE -pedantic)
-   else(NOT MSVC)
+    else(NOT MSVC)
         add_definitions(-Za -D_POSIX_C_SOURCE=199309L -D_BSD_SOURCE -W4)
-   endif()
+    endif()
 endif()
 
 option(DBUS_ENABLE_VERBOSE_MODE "support verbose debug mode" ON)
@@ -390,7 +390,7 @@ if(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
 endif()
 
 if(X11_FOUND)
-  option(DBUS_BUILD_X11 "Build with X11 autolaunch support " ON)
+    option(DBUS_BUILD_X11 "Build with X11 autolaunch support " ON)
 endif()
 
 # test binary names
@@ -448,27 +448,27 @@ set(DBUS_CONSOLE_AUTH_DIR "" CACHE STRING "Directory to check for pam_console/pa
 set(DBUS_SYSTEM_BUS_DEFAULT_ADDRESS "unix:path=${DBUS_RUNSTATEDIR}/dbus/system_bus_socket" CACHE STRING "system bus default address")
 
 if(WIN32)
-  set(DBUS_SESSION_BUS_LISTEN_ADDRESS "autolaunch:" CACHE STRING "session bus default listening address")
-  set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
+    set(DBUS_SESSION_BUS_LISTEN_ADDRESS "autolaunch:" CACHE STRING "session bus default listening address")
+    set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
 
-  set(DBUS_SYSTEM_CONFIG_FILE "share/dbus-1/system.conf")
-  set(DBUS_SESSION_CONFIG_FILE "share/dbus-1/session.conf")
+    set(DBUS_SYSTEM_CONFIG_FILE "share/dbus-1/system.conf")
+    set(DBUS_SESSION_CONFIG_FILE "share/dbus-1/session.conf")
   # bus-test expects a non empty string
-  set(DBUS_USER "Administrator")
-  set(DBUS_TEST_USER "guest")
-  set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<!--<auth>EXTERNAL</auth>-->")
+    set(DBUS_USER "Administrator")
+    set(DBUS_TEST_USER "guest")
+    set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<!--<auth>EXTERNAL</auth>-->")
 else(WIN32)
-  set(DBUS_SESSION_BUS_LISTEN_ADDRESS "unix:tmpdir=${DBUS_SESSION_SOCKET_DIR}" CACHE STRING "session bus default listening address")
-  set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
-  set(sysconfdir "")
-  set(configdir ${sysconfdir}/dbus-1 )
-  set(DBUS_SYSTEM_CONFIG_FILE  ${configdir}/system.conf)
-  set(DBUS_SESSION_CONFIG_FILE ${configdir}/session.conf)
-  set(DBUS_USER "messagebus")
-  set(DBUS_TEST_USER "nobody")
+    set(DBUS_SESSION_BUS_LISTEN_ADDRESS "unix:tmpdir=${DBUS_SESSION_SOCKET_DIR}" CACHE STRING "session bus default listening address")
+    set(DBUS_SESSION_BUS_CONNECT_ADDRESS "autolaunch:" CACHE STRING "session bus fallback address for clients")
+    set(sysconfdir "")
+    set(configdir ${sysconfdir}/dbus-1 )
+    set(DBUS_SYSTEM_CONFIG_FILE  ${configdir}/system.conf)
+    set(DBUS_SESSION_CONFIG_FILE ${configdir}/session.conf)
+    set(DBUS_USER "messagebus")
+    set(DBUS_TEST_USER "nobody")
   # For best security, assume that all non-Windows platforms can do
   # credentials-passing.
-  set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<auth>EXTERNAL</auth>")
+    set(DBUS_SESSION_CONF_MAYBE_AUTH_EXTERNAL "<auth>EXTERNAL</auth>")
 endif()
 
 set(DBUS_DAEMON_NAME "dbus-daemon" CACHE STRING "The name of the dbus daemon executable")
@@ -524,9 +524,9 @@ endif()
 #
 set(INSTALL_CMAKE_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/DBus1)
 if(WIN32)
-   configure_file(cmake/DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+    configure_file(cmake/DBus1Config.cmake.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 else()
-   configure_file(cmake/DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
+    configure_file(cmake/DBus1Config.pkgconfig.in "${CMAKE_BINARY_DIR}/DBus1Config.cmake" @ONLY)
 endif()
 configure_file(cmake/DBus1ConfigVersion.cmake.in "${CMAKE_BINARY_DIR}/DBus1ConfigVersion.cmake" @ONLY)
 install(FILES
