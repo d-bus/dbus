@@ -10,8 +10,8 @@ if(DOXYGEN_EXECUTABLE)
   option(DBUS_ENABLE_DOXYGEN_DOCS "build DOXYGEN documentation (requires Doxygen)" ON)
 endif(DOXYGEN_EXECUTABLE)
 
-if (DBUS_ENABLE_DOXYGEN_DOCS)
-    set (top_srcdir ${CMAKE_SOURCE_DIR})
+if(DBUS_ENABLE_DOXYGEN_DOCS)
+    set(top_srcdir ${CMAKE_SOURCE_DIR})
     configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
@@ -28,7 +28,7 @@ if (DBUS_ENABLE_DOXYGEN_DOCS)
     )
     add_dependencies(doc devhelp2)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api/html/ DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/api)
-endif (DBUS_ENABLE_DOXYGEN_DOCS)
+endif(DBUS_ENABLE_DOXYGEN_DOCS)
 
 find_program(XSLTPROC_EXECUTABLE xsltproc)
 if(XSLTPROC_EXECUTABLE)
@@ -79,9 +79,9 @@ macro(DOCBOOK _sources _format)
                 DEPENDS ${_infile}
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
             )
-        endif ()
+        endif()
         add_dependencies(xmldoc ${_outname})
-        if (${_format} STREQUAL "man")
+        if(${_format} STREQUAL "man")
             install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/man/man1)
         else()
             install(FILES ${_outfile} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
@@ -152,7 +152,7 @@ docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml htm
 configure_file(index.html.in ${CMAKE_CURRENT_BINARY_DIR}/index.html)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
-set (EXTRA_DIST
+set(EXTRA_DIST
     busconfig.dtd
     introspect.dtd
     introspect.xsl

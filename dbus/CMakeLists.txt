@@ -2,7 +2,7 @@ configure_file(dbus-arch-deps.h.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h 
 
 add_definitions(-DDBUS_COMPILATION)
 
-set (dbusinclude_HEADERS
+set(dbusinclude_HEADERS
     dbus.h
     dbus-address.h
     dbus-bus.h
@@ -21,13 +21,13 @@ set (dbusinclude_HEADERS
     dbus-threads.h
     dbus-types.h
 )
-set (dbusinclude_ARCH_HEADERS
+set(dbusinclude_ARCH_HEADERS
     ${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h
 )
 
 ### source code that goes in the installed client library
 ### and is specific to library functionality
-set (DBUS_LIB_SOURCES
+set(DBUS_LIB_SOURCES
     dbus-address.c
     dbus-auth.c
     dbus-bus.c
@@ -60,18 +60,18 @@ set (DBUS_LIB_SOURCES
 
 
 if(UNIX)
-    set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
+    set(DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
         dbus-transport-unix.c
         dbus-server-unix.c
     )
 else(UNIX)
-    set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
+    set(DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
         dbus-transport-win.c
         dbus-server-win.c
     )
 endif(UNIX)
 
-set (DBUS_LIB_HEADERS
+set(DBUS_LIB_HEADERS
     dbus-auth.h
     dbus-connection-internal.h
     dbus-credentials.h
@@ -99,11 +99,11 @@ set (DBUS_LIB_HEADERS
     ${CMAKE_BINARY_DIR}/config.h
 )
 if(UNIX)
-    set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
+    set(DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
         dbus-transport-unix.h
     )
 else(UNIX)
-    set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
+    set(DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
         dbus-transport-win.h
     )
 endif(UNIX)
@@ -113,7 +113,7 @@ endif(UNIX)
 ### AND is generic utility functionality used by the 
 ### daemon or test programs (all symbols in here should 
 ### be underscore-prefixed)
-set (DBUS_SHARED_SOURCES
+set(DBUS_SHARED_SOURCES
     dbus-dataslot.c
     dbus-file.c
     dbus-hash.c
@@ -128,7 +128,7 @@ set (DBUS_SHARED_SOURCES
     dbus-test-tap.c
 )
 
-set (DBUS_SHARED_HEADERS
+set(DBUS_SHARED_HEADERS
     dbus-dataslot.h
     dbus-file.h
     dbus-hash.h
@@ -148,7 +148,7 @@ set (DBUS_SHARED_HEADERS
 ### in the D-BUS client library (all symbols in here 
 ### should be underscore-prefixed but don't really need 
 ### to be unless they move to DBUS_SHARED_SOURCES later)
-set (DBUS_UTIL_SOURCES
+set(DBUS_UTIL_SOURCES
     dbus-asv-util.c
     dbus-mainloop.c
     dbus-message-util.c
@@ -159,7 +159,7 @@ set (DBUS_UTIL_SOURCES
     dbus-sysdeps-util.c
 )
 
-set (DBUS_UTIL_HEADERS
+set(DBUS_UTIL_HEADERS
     dbus-asv-util.h
     dbus-mainloop.h
     dbus-shell.h
@@ -169,50 +169,50 @@ set (DBUS_UTIL_HEADERS
 )
 
 ### platform specific settings
-if (WIN32)
-    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+if(WIN32)
+    set(DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
         dbus-file-win.c
         dbus-init-win.cpp
         dbus-sysdeps-win.c
         dbus-pipe-win.c
         dbus-sysdeps-thread-win.c
     )
-    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+    set(DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
         dbus-sockets-win.h
         dbus-sysdeps-win.h
     )
-    set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
+    set(DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
         dbus-spawn-win.c
         dbus-sysdeps-util-win.c
     )
     if(WINCE)
-    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+    set(DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
         dbus-sysdeps-wince-glue.c
     )
-    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+    set(DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
         dbus-sysdeps-wince-glue.h
     )
     endif(WINCE)
-else (WIN32)
-    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+else(WIN32)
+    set(DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
         dbus-file-unix.c
         dbus-pipe-unix.c
         dbus-sysdeps-unix.c
         dbus-sysdeps-pthread.c
         dbus-userdb.c
     )
-    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+    set(DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
         dbus-server-unix.h
         dbus-transport-unix.h
         dbus-sysdeps-unix.h
         dbus-userdb.h
     )
-    set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
+    set(DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
         dbus-spawn-unix.c
         dbus-userdb-util.c
         dbus-sysdeps-util-unix.c
     )
-endif (WIN32)
+endif(WIN32)
 
 if(DBUS_HAVE_LINUX_EPOLL)
         set(DBUS_UTIL_SOURCES
@@ -318,7 +318,7 @@ else(WIN32)
     endif()
 endif(WIN32)
 
-if (UNIX)
+if(UNIX)
 # set version info
 endif(UNIX)
 

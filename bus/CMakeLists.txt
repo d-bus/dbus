@@ -26,15 +26,15 @@ foreach(FILE ${FILES})
 endforeach(FILE)
 
 
-if (DBUS_BUS_ENABLE_INOTIFY)
-    set (DIR_WATCH_SOURCE dir-watch-inotify.c)
-elseif (DBUS_BUS_ENABLE_KQUEUE)
-    set (DIR_WATCH_SOURCE dir-watch-kqueue.c)
-else (DBUS_BUS_ENABLE_INOTIFY)
-    set (DIR_WATCH_SOURCE dir-watch-default.c)
-endif (DBUS_BUS_ENABLE_INOTIFY)
+if(DBUS_BUS_ENABLE_INOTIFY)
+    set(DIR_WATCH_SOURCE dir-watch-inotify.c)
+elseif(DBUS_BUS_ENABLE_KQUEUE)
+    set(DIR_WATCH_SOURCE dir-watch-kqueue.c)
+else(DBUS_BUS_ENABLE_INOTIFY)
+    set(DIR_WATCH_SOURCE dir-watch-default.c)
+endif(DBUS_BUS_ENABLE_INOTIFY)
 
-set (BUS_SOURCES
+set(BUS_SOURCES
     activation.c
     activation.h
     apparmor.c
@@ -115,8 +115,8 @@ if(NOT WIN32)
     install(DIRECTORY DESTINATION ${CMAKE_INSTALL_LOCALSTATEDIR}/run/dbus)
 endif()
 
-if (DBUS_SERVICE)
-    set (dbus_service_SOURCES
+if(DBUS_SERVICE)
+    set(dbus_service_SOURCES
             bus-service-win.c
     # TODO: add additional files
     #    service-main.c
@@ -128,7 +128,7 @@ if (DBUS_SERVICE)
     target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
     set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
     install(TARGETS dbus-service ${INSTALL_TARGETS_DEFAULT_ARGS})
-endif (DBUS_SERVICE)
+endif(DBUS_SERVICE)
 
 set(LAUNCH_HELPER_SOURCES
     config-loader-expat.c

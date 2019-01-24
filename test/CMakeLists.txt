@@ -15,56 +15,56 @@ target_link_libraries(dbus-testutils ${DBUS_INTERNAL_LIBRARIES})
 
 add_subdirectory( name-test )
 
-set (manual-dir-iter_SOURCES
+set(manual-dir-iter_SOURCES
     manual-dir-iter.c
 )
 
-set (test-service_SOURCES
+set(test-service_SOURCES
     test-service.c
 )
 
-set (test-names_SOURCES
+set(test-names_SOURCES
     test-names.c
 )
 
-set (break_loader_SOURCES
+set(break_loader_SOURCES
     break-loader.c
 )
 
-set (test-shell-service_SOURCES
+set(test-shell-service_SOURCES
     test-shell-service.c
 )
 
-set (test-shell_SOURCES
+set(test-shell_SOURCES
         shell-test.c
 )
 
-set (test-spawn_SOURCES
+set(test-spawn_SOURCES
     spawn-test.c
 )
 
-set (test-exit_SOURCES
+set(test-exit_SOURCES
     test-exit.c
 )
 
 # We have to compile a separate copy of disable-crash-handling.c for
 # test-segfault rather than using the libdbus-testutils library, because
 # otherwise it would fail to link when using the AddressSanitizer.
-set (test-segfault_SOURCES
+set(test-segfault_SOURCES
     disable-crash-handling.c
     disable-crash-handling.h
     test-segfault.c
 )
 
-set (test-sleep-forever_SOURCES
+set(test-sleep-forever_SOURCES
     test-sleep-forever.c
 )
 
-set (manual-tcp_SOURCES
+set(manual-tcp_SOURCES
     manual-tcp.c
 )
 
-set (manual-paths_SOURCES
+set(manual-paths_SOURCES
     manual-paths.c
 )
 
@@ -184,7 +184,7 @@ if(DBUS_WITH_GLIB)
 endif()
 
 ### keep these in creation order, i.e. uppermost dirs first 
-set (TESTDIRS
+set(TESTDIRS
     data
     data/invalid-messages
     data/auth
@@ -207,7 +207,7 @@ set (TESTDIRS
     data/equiv-config-files/entities
     data/equiv-config-files/entities/basic.d
 )
-set (CONFIG_VERBOSE 1)
+set(CONFIG_VERBOSE 1)
 
 foreach(DIR ${TESTDIRS})
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${DIR})
