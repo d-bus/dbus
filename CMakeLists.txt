@@ -8,7 +8,7 @@ set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 project(dbus)
 
 # we need to be up to date
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0.2 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.0.2 FATAL_ERROR)
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
@@ -106,7 +106,7 @@ set(DBUS_LIBEXECDIR          ${CMAKE_INSTALL_FULL_LIBEXECDIR})
 set(DBUS_DATADIR             ${CMAKE_INSTALL_FULL_DATADIR})
 
 #enable building of shared library
-SET(BUILD_SHARED_LIBS ON)
+set(BUILD_SHARED_LIBS ON)
 
 set(INSTALL_TARGETS_DEFAULT_ARGS EXPORT DBus1Targets RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
@@ -148,10 +148,10 @@ endif()
 add_definitions(-D_GNU_SOURCE)
 
 # do config checks
-INCLUDE(ConfigureChecks)
+include(ConfigureChecks)
 
 # @TODO: how to remove last dir from ${CMAKE_SOURCE_DIR} ?
-SET(DBUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
+set(DBUS_SOURCE_DIR ${CMAKE_SOURCE_DIR}/..)
 
 # make some more macros available
 include (MacroLibrary)
@@ -167,9 +167,9 @@ if(MSVC)
         #set(GROUP_CODE split) #cmake default
         set(GROUP_CODE flat)
     endif(NOT GROUP_CODE)
-    ADD_DEFINITIONS(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
-    SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   /FIconfig.h")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /FIconfig.h")
+    add_definitions(-D_CRT_SECURE_NO_DEPRECATE -D_CRT_NONSTDC_NO_DEPRECATE)
+    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   /FIconfig.h")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /FIconfig.h")
     option (DBUS_MSVC_ANALYZE "Enable code analyzing for MSVC compiler: /analyze" OFF)
 endif()
 
@@ -228,8 +228,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGS_CFLAGS}")
 
 if (UNIX AND NOT DBUS_DISABLE_ASSERT)
     # required for backtrace
-    SET(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -Wl,--export-dynamic")
-    SET(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--export-dynamic")
+    set(CMAKE_C_FLAGS_DEBUG   "${CMAKE_C_FLAGS_DEBUG}   -Wl,--export-dynamic")
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -Wl,--export-dynamic")
     add_definitions(-DDBUS_BUILT_R_DYNAMIC)
 endif (UNIX AND NOT DBUS_DISABLE_ASSERT)
 
@@ -238,7 +238,7 @@ if(DBUS_WITH_GLIB)
     autodefine(GLIB_VERSION_MAX_ALLOWED)
 endif()
 
-SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
 
 #########################################################################
 # Windows CE (>= 5.0.0)
@@ -260,13 +260,13 @@ SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}  -D_DEBUG")
 #
 if(WINCE)
 
-MESSAGE("Building for WinCE (${CMAKE_SYSTEM_VERSION})")
+message("Building for WinCE (${CMAKE_SYSTEM_VERSION})")
 
 endif(WINCE)
 #########################################################################
 
 
-ENABLE_TESTING()
+enable_testing()
 
 #########################################################################
 # Disallow in-source build
@@ -297,7 +297,7 @@ include_directories( ${CMAKE_LIBRARY_PATH}  )
 
 set(DBUS_INCLUDES)
 
-ENABLE_TESTING()
+enable_testing()
 
 ########### command line options ###############
 option (DBUS_BUILD_TESTS "enable unit test code" ON)
@@ -352,7 +352,7 @@ elseif("${CMAKE_SYSTEM_NAME}" MATCHES ".*BSD")
     endif(DBUS_BUS_ENABLE_KQUEUE)
 endif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 
-STRING(TOUPPER ${CMAKE_SYSTEM_NAME} sysname)
+string(TOUPPER ${CMAKE_SYSTEM_NAME} sysname)
 if("${sysname}" MATCHES ".*SOLARIS.*")
     option (HAVE_CONSOLE_OWNER_FILE "enable console owner file (solaris only)" ON)
     if(HAVE_CONSOLE_OWNER_FILE)
@@ -370,12 +370,12 @@ endif(NOT EXPAT_FOUND)
 set(atomic_int OFF)
 set(atomic_int486 OFF)
 if(CMAKE_COMPILER_IS_GNUCC AND NOT DBUS_ENABLE_ANSI)
-    FIND_PROGRAM(UNAME_EXECUTABLE
+    find_program(UNAME_EXECUTABLE
                     NAMES uname
                     PATHS /bin /usr/bin /usr/local/bin c:/Programme/MSys/bin d:/Programme/MSys/bin)
 
     if(UNAME_EXECUTABLE)
-        EXECUTE_PROCESS(COMMAND ${UNAME_EXECUTABLE} "-m"
+        execute_process(COMMAND ${UNAME_EXECUTABLE} "-m"
                         OUTPUT_VARIABLE UNAME_OUTPUT)
 
         if("UNAME_OUTPUT" MATCHES "^.*i[0123]86.*$")
@@ -416,7 +416,7 @@ if (MSVC_IDE)
         message(STATUS)
     endif(CMAKE_BUILD_TYPE MATCHES Debug)
     set (TEST_PATH_FORCE FORCE)
-    FILE(REMOVE ${CMAKE_BINARY_DIR}/data/dbus-1/services)
+    file(REMOVE ${CMAKE_BINARY_DIR}/data/dbus-1/services)
 endif (MSVC_IDE)
 
 #### Find socket directories
@@ -553,14 +553,14 @@ add_subdirectory( tools )
 add_subdirectory( doc )
 
 
-OPTION(DBUS_INSTALL_SYSTEM_LIBS "install required system libraries" OFF)
-MESSAGE(" ")
-MESSAGE("set -DDBUS_INSTALL_SYSTEM_LIBS=1 to install runtime libraries too")
-MESSAGE("set DBUSDIR (environment or cmake option) to overwrite the default install directory ")
-MESSAGE(" ")
-MESSAGE(" ")
-GET_FILENAME_COMPONENT(C_COMPILER ${CMAKE_C_COMPILER} NAME)
-GET_FILENAME_COMPONENT(CXX_COMPILER ${CMAKE_CXX_COMPILER} NAME)
+option(DBUS_INSTALL_SYSTEM_LIBS "install required system libraries" OFF)
+message(" ")
+message("set -DDBUS_INSTALL_SYSTEM_LIBS=1 to install runtime libraries too")
+message("set DBUSDIR (environment or cmake option) to overwrite the default install directory ")
+message(" ")
+message(" ")
+get_filename_component(C_COMPILER ${CMAKE_C_COMPILER} NAME)
+get_filename_component(CXX_COMPILER ${CMAKE_CXX_COMPILER} NAME)
 
 message("                  D-BUS ${DBUS_VERSION}                               ")
 message("                  =============                                       ")
@@ -627,7 +627,7 @@ if (MSVC)
 message("        build timestamp:          ${DBUS_BUILD_TIMESTAMP}             ")
 endif (MSVC)
 
-MESSAGE(" ")
+message(" ")
 if (DBUS_BUILD_TESTS)
     message("NOTE: building with unit tests increases the size of the installed library and renders it insecure.")
 endif(DBUS_BUILD_TESTS)
@@ -656,9 +656,9 @@ foreach(_note ${FOOTNOTES})
     message(${_note})
 endforeach()
 
-MESSAGE(" ")
+message(" ")
 
-INCLUDE(CPackInstallConfig)
+include(CPackInstallConfig)
 
 add_custom_target(help-options
     cmake -LH

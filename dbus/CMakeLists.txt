@@ -320,7 +320,7 @@ endif(WIN32)
 
 if (UNIX)
 # set version info
-ENDIF (UNIX)
+endif(UNIX)
 
 
 ## mop up the gcov files

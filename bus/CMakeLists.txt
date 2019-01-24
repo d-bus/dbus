@@ -1,29 +1,29 @@
 add_definitions(-DDBUS_COMPILATION)
 
-SET(EFENCE "")
+set(EFENCE "")
 
 # config files for installation 
-CONFIGURE_FILE( "session.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/session.conf" IMMEDIATE @ONLY)
-CONFIGURE_FILE( "legacy-config/session.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/legacy-config/session.conf" IMMEDIATE @ONLY)
-FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/session.d)
+configure_file( "session.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/session.conf" IMMEDIATE @ONLY)
+configure_file( "legacy-config/session.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/legacy-config/session.conf" IMMEDIATE @ONLY)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/session.d)
 
 if(NOT WIN32)
-    CONFIGURE_FILE( "system.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/system.conf" IMMEDIATE @ONLY)
-    CONFIGURE_FILE( "legacy-config/system.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/legacy-config/system.conf" IMMEDIATE @ONLY)
-    FILE(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/system.d)
+    configure_file( "system.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/system.conf" IMMEDIATE @ONLY)
+    configure_file( "legacy-config/system.conf.in" "${CMAKE_CURRENT_BINARY_DIR}/legacy-config/system.conf" IMMEDIATE @ONLY)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/system.d)
 endif()
 
 # copy services for local daemon start to local service dir data/dbus-1/services
-SET (SERVICE_FILES test/data/valid-service-files)
-FILE(GLOB FILES "${SERVICE_FILES}/*.service.in" )
-FOREACH(FILE ${FILES})
-    GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME_WE)
-    SET (TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
-    IF (CONFIG_VERBOSE)
-        MESSAGE("FROM: ${FILE}\nTO: ${TARGET}\n")
-    ENDIF (CONFIG_VERBOSE)
+set(SERVICE_FILES test/data/valid-service-files)
+file(GLOB FILES "${SERVICE_FILES}/*.service.in" )
+foreach(FILE ${FILES})
+    get_filename_component(FILENAME ${FILE} NAME_WE)
+    set(TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
+    if(CONFIG_VERBOSE)
+        message("FROM: ${FILE}\nTO: ${TARGET}\n")
+    endif(CONFIG_VERBOSE)
     configure_file(${FILE} ${TARGET} )
-ENDFOREACH(FILE)
+endforeach(FILE)
 
 
 if (DBUS_BUS_ENABLE_INOTIFY)
