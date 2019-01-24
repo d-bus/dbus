@@ -1,45 +1,45 @@
 add_definitions("-DDBUS_COMPILATION")
 
 set (dbus_send_SOURCES
-	dbus-print-message.c
-	dbus-print-message.h
-	dbus-send.c
-	tool-common.c
-	tool-common.h
+    dbus-print-message.c
+    dbus-print-message.h
+    dbus-send.c
+    tool-common.c
+    tool-common.h
 )
 
 set (dbus_monitor_SOURCES
-	dbus-monitor.c
-	dbus-print-message.c
-	dbus-print-message.h
-	tool-common.c
-	tool-common.h
+    dbus-monitor.c
+    dbus-print-message.c
+    dbus-print-message.h
+    tool-common.c
+    tool-common.h
 )
 
 set (dbus_test_tool_SOURCES
-	dbus-echo.c
-	dbus-spam.c
-	tool-common.c
-	tool-common.h
-	test-tool.c
-	test-tool.h
+    dbus-echo.c
+    dbus-spam.c
+    tool-common.c
+    tool-common.h
+    test-tool.c
+    test-tool.h
 )
 
 set (dbus_update_activation_environment_SOURCES
-	dbus-update-activation-environment.c
-	tool-common.c
-	tool-common.h
+    dbus-update-activation-environment.c
+    tool-common.c
+    tool-common.h
 )
 
 if (WIN32)
 set (dbus_launch_SOURCES
-	dbus-launch-win.c
+    dbus-launch-win.c
 )
 else (WIN32)
 set (dbus_launch_SOURCES
-	dbus-launch.c
-	tool-common.c
-	tool-common.h
+    dbus-launch.c
+    tool-common.c
+    tool-common.h
 )
 endif (WIN32)
 
@@ -51,7 +51,7 @@ set (dbus_launch_SOURCES
 endif(DBUS_BUILD_X11)
 
 set (dbus_cleanup_sockets_SOURCES
-	dbus-cleanup-sockets.c
+    dbus-cleanup-sockets.c
 )
 
 set (dbus_run_session_SOURCES

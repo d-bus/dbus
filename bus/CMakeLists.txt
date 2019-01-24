@@ -17,12 +17,12 @@ endif()
 SET (SERVICE_FILES test/data/valid-service-files)
 FILE(GLOB FILES "${SERVICE_FILES}/*.service.in" )
 FOREACH(FILE ${FILES})
-	GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME_WE)
-	SET (TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
-	IF (CONFIG_VERBOSE)
-		MESSAGE("FROM: ${FILE}\nTO: ${TARGET}\n")
-	ENDIF (CONFIG_VERBOSE)
-	configure_file(${FILE} ${TARGET} )
+    GET_FILENAME_COMPONENT(FILENAME ${FILE} NAME_WE)
+    SET (TARGET ${CMAKE_BINARY_DIR}/data/dbus-1/services/${FILENAME}.service)
+    IF (CONFIG_VERBOSE)
+        MESSAGE("FROM: ${FILE}\nTO: ${TARGET}\n")
+    ENDIF (CONFIG_VERBOSE)
+    configure_file(${FILE} ${TARGET} )
 ENDFOREACH(FILE)
 
 
@@ -35,58 +35,58 @@ else (DBUS_BUS_ENABLE_INOTIFY)
 endif (DBUS_BUS_ENABLE_INOTIFY)
 
 set (BUS_SOURCES
-	activation.c
-	activation.h
-	apparmor.c
-	apparmor.h
-	audit.c
-	audit.h
-	bus.c
-	bus.h
-	config-loader-expat.c
-	config-parser.c
-	config-parser.h
-	config-parser-common.c
-	config-parser-common.h
+    activation.c
+    activation.h
+    apparmor.c
+    apparmor.h
+    audit.c
+    audit.h
+    bus.c
+    bus.h
+    config-loader-expat.c
+    config-parser.c
+    config-parser.h
+    config-parser-common.c
+    config-parser-common.h
 #    config-parser-trivial.c
-	connection.c
-	connection.h
-	containers.c
-	containers.h
-	desktop-file.c
-	desktop-file.h
-	dir-watch.h
-	dispatch.c
-	dispatch.h
-	driver.c
-	driver.h
-	expirelist.c
-	expirelist.h
-	policy.c
-	policy.h
-	selinux.h
-	selinux.c
-	services.c
-	services.h
-	signals.c
-	signals.h
-	test.c
-	test.h
-	utils.c
-	utils.h
-	${DIR_WATCH_SOURCE}
+    connection.c
+    connection.h
+    containers.c
+    containers.h
+    desktop-file.c
+    desktop-file.h
+    dir-watch.h
+    dispatch.c
+    dispatch.h
+    driver.c
+    driver.h
+    expirelist.c
+    expirelist.h
+    policy.c
+    policy.h
+    selinux.h
+    selinux.c
+    services.c
+    services.h
+    signals.c
+    signals.h
+    test.c
+    test.h
+    utils.c
+    utils.h
+    ${DIR_WATCH_SOURCE}
 )
 if(DBUS_ENABLE_STATS)
-	list(APPEND BUS_SOURCES
-		stats.c
-		stats.h
-	)
+    list(APPEND BUS_SOURCES
+        stats.c
+        stats.h
+    )
 endif(DBUS_ENABLE_STATS)
 
 include_directories(
-	${CMAKE_BINARY_DIR}
-	${CMAKE_SOURCE_DIR}/..
-	${EXPAT_INCLUDE_DIR}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/..
+    ${EXPAT_INCLUDE_DIR}
 )
 
 if(WIN32)
@@ -116,18 +116,18 @@ if(NOT WIN32)
 endif()
 
 if (DBUS_SERVICE)
-	set (dbus_service_SOURCES
-	        bus-service-win.c
-	# TODO: add additional files
-	#	service-main.c
-	#	${BUS_SOURCES}
-	)
+    set (dbus_service_SOURCES
+            bus-service-win.c
+    # TODO: add additional files
+    #    service-main.c
+    #    ${BUS_SOURCES}
+    )
 
-	add_executable_version_info(dbus_service_SOURCES "dbus-service")
-	add_executable(dbus-service ${dbus_service_SOURCES} )
-	target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
-	set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
-	install(TARGETS dbus-service ${INSTALL_TARGETS_DEFAULT_ARGS})
+    add_executable_version_info(dbus_service_SOURCES "dbus-service")
+    add_executable(dbus-service ${dbus_service_SOURCES} )
+    target_link_libraries(dbus-service ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
+    set_target_properties(dbus-service PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
+    install(TARGETS dbus-service ${INSTALL_TARGETS_DEFAULT_ARGS})
 endif (DBUS_SERVICE)
 
 set(LAUNCH_HELPER_SOURCES
@@ -139,15 +139,15 @@ set(LAUNCH_HELPER_SOURCES
 )
 
 if(NOT WIN32)
-	add_library(launch-helper-internal STATIC ${LAUNCH_HELPER_SOURCES})
-	target_link_libraries(launch-helper-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
+    add_library(launch-helper-internal STATIC ${LAUNCH_HELPER_SOURCES})
+    target_link_libraries(launch-helper-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 
-	add_executable(dbus-daemon-launch-helper activation-helper.c activation-helper-bin.c )
-	target_link_libraries(dbus-daemon-launch-helper launch-helper-internal)
+    add_executable(dbus-daemon-launch-helper activation-helper.c activation-helper-bin.c )
+    target_link_libraries(dbus-daemon-launch-helper launch-helper-internal)
 endif(NOT WIN32)
 
 if(MSVC)
-	project_source_group(${GROUP_CODE} bus_test_SOURCES dummy)
+    project_source_group(${GROUP_CODE} bus_test_SOURCES dummy)
 endif(MSVC)
 
 ## mop up the gcov files

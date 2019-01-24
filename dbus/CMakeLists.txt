@@ -3,109 +3,109 @@ configure_file(dbus-arch-deps.h.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h 
 add_definitions(-DDBUS_COMPILATION)
 
 set (dbusinclude_HEADERS
-	dbus.h
-	dbus-address.h
-	dbus-bus.h
-	dbus-connection.h
-	dbus-errors.h
-	dbus-macros.h
-	dbus-memory.h
-	dbus-message.h
-	dbus-misc.h
-	dbus-pending-call.h
-	dbus-protocol.h
-	dbus-server.h
-	dbus-shared.h
-	dbus-signature.h
-	dbus-syntax.h
-	dbus-threads.h
-	dbus-types.h
+    dbus.h
+    dbus-address.h
+    dbus-bus.h
+    dbus-connection.h
+    dbus-errors.h
+    dbus-macros.h
+    dbus-memory.h
+    dbus-message.h
+    dbus-misc.h
+    dbus-pending-call.h
+    dbus-protocol.h
+    dbus-server.h
+    dbus-shared.h
+    dbus-signature.h
+    dbus-syntax.h
+    dbus-threads.h
+    dbus-types.h
 )
 set (dbusinclude_ARCH_HEADERS
-	${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h
+    ${CMAKE_CURRENT_BINARY_DIR}/dbus-arch-deps.h
 )
 
 ### source code that goes in the installed client library
 ### and is specific to library functionality
 set (DBUS_LIB_SOURCES
-	dbus-address.c
-	dbus-auth.c
-	dbus-bus.c
-	dbus-connection.c
-	dbus-credentials.c
-	dbus-errors.c
-	dbus-keyring.c
-	dbus-marshal-header.c
-	dbus-marshal-byteswap.c
-	dbus-marshal-recursive.c
-	dbus-marshal-validate.c
-	dbus-message.c
-	dbus-misc.c
-	dbus-nonce.c
-	dbus-object-tree.c
-	dbus-pending-call.c
-	dbus-resources.c
-	dbus-server.c
-	dbus-server-socket.c
-	dbus-server-debug-pipe.c
-	dbus-sha.c
-	dbus-signature.c
-	dbus-syntax.c
-	dbus-timeout.c
-	dbus-threads.c
-	dbus-transport.c
-	dbus-transport-socket.c
-	dbus-watch.c
+    dbus-address.c
+    dbus-auth.c
+    dbus-bus.c
+    dbus-connection.c
+    dbus-credentials.c
+    dbus-errors.c
+    dbus-keyring.c
+    dbus-marshal-header.c
+    dbus-marshal-byteswap.c
+    dbus-marshal-recursive.c
+    dbus-marshal-validate.c
+    dbus-message.c
+    dbus-misc.c
+    dbus-nonce.c
+    dbus-object-tree.c
+    dbus-pending-call.c
+    dbus-resources.c
+    dbus-server.c
+    dbus-server-socket.c
+    dbus-server-debug-pipe.c
+    dbus-sha.c
+    dbus-signature.c
+    dbus-syntax.c
+    dbus-timeout.c
+    dbus-threads.c
+    dbus-transport.c
+    dbus-transport-socket.c
+    dbus-watch.c
 )
 
 
 if(UNIX)
-	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
-		dbus-transport-unix.c
-		dbus-server-unix.c
-	)
+    set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
+        dbus-transport-unix.c
+        dbus-server-unix.c
+    )
 else(UNIX)
-	set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
-		dbus-transport-win.c
-		dbus-server-win.c
-	)
+    set (DBUS_LIB_SOURCES ${DBUS_LIB_SOURCES}
+        dbus-transport-win.c
+        dbus-server-win.c
+    )
 endif(UNIX)
 
 set (DBUS_LIB_HEADERS
-	dbus-auth.h
-	dbus-connection-internal.h
-	dbus-credentials.h
-	dbus-keyring.h
-	dbus-marshal-header.h
-	dbus-marshal-byteswap.h
-	dbus-marshal-recursive.h
-	dbus-marshal-validate.h
-	dbus-message-internal.h
-	dbus-message-private.h
-	dbus-misc.h
-	dbus-object-tree.h
-	dbus-protocol.h
-	dbus-resources.h
-	dbus-server-debug-pipe.h
-	dbus-server-protected.h
-	dbus-server-unix.h
-	dbus-sha.h
-	dbus-timeout.h
-	dbus-threads.h
-	dbus-threads-internal.h
-	dbus-transport.h
-	dbus-transport-protected.h
-	dbus-watch.h
-	${CMAKE_BINARY_DIR}/config.h
+    dbus-auth.h
+    dbus-connection-internal.h
+    dbus-credentials.h
+    dbus-keyring.h
+    dbus-marshal-header.h
+    dbus-marshal-byteswap.h
+    dbus-marshal-recursive.h
+    dbus-marshal-validate.h
+    dbus-message-internal.h
+    dbus-message-private.h
+    dbus-misc.h
+    dbus-object-tree.h
+    dbus-protocol.h
+    dbus-resources.h
+    dbus-server-debug-pipe.h
+    dbus-server-protected.h
+    dbus-server-unix.h
+    dbus-sha.h
+    dbus-timeout.h
+    dbus-threads.h
+    dbus-threads-internal.h
+    dbus-transport.h
+    dbus-transport-protected.h
+    dbus-watch.h
+    ${CMAKE_BINARY_DIR}/config.h
 )
 if(UNIX)
-	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
-		dbus-transport-unix.h
-	)
+    set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
+        dbus-transport-unix.h
+    )
 else(UNIX)
-	set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
-		dbus-transport-win.h
-	)
+    set (DBUS_LIB_HEADERS ${DBUS_LIB_HEADERS}
+        dbus-transport-win.h
+    )
 endif(UNIX)
 
 
@@ -114,33 +114,33 @@ endif(UNIX)
 ### daemon or test programs (all symbols in here should 
 ### be underscore-prefixed)
 set (DBUS_SHARED_SOURCES
-	dbus-dataslot.c
-	dbus-file.c
-	dbus-hash.c
-	dbus-internals.c
-	dbus-list.c
-	dbus-marshal-basic.c
-	dbus-memory.c
-	dbus-mempool.c
-	dbus-string.c
-	dbus-sysdeps.c
-	dbus-pipe.c
-	dbus-test-tap.c
+    dbus-dataslot.c
+    dbus-file.c
+    dbus-hash.c
+    dbus-internals.c
+    dbus-list.c
+    dbus-marshal-basic.c
+    dbus-memory.c
+    dbus-mempool.c
+    dbus-string.c
+    dbus-sysdeps.c
+    dbus-pipe.c
+    dbus-test-tap.c
 )
 
 set (DBUS_SHARED_HEADERS
-	dbus-dataslot.h
-	dbus-file.h
-	dbus-hash.h
-	dbus-internals.h
-	dbus-list.h
-	dbus-marshal-basic.h
-	dbus-mempool.h
-	dbus-string.h
-	dbus-string-private.h
-	dbus-pipe.h
-	dbus-sysdeps.h
-	dbus-test-tap.h
+    dbus-dataslot.h
+    dbus-file.h
+    dbus-hash.h
+    dbus-internals.h
+    dbus-list.h
+    dbus-marshal-basic.h
+    dbus-mempool.h
+    dbus-string.h
+    dbus-string-private.h
+    dbus-pipe.h
+    dbus-sysdeps.h
+    dbus-test-tap.h
 )
 
 ### source code that is generic utility functionality used
@@ -149,69 +149,69 @@ set (DBUS_SHARED_HEADERS
 ### should be underscore-prefixed but don't really need 
 ### to be unless they move to DBUS_SHARED_SOURCES later)
 set (DBUS_UTIL_SOURCES
-	dbus-asv-util.c
-	dbus-mainloop.c
-	dbus-message-util.c
-	dbus-shell.c
-	dbus-pollable-set.c
-	dbus-pollable-set-poll.c
-	dbus-string-util.c
-	dbus-sysdeps-util.c
+    dbus-asv-util.c
+    dbus-mainloop.c
+    dbus-message-util.c
+    dbus-shell.c
+    dbus-pollable-set.c
+    dbus-pollable-set-poll.c
+    dbus-string-util.c
+    dbus-sysdeps-util.c
 )
 
 set (DBUS_UTIL_HEADERS
-	dbus-asv-util.h
-	dbus-mainloop.h
-	dbus-shell.h
-	dbus-pollable-set.h
-	dbus-spawn.h
-	dbus-test.h
+    dbus-asv-util.h
+    dbus-mainloop.h
+    dbus-shell.h
+    dbus-pollable-set.h
+    dbus-spawn.h
+    dbus-test.h
 )
 
 ### platform specific settings
 if (WIN32)
-	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
-		dbus-file-win.c
-		dbus-init-win.cpp
-		dbus-sysdeps-win.c
-		dbus-pipe-win.c
-		dbus-sysdeps-thread-win.c
-	)
-	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
-		dbus-sockets-win.h
-		dbus-sysdeps-win.h
-	)
-	set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
-		dbus-spawn-win.c
-		dbus-sysdeps-util-win.c
-	)
-	if(WINCE)
-	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
-		dbus-sysdeps-wince-glue.c
-	)
-	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
-		dbus-sysdeps-wince-glue.h
-	)
-	endif(WINCE)
+    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+        dbus-file-win.c
+        dbus-init-win.cpp
+        dbus-sysdeps-win.c
+        dbus-pipe-win.c
+        dbus-sysdeps-thread-win.c
+    )
+    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+        dbus-sockets-win.h
+        dbus-sysdeps-win.h
+    )
+    set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
+        dbus-spawn-win.c
+        dbus-sysdeps-util-win.c
+    )
+    if(WINCE)
+    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+        dbus-sysdeps-wince-glue.c
+    )
+    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+        dbus-sysdeps-wince-glue.h
+    )
+    endif(WINCE)
 else (WIN32)
-	set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
-		dbus-file-unix.c
-		dbus-pipe-unix.c
-		dbus-sysdeps-unix.c
-		dbus-sysdeps-pthread.c
-		dbus-userdb.c
-	)
-	set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
-		dbus-server-unix.h
-		dbus-transport-unix.h
-		dbus-sysdeps-unix.h
-		dbus-userdb.h
-	)
-	set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
-		dbus-spawn-unix.c
-		dbus-userdb-util.c
-		dbus-sysdeps-util-unix.c
-	)
+    set (DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES}
+        dbus-file-unix.c
+        dbus-pipe-unix.c
+        dbus-sysdeps-unix.c
+        dbus-sysdeps-pthread.c
+        dbus-userdb.c
+    )
+    set (DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS}
+        dbus-server-unix.h
+        dbus-transport-unix.h
+        dbus-sysdeps-unix.h
+        dbus-userdb.h
+    )
+    set (DBUS_UTIL_SOURCES ${DBUS_UTIL_SOURCES}
+        dbus-spawn-unix.c
+        dbus-userdb-util.c
+        dbus-sysdeps-util-unix.c
+    )
 endif (WIN32)
 
 if(DBUS_HAVE_LINUX_EPOLL)
@@ -222,13 +222,13 @@ if(DBUS_HAVE_LINUX_EPOLL)
 endif()
 
 set(libdbus_SOURCES
-	${DBUS_LIB_SOURCES}
-	${DBUS_SHARED_SOURCES}
+    ${DBUS_LIB_SOURCES}
+    ${DBUS_SHARED_SOURCES}
 )
 
 set(libdbus_HEADERS
-	${DBUS_LIB_HEADERS}
-	${DBUS_SHARED_HEADERS}
+    ${DBUS_LIB_HEADERS}
+    ${DBUS_SHARED_HEADERS}
 )
 
 if(DEFINED DBUS_LIBRARY_REVISION)
@@ -240,9 +240,9 @@ if(WIN32)
 endif()
 
 if(MSVC_IDE)
-	project_source_group(${GROUP_CODE} DBUS_LIB_SOURCES DBUS_LIB_HEADERS)
-	project_source_group(${GROUP_CODE} DBUS_SHARED_SOURCES DBUS_SHARED_HEADERS)
-	project_source_group(${GROUP_CODE} DBUS_UTIL_SOURCES DBUS_UTIL_SOURCES)
+    project_source_group(${GROUP_CODE} DBUS_LIB_SOURCES DBUS_LIB_HEADERS)
+    project_source_group(${GROUP_CODE} DBUS_SHARED_SOURCES DBUS_SHARED_HEADERS)
+    project_source_group(${GROUP_CODE} DBUS_UTIL_SOURCES DBUS_UTIL_SOURCES)
 endif(MSVC_IDE)
 
 # for clock_getres() on e.g. GNU/Linux (but not Android)
@@ -253,8 +253,8 @@ find_library(LIBSOCKET socket)
 
 ### Client library
 add_library(dbus-1 SHARED
-			${libdbus_SOURCES}
-			${libdbus_HEADERS}
+            ${libdbus_SOURCES}
+            ${libdbus_HEADERS}
 )
 
 if(WIN32)
@@ -298,8 +298,8 @@ install(FILES ${dbusinclude_ARCH_HEADERS} DESTINATION ${CMAKE_INSTALL_LIBDIR}/db
 ### Internal library, used for the daemon, tools and tests, compiled statically.
 
 add_library(dbus-internal ${DBUS_INTERNAL_ADD_LIBRARY_OPTIONS}
-			${DBUS_UTIL_SOURCES}
-			${DBUS_UTIL_HEADERS}
+            ${DBUS_UTIL_SOURCES}
+            ${DBUS_UTIL_HEADERS}
 )
 target_link_libraries(dbus-internal dbus-1)
 if(WIN32)
