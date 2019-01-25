@@ -23,7 +23,7 @@ if(DBUS_ENABLE_DOXYGEN_DOCS)
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
         DEPENDS ${CMAKE_SOURCE_DIR}/Doxyfile.in  ${CMAKE_BINARY_DIR}/Doxyfile ${dbus_files}
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/api
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/api/html
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
         COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
