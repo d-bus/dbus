@@ -29,10 +29,6 @@ if(DBUS_ENABLE_DOXYGEN_DOCS)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
     add_dependencies(doc apidoc)
-    add_custom_target(devhelp2
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
-    )
-    add_dependencies(doc devhelp2)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api/html/ DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/api)
 endif()
 
@@ -49,6 +45,10 @@ if(DBUS_HAVE_XSLTPROC)
         DEPENDS doxygen_to_devhelp.xsl api/html/index.html
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
+    add_custom_target(devhelp2
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
+    )
+    add_dependencies(doc devhelp2)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2 DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 endif()
 
