@@ -40,10 +40,14 @@ endif()
 
 if(DBUS_HAVE_XSLTPROC)
     add_custom_command(
-        OUTPUT dbus.devhelp2
-        COMMAND ${XSLTPROC_EXECUTABLE} -o dbus.devhelp2 ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_to_devhelp.xsl api/xml/index.xml
-        DEPENDS doxygen_to_devhelp.xsl api/html/index.html
-        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
+        COMMAND ${XSLTPROC_EXECUTABLE}
+            -o ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
+            ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_to_devhelp.xsl
+            ${CMAKE_CURRENT_BINARY_DIR}/api/xml/index.xml
+        DEPENDS
+            ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_to_devhelp.xsl
+            ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
     )
     add_custom_target(devhelp2
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
