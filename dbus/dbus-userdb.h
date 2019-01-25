@@ -61,20 +61,11 @@ dbus_bool_t       _dbus_user_database_get_uid       (DBusUserDatabase     *db,
                                                      dbus_uid_t            uid,
                                                      const DBusUserInfo  **info,
                                                      DBusError            *error);
-dbus_bool_t       _dbus_user_database_get_gid       (DBusUserDatabase     *db,
-                                                     dbus_gid_t            gid,
-                                                     const DBusGroupInfo **info,
-                                                     DBusError            *error);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t       _dbus_user_database_get_username  (DBusUserDatabase     *db,
                                                      const DBusString     *username,
                                                      const DBusUserInfo  **info,
                                                      DBusError            *error);
-dbus_bool_t       _dbus_user_database_get_groupname (DBusUserDatabase     *db,
-                                                     const DBusString     *groupname,
-                                                     const DBusGroupInfo **info,
-                                                     DBusError            *error);
-
 DBUS_PRIVATE_EXPORT
 DBusUserInfo*  _dbus_user_database_lookup       (DBusUserDatabase *db,
                                                  dbus_uid_t        uid,
@@ -107,8 +98,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_get_user_id_and_primary_group (const DBusString  *username,
                                                  dbus_uid_t        *uid_p,
                                                  dbus_gid_t        *gid_p);
-dbus_bool_t _dbus_credentials_from_uid          (dbus_uid_t         user_id,
-                                                 DBusCredentials   *credentials);
 dbus_bool_t _dbus_groups_from_uid		(dbus_uid_t            uid,
                                                  dbus_gid_t          **group_ids,
                                                  int                  *n_group_ids);
@@ -124,9 +113,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_username_from_current_process (const DBusString **username);
 DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_homedir_from_current_process  (const DBusString **homedir);
-dbus_bool_t _dbus_homedir_from_username         (const DBusString  *username,
-                                                 DBusString        *homedir);
-
 dbus_bool_t _dbus_homedir_from_uid              (dbus_uid_t         uid,
                                                  DBusString        *homedir);
 

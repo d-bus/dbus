@@ -418,48 +418,6 @@ _dbus_homedir_from_current_process (const DBusString  **homedir)
 /**
  * Gets the home directory for the given user.
  *
- * @param username the username
- * @param homedir string to append home directory to
- * @returns #TRUE if user existed and we appended their homedir
- */
-dbus_bool_t
-_dbus_homedir_from_username (const DBusString *username,
-                             DBusString       *homedir)
-{
-  DBusUserDatabase *db;
-  const DBusUserInfo *info;
-
-  /* FIXME: this can't distinguish ENOMEM from other errors */
-  if (!_dbus_user_database_lock_system ())
-    return FALSE;
-
-  db = _dbus_user_database_get_system ();
-  if (db == NULL)
-    {
-      _dbus_user_database_unlock_system ();
-      return FALSE;
-    }
-
-  if (!_dbus_user_database_get_username (db, username,
-                                         &info, NULL))
-    {
-      _dbus_user_database_unlock_system ();
-      return FALSE;
-    }
-
-  if (!_dbus_string_append (homedir, info->homedir))
-    {
-      _dbus_user_database_unlock_system ();
-      return FALSE;
-    }
-  
-  _dbus_user_database_unlock_system ();
-  return TRUE;
-}
-
-/**
- * Gets the home directory for the given user.
- *
  * @param uid the uid
  * @param homedir string to append home directory to
  * @returns #TRUE if user existed and we appended their homedir

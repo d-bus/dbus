@@ -2992,46 +2992,6 @@ _dbus_pid_for_log (void)
   return getpid ();
 }
 
-/**
- * Gets a UID from a UID string.
- *
- * @param uid_str the UID in string form
- * @param uid UID to fill in
- * @returns #TRUE if successfully filled in UID
- */
-dbus_bool_t
-_dbus_parse_uid (const DBusString      *uid_str,
-                 dbus_uid_t            *uid)
-{
-  int end;
-  long val;
-
-  if (_dbus_string_get_length (uid_str) == 0)
-    {
-      _dbus_verbose ("UID string was zero length\n");
-      return FALSE;
-    }
-
-  val = -1;
-  end = 0;
-  if (!_dbus_string_parse_int (uid_str, 0, &val,
-                               &end))
-    {
-      _dbus_verbose ("could not parse string as a UID\n");
-      return FALSE;
-    }
-
-  if (end != _dbus_string_get_length (uid_str))
-    {
-      _dbus_verbose ("string contained trailing stuff after UID\n");
-      return FALSE;
-    }
-
-  *uid = val;
-
-  return TRUE;
-}
-
 #if !DBUS_USE_SYNC
 /* To be thread-safe by default on platforms that don't necessarily have
  * atomic operations (notably Debian armel, which is armv4t), we must
