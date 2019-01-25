@@ -3,7 +3,7 @@
 #
 find_package(Doxygen)
 
-# build doc always
+# always check doc target
 add_custom_target(doc ALL)
 
 if(DOXYGEN_EXECUTABLE)
@@ -19,14 +19,17 @@ if(DBUS_ENABLE_DOXYGEN_DOCS)
         set(DBUS_GENERATE_MAN YES)
     endif()
     configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
+    file(GLOB dbus_files "${CMAKE_SOURCE_DIR}/dbus/*.[ch]*")
     add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
+        DEPENDS ${CMAKE_SOURCE_DIR}/Doxyfile.in  ${CMAKE_BINARY_DIR}/Doxyfile ${dbus_files}
         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
     )
     add_custom_target(apidoc
-        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_BINARY_DIR}/Doxyfile
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
     )
     add_dependencies(doc apidoc)
     install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/api/html/ DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/api)
@@ -47,7 +50,7 @@ if(DBUS_HAVE_XSLTPROC)
             ${CMAKE_CURRENT_BINARY_DIR}/api/xml/index.xml
         DEPENDS
             ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_to_devhelp.xsl
-            ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
+            ${CMAKE_CURRENT_BINARY_DIR}/doxygen.stamp
     )
     add_custom_target(devhelp2
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
