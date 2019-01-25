@@ -50,7 +50,7 @@ if(DBUS_HAVE_XSLTPROC)
             ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
     )
     add_custom_target(devhelp2
-        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2
     )
     add_dependencies(doc devhelp2)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.devhelp2 DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
