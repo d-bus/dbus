@@ -519,6 +519,23 @@ _dbus_test_main (int                  argc,
   else
     specific_test = strdup0_or_die (_dbus_getenv ("DBUS_TEST_ONLY"));
 
+  /* Some NSS modules like those for sssd and LDAP might allocate fds
+   * on a one-per-process basis. Make sure those have already been
+   * allocated before we enter the code under test, so that they don't
+   * show up as having been "leaked" by the first module of code under
+   * test that happens to do a NSS lookup. */
+    {
+      DBusString username;
+      dbus_uid_t ignored_uid = DBUS_UID_UNSET;
+
+      _dbus_string_init_const (&username, "dbus-no-user-with-this-name");
+      /* We use a username that almost certainly doesn't exist, because
+       * if we used something like root it might get handled early in the
+       * NSS search order, before we get as far as asking sssd or LDAP. */
+      _dbus_parse_unix_user_from_config (&username, &ignored_uid);
+      _dbus_test_check_memleaks ("initial nss query");
+    }
+
   for (i = 0; i < n_tests; i++)
     {
       long before, after;
