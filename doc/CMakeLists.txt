@@ -158,6 +158,6 @@ set(EXTRA_DIST
     introspect.xsl
 )
 
-install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
+install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/xml/dbus-1)
 
 endif()
