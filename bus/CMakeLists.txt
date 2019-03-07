@@ -150,6 +150,19 @@ if(MSVC)
     project_source_group(${GROUP_CODE} bus_test_SOURCES dummy)
 endif()
 
+configure_file(example-session-disable-stats.conf.in ${CMAKE_CURRENT_BINARY_DIR}/example-session-disable-stats.conf)
+set(EXAMPLES_DATA
+    ${CMAKE_CURRENT_BINARY_DIR}/example-session-disable-stats.conf
+)
+if(NOT WIN32)
+    configure_file(example-system-enable-stats.conf.in ${CMAKE_CURRENT_BINARY_DIR}/example-system-enable-stats.conf)
+    list(APPEND EXAMPLES_DATA
+        ${CMAKE_CURRENT_BINARY_DIR}/example-system-enable-stats.conf
+    )
+endif()
+
+install(FILES ${EXAMPLES_DATA} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/examples)
+
 ## mop up the gcov files
 #clean-local:
 #	/bin/rm *.bb *.bbg *.da *.gcov || true

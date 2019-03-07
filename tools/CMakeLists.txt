@@ -109,3 +109,9 @@ install(TARGETS dbus-run-session ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 # create the /var/lib/dbus directory for dbus-uuidgen
 install(DIRECTORY DESTINATION ${CMAKE_INSTALL_LOCALSTATEDIR}/lib/dbus)
+
+set(EXAMPLES_SCRIPTS
+    GetAllMatchRules.py
+)
+
+install(FILES ${EXAMPLES_SCRIPTS} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus/examples)
