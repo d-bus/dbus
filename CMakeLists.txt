@@ -89,6 +89,7 @@ set(DATADIR_FROM_PKGSYSCONFDIR ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 
 option(DBUS_RELOCATABLE "Attempt to make metadata relocatable" ON)
+option(DBUS_ENABLE_PKGCONFIG "Enable pkgconfig support" ON)
 
 # For simplicity, we're not relocatable if CMAKE_INSTALL_LIBDIR
 # is something more complicated (e.g. Debian multiarch);
@@ -671,7 +672,7 @@ add_custom_target(help-options
 #
 # create pkgconfig file
 #
-if(UNIX)
+if(DBUS_ENABLE_PKGCONFIG)
     set(PLATFORM_LIBS pthread ${LIBRT})
     include(FindPkgConfig QUIET)
     if(PKG_CONFIG_FOUND)
