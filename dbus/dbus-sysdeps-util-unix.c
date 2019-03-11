@@ -406,23 +406,15 @@ _dbus_rlimit_save_fd_limit (DBusError *error)
   return self;
 }
 
-dbus_bool_t
-_dbus_rlimit_raise_fd_limit_if_privileged (unsigned int  desired,
-                                           DBusError    *error)
-{
-  struct rlimit lim;
+/* Enough fds that we shouldn't run out, even if several uids work
+ * together to carry out a denial-of-service attack. This happens to be
+ * the same number that systemd < 234 would normally use. */
+#define ENOUGH_FDS 65536
 
-  /* No point to doing this practically speaking
-   * if we're not uid 0.  We expect the system
-   * bus to use this before we change UID, and
-   * the session bus takes the Linux default,
-   * currently 1024 for cur and 4096 for max.
-   */
-  if (getuid () != 0)
-    {
-      /* not an error, we're probably the session bus */
-      return TRUE;
-    }
+dbus_bool_t
+_dbus_rlimit_raise_fd_limit (DBusError *error)
+{
+  struct rlimit old, lim;
 
   if (getrlimit (RLIMIT_NOFILE, &lim) < 0)
     {
@@ -431,22 +423,43 @@ _dbus_rlimit_raise_fd_limit_if_privileged (unsigned int  desired,
       return FALSE;
     }
 
-  if (lim.rlim_cur == RLIM_INFINITY || lim.rlim_cur >= desired)
+  old = lim;
+
+  if (getuid () == 0)
     {
-      /* not an error, everything is fine */
-      return TRUE;
+      /* We are privileged, so raise the soft limit to at least
+       * ENOUGH_FDS, and the hard limit to at least the desired soft
+       * limit. This assumes we can exercise CAP_SYS_RESOURCE on Linux,
+       * or other OSs' equivalents. */
+      if (lim.rlim_cur != RLIM_INFINITY &&
+          lim.rlim_cur < ENOUGH_FDS)
+        lim.rlim_cur = ENOUGH_FDS;
+
+      if (lim.rlim_max != RLIM_INFINITY &&
+          lim.rlim_max < lim.rlim_cur)
+        lim.rlim_max = lim.rlim_cur;
     }
 
-  /* Ignore "maximum limit", assume we have the "superuser"
-   * privileges.  On Linux this is CAP_SYS_RESOURCE.
-   */
-  lim.rlim_cur = lim.rlim_max = desired;
+  /* Raise the soft limit to match the hard limit, which we can do even
+   * if we are unprivileged. In particular, systemd >= 240 will normally
+   * set rlim_cur to 1024 and rlim_max to 512*1024, recent Debian
+   * versions end up setting rlim_cur to 1024 and rlim_max to 1024*1024,
+   * and older and non-systemd Linux systems would typically set rlim_cur
+   * to 1024 and rlim_max to 4096. */
+  if (lim.rlim_max == RLIM_INFINITY || lim.rlim_cur < lim.rlim_max)
+    lim.rlim_cur = lim.rlim_max;
+
+  /* Early-return if there is nothing to do. */
+  if (lim.rlim_max == old.rlim_max &&
+      lim.rlim_cur == old.rlim_cur)
+    return TRUE;
 
   if (setrlimit (RLIMIT_NOFILE, &lim) < 0)
     {
       dbus_set_error (error, _dbus_error_from_errno (errno),
-                      "Failed to set fd limit to %u: %s",
-                      desired, _dbus_strerror (errno));
+                      "Failed to set fd limit to %lu: %s",
+                      (unsigned long) lim.rlim_cur,
+                      _dbus_strerror (errno));
       return FALSE;
     }
 
@@ -485,8 +498,7 @@ _dbus_rlimit_save_fd_limit (DBusError *error)
 }
 
 dbus_bool_t
-_dbus_rlimit_raise_fd_limit_if_privileged (unsigned int  desired,
-                                           DBusError    *error)
+_dbus_rlimit_raise_fd_limit (DBusError *error)
 {
   fd_limit_not_supported (error);
   return FALSE;

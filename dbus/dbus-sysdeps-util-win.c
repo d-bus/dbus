@@ -273,8 +273,7 @@ _dbus_rlimit_save_fd_limit (DBusError *error)
 }
 
 dbus_bool_t
-_dbus_rlimit_raise_fd_limit_if_privileged (unsigned int  desired,
-                                           DBusError    *error)
+_dbus_rlimit_raise_fd_limit (DBusError *error)
 {
   fd_limit_not_supported (error);
   return FALSE;

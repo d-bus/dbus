@@ -693,11 +693,11 @@ raise_file_descriptor_limit (BusContext      *context)
   /* We used to compute a suitable rlimit based on the configured number
    * of connections, but that breaks down as soon as we allow fd-passing,
    * because each connection is allowed to pass 64 fds to us, and if
-   * they all did, we'd hit kernel limits. We now hard-code 64k as a
-   * good limit, like systemd does: that's enough to avoid DoS from
-   * anything short of multiple uids conspiring against us.
+   * they all did, we'd hit kernel limits. We now hard-code a good
+   * limit that is enough to avoid DoS from anything short of multiple
+   * uids conspiring against us, much like systemd does.
    */
-  if (!_dbus_rlimit_raise_fd_limit_if_privileged (65536, &error))
+  if (!_dbus_rlimit_raise_fd_limit (&error))
     {
       bus_context_log (context, DBUS_SYSTEM_LOG_WARNING,
                        "%s: %s", error.name, error.message);

@@ -698,8 +698,7 @@ dbus_bool_t _dbus_replace_install_prefix (DBusString *path);
 typedef struct DBusRLimit DBusRLimit;
 
 DBusRLimit     *_dbus_rlimit_save_fd_limit                 (DBusError    *error);
-dbus_bool_t     _dbus_rlimit_raise_fd_limit_if_privileged  (unsigned int  desired,
-                                                            DBusError    *error);
+dbus_bool_t     _dbus_rlimit_raise_fd_limit                (DBusError    *error);
 dbus_bool_t     _dbus_rlimit_restore_fd_limit              (DBusRLimit   *saved,
                                                             DBusError    *error);
 void            _dbus_rlimit_free                          (DBusRLimit   *lim);
