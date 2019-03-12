@@ -88,7 +88,7 @@ Linux
 4. mkdir dbus-build
 5. cd dbus-build
 6. run 
-    cmake -G "<for available targets, see cmake --help for a list>" [<options, see below>] <dbus-src-root>
+    cmake [<options, see below>] <dbus-src-root>
     make
     make install
 
