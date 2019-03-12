@@ -25,7 +25,23 @@ Win32 MinGW-w64|32
     mingw32-make
     mingw32-make install
 
-Win32 Microsoft nmake
+Mingw32 cross compile on Linux
+2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
+    e.g on openSUSE Leap 15.0:
+      sudo zypper ar -f https://download.opensuse.org/repositories/windows:/mingw:/win32/openSUSE_Leap_15.0/
+      sudo zypper install mingw32-cross-gcc-c++ mingw32-libexpat-devel libxslt-tools mingw32-docbook_4 mingw32-docbool-xsl-stylesheets
+2. get dbus sources
+3. unpack dbus sources into a sub directory (referred as <dbus-src-root> later)
+4. mkdir dbus-build
+5. cd dbus-build
+6. run
+    cmake -DCMAKE_TOOLCHAIN_FILE=<dbus-src-root>/cmake/i686-w64-mingw32.cmake \
+          -DCMAKE_FIND_ROOT_PATH=/usr/i686-w64-mingw32/sysroot/i686-w64-mingw32 \
+          [<options, see below>] <dbus-src-root>
+    make
+    make install
+
+    Win32 Microsoft nmake
 1. install MSVC 2010 Express Version from http://www.microsoft.com/visualstudio/en-us/products/2010-editions/visual-cpp-express
 2. install cmake, libexpat and optional xsltproc and docbook dtd and stylesheets
 3. get dbus sources
