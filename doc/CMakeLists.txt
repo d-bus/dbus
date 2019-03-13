@@ -12,6 +12,11 @@ endif()
 
 if(DBUS_ENABLE_DOXYGEN_DOCS)
     set(top_srcdir ${CMAKE_SOURCE_DIR})
+    if(WIN32)
+        set(DBUS_GENERATE_MAN NO)
+    else()
+        set(DBUS_GENERATE_MAN YES)
+    endif()
     configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html
@@ -123,6 +128,7 @@ configure_file(dbus-cleanup-sockets.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-cl
 configure_file(dbus-daemon.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml)
 configure_file(dbus-launch.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml)
 configure_file(dbus-monitor.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml)
+configure_file(dbus-run-session.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-run-session.1.xml)
 configure_file(dbus-send.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml)
 configure_file(dbus-test-tool.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml)
 configure_file(dbus-update-activation-environment.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml)
@@ -130,6 +136,7 @@ configure_file(dbus-uuidgen.1.xml.in ${CMAKE_CURRENT_BINARY_DIR}/dbus-uuidgen.1.
 if(UNIX)
     docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml man)
     docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml man)
+    docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-run-session.1.xml man)
     docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml man)
     docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml man)
     docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml man)
@@ -139,6 +146,7 @@ if(UNIX)
 endif()
 docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-daemon.1.xml html)
 docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-monitor.1.xml html)
+docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-run-session.1.xml html)
 docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-send.1.xml html)
 docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-test-tool.1.xml html)
 docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-launch.1.xml html)
@@ -152,12 +160,28 @@ docbook(${CMAKE_CURRENT_BINARY_DIR}/dbus-update-activation-environment.1.xml htm
 configure_file(index.html.in ${CMAKE_CURRENT_BINARY_DIR}/index.html)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/index.html DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
 
+#
+# misc files
+#
+set(DTD_DATA
+    diagram.png
+    diagram.svg
+)
+
+install(FILES ${DTD_DATA} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
+
+set(DOC_DATA
+    system-activation.txt
+)
+
+install(FILES ${DOC_DATA} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
+
 set(EXTRA_DIST
     busconfig.dtd
     introspect.dtd
     introspect.xsl
 )
 
-install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/doc/dbus)
+install(FILES ${EXTRA_DIST} DESTINATION ${CMAKE_INSTALL_DATADIR}/xml/dbus-1)
 
 endif()

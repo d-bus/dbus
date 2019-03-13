@@ -127,7 +127,7 @@ RTF_EXTENSIONS_FILE    =
 #---------------------------------------------------------------------------
 # configuration options related to the man page output
 #---------------------------------------------------------------------------
-GENERATE_MAN           = YES
+GENERATE_MAN           = @DBUS_GENERATE_MAN@
 MAN_OUTPUT             = man
 MAN_EXTENSION          = .3dbus
 MAN_LINKS              = YES
