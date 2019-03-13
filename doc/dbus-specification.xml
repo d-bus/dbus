@@ -1875,11 +1875,6 @@
                 </para>
             </listitem>
 
-            <listitem><para>Interface names must contain at least one '.' (period)
-              character (and thus at least two elements).
-              </para></listitem>
-
-            <listitem><para>Interface names must not begin with a '.' (period) character.</para></listitem>
             <listitem><para>Interface names must not exceed the maximum name length.</para></listitem>
           </itemizedlist>
         </para>
