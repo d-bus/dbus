@@ -12,6 +12,11 @@ endif()
 
 if(DBUS_ENABLE_DOXYGEN_DOCS)
     set(top_srcdir ${CMAKE_SOURCE_DIR})
+    if(WIN32)
+        set(DBUS_GENERATE_MAN NO)
+    else()
+        set(DBUS_GENERATE_MAN YES)
+    endif()
     configure_file(../Doxyfile.in ${CMAKE_BINARY_DIR}/Doxyfile )
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/api/html/index.html

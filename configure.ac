@@ -1269,6 +1269,13 @@ if test x$enable_doxygen_docs = xyes; then
     fi
 fi
 
+if test x$dbus_win = xno; then
+    DBUS_GENERATE_MAN=YES
+else
+    DBUS_GENERATE_MAN=NO
+fi
+AC_SUBST([DBUS_GENERATE_MAN])
+
 AM_CONDITIONAL(DBUS_DOXYGEN_DOCS_ENABLED, test x$enable_doxygen_docs = xyes)
 AC_MSG_RESULT($enable_doxygen_docs)
 
