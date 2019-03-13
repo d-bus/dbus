@@ -1865,7 +1865,7 @@
           additional restrictions that apply to interface names
           specifically:
           <itemizedlist>
-            <listitem><para>Interface names are composed of 1 or more elements separated by
+            <listitem><para>Interface names are composed of 2 or more elements separated by
                 a period ('.') character. All elements must contain at least
                 one character.
                 </para>
