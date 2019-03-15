@@ -267,38 +267,78 @@ check_spawn_and_kill (void        *data,
 }
 
 static dbus_bool_t
-_dbus_spawn_test (const char *test_data_dir)
+_dbus_check_spawn_nonexistant (const char *test_data_dir)
 {
-  if (!_dbus_test_oom_handling ("spawn_nonexistent",
-                                check_spawn_nonexistent,
-                                NULL))
-    return FALSE;
-
-  if (!_dbus_test_oom_handling ("spawn_segfault",
-                                check_spawn_segfault,
-                                NULL))
-    return FALSE;
-
-  if (!_dbus_test_oom_handling ("spawn_exit",
-                                check_spawn_exit,
-                                NULL))
-    return FALSE;
-
-  if (!_dbus_test_oom_handling ("spawn_and_kill",
-                                check_spawn_and_kill,
-                                NULL))
-    return FALSE;
-
-  return TRUE;
+    return check_spawn_nonexistent(NULL, TRUE);
 }
 
-static DBusTestCase test = { "spawn", _dbus_spawn_test };
+static dbus_bool_t
+_dbus_check_spawn_segfault (const char *test_data_dir)
+{
+  return check_spawn_segfault(NULL, TRUE);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_exit (const char *test_data_dir)
+{
+  return check_spawn_exit (NULL, TRUE);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_and_kill (const char *test_data_dir)
+{
+  return check_spawn_and_kill (NULL, TRUE);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_nonexistant_oom (const char *test_data_dir)
+{
+    return _dbus_test_oom_handling ("spawn_nonexistent",
+                                    check_spawn_nonexistent,
+                                    NULL);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_segfault_oom (const char *test_data_dir)
+{
+  return _dbus_test_oom_handling ("spawn_segfault",
+                                  check_spawn_segfault,
+                                  NULL);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_exit_oom (const char *test_data_dir)
+{
+  return _dbus_test_oom_handling ("spawn_exit",
+                                  check_spawn_exit,
+                                  NULL);
+}
+
+static dbus_bool_t
+_dbus_check_spawn_and_kill_oom (const char *test_data_dir)
+{
+  return _dbus_test_oom_handling ("spawn_and_kill",
+                                  check_spawn_and_kill,
+                                  NULL);
+}
+
+static DBusTestCase tests[] =
+{
+  { "spawn_nonexistant", _dbus_check_spawn_nonexistant },
+  { "spawn_segfault", _dbus_check_spawn_segfault },
+  { "spawn_exit", _dbus_check_spawn_exit },
+  { "spawn_and_kill", _dbus_check_spawn_and_kill },
+  { "spawn_nonexistant oom", _dbus_check_spawn_nonexistant_oom },
+  { "spawn_segfault oom", _dbus_check_spawn_segfault_oom },
+  { "spawn_exit oom", _dbus_check_spawn_exit_oom },
+  { "spawn_and_kill oom", _dbus_check_spawn_and_kill_oom }
+};
 
 int
 main (int    argc,
       char **argv)
 {
-  return _dbus_test_main (argc, argv, 1, &test,
+  return _dbus_test_main (argc, argv, _DBUS_N_ELEMENTS (tests), tests,
                           DBUS_TEST_FLAGS_CHECK_MEMORY_LEAKS,
                           NULL, NULL);
 }

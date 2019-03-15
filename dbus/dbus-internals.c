@@ -1101,7 +1101,7 @@ _dbus_test_oom_handling (const char             *description,
       ++i;
     }
   
-  _dbus_verbose ("\"%s\" coped OK with malloc failures", description);
+  _dbus_verbose ("\"%s\" coped OK with malloc failures\n", description);
 
   return TRUE;
 }
