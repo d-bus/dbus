@@ -119,7 +119,6 @@ endif()
 if(WIN32)
     # include local header first to avoid using old installed header
     set(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${CMAKE_SOURCE_DIR}/..)
-    find_package(LibIconv)
     include(Win32Macros)
     addExplorerWrapper(${CMAKE_PROJECT_NAME})
 endif()
