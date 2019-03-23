@@ -67,7 +67,6 @@ uninstallable_test_programs =
 ## break-loader removed for now
 ## these binaries are used in tests but are not themselves tests
 TEST_BINARIES = \
-	test-spawn \
 	test-exit \
 	test-names \
 	test-privserver \
@@ -76,7 +75,13 @@ TEST_BINARIES = \
 	$(NULL)
 
 if !DBUS_WINCE
+if ENABLE_TRADITIONAL_ACTIVATION
 uninstallable_test_programs += test-spawn-oom
+endif ENABLE_TRADITIONAL_ACTIVATION
+endif !DBUS_WINCE
+
+if ENABLE_TRADITIONAL_ACTIVATION
+TEST_BINARIES               += test-spawn
 endif
 
 uninstallable_test_programs += \
@@ -90,11 +95,13 @@ uninstallable_test_programs += \
 	$(NULL)
 
 if DBUS_UNIX
+if ENABLE_TRADITIONAL_ACTIVATION
 uninstallable_test_programs += test-bus-launch-helper-oom
 uninstallable_test_programs += test-bus-system
 # this is used by the tests but is not, itself, a test
 TEST_BINARIES += dbus-daemon-launch-helper-for-tests
-endif
+endif ENABLE_TRADITIONAL_ACTIVATION
+endif DBUS_UNIX
 
 noinst_PROGRAMS += $(uninstallable_test_programs)
 TESTS += $(uninstallable_test_programs)
@@ -120,10 +127,13 @@ test_privserver_LDADD = libdbus-testutils.la
 test_shell_service_LDADD = libdbus-testutils.la
 test_shell_SOURCES = shell-test.c
 test_shell_LDADD = libdbus-testutils.la
+
+if ENABLE_TRADITIONAL_ACTIVATION
 test_spawn_SOURCES = spawn-test.c
 test_spawn_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 test_spawn_oom_SOURCES = internals/spawn-oom.c
 test_spawn_oom_LDADD = libdbus-testutils.la
+endif
 
 test_assertions_SOURCES = internals/assertions.c
 test_assertions_LDADD = libdbus-testutils.la $(GLIB_LIBS)

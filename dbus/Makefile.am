@@ -85,8 +85,12 @@ DBUS_SHARED_arch_sources = 			\
 	dbus-transport-win.h
 
 DBUS_UTIL_arch_sources =			\
-	dbus-sysdeps-util-win.c			\
-	dbus-spawn-win.c
+	dbus-sysdeps-util-win.c
+
+if ENABLE_TRADITIONAL_ACTIVATION
+DBUS_UTIL_arch_sources += dbus-spawn-win.c
+endif
+
 else
 
 if DBUS_ENABLE_LAUNCHD
@@ -117,8 +121,11 @@ DBUS_SHARED_arch_sources = 			\
 DBUS_UTIL_arch_sources = 			\
 	dbus-sysdeps-util-unix.c		\
 	dbus-userdb-util.c			\
-	dbus-spawn-unix.c			\
 	$(NULL)
+
+if ENABLE_TRADITIONAL_ACTIVATION
+DBUS_UTIL_arch_sources += dbus-spawn-unix.c
+endif
 endif
 
 if DBUS_HAVE_LINUX_EPOLL

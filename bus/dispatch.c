@@ -639,6 +639,7 @@ pop_message_waiting_for_memory (DBusConnection *connection)
   return dbus_connection_pop_message (connection);
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static DBusMessage*
 borrow_message_waiting_for_memory (DBusConnection *connection)
 {
@@ -648,6 +649,7 @@ borrow_message_waiting_for_memory (DBusConnection *connection)
 
   return dbus_connection_borrow_message (connection);
 }
+#endif
 
 static void
 warn_unexpected_real (DBusConnection *connection,
@@ -1156,6 +1158,7 @@ check_hello_message (BusContext     *context,
   return retval;
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
  */
@@ -1552,6 +1555,7 @@ check_get_connection_unix_process_id (BusContext     *context,
 
   return retval;
 }
+#endif
 
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
@@ -1685,7 +1689,7 @@ check_add_match (BusContext     *context,
   return retval;
 }
 
-#ifdef DBUS_ENABLE_STATS
+#if defined(ENABLE_TRADITIONAL_ACTIVATION) && defined(DBUS_ENABLE_STATS)
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
  */
@@ -1863,6 +1867,7 @@ check_hello_connection (BusContext     *context,
 
 #define NONEXISTENT_SERVICE_NAME "test.this.service.does.not.exist.ewuoiurjdfxcvn"
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
  */
@@ -3190,10 +3195,12 @@ check_segfault_service_auto_start (BusContext     *context,
 
   return retval;
 }
+#endif
 
 #define TEST_ECHO_MESSAGE "Test echo message"
 #define TEST_RUN_HELLO_FROM_SELF_MESSAGE "Test sending message to self"
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
  */
@@ -3708,8 +3715,9 @@ check_launch_service_file_missing (BusContext     *context,
 
   return retval;
 }
+#endif
 
-#ifndef DBUS_WIN
+#if defined(ENABLE_TRADITIONAL_ACTIVATION) && !defined(DBUS_WIN)
 
 #define SERVICE_USER_MISSING_NAME "org.freedesktop.DBus.TestSuiteNoUser"
 
@@ -4018,6 +4026,7 @@ check_launch_service_service_missing (BusContext     *context,
 
 #define SHELL_FAIL_SERVICE_NAME "org.freedesktop.DBus.TestSuiteShellEchoServiceFail"
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /* returns TRUE if the correct thing happens,
  * but the correct thing may include OOM errors.
  */
@@ -4701,6 +4710,7 @@ check_list_services (BusContext     *context,
 
   return retval;
 }
+#endif
 
 typedef struct
 {
@@ -4751,6 +4761,7 @@ check2_try_iterations (BusContext     *context,
     _dbus_test_fatal ("%s failed during oom", description);
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static dbus_bool_t
 setenv_TEST_LAUNCH_HELPER_CONFIG(const DBusString *test_data_dir,
                                  const char       *filename)
@@ -4912,6 +4923,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
                          check_shell_fail_service_auto_start);
   _dbus_test_ok ("%s:%s - check_shell_fail_service_auto_start", _DBUS_FUNCTION_NAME, filename);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   /* specific to launcher */
   if (use_launcher)
     {
@@ -4920,6 +4932,7 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
 
       _dbus_test_ok ("%s:%s - check_launch_service_file_missing", _DBUS_FUNCTION_NAME, filename);
     }
+#endif
 
 #if 0
   /* Note: need to resolve some issues with the testing code in order to run
@@ -4955,8 +4968,9 @@ bus_dispatch_test_conf (const DBusString *test_data_dir,
   _dbus_test_ok ("%s:%s", _DBUS_FUNCTION_NAME, filename);
   return TRUE;
 }
+#endif
 
-#ifndef DBUS_WIN
+#if defined(ENABLE_TRADITIONAL_ACTIVATION) && !defined(DBUS_WIN)
 static dbus_bool_t
 bus_dispatch_test_conf_fail (const DBusString *test_data_dir,
 		             const char       *filename)
@@ -5029,6 +5043,7 @@ bus_dispatch_test (const char *test_data_dir_cstr)
 
   _dbus_string_init_const (&test_data_dir, test_data_dir_cstr);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   /* run normal activation tests */
   _dbus_verbose ("Normal activation tests\n");
   if (!bus_dispatch_test_conf (&test_data_dir,
@@ -5046,6 +5061,7 @@ bus_dispatch_test (const char *test_data_dir_cstr)
   if (!bus_dispatch_test_conf_fail (&test_data_dir,
   			            "valid-config-files-system/debug-allow-all-fail.conf"))
     return FALSE;
+#endif
 #endif
 
   return TRUE;

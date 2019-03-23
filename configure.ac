@@ -217,6 +217,7 @@ AC_ARG_ENABLE(kqueue, AS_HELP_STRING([--enable-kqueue],[build with kqueue suppor
 AC_ARG_ENABLE(console-owner-file, AS_HELP_STRING([--enable-console-owner-file],[enable console owner file]),enable_console_owner_file=$enableval,enable_console_owner_file=auto)
 AC_ARG_ENABLE(launchd, AS_HELP_STRING([--enable-launchd],[build with launchd auto-launch support]),enable_launchd=$enableval,enable_launchd=auto)
 AC_ARG_ENABLE(systemd, AS_HELP_STRING([--enable-systemd],[build with systemd at_console support]),enable_systemd=$enableval,enable_systemd=auto)
+AC_ARG_ENABLE(traditional-activation, AS_HELP_STRING([--disable-traditional-activation], [Do not build support for service activation without using SystemdService]), enable_traditional_activation="$enableval", enable_traditional_activation=yes)
 
 AC_ARG_WITH(session-socket-dir, AS_HELP_STRING([--with-session-socket-dir=[dirname]],[Where to put sockets for the per-login-session message bus]))
 AC_ARG_WITH(test-socket-dir, AS_HELP_STRING([--with-test-socket-dir=[dirname]],[Where to put sockets for make check]))
@@ -1043,6 +1044,13 @@ if test x$enable_systemd = xyes -a x$have_systemd != xyes ; then
     AC_MSG_ERROR([Explicitly requested systemd support, but systemd not found])
 fi
 
+AS_IF([test "x$enable_traditional_activation" = xyes],
+    AC_DEFINE(ENABLE_TRADITIONAL_ACTIVATION,[1], [Enable traditional activation without using systemd])
+    AS_IF([test "x$enable_systemd" = xno],
+       AC_MSG_WARN([Traditional activation and systemd activation are both disabled, so service activation (automatically starting services that receive messages) will not work])))
+
+AM_CONDITIONAL(ENABLE_TRADITIONAL_ACTIVATION, test x$enable_traditional_activation = xyes)
+
 # If not found in $PATH, we might still have systemd and systemctl at runtime
 # (perhaps dbus is being compiled in a minimal chroot with no systemd).
 # Assume the upstream-recommended location. Distributors with split /usr
@@ -1798,6 +1806,7 @@ echo "
         Building inotify support: ${have_inotify}
         Building kqueue support:  ${have_kqueue}
         Building systemd support: ${have_systemd}
+        Traditional activation:   ${enable_traditional_activation}
         Building X11 code:        ${have_x11}
         Building Doxygen docs:    ${enable_doxygen_docs}
         Building Ducktype docs:   ${enable_ducktype_docs}
