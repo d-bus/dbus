@@ -297,6 +297,63 @@ _dbus_asv_add_object_path (DBusMessageIter *arr_iter,
 
 /**
  * Create a new entry in an a{sv} (map from string to variant)
+ * with an array of a fixed-length basic type (excluding unix fd).
+ *
+ * If this function fails, the a{sv} must be abandoned, for instance
+ * with _dbus_asv_abandon().
+ *
+ * @param arr_iter the iterator which is appending to the array
+ * @param key a UTF-8 key for the map
+ * @param value the value
+ * @param n_elements the number of elements to append
+ * @returns #TRUE on success, or #FALSE if not enough memory
+ */
+dbus_bool_t
+_dbus_asv_add_fixed_array (DBusMessageIter *arr_iter,
+                           const char      *key,
+                           char            element_type,
+                           const void      *value,
+                           int              n_elements)
+{
+  const char type[] = { DBUS_TYPE_ARRAY, element_type, 0 };
+  DBusMessageIter entry_iter;
+  DBusMessageIter var_iter;
+  DBusMessageIter array_iter;
+
+  _dbus_assert (dbus_type_is_fixed (element_type) && element_type != DBUS_TYPE_UNIX_FD);
+
+  if (!_dbus_asv_open_entry (arr_iter, &entry_iter, key, type, &var_iter))
+    return FALSE;
+
+  if (!dbus_message_iter_open_container (&var_iter, DBUS_TYPE_ARRAY, type + 1,
+                                         &array_iter))
+    {
+      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
+      return FALSE;
+    }
+
+  if (!dbus_message_iter_append_fixed_array (&array_iter, element_type,
+                                             &value, n_elements))
+    {
+      dbus_message_iter_abandon_container (&var_iter, &array_iter);
+      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
+      return FALSE;
+    }
+
+  if (!dbus_message_iter_close_container (&var_iter, &array_iter))
+    {
+      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
+      return FALSE;
+    }
+
+  if (!_dbus_asv_close_entry (arr_iter, &entry_iter, &var_iter))
+    return FALSE;
+
+  return TRUE;
+}
+
+/**
+ * Create a new entry in an a{sv} (map from string to variant)
  * with a byte array value.
  *
  * If this function fails, the a{sv} must be abandoned, for instance
@@ -314,37 +371,6 @@ _dbus_asv_add_byte_array (DBusMessageIter *arr_iter,
                           const void      *value,
                           int              n_elements)
 {
-  DBusMessageIter entry_iter;
-  DBusMessageIter var_iter;
-  DBusMessageIter byte_array_iter;
-
-  if (!_dbus_asv_open_entry (arr_iter, &entry_iter, key, "ay", &var_iter))
-    return FALSE;
-
-  if (!dbus_message_iter_open_container (&var_iter, DBUS_TYPE_ARRAY,
-                                         DBUS_TYPE_BYTE_AS_STRING,
-                                         &byte_array_iter))
-    {
-      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
-      return FALSE;
-    }
-
-  if (!dbus_message_iter_append_fixed_array (&byte_array_iter, DBUS_TYPE_BYTE,
-                                             &value, n_elements))
-    {
-      dbus_message_iter_abandon_container (&var_iter, &byte_array_iter);
-      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
-      return FALSE;
-    }
-
-  if (!dbus_message_iter_close_container (&var_iter, &byte_array_iter))
-    {
-      _dbus_asv_abandon_entry (arr_iter, &entry_iter, &var_iter);
-      return FALSE;
-    }
-
-  if (!_dbus_asv_close_entry (arr_iter, &entry_iter, &var_iter))
-    return FALSE;
-
-  return TRUE;
+  return _dbus_asv_add_fixed_array (arr_iter, key, DBUS_TYPE_BYTE, value,
+                                    n_elements);
 }
