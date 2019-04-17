@@ -6732,7 +6732,8 @@
                   group and the supplementary groups), as defined by POSIX, in
                   numerically sorted order. This array is either complete or
                   absent: if the message bus is able to determine some but not
-                  all of the caller's groups, it must not add this credential
+                  all of the caller's groups, or if one of the groups is not
+                  representable in a UINT32, it must not add this credential
                   to the dictionary.
                 </entry>
               </row>
