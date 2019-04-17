@@ -4,6 +4,7 @@
 *.o
 *~
 /.ccache/
+/aminclude_static.am
 /build-aux/
 compile
 config.cache
@@ -39,6 +40,9 @@ config.h.in
 *.gcno
 tags
 /bus/tmpfiles.d/dbus.conf
+/dbus-1.*-coverage.info
+/dbus-1.*-coverage.info.tmp
+/dbus-1.*-coverage/
 /dbus-1.*/
 /dbus-1.*.tar.*
 /lcov.html/

@@ -39,9 +39,9 @@ libdbus_testutils_la_SOURCES += \
 endif
 
 libdbus_testutils_la_LIBADD = \
+	$(CODE_COVERAGE_LIBS) \
 	$(top_builddir)/dbus/libdbus-1.la \
 	$(top_builddir)/dbus/libdbus-internal.la \
-	$(CODE_COVERAGE_LDFLAGS) \
 	$(NULL)
 
 TEST_EXTENSIONS = .sh
@@ -672,4 +672,4 @@ $(installable_test_meta_with_config): %_with_config.test: %$(EXEEXT) Makefile
 	) > $@.tmp && mv $@.tmp $@
 
 # Add rules for code-coverage testing, as defined by AX_CODE_COVERAGE
-@CODE_COVERAGE_RULES@
+include $(top_srcdir)/aminclude_static.am
