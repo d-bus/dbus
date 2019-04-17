@@ -516,6 +516,19 @@ test_creds (Fixture *f,
           g_test_message ("%s of this process is %s", name, label);
           g_assert_cmpuint (strlen (label) + 1, ==, len);
           seen |= SEEN_LINUX_SECURITY_LABEL;
+
+          /*
+           * At this point we would like to do something like:
+           *
+           * g_assert_cmpstr (label, ==, real_security_label);
+           *
+           * but there is no LSM-agnostic way to find out our real security
+           * label in a way that matches SO_PEERSEC. The closest thing
+           * available is reading /proc/self/attr/current, but that is only
+           * equal to SO_PEERSEC after applying LSM-specific
+           * canonicalization (for example for AppArmor you have to remove
+           * a trailing newline from /proc/self/attr/current).
+           */
 #else
           g_assert_not_reached ();
 #endif
