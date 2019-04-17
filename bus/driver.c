@@ -1939,6 +1939,9 @@ bus_driver_credentials_fill_unix_gids (DBusCredentials *credentials,
         {
           if (gids[i] > _DBUS_UINT32_MAX)
             {
+              /* At least one gid is unrepresentable, so behave as though
+               * we didn't know the group IDs at all (not an error, just
+               * success with less information) */
               dbus_free (gids_u32);
               return TRUE;
             }
