@@ -1993,6 +1993,7 @@ test_fd_limit (Fixture *f,
 #define ECHO_SERVICE_PATH "/org/freedesktop/TestSuite"
 #define ECHO_SERVICE_INTERFACE "org.freedesktop.TestSuite"
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /*
  * Helper for test_activation_forking: whenever the forking service is
  * activated, start it again.
@@ -2207,6 +2208,7 @@ test_system_signals (Fixture *f,
   dbus_connection_remove_filter (f->left_conn, foo_signal_filter, f);
 }
 #endif
+#endif
 
 static void
 teardown (Fixture *f,
@@ -2338,6 +2340,7 @@ static Config as_another_user_config = {
     TEST_USER_ROOT, SPECIFY_ADDRESS
 };
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static Config tmp_session_config = {
     NULL, 1, "valid-config-files/tmp-session.conf",
     TEST_USER_ME, SPECIFY_ADDRESS
@@ -2347,6 +2350,7 @@ static Config nearly_system_config = {
     NULL, 1, "valid-config-files-system/tmp-session-like-system.conf",
     TEST_USER_ME, SPECIFY_ADDRESS
 };
+#endif
 #endif
 
 int
@@ -2431,10 +2435,12 @@ main (int argc,
   g_test_add ("/fd-limit/system", Fixture, &as_another_user_config,
               setup, test_fd_limit, teardown);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   g_test_add ("/activation/forking", Fixture, &tmp_session_config,
               setup, test_activation_forking, teardown);
   g_test_add ("/system-policy/allow-signals", Fixture, &nearly_system_config,
               setup, test_system_signals, teardown);
+#endif
 #endif
 
   ret = g_test_run ();

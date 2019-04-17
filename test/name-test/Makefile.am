@@ -51,13 +51,18 @@ TESTS += \
 	run-test.sh \
 	run-test-systemserver.sh \
 	test-ids \
+	test-pending-call-disconnected \
+	test-shutdown \
+	$(NULL)
+
+if ENABLE_TRADITIONAL_ACTIVATION
+TESTS += \
 	test-pending-call-dispatch \
 	test-pending-call-timeout \
-	test-pending-call-disconnected \
 	test-privserver-client \
-	test-shutdown \
 	test-threads-init \
 	$(NULL)
+endif
 endif
 endif
 

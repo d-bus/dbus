@@ -67,6 +67,10 @@ examples_DATA = \
 	example-session-disable-stats.conf	\
 	$(NULL)
 
+dist_examples_DATA = \
+	example-system-hardening-without-traditional-activation.conf	\
+	$(NULL)
+
 if DBUS_ENABLE_LAUNCHD
 agentdir=$(LAUNCHD_AGENT_DIR)
 agent_DATA=org.freedesktop.dbus-session.plist
@@ -171,8 +175,10 @@ liblaunch_helper_internal_la_LIBADD = \
 noinst_PROGRAMS =
 dbus_daemon_exec_PROGRAMS = dbus-daemon
 if DBUS_UNIX
+if ENABLE_TRADITIONAL_ACTIVATION
 noinst_LTLIBRARIES += liblaunch-helper-internal.la
 libexec_PROGRAMS = dbus-daemon-launch-helper
+endif ENABLE_TRADITIONAL_ACTIVATION
 endif DBUS_UNIX
 
 install-data-hook:
@@ -199,6 +205,7 @@ if DBUS_ENABLE_USER_SESSION
 endif
 
 if DBUS_UNIX
+if ENABLE_TRADITIONAL_ACTIVATION
 install-exec-hook:
 	if test `id -u` -eq 0; then \
 		chown root:$(DBUS_USER) $(DESTDIR)$(libexecdir)/dbus-daemon-launch-helper$(EXEEXT); \
@@ -207,7 +214,8 @@ install-exec-hook:
 		echo "Not installing $(DESTDIR)$(libexecdir)/dbus-daemon-launch-helper binary setuid!"; \
 		echo "You'll need to manually set permissions to root:$(DBUS_USER) and permissions 4750"; \
 	fi
-endif
+endif ENABLE_TRADITIONAL_ACTIVATION
+endif DBUS_UNIX
 
 EXTRA_DIST += \
 	dbus.service.in \

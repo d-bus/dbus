@@ -36,7 +36,9 @@
 #include <dbus/dbus-hash.h>
 #include <dbus/dbus-list.h>
 #include <dbus/dbus-shell.h>
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 #include <dbus/dbus-spawn.h>
+#endif
 #include <dbus/dbus-timeout.h>
 #include <dbus/dbus-sysdeps.h>
 #include <dbus/dbus-test-tap.h>
@@ -106,7 +108,9 @@ typedef struct
   char *systemd_service;
   DBusList *entries;
   int n_entries;
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   DBusBabysitter *babysitter;
+#endif
   DBusTimeout *timeout;
   unsigned int timeout_added : 1;
 } BusPendingActivation;
@@ -187,6 +191,7 @@ bus_pending_activation_unref (BusPendingActivation *pending_activation)
   if (pending_activation->timeout)
     _dbus_timeout_unref (pending_activation->timeout);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   if (pending_activation->babysitter)
     {
       if (!_dbus_babysitter_set_watch_functions (pending_activation->babysitter,
@@ -197,6 +202,7 @@ bus_pending_activation_unref (BusPendingActivation *pending_activation)
 
       _dbus_babysitter_unref (pending_activation->babysitter);
     }
+#endif
 
   dbus_free (pending_activation->service_name);
   dbus_free (pending_activation->exec);
@@ -1068,6 +1074,7 @@ bus_activation_unref (BusActivation *activation)
   dbus_free (activation);
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static dbus_bool_t
 add_bus_environment (BusActivation *activation,
                      DBusError     *error)
@@ -1108,6 +1115,7 @@ add_bus_environment (BusActivation *activation,
 
   return TRUE;
 }
+#endif
 
 typedef struct
 {
@@ -1387,6 +1395,7 @@ pending_activation_failed (BusPendingActivation *pending_activation,
                                   pending_activation->service_name);
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 /**
  * Depending on the exit code of the helper, set the error accordingly
  */
@@ -1557,6 +1566,7 @@ toggle_babysitter_watch (DBusWatch      *watch,
   _dbus_loop_toggle_watch (bus_context_get_loop (pending_activation->activation->context),
                            watch);
 }
+#endif
 
 static dbus_bool_t
 pending_activation_timed_out (void *data)
@@ -1569,12 +1579,14 @@ pending_activation_timed_out (void *data)
   context = pending_activation->activation->context;
   timeout = bus_context_get_activation_timeout (context);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   /* Kill the spawned process, since it sucks
    * (not sure this is what we want to do, but
    * may as well try it for now)
    */
   if (pending_activation->babysitter)
     _dbus_babysitter_kill_child (pending_activation->babysitter);
+#endif
 
   dbus_error_init (&error);
 
@@ -1599,8 +1611,10 @@ cancel_pending (void *data)
   _dbus_verbose ("Canceling pending activation of %s\n",
                  pending_activation->service_name);
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   if (pending_activation->babysitter)
     _dbus_babysitter_kill_child (pending_activation->babysitter);
+#endif
 
   _dbus_hash_table_remove_string (pending_activation->activation->pending_activations,
                                   pending_activation->service_name);
@@ -1696,11 +1710,13 @@ activation_find_entry (BusActivation *activation,
   return entry;
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static char **
 bus_activation_get_environment (BusActivation *activation)
 {
   return _dbus_hash_table_to_array (activation->environment, '=');
 }
+#endif
 
 dbus_bool_t
 bus_activation_set_environment_variable (BusActivation     *activation,
@@ -1741,6 +1757,7 @@ out:
   return retval;
 }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
 static void
 child_setup (void *user_data)
 {
@@ -1764,6 +1781,7 @@ child_setup (void *user_data)
     }
 #endif
 }
+#endif
 
 
 /*
@@ -1790,21 +1808,23 @@ bus_activation_activate_service (BusActivation  *activation,
                                  const char     *service_name,
                                  DBusError      *error)
 {
-  DBusError tmp_error;
   BusActivationEntry *entry;
   BusPendingActivation *pending_activation;
   BusPendingActivationEntry *pending_activation_entry;
   DBusMessage *message;
   DBusString service_str;
-  const char *servicehelper;
+  dbus_bool_t retval;
+  dbus_bool_t was_pending_activation;
+  int limit;
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
+  DBusError tmp_error;
+  DBusString command;
   char **argv;
   char **envp = NULL;
   int argc;
-  dbus_bool_t retval;
-  dbus_bool_t was_pending_activation;
-  DBusString command;
-  int limit;
+  const char *servicehelper;
   DBusSpawnFlags flags = DBUS_SPAWN_NONE;
+#endif
 
   _dbus_assert (activation != NULL);
   _dbus_assert (transaction != NULL);
@@ -2174,6 +2194,7 @@ bus_activation_activate_service (BusActivation  *activation,
          proceed with traditional activation. */
     }
 
+#ifdef ENABLE_TRADITIONAL_ACTIVATION
   /* If entry was NULL, it would be because we were doing systemd activation
    * and activating systemd itself; but we already handled that case with
    * an early-return */
@@ -2323,7 +2344,13 @@ bus_activation_activate_service (BusActivation  *activation,
     }
 
   return TRUE;
-
+#else /* !TRADITIONAL_ACTIVATION */
+    bus_context_log (activation->context,
+                     DBUS_SYSTEM_LOG_INFO, "Cannot activate service name='%s' requested by '%s' (%s): SystemdService not configured and dbus was compiled with --disable-traditional-activation",
+                     service_name,
+                     bus_connection_get_name (connection),
+                     bus_connection_get_loginfo (connection));
+#endif
 cancel_pending_activation:
   _DBUS_ASSERT_ERROR_IS_SET (error);
   _dbus_hash_table_remove_string (activation->pending_activations,
