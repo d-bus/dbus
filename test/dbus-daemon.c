@@ -485,15 +485,15 @@ test_creds (Fixture *f,
           gid_t *actual_groups;
           int len, ret, i;
           size_t nmemb;
-          DBusMessageIter ay_iter;
+          DBusMessageIter array_iter;
 
           g_assert (!(seen & SEEN_UNIX_GROUPS));
           g_assert_cmpuint (dbus_message_iter_get_arg_type (&var_iter), ==,
               DBUS_TYPE_ARRAY);
-          dbus_message_iter_recurse (&var_iter, &ay_iter);
-          g_assert_cmpuint (dbus_message_iter_get_arg_type (&ay_iter), ==,
+          dbus_message_iter_recurse (&var_iter, &array_iter);
+          g_assert_cmpuint (dbus_message_iter_get_arg_type (&array_iter), ==,
               DBUS_TYPE_UINT32);
-          dbus_message_iter_get_fixed_array (&ay_iter, &groups, &len);
+          dbus_message_iter_get_fixed_array (&array_iter, &groups, &len);
           g_test_message ("%s of this process present (%d groups)", name, len);
           g_assert_cmpint (len, >=, 1);
 
