@@ -554,8 +554,11 @@ EXTRA_DIST += $(static_data)
 
 ## copy tests to builddir so that generated tests and static tests
 ## are all in one place.
+## Note that we can't create the XDG_RUNTIME_DIR with permissions 0700
+## on MSYS2, which rejects attempts to change permissions, hence "|| true".
 all-local: copy-config-local uninstalled-config-local
-	$(AM_V_at)$(MKDIR_P) -m 700 XDG_RUNTIME_DIR
+	$(AM_V_at)$(MKDIR_P) XDG_RUNTIME_DIR
+	$(AM_V_at)chmod 0700 XDG_RUNTIME_DIR || true
 
 copy-config-local:
 	$(AM_V_at)$(MKDIR_P) data/valid-config-files/session.d
