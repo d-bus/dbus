@@ -919,6 +919,7 @@ statements, and works just like &lt;deny&gt; but with the inverse meaning.</para
    send_error="error_name" | "*"
    send_broadcast="true" | "false"
    send_destination="name" | "*"
+   send_destination_prefix="name"
    send_type="method_call" | "method_return" | "signal" | "error" | "*"
    send_path="/path/name" | "*"
 
@@ -996,6 +997,22 @@ will not work either. As a special case,
 <literal>send_destination="*"</literal> matches any message
 (whether it has a destination specified or not), and
 <literal>receive_sender="*"</literal> similarly matches any message.</para>
+
+<para>
+  A <literal>send_destination_prefix</literal> rule opens or closes
+  the whole namespace for sending. It means that messages may or may not
+  be sent to the <emphasis>owner</emphasis> of any name matching the prefix, regardless of whether
+  it is the primary or the queued owner.
+  In other words, for <literal>&lt;allow send_destination_prefix="a.b"/&gt;</literal>
+  rule and names "a.b", "a.b.c", and "a.b.c.d" present on the bus, it works the same as
+  if three separate rules: <literal>&lt;allow send_destination="a.b"/&gt;</literal>,
+  <literal>&lt;allow send_destination="a.b.c"/&gt;</literal>, and
+  <literal>&lt;allow send_destination="a.b.c.d"/&gt;</literal> had been defined.
+  The rules for matching names are the same as in <literal>own_prefix</literal>
+  (see below): a prefix of "a.b" matches names "a.b" or "a.b.c" or "a.b.c.d", but not "a.bc"
+  or "a.c". The <literal>send_destination_prefix</literal> attribute cannot be combined
+  with the <literal>send_destination</literal> attribute in the same rule.
+</para>
 
 <para>
   Rules with <literal>send_broadcast="true"</literal> match signal messages
