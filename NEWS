@@ -1,7 +1,42 @@
 dbus 1.12.14 (UNRELEASED)
 =========================
 
-...
+Enhancements:
+
+• Raise soft fd limit to match hard limit, even if unprivileged.
+  This makes session buses with many clients, or with clients that make
+  heavy use of fd-passing, less likely to suffer from fd exhaustion.
+  (dbus!103, Simon McVittie)
+
+Fixes:
+
+• If a privileged dbus-daemon has a hard fd limit greater than 64K, don't
+  reduce it to 64K, ensuring that we can put back the original fd limits
+  when carrying out traditional (non-systemd) activation. This fixes a
+  regression with systemd >= 240 in which system services inherited
+  dbus-daemon's hard and soft limit of 64K fds, instead of the intended
+  soft limit of 1K and hard limit of 512K or 1M.
+  (dbus!103, Debian#928877; Simon McVittie)
+
+• Fix build failures caused by an AX_CODE_COVERAGE API change in newer
+  autoconf-archive versions (dbus#249, dbus!88; Simon McVittie)
+
+• Fix build failures with newer autoconf-archive versions that include
+  AX_-prefixed shell variable names (dbus#249, dbus!86; Simon McVittie)
+
+• Parse section/group names in .service files according to the syntax
+  from the Desktop Entry Specification, rejecting control characters
+  and non-ASCII in section/group names (dbus#208, David King)
+
+• Fix various -Wlogical-op issues that cause build failure with newer
+  gcc versions (dbus#225, dbus!109; David King)
+
+• Don't assume we can set permissions on a directory, for the benefit of
+  MSYS and Cygwin builds (dbus#216, dbus!110; Simon McVittie)
+
+• Don't overwrite PKG_CONFIG_PATH and related environment variables when
+  the pkg-config-based version of DBus1Config is used in a CMake project
+  (dbus#267, dbus!96; Clemens Lang)
 
 dbus 1.12.12 (2018-12-04)
 =========================
