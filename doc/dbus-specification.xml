@@ -7,7 +7,7 @@
   <articleinfo>
     <title>D-Bus Specification</title>
     <releaseinfo>Version 0.35</releaseinfo>
-    <date>(not yet released)</date>
+    <date>2019-05-13</date>
     <authorgroup>
       <author>
         <firstname>Havoc</firstname>
@@ -77,6 +77,17 @@
        <revremark>
          See <ulink url='http://cgit.freedesktop.org/dbus/dbus/log/doc/dbus-specification.xml'>commit log</ulink>
        </revremark>
+     </revision>
+     <revision>
+       <revnumber>0.35</revnumber>
+       <date>2019-05-13</date>
+       <authorinitials></authorinitials>
+       <revdescription>
+         <itemizedlist>
+           <listitem><simpara>Add UnixGroupIDs to GetConnectionCredentials</simpara></listitem>
+           <listitem><simpara>Avoid redundancy in defining interface name syntax</simpara></listitem>
+         </itemizedlist>
+       </revdescription>
      </revision>
      <revision>
        <revnumber>0.34</revnumber>

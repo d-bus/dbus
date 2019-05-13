@@ -1,5 +1,7 @@
-dbus 1.13.10 (UNRELEASED)
+dbus 1.13.10 (2019-05-13)
 =========================
+
+The “engineering brick” release.
 
 Dependencies:
 
