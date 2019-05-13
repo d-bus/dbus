@@ -1,6 +1,11 @@
 dbus 1.13.10 (UNRELEASED)
 =========================
 
+Dependencies:
+
+• GLib >= 2.38 is required if full test coverage is enabled
+  (reduced from 2.40 in dbus 1.12.x.)
+
 Deprecations:
 
 • Third-party software should install default dbus policies for the system
@@ -16,7 +21,57 @@ Deprecations:
 
 • A similar pattern applies to the session bus policies in session.d.
 
+Enhancements:
+
+• Raise soft fd limit to match hard limit, even if unprivileged.
+  This makes session buses with many clients, or with clients that make
+  heavy use of fd-passing, less likely to suffer from fd exhaustion.
+  (dbus!103, Simon McVittie)
+
+• Embedded/special-purpose builds of dbus can now be configured with
+  --disable-traditional-activation, to disable services being launched
+  as a subprocess of the dbus-daemon. This allows the system dbus-daemon
+  to be run in a more tightly restricted security profile (an example
+  "drop-in" for systemd is provided).
+
+  If systemd support is enabled, then services with a SystemdService
+  configured can still be activated in these builds, via IPC to systemd.
+  Otherwise, services will not be activatable at all.
+
+  Please note that this option is not suitable for general-purpose
+  Linux distributions that are intended to support running third-party
+  D-Bus services.
+
+  (dbus!107, Topi Miettinen)
+
+• Move CMake build system to top level, matching normal practice for
+  CMake projects (dbus!84, Ralf Habacker)
+
+• Reformat CMake files (dbus#252, dbus!82, dbus!91; Ralf Habacker)
+
+• Avoid GLib 2.40 dependencies (dbus!79, Ralf Habacker)
+
+• Officially deprecate packaged XML policies in ${sysconfdir}, and
+  document how to install system services correctly
+  (dbus!76, Simon McVittie)
+
+• Add AddressSanitizer and ubsan support (dbus!57, Simon McVittie)
+
 Fixes:
+
+• If a privileged dbus-daemon has a hard fd limit greater than 64K, don't
+  reduce it to 64K, ensuring that we can put back the original fd limits
+  when carrying out traditional (non-systemd) activation. This fixes a
+  regression with systemd >= 240 in which system services inherited
+  dbus-daemon's hard and soft limit of 64K fds, instead of the intended
+  soft limit of 1K and hard limit of 512K or 1M.
+  (dbus!103, Debian#928877; Simon McVittie)
+
+• Fix build failures caused by an AX_CODE_COVERAGE API change in newer
+  autoconf-archive versions (dbus#249, dbus!88; Simon McVittie)
+
+• Fix build failures with newer autoconf-archive versions that include
+  AX_-prefixed shell variable names (dbus#249, dbus!86; Simon McVittie)
 
 • Avoid possible memory corruption in certain DBusHashTableIter use
   patterns, which in practice were never used (dbus!44, Simon McVittie)
@@ -25,15 +80,79 @@ Fixes:
   without the necessary privileges to increase resource limits
   (dbus!58, Debian #908092; Simon McVittie)
 
+• Don't overwrite PKG_CONFIG_PATH and related environment variables when
+  the pkg-config-based version of DBus1Config is used in a CMake project
+  (dbus#267, dbus!96; Clemens Lang)
+
+• In CMake builds, respect GNUInstallDirs variables
+  (dbus!77, Ralf Habacker)
+
+• In CMake builds, don't rebuild documentation every time
+  (dbus!94, Ralf Habacker)
+
+• In CMake builds for Windows, don't require libiconv
+  (dbus#262, dbus!100; Ralf Habacker)
+
+• Fix intermittent build failures with parallel CMake
+  (dbus#266, dbus!113; Simon McVittie)
+
+• Don't assume we can set permissions on a directory, for the benefit of
+  MSYS and Cygwin builds (dbus#216, dbus!110; Simon McVittie)
+
+• Avoid test failures with non-trivial NSS modules
+  (dbus#256, dbus!93; Simon McVittie)
+
 • Fix test failures in test-syslog and test-sysdeps under Windows
   (dbus#238, dbus#243, dbus!61, dbus!62; Simon McVittie)
 
-Tests and CI:
+• Ensure that CTest build-time tests on Windows use the just-built
+  libdbus-1-3.dll (dbus!83, Ralf Habacker)
+
+• Don't take so long to run test-refs on Windows
+  (dbus#244, dbus!65; Ralf Habacker)
+
+• Fix memory leaks in tests (dbus!68, Simon McVittie)
+
+• Avoid casting user-supplied pointers to DBusBasicValue *, which is
+  formally undefined behaviour (dbus!69, Simon McVittie)
+
+• Fix a non-exploitable stack array overrun in dbus-run-session on Windows
+  (Ralf Habacker)
+
+Tests and CI enhancements:
+
+• Verify that the result of an Autotools `make dist` can be used for a
+  successful CMake build (dbus#255, dbus!87; Simon McVittie)
 
 • Rewrite Python tests into C to reduce circular dependencies and
   facilitate use of AddressSanitizer (dbus!37, Simon McVittie)
 
+• Refactor tests to extract most of their code from the bus/ and dbus/
+  directories, and break them up into smaller modules
+  (dbus#223, dbus#240, dbus!1, dbus!99, dbus!73, dbus!74, dbus!75;
+  Simon McVittie, Ralf Habacker)
+
 • Do CI builds in a more minimal environment (dbus!63, Simon McVittie)
+
+• Improve test coverage with CMake (dbus#135, dbus!23; Ralf Habacker)
+
+• Avoid firewall exception requests when running build-time tests on
+  Windows (dbus!64, Ralf Habacker)
+
+• Allow use of Wine to run cross-compiled Windows tests on Linux
+  (dbus!60, Ralf Habacker)
+
+Internal changes:
+
+• Rename DBusSocketSet to the more accurate DBusPollableSet
+  (dbus!81, Ralf Habacker)
+
+• Refactor Windows implementation of dbus-spawn
+  (dbus!80; Ralf Habacker, Simon McVittie)
+
+• Delete unused code from userdb module (dbus!92, Simon McVittie)
+
+• Remove unnecessary _dbus_threads_init_debug() (dbus!72, Simon McVittie)
 
 dbus 1.13.8 (2018-12-04)
 ========================
