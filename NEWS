@@ -23,10 +23,21 @@ Deprecations:
 
 Enhancements:
 
+• D-Bus Specification 0.35:
+  · Add UnixGroupIDs to GetConnectionCredentials()
+    (dbus#196, dbus!105; Matthijs van Duin)
+  · Remove some redundancies from the spec for interface names
+    (dbus!102, Felipe Gasper)
+
 • Raise soft fd limit to match hard limit, even if unprivileged.
   This makes session buses with many clients, or with clients that make
   heavy use of fd-passing, less likely to suffer from fd exhaustion.
   (dbus!103, Simon McVittie)
+
+• On Linux 4.13 or later when built against a suitable glibc version,
+  GetConnectionCredentials() now includes UnixGroupIDs, the effective
+  group IDs of the initiator of the connection, taken from
+  SO_PEERGROUPS. (dbus#196, dbus!105; Matthijs van Duin)
 
 • Embedded/special-purpose builds of dbus can now be configured with
   --disable-traditional-activation, to disable services being launched
