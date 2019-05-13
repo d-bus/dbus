@@ -45,6 +45,8 @@
 #ifdef DBUS_UNIX
 # include <pwd.h>
 # include <unistd.h>
+# include <stdlib.h>
+# include <search.h>
 # include <sys/types.h>
 
 # ifdef HAVE_GIO_UNIX
@@ -392,6 +394,20 @@ test_no_reply (Fixture *f,
   dbus_clear_message (&reply);
 }
 
+#ifdef G_OS_UNIX
+static int
+gid_cmp (const void *ap, const void *bp)
+{
+  gid_t a = *(const gid_t *)ap;
+  gid_t b = *(const gid_t *)bp;
+  if (a < b)
+    return -1;
+  if (a > b)
+    return 1;
+  return 0;
+}
+#endif
+
 static void
 test_creds (Fixture *f,
     gconstpointer context)
@@ -408,7 +424,8 @@ test_creds (Fixture *f,
       SEEN_UNIX_USER = 1,
       SEEN_PID = 2,
       SEEN_WINDOWS_SID = 4,
-      SEEN_LINUX_SECURITY_LABEL = 8
+      SEEN_LINUX_SECURITY_LABEL = 8,
+      SEEN_UNIX_GROUPS = 16,
   } seen = 0;
 
   if (m == NULL)
@@ -456,6 +473,44 @@ test_creds (Fixture *f,
           g_test_message ("%s of this process is %u", name, u32);
           g_assert_cmpuint (u32, ==, geteuid ());
           seen |= SEEN_UNIX_USER;
+#else
+          g_assert_not_reached ();
+#endif
+        }
+      else if (g_strcmp0 (name, "UnixGroupIDs") == 0)
+        {
+#ifdef G_OS_UNIX
+          guint32 *groups;
+          gid_t egid = getegid();
+          gid_t *actual_groups;
+          int len, ret, i;
+          size_t nmemb;
+          DBusMessageIter array_iter;
+
+          g_assert (!(seen & SEEN_UNIX_GROUPS));
+          g_assert_cmpuint (dbus_message_iter_get_arg_type (&var_iter), ==,
+              DBUS_TYPE_ARRAY);
+          dbus_message_iter_recurse (&var_iter, &array_iter);
+          g_assert_cmpuint (dbus_message_iter_get_arg_type (&array_iter), ==,
+              DBUS_TYPE_UINT32);
+          dbus_message_iter_get_fixed_array (&array_iter, &groups, &len);
+          g_test_message ("%s of this process present (%d groups)", name, len);
+          g_assert_cmpint (len, >=, 1);
+
+          actual_groups = g_new0 (gid_t, len+1);
+          ret = getgroups (len, actual_groups);
+          if (ret < 0)
+            g_error ("getgroups: %s", g_strerror (errno));
+          nmemb = ret;
+          if (!lfind (&egid, actual_groups, &nmemb, sizeof (gid_t), gid_cmp))
+            actual_groups[ret++] = egid;
+          g_assert_cmpint (ret, ==, len);
+          qsort (actual_groups, len, sizeof (gid_t), gid_cmp);
+          for (i = 0; i < len; i++)
+            g_assert_true (groups[i] == actual_groups[i]);
+          g_free (actual_groups);
+
+          seen |= SEEN_UNIX_GROUPS;
 #else
           g_assert_not_reached ();
 #endif

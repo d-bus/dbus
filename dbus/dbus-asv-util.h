@@ -45,6 +45,11 @@ dbus_bool_t  _dbus_asv_add_string        (DBusMessageIter *arr_iter,
 dbus_bool_t  _dbus_asv_add_object_path   (DBusMessageIter *arr_iter,
                                           const char      *key,
                                           const char      *value);
+dbus_bool_t  _dbus_asv_add_fixed_array   (DBusMessageIter *arr_iter,
+                                          const char      *key,
+                                          char             element_type,
+                                          const void      *value,
+                                          int              n_elements);
 dbus_bool_t  _dbus_asv_add_byte_array    (DBusMessageIter *arr_iter,
                                           const char      *key,
                                           const void      *value,

@@ -6726,6 +6726,18 @@
                 <entry>The numeric Unix user ID, as defined by POSIX</entry>
               </row>
               <row>
+                <entry>UnixGroupIDs</entry>
+                <entry>ARRAY of UINT32</entry>
+                <entry>The numeric Unix group IDs (including both the primary
+                  group and the supplementary groups), as defined by POSIX, in
+                  numerically sorted order. This array is either complete or
+                  absent: if the message bus is able to determine some but not
+                  all of the caller's groups, or if one of the groups is not
+                  representable in a UINT32, it must not add this credential
+                  to the dictionary.
+                </entry>
+              </row>
+              <row>
                 <entry>ProcessID</entry>
                 <entry>UINT32</entry>
                 <entry>The numeric process ID, on platforms that have

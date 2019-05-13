@@ -1905,6 +1905,59 @@ bus_driver_handle_get_connection_selinux_security_context (DBusConnection *conne
 }
 
 /*
+ * Write the unix group ids of credentials @credentials, if available, into
+ * the a{sv} @asv_iter. Return #FALSE on OOM.
+ */
+static dbus_bool_t
+bus_driver_credentials_fill_unix_gids (DBusCredentials *credentials,
+                                       DBusMessageIter *asv_iter)
+{
+  const dbus_gid_t *gids = NULL;
+  size_t n_gids = 0;
+
+  if (!_dbus_credentials_get_unix_gids (credentials, &gids, &n_gids))
+    return TRUE;
+
+  if (sizeof (dbus_gid_t) == sizeof (dbus_uint32_t))
+    {
+      return _dbus_asv_add_fixed_array (asv_iter, "UnixGroupIDs",
+                                        DBUS_TYPE_UINT32, gids, n_gids);
+    }
+  else
+    {
+      /* we can't represent > 32-bit uids; if your system needs them, please
+       * add UnixGroupIDs64 to the spec or something */
+      dbus_uint32_t *gids_u32;
+      size_t i;
+      dbus_bool_t result;
+
+      gids_u32 = dbus_new (dbus_uint32_t, n_gids);
+      if (gids_u32 == NULL)
+        return FALSE;
+
+      for (i = 0; i < n_gids; i++)
+        {
+          if (gids[i] > _DBUS_UINT32_MAX)
+            {
+              /* At least one gid is unrepresentable, so behave as though
+               * we didn't know the group IDs at all (not an error, just
+               * success with less information) */
+              dbus_free (gids_u32);
+              return TRUE;
+            }
+          gids_u32[i] = gids[i];
+        }
+
+      result = _dbus_asv_add_fixed_array (asv_iter, "UnixGroupIDs",
+                                          DBUS_TYPE_UINT32, gids_u32, n_gids);
+
+      dbus_free (gids_u32);
+
+      return result;
+    }
+}
+
+/*
  * Write the credentials of connection @conn (or the bus daemon itself,
  * if @conn is #NULL) into the a{sv} @asv_iter. Return #FALSE on OOM.
  */
@@ -1941,6 +1994,10 @@ bus_driver_fill_connection_credentials (DBusCredentials *credentials,
    * add UnixUserID64 to the spec or something */
   if (uid <= _DBUS_UINT32_MAX && uid != DBUS_UID_UNSET &&
       !_dbus_asv_add_uint32 (asv_iter, "UnixUserID", uid))
+    return FALSE;
+
+  if (credentials != NULL &&
+      !bus_driver_credentials_fill_unix_gids (credentials, asv_iter))
     return FALSE;
 
   if (windows_sid != NULL)
