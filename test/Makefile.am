@@ -604,6 +604,7 @@ in_data = \
 	data/valid-config-files/max-replies-per-connection.conf.in \
 	data/valid-config-files/multi-user.conf.in \
 	data/valid-config-files/pending-fd-timeout.conf.in \
+	data/valid-config-files/send-destination-prefix-rules.conf.in \
 	data/valid-config-files/systemd-activation.conf.in \
 	data/valid-config-files/tmp-session.conf.in \
 	data/valid-config-files-system/tmp-session-like-system.conf.in \
@@ -687,6 +688,9 @@ static_data = \
 	data/systemd-activation/com.example.ReceiveDenied.service \
 	data/systemd-activation/com.example.SendDenied.service \
 	data/systemd-activation/com.example.SendDeniedByAppArmorName.service \
+	data/systemd-activation/com.example.SendPrefixDenied.service \
+	data/systemd-activation/com.example.SendPrefixDenied.internal.service \
+	data/systemd-activation/com.example.SendPrefixDenied.SendPrefixAllowed.internal.service \
 	data/systemd-activation/com.example.SystemdActivatable1.service \
 	data/systemd-activation/com.example.SystemdActivatable2.service \
 	data/systemd-activation/org.freedesktop.systemd1.service \

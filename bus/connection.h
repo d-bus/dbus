@@ -82,6 +82,10 @@ void        bus_connection_send_oom_error        (DBusConnection *connection,
 void        bus_connection_request_headers       (DBusConnection  *connection,
                                                   BusExtraHeaders  headers);
 
+/* called by policy.c */
+dbus_bool_t bus_connection_is_name_owner_by_prefix (DBusConnection *connection,
+                                                    const char *name_prefix);
+
 /* called by signals.c */
 dbus_bool_t bus_connection_add_match_rule      (DBusConnection *connection,
                                                 BusMatchRule   *rule);

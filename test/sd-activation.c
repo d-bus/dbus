@@ -516,6 +516,37 @@ test_activation (Fixture *f,
     g_error ("OOM");
   dbus_connection_send (f->systemd, m, NULL);
   dbus_message_unref (m);
+
+  /* A fourth activation: for name from send_destination_prefix namespace */
+  m = dbus_message_new_signal ("/foo", "com.example.bar", "UnicastSignal4");
+  if (!dbus_message_set_destination (m, "com.example.SendPrefixDenied.SendPrefixAllowed.internal"))
+    g_error ("OOM");
+  dbus_connection_send (f->caller, m, NULL);
+  dbus_message_unref (m);
+
+  /* systemd is already ready for it. */
+  while (f->systemd_message == NULL)
+    test_main_context_iterate (f->ctx, TRUE);
+
+  m = f->systemd_message;
+  f->systemd_message = NULL;
+  assert_signal (m, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS,
+      "org.freedesktop.systemd1.Activator", "ActivationRequest", "s",
+      "org.freedesktop.systemd1");
+
+  /* Check ActivationRequest for the required name. */
+  /* If it is correct, then it passed through policy checking, and the test is over. */
+  do
+    {
+      const char *name;
+      DBusError error;
+
+      dbus_error_init (&error);
+      dbus_message_get_args (m, &error, DBUS_TYPE_STRING, &name, DBUS_TYPE_INVALID);
+      test_assert_no_error (&error);
+      g_assert_cmpstr (name, ==, "dbus-com.example.SendPrefixDenied.SendPrefixAllowed.internal.service");
+    } while (0);
+  dbus_message_unref (m);
 }
 
 static void
@@ -1031,7 +1062,9 @@ static const Config deny_send_tests[] =
     { "com.example.SendDeniedByNonexistentAppArmorLabel" },
     { "com.example.SendDeniedByAppArmorName" },
 #endif
-    { "com.example.SendDenied" }
+    { "com.example.SendDenied" },
+    { "com.example.SendPrefixDenied" },
+    { "com.example.SendPrefixDenied.internal" }
 };
 
 static const Config deny_receive_tests[] =

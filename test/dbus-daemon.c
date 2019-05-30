@@ -2266,6 +2266,267 @@ test_system_signals (Fixture *f,
 #endif
 
 static void
+take_well_known_name (DBusConnection *conn,
+                      const char *name,
+                      DBusError *error,
+                      int ownership_type)
+{
+  int ret = dbus_bus_request_name (conn, name, 0, error);
+  test_assert_no_error (error);
+  g_assert_cmpint (ret, ==, ownership_type);
+}
+
+static void
+drop_well_known_name (DBusConnection *conn,
+                      const char *name,
+                      DBusError *error)
+{
+  int ret = dbus_bus_release_name (conn, name, error);
+  test_assert_no_error (error);
+  g_assert_cmpint (ret, ==, DBUS_RELEASE_NAME_REPLY_RELEASED);
+}
+
+static void
+helper_send_destination_prefix_check (Fixture *f,
+                                      const char *name,
+                                      const char *interface,
+                                      const char *member,
+                                      dbus_bool_t allowed,
+                                      const char *additional_name,
+                                      int ownership_type)
+{
+  DBusMessage *call = NULL;
+  DBusMessage *reply = NULL;
+
+  take_well_known_name (f->right_conn, name, &f->e, ownership_type);
+
+  if (additional_name)
+    take_well_known_name (f->right_conn, additional_name, &f->e, ownership_type);
+
+  call = dbus_message_new_method_call (dbus_bus_get_unique_name (f->right_conn),
+                                       "/",
+                                       interface,
+                                       member);
+
+  if (call == NULL)
+    g_error ("OOM");
+
+  reply = test_main_context_call_and_wait (f->ctx, f->left_conn, call,
+                                           DBUS_TIMEOUT_USE_DEFAULT);
+  dbus_clear_message (&call);
+  g_test_message ("reply from %s(%d):%s OK", name, ownership_type, member);
+  if (allowed)
+    {
+      g_test_message ("checking reply from %s for correct method_return", name);
+      g_assert_cmpint (dbus_message_get_type (reply), ==,
+                       DBUS_MESSAGE_TYPE_METHOD_RETURN);
+    }
+  else
+    {
+      g_test_message ("checking reply from %s for correct access_denied", name);
+      g_assert_cmpint (dbus_message_get_type (reply), ==,
+                       DBUS_MESSAGE_TYPE_ERROR);
+      g_assert_cmpstr (dbus_message_get_error_name (reply), ==,
+                       DBUS_ERROR_ACCESS_DENIED);
+    }
+  dbus_clear_message (&reply);
+
+  drop_well_known_name (f->right_conn, name, &f->e);
+
+  if (additional_name)
+    drop_well_known_name (f->right_conn, additional_name, &f->e);
+}
+
+static void
+helper_send_destination_prefix (Fixture *f,
+                                const char *name,
+                                const char *interface,
+                                const char *member,
+                                dbus_bool_t allowed,
+                                const char *additional_name)
+{
+  /* check with primary ownership */
+  helper_send_destination_prefix_check (f, name, interface, member, allowed, additional_name, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
+
+  /* check with queued ownership */
+  take_well_known_name (f->left_conn, name, &f->e, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
+  if (additional_name)
+    take_well_known_name (f->left_conn, additional_name, &f->e, DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER);
+
+  helper_send_destination_prefix_check (f, name, interface, member, allowed, additional_name, DBUS_REQUEST_NAME_REPLY_IN_QUEUE);
+
+  drop_well_known_name (f->left_conn, name, &f->e);
+  if (additional_name)
+    drop_well_known_name (f->left_conn, additional_name, &f->e);
+}
+
+static void
+test_send_destination_prefix (Fixture *f,
+                              gconstpointer context G_GNUC_UNUSED)
+{
+  if (f->skip)
+    return;
+
+  add_echo_filter (f);
+
+  /*
+   * Names are constructed with prefix foo.bar.test.dest_prefix followed by some of the tokens:
+   * - a - allow send_destination for this name
+   * - d - deny send_destination for this name
+   * - ap - allow send_destination_prefix for this name
+   * - dp - deny send_destination_prefix for this name
+   * - f, f1, f2, f3 - fillers for generating names down the name hierarchy
+   * - apf, dpf, ao, do - just some neighbour names
+   * - m - names with 'm' have rules for interface and member
+   * - apxdp, dpxap - names that have contradicting rules, e.g. for apxdp there are "allow send_destination_prefix"
+   *   rules first, followed by "deny send_destination_prefix" rules
+   */
+
+  /* basic checks - base allow */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap",           "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f.f.f.f.f", "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.apf",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.apf.f.f.f.f",  "com.example.Anything", "Anything", FALSE, NULL);
+  /* basic checks - base deny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp",           "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f.f.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dpf",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dpf.f.f.f.f",  "com.example.Anything", "Anything", FALSE, NULL);
+  /* With interface and method in the policy:
+   * everything is allowed, except foo.bar.a.CallDeny and whole foo.bar.d minus foo.bar.d.CallAllow.*/
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.a", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.a", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.a", "NonExistent", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.d", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.d", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.d", "NonExistent", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m", "foo.bar.none", "NonExistent", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.a", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.a", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.a", "NonExistent", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.d", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.d", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.d", "NonExistent", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.m.f.f.f.f.f", "foo.bar.none", "NonExistent", TRUE, NULL);
+  /* With interface and method in the policy:
+   * everything is denied, except foo.bar.d.CallAllow and whole foo.bar.a minus foo.bar.a.CallDeny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.a", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.a", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.a", "NonExistent", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.d", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.d", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.d", "NonExistent", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m", "foo.bar.none", "NonExistent", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.a", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.a", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.a", "NonExistent", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.d", "CallDeny", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.d", "CallAllow", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.d", "NonExistent", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.m.f.f.f.f.f", "foo.bar.none", "NonExistent", FALSE, NULL);
+  /* multiple names owned - everything is allowed */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao",   "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.ap.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f", "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.ao");
+  /* multiple names owned - mixed allow/deny, but denied wins */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ap.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.dp.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.do",     "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ap.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.do");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao",     "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.dp.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ao");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f.f", "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ao.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.dp.f.f");
+  /* multiple names owned - mixed allow/deny, but allowed wins */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f",       "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.ao.ao");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao.ao",      "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f",       "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f1.ap.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.f", "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f");
+  /* multiple names owned - everything is denied */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.do.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.do.f",   "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.dp.f");
+  /* holes in default allow */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.d",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp",         "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.f.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.f.f.f.f", "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ao");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.f.f.f.f", "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ap");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao",               "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ap.f1.dp.f.f.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap",               "com.example.Anything", "Anything", FALSE, "foo.bar.test.dest_prefix.ap.f1.dp.f.f.f.f");
+  /* holes in holes in default allow */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.d.ap",          "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.d.ap.f.f.f.f",  "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.ap",         "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.ap.f.f.f.f", "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f1.dp.ap.a",       "com.example.Anything", "Anything", TRUE, NULL);
+  /* redefinitions in default allow */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp",               "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.f.f.f.f",       "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp",            "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.f.f.f.f",    "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.ap",         "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.ap.f.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.ap.d",       "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.a",           "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.dp.ap.f.a",      "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.f.f.f.ap",       "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f2.apxdp.f.f.f.ap.f.f.f", "com.example.Anything", "Anything", TRUE, NULL);
+  /* cancelled definitions in default allow */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap",                  "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.f.f.f.f",          "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap",               "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.f.f.f",         "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.dp",            "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.dp.f.f.f.f",    "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.dp.ap",         "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.dp.ap.f.f.f.f", "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ap.f3.dpxap.ap.dp.a",          "com.example.Anything", "Anything", TRUE, NULL);
+  /* holes in default deny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.a",          "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.a.f.f.f.f",  "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap",         "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.f.f.f.f", "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.f.f.f",   "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.do");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.do",               "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f1.ap.f.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.f.f.f",   "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.do.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.do.f.f",           "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f1.ap.f.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.f.f",     "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f.f.f",         "com.example.Anything", "Anything", TRUE, "foo.bar.test.dest_prefix.dp.f1.ap.f.f");
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.ao",               "com.example.Anything", "Anything", TRUE, NULL);
+  /* holes in holes in default deny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.a.dp",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.a.dp.f.f.f.f",  "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.dp",         "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.dp.f.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.d",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f1.ap.d.f.f.f.f",  "com.example.Anything", "Anything", TRUE, NULL);
+  /* redefinitions in default deny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap",                "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.f.f.f.f",        "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap",             "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.f.f.f.f",     "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.dp",          "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.dp.f.f.f.f",  "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.dp.a",        "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.dp.a.f.f.f",  "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.d",           "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.d.f.f.f",     "com.example.Anything", "Anything", TRUE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.ap.dp.f.d",      "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.f.f.f.dp",       "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f2.dpxap.f.f.f.dp.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  /* cancelled definitions in default deny */
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp",                  "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.f.f.f.f",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp",               "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.f.f.f.f",       "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap",            "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap.f.f.f.f",    "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap.dp",         "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap.dp.f.f.f.f", "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap.d",          "com.example.Anything", "Anything", FALSE, NULL);
+  helper_send_destination_prefix (f, "foo.bar.test.dest_prefix.dp.f3.apxdp.dp.ap.d.f.f.f.f",  "com.example.Anything", "Anything", FALSE, NULL);
+}
+
+static void
 teardown (Fixture *f,
     gconstpointer context G_GNUC_UNUSED)
 {
@@ -2408,6 +2669,11 @@ static Config nearly_system_config = {
 #endif
 #endif
 
+static Config send_destination_prefix_config = {
+    NULL, 1, "valid-config-files/send-destination-prefix-rules.conf",
+    TEST_USER_ME, SPECIFY_ADDRESS
+};
+
 int
 main (int argc,
     char **argv)
@@ -2497,6 +2763,9 @@ main (int argc,
               setup, test_system_signals, teardown);
 #endif
 #endif
+
+  g_test_add ("/system-policy/send-destination/prefix", Fixture, &send_destination_prefix_config,
+              setup, test_send_destination_prefix, teardown);
 
   ret = g_test_run ();
   dbus_shutdown ();
