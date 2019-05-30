@@ -88,4 +88,12 @@ int _dbus_test_main (int                  argc,
                      void               (*test_pre_hook) (void),
                      void               (*test_post_hook) (void));
 
+_DBUS_WARN_UNUSED_RESULT
+dbus_bool_t _dbus_test_append_different_uid (DBusString *uid);
+
+#ifdef DBUS_UNIX
+_DBUS_WARN_UNUSED_RESULT
+dbus_bool_t _dbus_test_append_different_username (DBusString *username);
+#endif
+
 #endif

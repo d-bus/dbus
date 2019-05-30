@@ -41,6 +41,8 @@
 # include "dbus/dbus-userdb.h"
 #endif
 
+#include "test/test-utils.h"
+
 /**
  * @defgroup DBusAuthScript code for running unit test scripts for DBusAuth
  * @ingroup  DBusInternals
@@ -526,8 +528,36 @@ _dbus_auth_script_run (const DBusString *filename)
           {
             int where;
 
-            if (_dbus_string_find (&to_send, 0,
-                                   "USERID_HEX", &where))
+            if (_dbus_string_find (&to_send, 0, "WRONG_USERID_HEX", &where))
+              {
+                /* This must be checked for before USERID_HEX, because
+                 * that's a substring. */
+                DBusString uid = _DBUS_STRING_INIT_INVALID;
+
+                if (!_dbus_string_init (&uid) ||
+                    !_dbus_test_append_different_uid (&uid))
+                  {
+                    _dbus_warn ("no memory for uid");
+                    _dbus_string_free (&to_send);
+                    _dbus_string_free (&uid);
+                    goto out;
+                  }
+
+                _dbus_string_delete (&to_send, where,
+                                     (int) strlen ("WRONG_USERID_HEX"));
+
+                if (!_dbus_string_hex_encode (&uid, 0, &to_send, where))
+                  {
+                    _dbus_warn ("no memory to subst WRONG_USERID_HEX");
+                    _dbus_string_free (&to_send);
+                    _dbus_string_free (&uid);
+                    goto out;
+                  }
+
+                _dbus_string_free (&uid);
+              }
+            else if (_dbus_string_find (&to_send, 0,
+                                        "USERID_HEX", &where))
               {
                 DBusString username;
 
@@ -558,6 +588,45 @@ _dbus_auth_script_run (const DBusString *filename)
                   }
 
                 _dbus_string_free (&username);
+              }
+            else if (_dbus_string_find (&to_send, 0,
+                                        "WRONG_USERNAME_HEX", &where))
+              {
+                /* This must be checked for before USERNAME_HEX, because
+                 * that's a substring. */
+#ifdef DBUS_UNIX
+                DBusString username = _DBUS_STRING_INIT_INVALID;
+
+                if (!_dbus_string_init (&username) ||
+                    !_dbus_test_append_different_username (&username))
+                  {
+                    _dbus_warn ("no memory for username");
+                    _dbus_string_free (&to_send);
+                    _dbus_string_free (&username);
+                    goto out;
+                  }
+
+                _dbus_string_delete (&to_send, where,
+                                     (int) strlen ("WRONG_USERNAME_HEX"));
+
+                if (!_dbus_string_hex_encode (&username, 0,
+                                              &to_send, where))
+                  {
+                    _dbus_warn ("no memory to subst WRONG_USERNAME_HEX");
+                    _dbus_string_free (&to_send);
+                    _dbus_string_free (&username);
+                    goto out;
+                  }
+
+                _dbus_string_free (&username);
+#else
+                /* No authentication mechanism uses the login name on
+                 * Windows, so there's no point in it appearing in an
+                 * auth script that is not UNIX_ONLY. */
+                _dbus_warn ("WRONG_USERNAME_HEX cannot be used on Windows");
+                _dbus_string_free (&to_send);
+                goto out;
+#endif
               }
             else if (_dbus_string_find (&to_send, 0,
                                         "USERNAME_HEX", &where))

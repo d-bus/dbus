@@ -35,8 +35,15 @@
 #include <locale.h>
 #endif
 
+#include <dbus/dbus-sysdeps.h>
+
 #ifdef DBUS_UNIX
+# include <sys/types.h>
+# include <unistd.h>
+
 # include <dbus/dbus-sysdeps-unix.h>
+#else
+# include <dbus/dbus-sysdeps-win.h>
 #endif
 
 #include "dbus/dbus-message-internal.h"
@@ -455,6 +462,70 @@ test_pending_call_store_reply (DBusPendingCall *pc,
 }
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
+
+#ifdef DBUS_UNIX
+
+/*
+ * Set uid to a machine-readable authentication identity (numeric Unix
+ * uid or ConvertSidToStringSid-style Windows SID) that is likely to exist,
+ * and differs from the identity of the current process.
+ *
+ * @param uid Populated with a machine-readable authentication identity
+ *    on success
+ * @returns #FALSE if no memory
+ */
+dbus_bool_t
+_dbus_test_append_different_uid (DBusString *uid)
+{
+  if (geteuid () == 0)
+    return _dbus_string_append (uid, "65534");
+  else
+    return _dbus_string_append (uid, "0");
+}
+
+/*
+ * Set uid to a human-readable authentication identity (login name)
+ * that is likely to exist, and differs from the identity of the current
+ * process. This function currently only exists on Unix platforms.
+ *
+ * @param uid Populated with a machine-readable authentication identity
+ *    on success
+ * @returns #FALSE if no memory
+ */
+dbus_bool_t
+_dbus_test_append_different_username (DBusString *username)
+{
+  if (geteuid () == 0)
+    return _dbus_string_append (username, "nobody");
+  else
+    return _dbus_string_append (username, "root");
+}
+
+#else /* !defined(DBUS_UNIX) */
+
+#define ANONYMOUS_SID "S-1-5-7"
+#define LOCAL_SYSTEM_SID "S-1-5-18"
+
+dbus_bool_t
+_dbus_test_append_different_uid (DBusString *uid)
+{
+  char *sid = NULL;
+  dbus_bool_t ret;
+
+  if (!_dbus_getsid (&sid, _dbus_getpid ()))
+    return FALSE;
+
+  if (strcmp (sid, ANONYMOUS_SID) == 0)
+    ret = _dbus_string_append (uid, LOCAL_SYSTEM_SID);
+  else
+    ret = _dbus_string_append (uid, ANONYMOUS_SID);
+
+  LocalFree (sid);
+  return ret;
+}
+
+#endif /* !defined(DBUS_UNIX) */
+
 /*
  * _dbus_test_main:
  * @argc: number of command-line arguments
