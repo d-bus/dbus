@@ -703,6 +703,16 @@ dbus_bool_t     _dbus_rlimit_restore_fd_limit              (DBusRLimit   *saved,
                                                             DBusError    *error);
 void            _dbus_rlimit_free                          (DBusRLimit   *lim);
 
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+_DBUS_GNUC_WARN_UNUSED_RESULT
+dbus_bool_t _dbus_test_append_different_uid (DBusString *uid);
+
+#ifdef DBUS_UNIX
+_DBUS_GNUC_WARN_UNUSED_RESULT
+dbus_bool_t _dbus_test_append_different_username (DBusString *username);
+#endif
+#endif  /* DBUS_ENABLE_EMBEDDED_TESTS */
+
 /** @} */
 
 DBUS_END_DECLS
