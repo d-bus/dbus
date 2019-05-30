@@ -1448,3 +1448,43 @@ _dbus_append_session_config_file (DBusString *str)
 {
   return _dbus_string_append (str, DBUS_SESSION_CONFIG_FILE);
 }
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+
+/*
+ * Set uid to a machine-readable authentication identity (numeric Unix
+ * uid or ConvertSidToStringSid-style Windows SID) that is likely to exist,
+ * and differs from the identity of the current process.
+ *
+ * @param uid Populated with a machine-readable authentication identity
+ *    on success
+ * @returns #FALSE if no memory
+ */
+dbus_bool_t
+_dbus_test_append_different_uid (DBusString *uid)
+{
+  if (geteuid () == 0)
+    return _dbus_string_append (uid, "65534");
+  else
+    return _dbus_string_append (uid, "0");
+}
+
+/*
+ * Set uid to a human-readable authentication identity (login name)
+ * that is likely to exist, and differs from the identity of the current
+ * process. This function currently only exists on Unix platforms.
+ *
+ * @param uid Populated with a machine-readable authentication identity
+ *    on success
+ * @returns #FALSE if no memory
+ */
+dbus_bool_t
+_dbus_test_append_different_username (DBusString *username)
+{
+  if (geteuid () == 0)
+    return _dbus_string_append (username, "nobody");
+  else
+    return _dbus_string_append (username, "root");
+}
+
+#endif

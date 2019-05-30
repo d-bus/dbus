@@ -1702,3 +1702,28 @@ _dbus_append_session_config_file (DBusString *str)
 {
   return _dbus_get_config_file_name(str, "session.conf");
 }
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+
+#define ANONYMOUS_SID "S-1-5-7"
+#define LOCAL_SYSTEM_SID "S-1-5-18"
+
+dbus_bool_t
+_dbus_test_append_different_uid (DBusString *uid)
+{
+  char *sid = NULL;
+  dbus_bool_t ret;
+
+  if (!_dbus_getsid (&sid, _dbus_getpid ()))
+    return FALSE;
+
+  if (strcmp (sid, ANONYMOUS_SID) == 0)
+    ret = _dbus_string_append (uid, LOCAL_SYSTEM_SID);
+  else
+    ret = _dbus_string_append (uid, ANONYMOUS_SID);
+
+  LocalFree (sid);
+  return ret;
+}
+
+#endif
