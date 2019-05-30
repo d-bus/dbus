@@ -529,6 +529,7 @@ sha1_handle_first_client_response (DBusAuth         *auth,
   DBusString tmp2;
   dbus_bool_t retval = FALSE;
   DBusError error = DBUS_ERROR_INIT;
+  DBusCredentials *myself = NULL;
 
   _dbus_string_set_length (&auth->challenge, 0);
   
@@ -572,6 +573,34 @@ sha1_handle_first_client_response (DBusAuth         *auth,
     {
       _dbus_string_free (&tmp);
       return FALSE;
+    }
+
+  myself = _dbus_credentials_new_from_current_process ();
+
+  if (myself == NULL)
+    goto out;
+
+  if (!_dbus_credentials_same_user (myself, auth->desired_identity))
+    {
+      /*
+       * DBUS_COOKIE_SHA1 is not suitable for authenticating that the
+       * client is anyone other than the user owning the process
+       * containing the DBusServer: we probably aren't allowed to write
+       * to other users' home directories. Even if we can (for example
+       * uid 0 on traditional Unix or CAP_DAC_OVERRIDE on Linux), we
+       * must not, because the other user controls their home directory,
+       * and could carry out symlink attacks to make us read from or
+       * write to unintended locations. It's difficult to avoid symlink
+       * attacks in a portable way, so we just don't try. This isn't a
+       * regression, because DBUS_COOKIE_SHA1 never worked for other
+       * users anyway.
+       */
+      _dbus_verbose ("%s: client tried to authenticate as \"%s\", "
+                     "but that doesn't match this process",
+                     DBUS_AUTH_NAME (auth),
+                     _dbus_string_get_const_data (data));
+      retval = send_rejected (auth);
+      goto out;
     }
 
   /* we cache the keyring for speed, so here we drop it if it's the
@@ -687,6 +716,7 @@ sha1_handle_first_client_response (DBusAuth         *auth,
   _dbus_string_free (&tmp);
   _dbus_string_zero (&tmp2);
   _dbus_string_free (&tmp2);
+  _dbus_clear_credentials (&myself);
 
   return retval;
 }
