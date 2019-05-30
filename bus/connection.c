@@ -1460,8 +1460,8 @@ bus_connection_get_n_match_rules (DBusConnection *connection)
  * regardless of the type of ownership
  */
 dbus_bool_t
-bus_connection_is_name_owner_by_prefix (DBusConnection *connection,
-                                        const char *name_prefix)
+bus_connection_is_queued_owner_by_prefix (DBusConnection *connection,
+                                          const char *name_prefix)
 {
   BusConnectionData *d;
   DBusList *link;

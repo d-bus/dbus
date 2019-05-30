@@ -1055,9 +1055,9 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
                   continue;
                 }
 
-              if (!bus_service_has_owner (service, receiver))
+              if (!bus_service_owner_in_queue (service, receiver))
                 {
-                  _dbus_verbose ("  (policy) skipping rule because dest %s isn't owned by receiver\n",
+                  _dbus_verbose ("  (policy) skipping rule because receiver isn't primary or queued owner of name %s\n",
                                  rule->d.send.destination);
                   continue;
                 }
@@ -1084,17 +1084,17 @@ bus_client_policy_check_can_send (BusClientPolicy *policy,
                                                          rule->d.send.destination,
                                                          '.'))
                 {
-                  _dbus_verbose ("  (policy) skipping rule because message dest doesn't start with %s\n",
+                  _dbus_verbose ("  (policy) skipping rule because message dest doesn't have prefix %s\n",
                                  rule->d.send.destination);
                   continue;
                 }
             }
           else
             {
-              if (!bus_connection_is_name_owner_by_prefix (receiver,
-                                                           rule->d.send.destination))
+              if (!bus_connection_is_queued_owner_by_prefix (receiver,
+                                                             rule->d.send.destination))
                 {
-                  _dbus_verbose ("  (policy) skipping rule because no dest with prefix %s is owned by receiver\n",
+                  _dbus_verbose ("  (policy) skipping rule because recipient isn't primary or queued owner of any name below %s\n",
                                  rule->d.send.destination);
                   continue;
                 }
@@ -1307,9 +1307,9 @@ bus_client_policy_check_can_receive (BusClientPolicy *policy,
                   continue;
                 }
 
-              if (!bus_service_has_owner (service, sender))
+              if (!bus_service_owner_in_queue (service, sender))
                 {
-                  _dbus_verbose ("  (policy) skipping rule because origin %s isn't owned by sender\n",
+                  _dbus_verbose ("  (policy) skipping rule because sender isn't primary or queued owner of %s\n",
                                  rule->d.receive.origin);
                   continue;
                 }
