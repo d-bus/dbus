@@ -670,7 +670,7 @@ bus_registry_release_service (BusRegistry      *registry,
     {
       *result = DBUS_RELEASE_NAME_REPLY_NON_EXISTENT;
     }
-  else if (!bus_service_has_owner (service, connection))
+  else if (!bus_service_owner_in_queue (service, connection))
     {
       *result = DBUS_RELEASE_NAME_REPLY_NOT_OWNER;
     }
@@ -680,7 +680,7 @@ bus_registry_release_service (BusRegistry      *registry,
                                      transaction, error))
         goto out;
 
-      _dbus_assert (!bus_service_has_owner (service, connection));
+      _dbus_assert (!bus_service_owner_in_queue (service, connection));
       *result = DBUS_RELEASE_NAME_REPLY_RELEASED;
     }
 
@@ -1274,8 +1274,8 @@ bus_service_get_allow_replacement (BusService *service)
 }
 
 dbus_bool_t
-bus_service_has_owner (BusService     *service,
-		       DBusConnection *connection)
+bus_service_owner_in_queue (BusService     *service,
+                            DBusConnection *connection)
 {
   DBusList *link;
 
