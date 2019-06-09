@@ -1,7 +1,30 @@
-dbus 1.13.12 (UNRELEASED)
+dbus 1.13.12 (2019-06-11)
 =========================
 
-...
+The “patio squirrel” release.
+
+Security fixes:
+
+• CVE-2019-12749: Do not attempt to carry out DBUS_COOKIE_SHA1
+  authentication for identities that differ from the user running the
+  DBusServer. Previously, a local attacker could manipulate symbolic
+  links in their own home directory to bypass authentication and connect
+  to a DBusServer with elevated privileges. The standard system and
+  session dbus-daemons in their default configuration were immune to this
+  attack because they did not allow DBUS_COOKIE_SHA1, but third-party
+  users of DBusServer such as Upstart could be vulnerable.
+  Thanks to Joe Vennix of Apple Information Security.
+  (dbus#269, Simon McVittie)
+
+Enhancements:
+
+• dbus-daemon <allow> and <deny> rules can now specify a
+  send_destination_prefix attribute, which is like a combination of
+  send_destination and the arg0namespace keyword in match rules: a rule
+  with send_destination_prefix="com.example.Foo" matches messages sent to
+  any destination that is in the queue to own well-known names like
+  com.example.Foo or com.example.Foo.A.B (but not com.example.Foobar).
+  (dbus!85, Adrian Szyndela)
 
 dbus 1.13.10 (2019-05-13)
 =========================
