@@ -1,12 +1,27 @@
-dbus 1.10.28 (UNRELEASED)
+dbus 1.10.28 (2019-06-11)
 ==
+
+The “kitchen slug” release.
 
 dbus version control is now hosted on freedesktop.org's Gitlab
 installation, and bug reports and feature requests have switched from
 Bugzilla bugs (indicated by "fd.o #nnn") to Gitlab issues ("dbus#nnn")
 and merge requests ("dbus!nnn").
 
-Fixes:
+Security fixes:
+
+• CVE-2019-12749: Do not attempt to carry out DBUS_COOKIE_SHA1
+  authentication for identities that differ from the user running the
+  DBusServer. Previously, a local attacker could manipulate symbolic
+  links in their own home directory to bypass authentication and connect
+  to a DBusServer with elevated privileges. The standard system and
+  session dbus-daemons in their default configuration were immune to this
+  attack because they did not allow DBUS_COOKIE_SHA1, but third-party
+  users of DBusServer such as Upstart could be vulnerable.
+  Thanks to Joe Vennix of Apple Information Security.
+  (dbus#269, Simon McVittie)
+
+Other fixes:
 
 • Prevent reading up to 3 bytes beyond the end of a truncated message.
   This could in principle be an information leak or denial of service
