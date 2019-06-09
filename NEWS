@@ -48,6 +48,9 @@ Other fixes:
 • Fix warning from gcc 8 about suspicious use of strncpy() when
   populating struct sockaddr_un (fd.o #107350, Simon McVittie)
 
+• Fix installation of Ducktype documentation with newer yelp-build
+  versions (fd.o #106171, Simon McVittie)
+
 Tests and CI:
 
 • Add Travis-CI builds for 64-bit Windows using mingw-w64
