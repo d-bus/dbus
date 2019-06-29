@@ -1003,9 +1003,9 @@ run_failing_each_malloc (int                    n_mallocs,
     {      
       _dbus_set_fail_alloc_counter (n_mallocs);
 
-      _dbus_verbose ("\n===\n%s: (will fail malloc %d with %d failures)\n===\n",
-                     description, n_mallocs,
-                     _dbus_get_fail_alloc_failures ());
+      _dbus_test_diag ("%s: will fail malloc %d and %d that follow",
+                       description, n_mallocs,
+                       _dbus_get_fail_alloc_failures () - 1);
 
       if (!(* func) (data, FALSE))
         return FALSE;
