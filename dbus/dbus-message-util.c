@@ -26,7 +26,7 @@
 #include "dbus-message-private.h"
 
 /**
- * @addtogroup DBusMessage
+ * @addtogroup DBusMessageInternals
  * @{
  */
 
@@ -45,3 +45,5 @@ _dbus_message_get_n_unix_fds (DBusMessage *message)
   return 0;
 #endif
 }
+
+/** @} */
