@@ -99,6 +99,7 @@ dbus_bool_t _dbus_test_append_different_username (DBusString *username);
 
 typedef struct DBusInitialFDs DBusInitialFDs;
 DBusInitialFDs *_dbus_check_fdleaks_enter (void);
-void            _dbus_check_fdleaks_leave (DBusInitialFDs *fds);
+void            _dbus_check_fdleaks_leave (DBusInitialFDs *fds,
+                                           const char     *context);
 
 #endif

@@ -597,7 +597,8 @@ _dbus_check_fdleaks_enter (void)
 }
 
 void
-_dbus_check_fdleaks_leave (DBusInitialFDs *fds)
+_dbus_check_fdleaks_leave (DBusInitialFDs *fds,
+                           const char     *context)
 {
 #ifdef __linux__
   DIR *d;
@@ -639,7 +640,7 @@ _dbus_check_fdleaks_leave (DBusInitialFDs *fds)
           if (FD_ISSET (fd, &fds->set))
             continue;
 
-          _dbus_test_fatal ("file descriptor %i leaked in %s.", fd, __FILE__);
+          _dbus_test_fatal ("file descriptor %i leaked in %s.", fd, context);
         }
 
       closedir (d);
@@ -775,7 +776,7 @@ _dbus_test_main (int                  argc,
         _dbus_test_check_memleaks (tests[i].name);
 
       if (flags & DBUS_TEST_FLAGS_CHECK_FD_LEAKS)
-        _dbus_check_fdleaks_leave (initial_fds);
+        _dbus_check_fdleaks_leave (initial_fds, tests[i].name);
     }
 
   free (test_data_dir);
