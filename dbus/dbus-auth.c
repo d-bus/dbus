@@ -1664,10 +1664,25 @@ process_ok(DBusAuth *auth,
                  _dbus_string_get_const_data (& DBUS_AUTH_CLIENT (auth)->guid_from_server));
 
   if (auth->unix_fd_possible)
-    return send_negotiate_unix_fd(auth);
+    {
+      if (!send_negotiate_unix_fd (auth))
+        {
+          _dbus_string_set_length (& DBUS_AUTH_CLIENT (auth)->guid_from_server, 0);
+          return FALSE;
+        }
+
+      return TRUE;
+    }
 
   _dbus_verbose("Not negotiating unix fd passing, since not possible\n");
-  return send_begin (auth);
+
+  if (!send_begin (auth))
+    {
+      _dbus_string_set_length (& DBUS_AUTH_CLIENT (auth)->guid_from_server, 0);
+      return FALSE;
+    }
+
+  return TRUE;
 }
 
 static dbus_bool_t
