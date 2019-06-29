@@ -209,6 +209,24 @@ spawn_dbus_daemon (const gchar *binary,
       &address_fd,
       NULL, /* child's stderr = our stderr */
       &error);
+
+  /* The other uid might not have access to our build directory if we
+   * are building in /root or something */
+  if (user != TEST_USER_ME &&
+      g_getenv ("DBUS_TEST_UNINSTALLED") != NULL &&
+      error != NULL &&
+      error->domain == G_SPAWN_ERROR &&
+      (error->code == G_SPAWN_ERROR_CHDIR ||
+       error->code == G_SPAWN_ERROR_ACCES ||
+       error->code == G_SPAWN_ERROR_PERM))
+    {
+      g_prefix_error (&error, "Unable to launch %s as other user: ",
+          binary);
+      g_test_skip (error->message);
+      g_clear_error (&error);
+      return NULL;
+    }
+
   g_assert_no_error (error);
 
   g_ptr_array_free (argv, TRUE);
