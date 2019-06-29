@@ -46,6 +46,8 @@
 
 #include "dbus-message-factory.h"
 
+#include "test/test-utils.h"
+
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
 /**
  * Reads arguments from a message iterator given a variable argument
