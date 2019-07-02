@@ -126,6 +126,7 @@ spawn_dbus_daemon (const gchar *binary,
           case TEST_USER_ROOT:
             break;
 
+          case TEST_USER_ROOT_DROP_TO_MESSAGEBUS:
           case TEST_USER_MESSAGEBUS:
             pwd = getpwnam (DBUS_USER);
 
@@ -137,6 +138,13 @@ spawn_dbus_daemon (const gchar *binary,
                 g_test_skip (message);
                 g_free (message);
                 return NULL;
+              }
+
+            if (user == TEST_USER_ROOT_DROP_TO_MESSAGEBUS)
+              {
+                /* Let the dbus-daemon start as root and drop privileges
+                 * itself */
+                pwd = NULL;
               }
 
             break;
@@ -399,6 +407,11 @@ become_other_user (TestUser user,
         username = DBUS_TEST_USER;
         break;
 
+      /* TEST_USER_ROOT_DROP_TO_MESSAGEBUS is only meaningful for
+       * test_get_dbus_daemon(), not as a client */
+      case TEST_USER_ROOT_DROP_TO_MESSAGEBUS:
+        g_return_val_if_reached (FALSE);
+
       case TEST_USER_ME:
       default:
         g_return_val_if_reached (FALSE);
@@ -444,6 +457,11 @@ become_other_user (TestUser user,
             "setresuid() not available, or unsure about "
             "credentials-passing semantics on this platform");
         return FALSE;
+
+      /* TEST_USER_ROOT_DROP_TO_MESSAGEBUS is only meaningful for
+       * test_get_dbus_daemon(), not as a client */
+      case TEST_USER_ROOT_DROP_TO_MESSAGEBUS:
+        g_return_val_if_reached (FALSE);
 
       case TEST_USER_ME:
       default:

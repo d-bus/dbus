@@ -2653,7 +2653,7 @@ static Config as_another_user_config = {
     NULL, 1, "valid-config-files/as-another-user.conf",
     /* We start the dbus-daemon as root and drop privileges, like the
      * real system bus does */
-    TEST_USER_ROOT, SPECIFY_ADDRESS
+    TEST_USER_ROOT_DROP_TO_MESSAGEBUS, SPECIFY_ADDRESS
 };
 
 #ifdef ENABLE_TRADITIONAL_ACTIVATION
