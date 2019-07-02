@@ -145,7 +145,7 @@ The default is implementation&hyphen;defined, typically 25 seconds.</para>
   <varlistentry>
   <term><option>--peer=</option><replaceable>ADDRESS</replaceable></term>
   <listitem>
-<para>Send to <replaceable>ADDRESS</replaceable>.</para>
+<para>Send to a non-message-bus D-Bus server at <replaceable>ADDRESS</replaceable>. In this case <command>dbus-send</command> will not call the <literal>Hello</literal> method.</para>
   </listitem>
   </varlistentry>
   <varlistentry>
