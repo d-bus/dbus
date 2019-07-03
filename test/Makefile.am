@@ -248,6 +248,7 @@ test_misc_internals_SOURCES = \
 	internals/dbus-marshal-validate-util.c \
 	internals/dbus-string-util.c \
 	internals/dbus-sysdeps-util.c \
+	internals/mempool.c \
 	internals/misc-internals.c \
 	internals/misc-internals.h \
 	internals/sha.c \
