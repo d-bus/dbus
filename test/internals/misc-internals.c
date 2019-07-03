@@ -3,7 +3,8 @@
  * Copyright 2002-2011 Red Hat, Inc.
  * Copyright 2006 Julio M. Merino Vidal
  * Copyright 2006 Ralf Habacker
- * Copyright 2011-2018 Collabora Ltd.
+ * Copyright 2011-2019 Collabora Ltd.
+ * Copyright 2012 Lennart Poettering
  *
  * Licensed under the Academic Free License version 2.1
  *
@@ -31,6 +32,10 @@
 #include "dbus/dbus-test.h"
 #include "dbus/dbus-test-tap.h"
 #include "test/test-utils.h"
+
+#ifdef DBUS_UNIX
+#include "dbus/dbus-userdb.h"
+#endif
 
 #include "misc-internals.h"
 
@@ -913,6 +918,55 @@ _dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
   dbus_connection_unref (c);
 
   return ret;
+}
+
+/**
+ * Unit test for dbus-userdb.c.
+ *
+ * @returns #TRUE on success.
+ */
+static dbus_bool_t
+_dbus_userdb_test (const char *test_data_dir)
+{
+  const DBusString *username;
+  const DBusString *homedir;
+  dbus_uid_t uid;
+  unsigned long *group_ids;
+  int n_group_ids, i;
+  DBusError error;
+
+  if (!_dbus_username_from_current_process (&username))
+    _dbus_test_fatal ("didn't get username");
+
+  if (!_dbus_homedir_from_current_process (&homedir))
+    _dbus_test_fatal ("didn't get homedir");
+
+  if (!_dbus_get_user_id (username, &uid))
+    _dbus_test_fatal ("didn't get uid");
+
+  if (!_dbus_groups_from_uid (uid, &group_ids, &n_group_ids))
+    _dbus_test_fatal ("didn't get groups");
+
+  _dbus_test_diag ("    Current user: %s homedir: %s gids:",
+          _dbus_string_get_const_data (username),
+          _dbus_string_get_const_data (homedir));
+
+  for (i=0; i<n_group_ids; i++)
+      _dbus_test_diag ("- %ld", group_ids[i]);
+
+  dbus_error_init (&error);
+  _dbus_test_diag ("Is Console user: %i",
+          _dbus_is_console_user (uid, &error));
+  _dbus_test_diag ("Invocation was OK: %s", error.message ? error.message : "yes");
+  dbus_error_free (&error);
+  _dbus_test_diag ("Is Console user 4711: %i",
+          _dbus_is_console_user (4711, &error));
+  _dbus_test_diag ("Invocation was OK: %s", error.message ? error.message : "yes");
+  dbus_error_free (&error);
+
+  dbus_free (group_ids);
+
+  return TRUE;
 }
 #endif
 
