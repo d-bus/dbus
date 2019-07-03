@@ -35,6 +35,12 @@
 
 DBUS_BEGIN_DECLS
 
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+#define DBUS_EMBEDDED_TESTS_EXPORT DBUS_PRIVATE_EXPORT
+#else
+#define DBUS_EMBEDDED_TESTS_EXPORT /* nothing */
+#endif
+
 DBUS_PRIVATE_EXPORT
 void _dbus_warn               (const char *format,
                                ...) _DBUS_GNUC_PRINTF (1, 2);

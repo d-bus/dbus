@@ -116,6 +116,7 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
     set(SOURCES
+        internals/address.c
         internals/dbus-auth-script.c
         internals/dbus-auth-script.h
         internals/dbus-auth-util.c
@@ -126,8 +127,10 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
         internals/dbus-marshal-validate-util.c
         internals/dbus-string-util.c
         internals/dbus-sysdeps-util.c
+        internals/mempool.c
         internals/misc-internals.c
         internals/misc-internals.h
+        internals/sha.c
     )
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
