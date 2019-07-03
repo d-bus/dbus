@@ -1,7 +1,30 @@
 dbus 1.13.14 (UNRELEASED)
 =========================
 
-...
+Fixes:
+
+• Fix several test failures if the build-time tests were run as uid 0.
+  Note that running the tests with elevated privileges is likely to be
+  insecure, and should only be attempted in an expendable container or
+  virtual machine. (dbus!117, Simon McVittie)
+
+• Fix an assertion failure if a client encounters an out-of-memory
+  condition while sending its response to the "OK" authentication
+  message, and processing of the "OK" message is subsequently retried
+  when more memory is available (dbus!119, Simon McVittie)
+
+• The dbus-send(1) man page now documents --bus and --peer instead of
+  the old --address synonym for --peer, which has been deprecated since
+  the introduction of --bus and --peer in 1.7.6
+  (fd.o #48816, dbus!115; Chris Morin)
+
+Internal changes:
+
+• Move more test-only code from dbus/ to tests/
+  (dbus!120, dbus!121; Simon McVittie)
+
+• Improve diagnostics if memory or fd leaks are detected
+  (dbus!118, dbus!120; Simon McVittie)
 
 dbus 1.13.12 (2019-06-11)
 =========================
