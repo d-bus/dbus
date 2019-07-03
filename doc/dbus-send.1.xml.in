@@ -139,7 +139,7 @@ The default is implementation&hyphen;defined, typically 25 seconds.</para>
   <varlistentry>
   <term><option>--bus=</option><replaceable>ADDRESS</replaceable></term>
   <listitem>
-<para>Register on bus <replaceable>ADDRESS</replaceable>.</para>
+<para>Register on a message bus at <replaceable>ADDRESS</replaceable>, typically a <command>dbus-daemon</command>.</para>
   </listitem>
   </varlistentry>
   <varlistentry>
