@@ -47,9 +47,6 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_address_test           (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT
-dbus_bool_t _dbus_sha_test               (const char *test_data_dir);
-
-DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_keyring_test           (const char *test_data_dir);
 
 DBUS_PRIVATE_EXPORT

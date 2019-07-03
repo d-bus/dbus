@@ -249,6 +249,7 @@ test_misc_internals_SOURCES = \
 	internals/dbus-sysdeps-util.c \
 	internals/misc-internals.c \
 	internals/misc-internals.h \
+	internals/sha.c \
 	$(NULL)
 test_misc_internals_LDADD = libdbus-testutils.la
 

@@ -128,6 +128,7 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
         internals/dbus-sysdeps-util.c
         internals/misc-internals.c
         internals/misc-internals.h
+        internals/sha.c
     )
     add_test_executable(test-misc-internals "${SOURCES}" dbus-testutils)
     set_target_properties(test-misc-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
