@@ -116,6 +116,7 @@ if(DBUS_ENABLE_EMBEDDED_TESTS)
     set_target_properties(test-message-internals PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 
     set(SOURCES
+        internals/address.c
         internals/dbus-auth-script.c
         internals/dbus-auth-script.h
         internals/dbus-auth-util.c

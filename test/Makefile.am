@@ -237,6 +237,7 @@ test_message_internals_SOURCES = \
 test_message_internals_LDADD = libdbus-testutils.la
 
 test_misc_internals_SOURCES = \
+	internals/address.c \
 	internals/dbus-auth-script.c \
 	internals/dbus-auth-script.h \
 	internals/dbus-auth-util.c \
