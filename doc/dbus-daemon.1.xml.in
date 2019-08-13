@@ -282,7 +282,7 @@ DBUS_STARTER_BUS_TYPE environment variable will be set to "session"
 and the DBUS_SESSION_BUS_ADDRESS environment variable will be set
 to the address of the session bus.  Likewise, if the type of the
 message bus is "system", then the DBUS_STARTER_BUS_TYPE environment
-variable will be set to "system" and the DBUS_SESSION_BUS_ADDRESS
+variable will be set to "system" and the DBUS_SYSTEM_BUS_ADDRESS
 environment variable will be set to the address of the system bus
 (which is normally well known anyway).</para>
 
