@@ -85,6 +85,7 @@ TEST_BINARIES               += test-spawn
 endif
 
 uninstallable_test_programs += \
+	test-atomic \
 	test-bus \
 	test-bus-dispatch \
 	test-bus-dispatch-sha1 \
@@ -105,6 +106,9 @@ endif DBUS_UNIX
 
 noinst_PROGRAMS += $(uninstallable_test_programs)
 TESTS += $(uninstallable_test_programs)
+
+test_atomic_SOURCES = internals/atomic.c
+test_atomic_LDADD = libdbus-testutils.la
 
 else !DBUS_ENABLE_EMBEDDED_TESTS
 
