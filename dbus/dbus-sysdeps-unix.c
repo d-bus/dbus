@@ -3072,6 +3072,42 @@ _dbus_atomic_get (DBusAtomic *atomic)
 }
 
 /**
+ * Atomically set the value of an integer to 0.
+ *
+ * @param atomic pointer to the integer to set
+ */
+void
+_dbus_atomic_set_zero (DBusAtomic *atomic)
+{
+#if DBUS_USE_SYNC
+  /* Atomic version of "*atomic &= 0; return *atomic" */
+  __sync_and_and_fetch (&atomic->value, 0);
+#else
+  pthread_mutex_lock (&atomic_mutex);
+  atomic->value = 0;
+  pthread_mutex_unlock (&atomic_mutex);
+#endif
+}
+
+/**
+ * Atomically set the value of an integer to something nonzero.
+ *
+ * @param atomic pointer to the integer to set
+ */
+void
+_dbus_atomic_set_nonzero (DBusAtomic *atomic)
+{
+#if DBUS_USE_SYNC
+  /* Atomic version of "*atomic |= 1; return *atomic" */
+  __sync_or_and_fetch (&atomic->value, 1);
+#else
+  pthread_mutex_lock (&atomic_mutex);
+  atomic->value = 1;
+  pthread_mutex_unlock (&atomic_mutex);
+#endif
+}
+
+/**
  * Wrapper for poll().
  *
  * @param fds the file descriptors to poll

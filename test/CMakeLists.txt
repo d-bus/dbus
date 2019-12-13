@@ -39,6 +39,10 @@ set(test-shell_SOURCES
     shell-test.c
 )
 
+set(test-atomic_SOURCES
+    internals/atomic.c
+)
+
 set(test-spawn_SOURCES
     spawn-test.c
 )
@@ -92,6 +96,7 @@ if(WIN32)
 endif()
 
 if(DBUS_ENABLE_EMBEDDED_TESTS)
+    add_test_executable(test-atomic ${test-atomic_SOURCES} dbus-testutils)
     add_test_executable(test-hash internals/hash.c dbus-testutils)
     set_target_properties(test-hash PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
 

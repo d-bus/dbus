@@ -99,6 +99,7 @@
  */
 
 #ifdef DBUS_ENABLE_EMBEDDED_TESTS
+/* Test-only, does not need to be thread-safe */
 static dbus_bool_t debug_initialized = FALSE;
 static int fail_nth = -1;
 static size_t fail_size = 0;

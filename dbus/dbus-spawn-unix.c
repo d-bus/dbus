@@ -1153,6 +1153,8 @@ check_babysit_events (pid_t grandchild_pid,
     }
 }
 
+/* Only used in a single-threaded child process, does not need to be
+ * thread-safe */
 static int babysit_sigchld_pipe = -1;
 
 static void
