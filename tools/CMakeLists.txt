@@ -48,6 +48,7 @@ set(dbus_launch_SOURCES
      ${dbus_launch_SOURCES}
      dbus-launch-x11.c
 )
+include_directories(${X11_INCLUDE_DIR})
 endif()
 
 set(dbus_cleanup_sockets_SOURCES
