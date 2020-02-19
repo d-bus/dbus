@@ -89,14 +89,18 @@ include_directories(
     ${EXPAT_INCLUDE_DIR}
 )
 
+set(DBUS_DAEMON_SOURCES
+    main.c
+)
+
 if(WIN32)
-    add_executable_version_info(BUS_SOURCES "dbus-daemon")
+    add_executable_version_info(DBUS_DAEMON_SOURCES "dbus-daemon")
 endif()
 
 add_library(dbus-daemon-internal STATIC ${BUS_SOURCES})
 target_link_libraries(dbus-daemon-internal ${DBUS_INTERNAL_LIBRARIES} ${EXPAT_LIBRARIES})
 
-add_executable(dbus-daemon main.c)
+add_executable(dbus-daemon ${DBUS_DAEMON_SOURCES})
 target_link_libraries(dbus-daemon dbus-daemon-internal)
 set_target_properties(dbus-daemon PROPERTIES OUTPUT_NAME ${DBUS_DAEMON_NAME})
 set_target_properties(dbus-daemon PROPERTIES COMPILE_FLAGS ${DBUS_INTERNAL_CLIENT_DEFINITIONS})
