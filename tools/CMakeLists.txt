@@ -97,12 +97,16 @@ endif()
 install(TARGETS dbus-launch ${INSTALL_TARGETS_DEFAULT_ARGS})
 
 if(WIN32)
-    add_executable_version_info(dbus_launch_SOURCES "dbus-monitor")
+    add_executable_version_info(dbus_monitor_SOURCES "dbus-monitor")
 endif()
 
 add_executable(dbus-monitor ${dbus_monitor_SOURCES})
 target_link_libraries(dbus-monitor ${DBUS_LIBRARIES})
 install(TARGETS dbus-monitor ${INSTALL_TARGETS_DEFAULT_ARGS})
+
+if(WIN32)
+    add_executable_version_info(dbus_run_session_SOURCES "dbus-run-session")
+endif()
 
 add_executable(dbus-run-session ${dbus_run_session_SOURCES})
 target_link_libraries(dbus-run-session ${DBUS_INTERNAL_LIBRARIES})
