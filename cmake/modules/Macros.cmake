@@ -194,7 +194,7 @@ endmacro()
 
 macro(add_library_version_info _sources _name)
     set(DBUS_VER_INTERNAL_NAME "${_name}")
-    set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}}${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(DBUS_VER_ORIGINAL_NAME "${DBUS_VER_INTERNAL_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(DBUS_VER_FILE_TYPE "VFT_DLL")
     configure_file(${CMAKE_SOURCE_DIR}/dbus/versioninfo.rc.in ${CMAKE_CURRENT_BINARY_DIR}/versioninfo-${DBUS_VER_INTERNAL_NAME}.rc)
     # version info and uac manifest can be combined in a binary because they use different resource types
