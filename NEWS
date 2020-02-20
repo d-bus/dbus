@@ -1,6 +1,11 @@
 dbus 1.13.14 (UNRELEASED)
 =========================
 
+Enhancements:
+
+• Add a --sender option to dbus-send, which requests a name and holds it
+  until the signal has been sent. (dbus!116, Christopher Morin)
+
 Fixes:
 
 • Fix several test failures if the build-time tests were run as uid 0.
@@ -13,10 +18,30 @@ Fixes:
   message, and processing of the "OK" message is subsequently retried
   when more memory is available (dbus!119, Simon McVittie)
 
+• On Linux with SELinux, don't assume that the system policy has the
+  "dbus" security class or the associated AV
+  (dbus#198, dbus!128; Laurent Bigonville)
+
+• Handle dbus_connection_set_change_sigpipe() in a thread-safe way
+  (dbus!132; Simon McVittie, Ralf Habacker)
+
+• When building with CMake, cope with libX11 in a non-standard location
+  (dbus!129, Tuomo Rinne)
+
+• On Windows with verbose mode enabled and outputting to the debug port,
+  use a dynamically-allocated buffer to avoid potential stack buffer
+  overflows in long messages (dbus#45, dbus!133; Ralf Habacker)
+
 • The dbus-send(1) man page now documents --bus and --peer instead of
   the old --address synonym for --peer, which has been deprecated since
   the introduction of --bus and --peer in 1.7.6
   (fd.o #48816, dbus!115; Chris Morin)
+
+• Fix a wrong environment variable name in dbus-daemon(1)
+  (dbus#275, dbus!122; Mubin, Philip Withnall)
+
+• Fix formatting of dbus_message_append_args example
+  (dbus!126, Felipe Franciosi)
 
 Internal changes:
 
@@ -25,6 +50,9 @@ Internal changes:
 
 • Improve diagnostics if memory or fd leaks are detected
   (dbus!118, dbus!120; Simon McVittie)
+
+• On Windows, improve embedded version information
+  (dbus!136, dbus!138, dbus!139; Ralf Habacker)
 
 dbus 1.13.12 (2019-06-11)
 =========================
