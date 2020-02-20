@@ -119,6 +119,7 @@ DBUS_PRIVATE_EXPORT
 dbus_bool_t _dbus_get_verbose (void);
 DBUS_PRIVATE_EXPORT
 void _dbus_set_verbose (dbus_bool_t state);
+void _dbus_verbose_raw (const char *s);
 
 #  define _dbus_verbose_reset _dbus_verbose_reset_real
 #  define _dbus_is_verbose _dbus_is_verbose_real
