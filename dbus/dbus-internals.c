@@ -382,6 +382,30 @@ dbus_bool_t _dbus_get_verbose (void)
 }
 
 /**
+ * Low-level function for displaying a string
+ * for the predefined output channel, which
+ * can be the Windows debug output port or stderr.
+ *
+ * This function must be used instead of
+ * dbus_verbose(), if a dynamic memory request
+ * cannot be used to avoid recursive call loops.
+ *
+ * @param s string to display
+ */
+void
+_dbus_verbose_raw (const char *s)
+{
+  if (!_dbus_is_verbose_real ())
+    return;
+#ifdef DBUS_USE_OUTPUT_DEBUG_STRING
+  OutputDebugStringA (s);
+#else
+  fputs (s, stderr);
+  fflush (stderr);
+#endif
+}
+
+/**
  * Prints a warning message to stderr
  * if the user has enabled verbose mode.
  * This is the real function implementation,
@@ -429,16 +453,37 @@ _dbus_verbose_real (
     need_pid = FALSE;
 
   va_start (args, format);
+
 #ifdef DBUS_USE_OUTPUT_DEBUG_STRING
   {
-  char buf[1024];
-  strcpy(buf,module_name);
+    DBusString out = _DBUS_STRING_INIT_INVALID;
+    const char *message = NULL;
+
+    if (!_dbus_string_init (&out))
+      goto out;
+
+    if (!_dbus_string_append (&out, module_name))
+      goto out;
+
 #ifdef DBUS_CPP_SUPPORTS_VARIABLE_MACRO_ARGUMENTS
-  sprintf (buf+strlen(buf), "[%s(%d):%s] ",_dbus_file_path_extract_elements_from_tail(file,2),line,function);
+    if (!_dbus_string_append_printf (&out, "[%s(%d):%s] ", _dbus_file_path_extract_elements_from_tail (file, 2), line, function))
+      goto out;
 #endif
-  vsprintf (buf+strlen(buf),format, args);
-  va_end (args);
-  OutputDebugStringA(buf);
+    if (!_dbus_string_append_printf_valist (&out, format, args))
+      goto out;
+    message = _dbus_string_get_const_data (&out);
+out:
+    if (message == NULL)
+      {
+        OutputDebugStringA ("Out of memory while formatting verbose message: '");
+        OutputDebugStringA (format);
+        OutputDebugStringA ("'");
+      }
+    else
+      {
+        OutputDebugStringA (message);
+      }
+    _dbus_string_free (&out);
   }
 #else
 #ifdef DBUS_CPP_SUPPORTS_VARIABLE_MACRO_ARGUMENTS
@@ -446,10 +491,10 @@ _dbus_verbose_real (
 #endif
 
   vfprintf (stderr, format, args);
-  va_end (args);
-
   fflush (stderr);
 #endif
+
+  va_end (args);
 }
 
 /**
