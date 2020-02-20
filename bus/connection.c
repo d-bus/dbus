@@ -537,9 +537,6 @@ bus_connections_unref (BusConnections *connections)
 
       _dbus_assert (connections->n_incomplete == 0);
 
-      /* drop all monitors */
-      _dbus_list_clear (&connections->monitors);
-
       /* drop all real connections */
       while (connections->completed != NULL)
         {
@@ -554,6 +551,10 @@ bus_connections_unref (BusConnections *connections)
         }
 
       _dbus_assert (connections->n_completed == 0);
+
+      /* disconnecting all the connections should have emptied the list of
+       * monitors (each link is removed in bus_connection_disconnected) */
+      _dbus_assert (connections->monitors == NULL);
 
       bus_expire_list_free (connections->pending_replies);
       
