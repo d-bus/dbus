@@ -1578,6 +1578,7 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
 
           if (connect_error == NULL)
             {
+              freeaddrinfo(ai);
               _DBUS_SET_OOM (error);
               goto out;
             }
@@ -1592,6 +1593,7 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
             {
               dbus_error_free (connect_error);
               dbus_free (connect_error);
+              freeaddrinfo(ai);
               _DBUS_SET_OOM (error);
               goto out;
             }
