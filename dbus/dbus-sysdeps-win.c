@@ -1509,7 +1509,8 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
   DBusSocket fd = DBUS_SOCKET_INIT;
   int res;
   struct addrinfo hints;
-  struct addrinfo *ai, *tmp;
+  struct addrinfo *ai = NULL;
+  const struct addrinfo *tmp;
   DBusError *connect_error;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR (error);
@@ -1562,7 +1563,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
                           _dbus_error_from_errno (saved_errno),
                           "Failed to open socket: %s",
                           _dbus_strerror (saved_errno));
-          freeaddrinfo(ai);
           _dbus_socket_invalidate (&fd);
           goto out;
         }
@@ -1578,7 +1578,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
 
           if (connect_error == NULL)
             {
-              freeaddrinfo(ai);
               _DBUS_SET_OOM (error);
               goto out;
             }
@@ -1593,7 +1592,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
             {
               dbus_error_free (connect_error);
               dbus_free (connect_error);
-              freeaddrinfo(ai);
               _DBUS_SET_OOM (error);
               goto out;
             }
@@ -1604,7 +1602,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
 
       break;
     }
-  freeaddrinfo(ai);
 
   if (!_dbus_socket_is_valid (fd))
     {
@@ -1639,6 +1636,9 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
     }
 
 out:
+  if (ai != NULL)
+    freeaddrinfo (ai);
+
   while ((connect_error = _dbus_list_pop_first (&connect_errors)))
     {
       dbus_error_free (connect_error);
