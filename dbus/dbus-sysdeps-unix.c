@@ -1411,7 +1411,8 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
   DBusSocket fd = DBUS_SOCKET_INIT;
   int res;
   struct addrinfo hints;
-  struct addrinfo *ai, *tmp;
+  struct addrinfo *ai = NULL;
+  const struct addrinfo *tmp;
   DBusError *connect_error;
 
   _DBUS_ASSERT_ERROR_IS_CLEAR(error);
@@ -1450,7 +1451,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
     {
       if (!_dbus_open_socket (&fd.fd, tmp->ai_family, SOCK_STREAM, 0, error))
         {
-          freeaddrinfo(ai);
           _DBUS_ASSERT_ERROR_IS_SET(error);
           _dbus_socket_invalidate (&fd);
           goto out;
@@ -1491,7 +1491,6 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
 
       break;
     }
-  freeaddrinfo(ai);
 
   if (!_dbus_socket_is_valid (fd))
     {
@@ -1523,6 +1522,9 @@ _dbus_connect_tcp_socket_with_nonce (const char     *host,
     }
 
 out:
+  if (ai != NULL)
+    freeaddrinfo (ai);
+
   while ((connect_error = _dbus_list_pop_first (&connect_errors)))
     {
       dbus_error_free (connect_error);
