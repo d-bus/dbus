@@ -680,52 +680,7 @@ case $host_os in
        CFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS" ;;
 esac
 
-# checking for a posix version of getpwnam_r
-# if we are cross compiling and can not run the test
-# assume getpwnam_r is the posix version
-# it is up to the person cross compiling to change
-# this behavior if desired
-AC_LANG_PUSH(C)
-AC_CACHE_CHECK([for posix getpwnam_r],
-		ac_cv_func_posix_getpwnam_r,
-		[AC_RUN_IFELSE([AC_LANG_PROGRAM(
-[[
-#include <errno.h>
-#include <pwd.h>
-]],
-[[
-    char buffer[10000];
-    struct passwd pwd, *pwptr = &pwd;
-    int error;
-    errno = 0;
-    error = getpwnam_r ("", &pwd, buffer,
-                        sizeof (buffer), &pwptr);
-   return (error < 0 && errno == ENOSYS)
-	   || error == ENOSYS;
-]])],
-	[ac_cv_func_posix_getpwnam_r=yes],
-	[ac_cv_func_posix_getpwnam_r=no],
-        [ac_cv_func_posix_getpwnam_r=yes]
-)])
-AC_LANG_POP(C)
-
-if test "$ac_cv_func_posix_getpwnam_r" = yes; then
-        AC_DEFINE(HAVE_POSIX_GETPWNAM_R,1,
-                [Have POSIX function getpwnam_r])
-else
-        AC_CACHE_CHECK([for nonposix getpwnam_r],
-                ac_cv_func_nonposix_getpwnam_r,
-                [AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <pwd.h>]], [[char buffer[10000];
-                        struct passwd pwd;
-                        getpwnam_r ("", &pwd, buffer,
-                                        sizeof (buffer));]])],
-                        [ac_cv_func_nonposix_getpwnam_r=yes],
-                        [ac_cv_func_nonposix_getpwnam_r=no])])
-                if test "$ac_cv_func_nonposix_getpwnam_r" = yes; then
-                AC_DEFINE(HAVE_NONPOSIX_GETPWNAM_R,1,
-                        [Have non-POSIX function getpwnam_r])
-        fi
-fi
+AC_CHECK_FUNCS_ONCE([getpwnam_r])
 
 dnl check for socklen_t
 AC_MSG_CHECKING(whether socklen_t is defined)

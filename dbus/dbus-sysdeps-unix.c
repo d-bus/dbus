@@ -2656,7 +2656,7 @@ fill_user_info (DBusUserInfo       *info,
    * checks
    */
 
-#if defined (HAVE_POSIX_GETPWNAM_R) || defined (HAVE_NONPOSIX_GETPWNAM_R)
+#ifdef HAVE_GETPWNAM_R
   {
     struct passwd *p;
     int result;
@@ -2685,20 +2685,12 @@ fill_user_info (DBusUserInfo       *info,
           }
 
         p = NULL;
-#ifdef HAVE_POSIX_GETPWNAM_R
         if (uid != DBUS_UID_UNSET)
           result = getpwuid_r (uid, &p_str, buf, buflen,
                                &p);
         else
           result = getpwnam_r (username_c, &p_str, buf, buflen,
                                &p);
-#else
-        if (uid != DBUS_UID_UNSET)
-          p = getpwuid_r (uid, &p_str, buf, buflen);
-        else
-          p = getpwnam_r (username_c, &p_str, buf, buflen);
-        result = 0;
-#endif /* !HAVE_POSIX_GETPWNAM_R */
         //Try a bigger buffer if ERANGE was returned
         if (result == ERANGE && buflen < 512 * 1024)
           {
@@ -2733,6 +2725,8 @@ fill_user_info (DBusUserInfo       *info,
   {
     /* I guess we're screwed on thread safety here */
     struct passwd *p;
+
+#warning getpwnam_r() not available, please report this to the dbus maintainers with details of your OS
 
     if (uid != DBUS_UID_UNSET)
       p = getpwuid (uid);
