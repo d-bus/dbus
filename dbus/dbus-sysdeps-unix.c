@@ -80,6 +80,9 @@
 #ifdef HAVE_ALLOCA_H
 #include <alloca.h>
 #endif
+#ifdef HAVE_SYS_RANDOM_H
+#include <sys/random.h>
+#endif
 
 #ifdef HAVE_ADT
 #include <bsm/adt.h>
@@ -3385,12 +3388,26 @@ _dbus_generate_random_bytes (DBusString *str,
                              int         n_bytes,
                              DBusError  *error)
 {
-  int old_len;
+  int old_len = _dbus_string_get_length (str);
   int fd;
   int result;
+#ifdef HAVE_GETRANDOM
+  char *buffer;
 
-  old_len = _dbus_string_get_length (str);
-  fd = -1;
+  if (!_dbus_string_lengthen (str, n_bytes))
+    {
+      _DBUS_SET_OOM (error);
+      return FALSE;
+    }
+
+  buffer = _dbus_string_get_data_len (str, old_len, n_bytes);
+  result = getrandom (buffer, n_bytes, GRND_NONBLOCK);
+
+  if (result == n_bytes)
+    return TRUE;
+
+  _dbus_string_set_length (str, old_len);
+#endif
 
   /* note, urandom on linux will fall back to pseudorandom */
   fd = open ("/dev/urandom", O_RDONLY);

@@ -205,6 +205,8 @@ case "$ci_buildsys" in
                 # armel, is one architecture that really
                 # doesn't have them)
                 set "$@" dbus_cv_sync_sub_and_fetch=no
+		# Disable getrandom syscall
+                set "$@" ac_cv_func_getrandom=no
                 # No epoll, kqueue or poll (we will fall back
                 # to select, even on Unix where we would
                 # usually at least have poll)
