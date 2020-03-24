@@ -68,9 +68,6 @@
 #ifdef HAVE_WRITEV
 #include <sys/uio.h>
 #endif
-#ifdef HAVE_POLL
-#include <sys/poll.h>
-#endif
 #ifdef HAVE_BACKTRACE
 #include <execinfo.h>
 #endif

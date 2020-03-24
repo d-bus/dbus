@@ -115,7 +115,7 @@
 
 #cmakedefine HAVE_MEMORY_H 1
 
-/* Define to 1 if you have sys/poll.h */
+/* Define to 1 if you have poll */
 #cmakedefine    HAVE_POLL 1
 
 /* Define to 1 if you have signal.h */
