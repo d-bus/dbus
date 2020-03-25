@@ -1677,13 +1677,13 @@ bus_context_check_security_policy (BusContext     *context,
        * go on with the standard checks.
        */
       if (!bus_selinux_allows_send (sender, proposed_recipient,
-				    dbus_message_type_to_string (dbus_message_get_type (message)),
-				    dbus_message_get_interface (message),
-				    dbus_message_get_member (message),
-				    dbus_message_get_error_name (message),
-				    dest ? dest : DBUS_SERVICE_DBUS,
-				    activation_entry,
-				    error))
+                                    dbus_message_type_to_string (dbus_message_get_type (message)),
+                                    dbus_message_get_interface (message),
+                                    dbus_message_get_member (message),
+                                    dbus_message_get_error_name (message),
+                                    dest ? dest : DBUS_SERVICE_DBUS,
+                                    activation_entry,
+                                    error))
         {
           if (error != NULL && !dbus_error_is_set (error))
             {
