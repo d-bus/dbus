@@ -386,6 +386,7 @@ fpathconf
 getgrouplist
 getpeereid
 getpeerucred
+getrandom
 getresuid
 getrlimit
 inotify_init1
@@ -421,6 +422,7 @@ locale.h
 signal.h
 stdint.h
 sys/prctl.h
+sys/random.h
 sys/resource.h
 sys/syslimits.h
 sys/time.h

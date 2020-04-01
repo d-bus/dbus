@@ -135,6 +135,7 @@
 #cmakedefine HAVE_SYS_EVENTS_H 1
 #cmakedefine HAVE_SYS_INOTIFY_H 1
 #cmakedefine HAVE_SYS_PRCTL_H 1
+#cmakedefine HAVE_SYS_RANDOM_H 1
 #cmakedefine HAVE_SYS_RESOURCE_H 1
 #cmakedefine HAVE_SYS_STAT_H 1
 
@@ -218,6 +219,7 @@
 #cmakedefine HAVE_DDFD 1
 
 #cmakedefine HAVE_INOTIFY_INIT1 1
+#cmakedefine HAVE_GETRANDOM 1
 #cmakedefine HAVE_GETRLIMIT 1
 #cmakedefine HAVE_PRCTL 1
 #cmakedefine HAVE_PRLIMIT 1
