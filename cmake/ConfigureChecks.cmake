@@ -33,7 +33,6 @@ check_include_file(sys/resource.h     HAVE_SYS_RESOURCE_H)
 check_include_file(sys/stat.h     HAVE_SYS_STAT_H)
 check_include_file(sys/types.h     HAVE_SYS_TYPES_H)
 check_include_file(sys/uio.h     HAVE_SYS_UIO_H)
-check_include_file(sys/poll.h   HAVE_POLL)      # dbus-sysdeps.c, dbus-sysdeps-win.c
 check_include_file(sys/prctl.h  HAVE_SYS_PRCTL_H)
 check_include_file(sys/syslimits.h    HAVE_SYS_SYSLIMITS_H)   # dbus-sysdeps-unix.c
 check_include_file(sys/time.h   HAVE_SYS_TIME_H)# dbus-sysdeps-win.c
@@ -56,6 +55,7 @@ check_symbol_exists(setrlimit    "sys/resource.h"   HAVE_SETRLIMIT)          #  
 check_symbol_exists(socketpair   "sys/socket.h"     HAVE_SOCKETPAIR)         #  dbus-sysdeps.c
 check_symbol_exists(setlocale    "locale.h"         HAVE_SETLOCALE)          #  dbus-test-main.c
 check_symbol_exists(localeconv   "locale.h"         HAVE_LOCALECONV)         #  dbus-sysdeps.c
+check_symbol_exists(poll         "poll.h"           HAVE_POLL)               #  dbus-sysdeps-unix.c
 check_symbol_exists(strtoll      "stdlib.h"         HAVE_STRTOLL)            #  dbus-send.c
 check_symbol_exists(strtoull     "stdlib.h"         HAVE_STRTOULL)           #  dbus-send.c
 set(CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
