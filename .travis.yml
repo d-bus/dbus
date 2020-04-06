@@ -37,7 +37,6 @@ env:
   - ci_host=i686-w64-mingw32 ci_buildsys=cmake ci_variant=debug
   - ci_host=x86_64-w64-mingw32 ci_variant=debug
   - ci_host=x86_64-w64-mingw32 ci_buildsys=cmake
-  - ci_docker=debian:jessie-slim ci_distro=debian ci_suite=jessie
   - ci_docker=debian:stretch-slim ci_distro=debian ci_suite=stretch
   - ci_docker=debian:buster-slim ci_distro=debian ci_suite=buster
 

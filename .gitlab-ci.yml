@@ -118,14 +118,6 @@ build:x86_64-w64-mingw32-cmake-debug:
     ci_variant: "debug"
   script: *script
 
-build:jessie:
-  when: manual
-  stage: build
-  image: "debian:jessie-slim"
-  variables:
-    ci_suite: "jessie"
-  script: *script
-
 build:stretch:
   when: manual
   stage: build
