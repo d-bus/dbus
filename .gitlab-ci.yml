@@ -20,7 +20,7 @@
 # CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-image: debian:stretch-slim
+image: debian:buster-slim
 
 stages:
   - build
@@ -44,11 +44,11 @@ variables:
   ci_parallel: "2"
   ci_sudo: "yes"
   ci_distro: "debian"
-  ci_suite: "stretch"
+  ci_suite: "buster"
 
 build:production:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_variant: "production"
   script: &script
@@ -57,7 +57,7 @@ build:production:
 
 build:debug:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_variant: "debug"
   script: *script
@@ -65,7 +65,7 @@ build:debug:
 build:reduced:
   stage: build
   when: manual
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_variant: "reduced"
   script: *script
@@ -73,21 +73,21 @@ build:reduced:
 build:legacy:
   stage: build
   when: manual
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_variant: "legacy"
   script: *script
 
 build:cmake:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_buildsys: "cmake-dist"
   script: *script
 
 build:i686-w64-mingw32-debug:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_host: "i686-w64-mingw32"
     ci_variant: "debug"
@@ -96,7 +96,7 @@ build:i686-w64-mingw32-debug:
 build:i686-w64-mingw32-cmake:
   stage: build
   when: manual
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_buildsys: "cmake"
     ci_host: "i686-w64-mingw32"
@@ -104,14 +104,14 @@ build:i686-w64-mingw32-cmake:
 
 build:x86_64-w64-mingw32:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_host: "i686-w64-mingw32"
   script: *script
 
 build:x86_64-w64-mingw32-cmake-debug:
   stage: build
-  image: "debian:stretch-slim"
+  image: "debian:buster-slim"
   variables:
     ci_buildsys: "cmake"
     ci_host: "i686-w64-mingw32"
@@ -126,12 +126,12 @@ build:jessie:
     ci_suite: "jessie"
   script: *script
 
-build:buster:
+build:stretch:
   when: manual
   stage: build
-  image: "debian:buster-slim"
+  image: "debian:stretch-slim"
   variables:
-    ci_suite: "buster"
+    ci_suite: "stretch"
   script: *script
 
 build:xenial:
