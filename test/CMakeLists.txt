@@ -92,7 +92,7 @@ add_helper_executable(test-sleep-forever ${test-sleep-forever_SOURCES} ${DBUS_IN
 add_helper_executable(manual-tcp ${manual-tcp_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
 add_helper_executable(manual-backtrace manual-backtrace.c dbus-1)
 if(WIN32)
-    add_helper_executable(manual-paths ${manual-paths_SOURCES} ${DBUS_INTERNAL_LIBRARIES})
+    add_helper_executable(manual-paths ${manual-paths_SOURCES} dbus-testutils)
 endif()
 
 if(DBUS_ENABLE_EMBEDDED_TESTS)

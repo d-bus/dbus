@@ -698,7 +698,7 @@ _dbus_server_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
         {
           _dbus_warn ("server listen error: %s: %s", error.name, error.message);
           dbus_error_free (&error);
-          _dbus_assert_not_reached ("Failed to listen for valid address.");
+          _dbus_test_fatal ("Failed to listen for valid address.");
         }
 
       id = dbus_server_get_id (server);
@@ -710,7 +710,7 @@ _dbus_server_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
         {
           _dbus_warn ("server id '%s' is not in the server address '%s'",
                       id, address);
-          _dbus_assert_not_reached ("bad server id or address");
+          _dbus_test_fatal ("bad server id or address");
         }
 
       dbus_free (id);

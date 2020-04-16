@@ -175,7 +175,7 @@ manual_dir_iter_SOURCES = manual-dir-iter.c
 manual_dir_iter_LDADD = $(top_builddir)/dbus/libdbus-internal.la
 
 manual_paths_SOURCES = manual-paths.c
-manual_paths_LDADD = $(top_builddir)/dbus/libdbus-internal.la
+manual_paths_LDADD = libdbus-testutils.la
 
 manual_tcp_SOURCES = manual-tcp.c
 manual_tcp_LDADD = $(top_builddir)/dbus/libdbus-internal.la
