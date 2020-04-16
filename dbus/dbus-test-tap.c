@@ -35,8 +35,6 @@
  * will not be explained here.
  */
 
-#ifdef DBUS_ENABLE_EMBEDDED_TESTS
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -166,6 +164,7 @@ _dbus_test_skip (const char *format,
 void
 _dbus_test_check_memleaks (const char *test_name)
 {
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
   dbus_shutdown ();
 
   if (_dbus_get_malloc_blocks_outstanding () == 0)
@@ -180,6 +179,12 @@ _dbus_test_check_memleaks (const char *test_name)
           _dbus_get_malloc_blocks_outstanding ());
       failures++;
     }
+#else
+  _dbus_test_skip (
+      "unable to determine whether %s leaked memory (not compiled "
+      "with memory instrumentation)",
+      test_name);
+#endif
 }
 
 /*
@@ -202,5 +207,3 @@ _dbus_test_done_testing (void)
 
   return 1;
 }
-
-#endif

@@ -54,9 +54,7 @@
 #endif
 
 #include "dbus/dbus-message-internal.h"
-#include "dbus/dbus-test-tap.h"
 
-#ifdef DBUS_ENABLE_EMBEDDED_TESTS
 /*
  * Like strdup(), but crash on out-of-memory, and pass through NULL
  * unchanged (the "0" in the name is meant to be a mnemonic for this,
@@ -77,7 +75,6 @@ strdup0_or_die (const char *str)
 
   return ret;
 }
-#endif
 
 typedef struct
 {
@@ -468,8 +465,6 @@ test_pending_call_store_reply (DBusPendingCall *pc,
   _dbus_assert (*message_p != NULL);
 }
 
-#ifdef DBUS_ENABLE_EMBEDDED_TESTS
-
 #ifdef DBUS_UNIX
 
 /*
@@ -785,4 +780,11 @@ _dbus_test_main (int                  argc,
   return _dbus_test_done_testing ();
 }
 
+/* If embedded tests are enabled, the TAP helpers have to be in the
+ * shared library because some of the embedded tests call them. If not,
+ * implement them here. We #include the file here instead of adding it
+ * to SOURCES because Automake versions older than 1.16 can't cope with
+ * expanding directory variables in SOURCES when using subdir-objects. */
+#ifndef DBUS_ENABLE_EMBEDDED_TESTS
+#include "dbus/dbus-test-tap.c"
 #endif
