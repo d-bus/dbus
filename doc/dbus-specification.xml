@@ -1179,7 +1179,7 @@
                          0x00             <lineannotation>trailing nul</lineannotation>
 
                                0x00 0x00  <lineannotation>2 bytes of padding to reach next multiple of 4</lineannotation>
-0x03 0x00 0x00 0x00                       <lineannotation>length of ‘bar’ = 1</lineannotation>
+0x03 0x00 0x00 0x00                       <lineannotation>length of ‘bar’ = 3</lineannotation>
                     0x62 0x61 0x72        <lineannotation>‘bar’</lineannotation>
                                     0x00  <lineannotation>trailing nul</lineannotation>
         </screen>
