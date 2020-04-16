@@ -59,7 +59,10 @@ void _dbus_test_check_memleaks (const char *test_name);
 DBUS_PRIVATE_EXPORT
 int _dbus_test_done_testing (void);
 
-#define _dbus_test_check(a) if (!(a)) _dbus_test_not_ok ("%s:%d - '%s' failed\n", __FILE__, __LINE__, #a)
+#define _dbus_test_check(a) do { \
+    if (!(a)) \
+      _dbus_test_not_ok ("%s:%d - '%s' failed\n", __FILE__, __LINE__, #a); \
+  } while (0)
 
 #endif
 
