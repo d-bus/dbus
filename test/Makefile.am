@@ -85,14 +85,11 @@ TEST_BINARIES               += test-spawn
 endif
 
 uninstallable_test_programs += \
-	test-atomic \
 	test-bus \
 	test-bus-dispatch \
 	test-bus-dispatch-sha1 \
-	test-hash \
 	test-marshal-recursive \
 	test-message-internals \
-	test-misc-internals \
 	$(NULL)
 
 if DBUS_UNIX
@@ -107,14 +104,14 @@ endif DBUS_UNIX
 noinst_PROGRAMS += $(uninstallable_test_programs)
 TESTS += $(uninstallable_test_programs)
 
-test_atomic_SOURCES = internals/atomic.c
-test_atomic_LDADD = libdbus-testutils.la
-
 else !DBUS_ENABLE_EMBEDDED_TESTS
 
 TEST_BINARIES=
 
 endif !DBUS_ENABLE_EMBEDDED_TESTS
+
+test_atomic_SOURCES = internals/atomic.c
+test_atomic_LDADD = libdbus-testutils.la
 
 noinst_PROGRAMS += $(TEST_BINARIES)
 
@@ -273,7 +270,10 @@ installable_helpers = \
 	test-sleep-forever \
 	$(NULL)
 installable_tests = \
+	test-atomic \
+	test-hash \
 	test-shell \
+	test-misc-internals \
 	test-printf \
 	$(NULL)
 installable_manual_tests = \

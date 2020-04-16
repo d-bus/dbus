@@ -26,6 +26,8 @@
 #include <config.h>
 #include "misc-internals.h"
 
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
+
 #include <stdio.h>
 #include <string.h>
 
@@ -489,3 +491,5 @@ _dbus_sha_test (const char *test_data_dir)
 
   return TRUE;
 }
+
+#endif

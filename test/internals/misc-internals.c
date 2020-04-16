@@ -895,6 +895,7 @@ _dbus_signature_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 }
 
 #ifdef DBUS_UNIX
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
 static dbus_bool_t
 _dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 {
@@ -919,6 +920,7 @@ _dbus_transport_unix_test (const char *test_data_dir _DBUS_GNUC_UNUSED)
 
   return ret;
 }
+#endif
 
 /**
  * Unit test for dbus-userdb.c.
@@ -972,28 +974,33 @@ _dbus_userdb_test (const char *test_data_dir)
 
 static DBusTestCase tests[] =
 {
-  { "string", _dbus_string_test },
-  { "sysdeps", _dbus_sysdeps_test },
-  { "data-slot", _dbus_data_slot_test },
   { "misc", _dbus_misc_test },
   { "address", _dbus_address_test },
   { "server", _dbus_server_test },
-  { "object-tree", _dbus_object_tree_test },
   { "signature", _dbus_signature_test },
-  { "marshalling", _dbus_marshal_test },
-  { "byteswap", _dbus_marshal_byteswap_test },
-  { "memory", _dbus_memory_test },
   { "mem-pool", _dbus_mem_pool_test },
   { "list", _dbus_list_test },
-  { "marshal-validate", _dbus_marshal_validate_test },
-  { "credentials", _dbus_credentials_test },
-  { "keyring", _dbus_keyring_test },
-  { "sha", _dbus_sha_test },
+
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
   { "auth", _dbus_auth_test },
+  { "byteswap", _dbus_marshal_byteswap_test },
+  { "credentials", _dbus_credentials_test },
+  { "data-slot", _dbus_data_slot_test },
+  { "keyring", _dbus_keyring_test },
+  { "marshal-validate", _dbus_marshal_validate_test },
+  { "marshalling", _dbus_marshal_test },
+  { "memory", _dbus_memory_test },
+  { "object-tree", _dbus_object_tree_test },
+  { "sha", _dbus_sha_test },
+  { "string", _dbus_string_test },
+  { "sysdeps", _dbus_sysdeps_test },
+#endif
 
 #if defined(DBUS_UNIX)
   { "userdb", _dbus_userdb_test },
+#ifdef DBUS_ENABLE_EMBEDDED_TESTS
   { "transport-unix", _dbus_transport_unix_test },
+#endif
 #endif
 
   { NULL }
