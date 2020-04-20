@@ -1,12 +1,28 @@
 dbus 1.13.14 (UNRELEASED)
 =========================
 
+Dependencies:
+
+• On Unix platforms, if getpwnam_r() and getgrnam_r() are implemented,
+  they must be POSIX-conformant. The non-POSIX signature seen in ancient
+  Solaris versions will no longer work. (dbus!11, Simon McVittie)
+
 Enhancements:
+
+• D-Bus Specification 0.35:
+  · Fix a typo in an annotated hexdump of part of a message
+    (dbus!152, Zygmunt Krynicki)
+
+• On Linux, use getrandom(2) in preference to /dev/urandom
+  (dbus!147, Natanael Copa)
 
 • Add a --sender option to dbus-send, which requests a name and holds it
   until the signal has been sent. (dbus!116, Christopher Morin)
 
 Fixes:
+
+• Fix a crash when the dbus-daemon is terminated while one or more
+  monitors are active (dbus#291, dbus!140; Simon McVittie)
 
 • Fix several test failures if the build-time tests were run as uid 0.
   Note that running the tests with elevated privileges is likely to be
@@ -18,12 +34,19 @@ Fixes:
   message, and processing of the "OK" message is subsequently retried
   when more memory is available (dbus!119, Simon McVittie)
 
+• Don't leak struct addrinfo if we run out of memory during a TCP
+  connect()
+  (dbus!143, dbus!144, Coverity CID 354880; Ralf Habacker, Simon McVittie)
+
 • On Linux with SELinux, don't assume that the system policy has the
   "dbus" security class or the associated AV
   (dbus#198, dbus!128; Laurent Bigonville)
 
 • Handle dbus_connection_set_change_sigpipe() in a thread-safe way
   (dbus!132; Simon McVittie, Ralf Habacker)
+
+• On Unix, use POSIX <poll.h> in preference to <sys/poll.h>
+  (dbus!148, Natanael Copa)
 
 • When building with CMake, cope with libX11 in a non-standard location
   (dbus!129, Tuomo Rinne)
@@ -46,13 +69,18 @@ Fixes:
 Internal changes:
 
 • Move more test-only code from dbus/ to tests/
-  (dbus!120, dbus!121; Simon McVittie)
+  (dbus!120, dbus!121, dbus!153; Simon McVittie)
 
 • Improve diagnostics if memory or fd leaks are detected
   (dbus!118, dbus!120; Simon McVittie)
 
+• Move from Debian 9 to Debian 10 for most continuous integration jobs
+  (dbus!151, Simon McVittie)
+
 • On Windows, improve embedded version information
   (dbus!136, dbus!138, dbus!139; Ralf Habacker)
+
+• Indentation fixes (dbus!149, Taras Zaporozhets)
 
 dbus 1.13.12 (2019-06-11)
 =========================
