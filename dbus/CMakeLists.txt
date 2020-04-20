@@ -125,7 +125,6 @@ set(DBUS_SHARED_SOURCES
     dbus-string.c
     dbus-sysdeps.c
     dbus-pipe.c
-    dbus-test-tap.c
 )
 
 set(DBUS_SHARED_HEADERS
@@ -140,8 +139,13 @@ set(DBUS_SHARED_HEADERS
     dbus-string-private.h
     dbus-pipe.h
     dbus-sysdeps.h
-    dbus-test-tap.h
 )
+
+if(DBUS_ENABLE_EMBEDDED_TESTS)
+    set(DBUS_SHARED_SOURCES ${DBUS_SHARED_SOURCES} dbus-test-tap.c)
+    set(DBUS_SHARED_HEADERS ${DBUS_SHARED_HEADERS} dbus-test-tap.h)
+    # ... else they are in the test library instead
+endif()
 
 ### source code that is generic utility functionality used
 ### by the bus daemon or test apps, but is NOT included

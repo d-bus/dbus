@@ -38,6 +38,8 @@
 #include <dbus/dbus-internals.h>
 #include <dbus/dbus-types.h>
 
+#include "dbus/dbus-test-tap.h"
+
 typedef DBusLoop TestMainContext;
 
 _DBUS_WARN_UNUSED_RESULT
