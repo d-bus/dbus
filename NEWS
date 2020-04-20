@@ -6,6 +6,17 @@ Fixes:
 • Fix a crash when the dbus-daemon is terminated while one or more
   monitors are active (dbus#291, dbus!140; Simon McVittie)
 
+• The dbus-send(1) man page now documents --bus and --peer instead of
+  the old --address synonym for --peer, which has been deprecated since
+  the introduction of --bus and --peer in 1.7.6
+  (fd.o #48816, dbus!115; Chris Morin)
+
+• Fix a wrong environment variable name in dbus-daemon(1)
+  (dbus#275, dbus!122; Mubin, Philip Withnall)
+
+• When building with CMake, cope with libX11 in a non-standard location
+  (dbus!129, Tuomo Rinne)
+
 dbus 1.12.16 (2019-06-11)
 =========================
 
