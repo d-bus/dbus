@@ -1,7 +1,10 @@
 dbus 1.12.18 (UNRELEASED)
 =========================
 
-...
+Fixes:
+
+• Fix a crash when the dbus-daemon is terminated while one or more
+  monitors are active (dbus#291, dbus!140; Simon McVittie)
 
 dbus 1.12.16 (2019-06-11)
 =========================
