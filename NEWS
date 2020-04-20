@@ -14,6 +14,9 @@ Fixes:
 • Fix a wrong environment variable name in dbus-daemon(1)
   (dbus#275, dbus!122; Mubin, Philip Withnall)
 
+• Fix formatting of dbus_message_append_args example
+  (dbus!126, Felipe Franciosi)
+
 • When building with CMake, cope with libX11 in a non-standard location
   (dbus!129, Tuomo Rinne)
 
