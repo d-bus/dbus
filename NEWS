@@ -1,5 +1,7 @@
-dbus 1.13.14 (UNRELEASED)
+dbus 1.13.14 (2020-04-21)
 =========================
+
+The “mystery allium” release.
 
 Dependencies:
 
@@ -9,7 +11,7 @@ Dependencies:
 
 Enhancements:
 
-• D-Bus Specification 0.35:
+• D-Bus Specification 0.36:
   · Fix a typo in an annotated hexdump of part of a message
     (dbus!152, Zygmunt Krynicki)
 
